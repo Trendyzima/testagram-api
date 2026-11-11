@@ -31,3 +31,38 @@ test("rejects protocol-relative paths", async () => {
   const client = new TestagramApiClient({ baseUrl: "https://api.testagram.site" });
   await assert.rejects(() => client.get("//evil.example/path"), /absolute path/);
 });
+
+test("creates a main-feed post with the required idempotency header", async () => {
+  const client = new TestagramApiClient({
+    baseUrl: "https://api.testagram.site",
+    getAccessToken: () => "test-jwt",
+    fetch: async (url, init) => {
+      assert.equal(String(url), "https://api.testagram.site/api/social/posts");
+      assert.equal(new Headers(init.headers).get("idempotency-key"), "post-key-0001");
+      assert.deepEqual(JSON.parse(String(init.body)), {
+        content: "Hello Testagram",
+        visibility: "public",
+      });
+      return new Response(JSON.stringify({ ok: true, data: { id: "post-1" } }), { status: 201 });
+    },
+  });
+  const result = await client.createPost({
+    content: "Hello Testagram",
+    visibility: "public",
+    idempotencyKey: "post-key-0001",
+  });
+  assert.deepEqual(result, { ok: true, data: { id: "post-1" } });
+});
+
+test("rejects unsafe idempotency keys before sending", async () => {
+  const client = new TestagramApiClient({
+    baseUrl: "https://api.testagram.site",
+    getAccessToken: () => "test-jwt",
+    fetch: async () => { throw new Error("fetch must not be called"); },
+  });
+  assert.throws(() => client.createPost({
+    content: "hello",
+    visibility: "public",
+    idempotencyKey: "bad key",
+  }), /Idempotency-Key/);
+});
