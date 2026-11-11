@@ -1,14 +1,47 @@
-# Dart / Flutter API transport
+# Testagram Dart API client
 
-The Flutter repository remains the canonical application and should own the production API integration. This folder documents a minimal transport contract and may be copied/adapted there after review; it is not a second Flutter app or a generated SDK yet.
+This directory is a reusable Dart transport package for Flutter clients. It does not own authentication: pass the current Appwrite session JWT through `tokenProvider`.
 
-## Required behavior
+## Use from Flutter after the API repository is merged and tagged
 
-- Use Appwrite Client SDK for login/session.
-- Inject the current Appwrite session JWT for each authenticated Backend request.
-- Keep API origin configurable through `--dart-define=TESTAGRAM_API_URL=...`.
-- Never ship private service tokens or call PostgreSQL, Data Centre private endpoints, Federation or Algorithm directly.
-- Preserve HTTP status and distinguish loading, empty, unavailable and forbidden states.
-- Do not fabricate empty results or success for unimplemented features.
+```yaml
+dependencies:
+  testagram_api:
+    git:
+      url: https://github.com/Trendyzima/testagram-api.git
+      ref: v0.1.0
+      path: packages/dart
+```
 
-See `example_client.dart` for a dependency-light starting point. Adapt it to the Flutter repo's existing HTTP package and error model rather than introducing a second networking stack.
+Until a release tag exists, do not pin production applications to a moving feature branch. Use a reviewed immutable commit during development.
+
+## Example
+
+```dart
+final api = TestagramApiClient(
+  baseUri: Uri.parse(const String.fromEnvironment('TESTAGRAM_API_URL')),
+  tokenProvider: () async => await appwriteAccount.createJWT().then((jwt) => jwt.jwt),
+);
+
+final feed = await api.get('/api/feed/home', query: {
+  'limit': '20',
+  'following_only': 'false',
+});
+
+final post = await api.createPost(
+  content: 'Hello Testagram',
+  visibility: 'public',
+  idempotencyKey: 'composer-session-0001',
+);
+```
+
+The client parses the Backend's nested `error.code/message` envelope, preserves HTTP status and request IDs, and fails closed when an authenticated call has no JWT. It does not silently retry writes or invent successful responses.
+
+## Validate
+
+```sh
+dart pub get
+dart format --set-exit-if-changed .
+dart analyze
+dart test
+```
