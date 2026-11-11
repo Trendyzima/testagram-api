@@ -18,6 +18,9 @@ jobs:
         with:
           node-version: 22
       - run: npm install --ignore-scripts
+      - name: Checkout Backend source for route audit
+        run: git clone --depth 1 https://github.com/Trendyzima/Testagram-backend-.git ../Testagram-backend-
       - run: npm run lint:openapi
       - run: npm run typecheck
       - run: npm test
+      - run: npm run audit:backend-routes
