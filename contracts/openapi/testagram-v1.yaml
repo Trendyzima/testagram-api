@@ -157,11 +157,28 @@ paths:
                 content: { type: string, minLength: 1, maxLength: 5000 }
                 visibility: { type: string, enum: [public, followers, private] }
       responses:
-        '200': { description: Idempotent replay of a previously created post. }
-        '201': { description: Post created. }
+        '200':
+          description: Existing post returned for a retry with the same author, key and normalized payload.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PostCreateReplayEnvelope' }
+        '201':
+          description: New post committed successfully.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PostCreateEnvelope' }
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
-        '409': { description: Idempotency key conflict. }
+        '409':
+          description: Idempotency key was already used with a different normalized payload.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+        '422':
+          description: Content moderation requires review; no post is published.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/social/posts/{postId}/interaction-summary:
@@ -422,6 +439,36 @@ components:
       type: object
       additionalProperties: true
       description: Temporary extensible schema. Replace with an implementation-backed DTO when exact wire shape is verified.
+    PostCreateEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [id, author_id, content, visibility, created_at, idempotent_replay]
+          properties:
+            id: { type: string }
+            author_id: { type: string, format: uuid }
+            content: { type: string, minLength: 1, maxLength: 5000 }
+            visibility: { type: string, enum: [public, followers, private] }
+            created_at: { type: string, format: date-time }
+            idempotent_replay: { const: false }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PostCreateReplayEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [id, idempotent_replay]
+          properties:
+            id: { type: string }
+            idempotent_replay: { const: true }
+        error: { type: 'null' }
+        request_id: { type: string }
     ApiError:
       type: object
       required: [ok, data, error, request_id]
