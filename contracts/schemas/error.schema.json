@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://testagram.site/schemas/api-error.schema.json",
+  "title": "Testagram Backend error envelope",
+  "description": "Matches the Backend writeJSON errorBody shape. request_id is echoed in the response header X-Request-ID.",
+  "type": "object",
+  "required": [
+    "ok",
+    "data",
+    "error",
+    "request_id"
+  ],
+  "properties": {
+    "ok": {
+      "const": false
+    },
+    "data": {
+      "type": "null"
+    },
+    "error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "request_id": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

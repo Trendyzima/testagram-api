@@ -1,0 +1,148 @@
+openapi: 3.1.0
+info:
+  title: Testagram Federated Content API
+  version: 0.1.0
+  description: Public ActivityPub discovery and actor endpoints. Inbox ingestion is disabled in this release.
+servers:
+  - url: https://federation.testagram.site
+paths:
+  /healthz:
+    get:
+      operationId: health
+      summary: Process liveness
+      responses:
+        "200":
+          description: Process is alive
+  /readyz:
+    get:
+      operationId: readiness
+      summary: Service readiness
+      responses:
+        "200":
+          description: Ready; the initial release has no external dependencies
+  /.well-known/webfinger:
+    get:
+      operationId: webfinger
+      summary: Resolve the configured service actor
+      parameters:
+        - in: query
+          name: resource
+          required: true
+          schema:
+            type: string
+            example: acct:testagram@testagram.site
+      responses:
+        "200":
+          description: JRD account descriptor
+          content:
+            application/jrd+json:
+              schema:
+                type: object
+        "404":
+          description: Account is not hosted by this service
+  /users/{username}:
+    get:
+      operationId: getActor
+      summary: Fetch the configured ActivityPub actor
+      parameters:
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: Accept
+          required: true
+          schema:
+            type: string
+            example: application/activity+json
+      responses:
+        "200":
+          description: ActivityPub actor document
+          content:
+            application/activity+json:
+              schema:
+                type: object
+        "404":
+          description: Actor not found
+        "406":
+          description: ActivityPub Accept header required
+  /users/{username}/outbox:
+    get:
+      operationId: getOutbox
+      summary: Fetch the configured actor's empty initial outbox
+      parameters:
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Empty OrderedCollection
+          content:
+            application/activity+json:
+              schema:
+                type: object
+        "404":
+          description: Actor not found
+  /users/{username}/inbox:
+    post:
+      operationId: receiveActivity
+      summary: Verify and durably accept a signed ActivityPub activity
+      description: |
+        Verifies the remote actor's HTTP Signature and key ownership, checks local
+        federation consent both before and after verification, persists remote actor
+        metadata, and durably deduplicates the activity in the inbox. Processing is
+        asynchronous; 202 means durable acceptance, not completed delivery or handling.
+      parameters:
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: Content-Type
+          required: true
+          schema:
+            type: string
+            enum: [application/activity+json, application/ld+json]
+      requestBody:
+        required: true
+        content:
+          application/activity+json:
+            schema:
+              type: object
+              required: [id, type, actor, object]
+              properties:
+                id: {type: string, format: uri}
+                type:
+                  type: string
+                  enum: [Follow, Undo, Create, Update, Delete, Like, Announce, Accept, Reject, Block]
+                actor: {type: string, format: uri}
+                object: {}
+          application/ld+json:
+            schema:
+              type: object
+      responses:
+        "202":
+          description: Signed activity durably accepted; duplicate submissions are idempotently acknowledged
+          headers:
+            Location:
+              schema: {type: string, format: uri}
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, duplicate, recipient]
+                properties:
+                  status: {type: string, const: accepted}
+                  duplicate: {type: boolean}
+                  recipient: {type: string, format: uri}
+        "400": {description: Invalid ActivityPub identity or malformed activity}
+        "401": {description: HTTP Signature is missing, invalid, expired or does not match the activity actor}
+        "404": {description: Local actor does not exist or has disabled federation}
+        "413": {description: Activity exceeds the one-megabyte limit}
+        "415": {description: ActivityPub content type required}
+        "422": {description: Activity type is not supported}
+        "503": {description: Durable inbox or actor persistence is unavailable}

@@ -1,0 +1,124 @@
+openapi: 3.1.0
+info:
+  title: Testagram Backend Private Federation Provider API
+  version: 1.0.0
+  license:
+    name: Proprietary
+    identifier: LicenseRef-Proprietary
+  description: >
+    Private Federation-to-Backend interfaces. These routes resolve current
+    canonical account eligibility; Federation must never maintain a second
+    local-user authority.
+servers:
+  - url: http://backend:8080
+    description: Private Backend service network only.
+security:
+  - federationBackendBearer: []
+paths:
+  /internal/v1/federation/readyz:
+    get:
+      operationId: getFederationBackendReadiness
+      summary: Verify canonical account storage is ready for Federation
+      parameters:
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '200':
+          description: Backend database is ready.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ReadyEnvelope' }
+        '400': { description: Unsupported API version. }
+        '401': { description: Invalid Federation service credential. }
+        '503': { description: Backend database or internal authentication is unavailable. }
+  /internal/v1/federation/actors/{handle}:
+    parameters:
+      - name: handle
+        in: path
+        required: true
+        schema: { type: string, minLength: 3, maxLength: 30, pattern: '^[A-Za-z0-9_]+$' }
+      - $ref: '#/components/parameters/ApiVersion'
+      - $ref: '#/components/parameters/RequestId'
+    get:
+      operationId: resolveFederationActorByHandle
+      summary: Resolve an active, discoverable, federation-enabled local account
+      responses:
+        '200':
+          description: Canonical account is eligible for federation.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ActorEnvelope' }
+        '400': { description: Invalid handle or unsupported API version. }
+        '401': { description: Invalid Federation service credential. }
+        '404': { description: "Account missing, inactive, undiscoverable or federation-disabled." }
+        '503': { description: Canonical account storage is unavailable. }
+  /internal/v1/federation/actors/by-id/{user_id}:
+    parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - $ref: '#/components/parameters/ApiVersion'
+      - $ref: '#/components/parameters/RequestId'
+    get:
+      operationId: resolveFederationActorById
+      summary: Resolve an eligible local account by canonical Backend ID
+      responses:
+        '200':
+          description: Canonical account is eligible for federation.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ActorEnvelope' }
+        '400': { description: Invalid user ID or unsupported API version. }
+        '401': { description: Invalid Federation service credential. }
+        '404': { description: "Account missing, inactive, undiscoverable or federation-disabled." }
+        '503': { description: Canonical account storage is unavailable. }
+components:
+  securitySchemes:
+    federationBackendBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+      description: Distinct Federation-to-Backend credential; never reuse Backend-to-Federation token.
+  parameters:
+    ApiVersion:
+      name: X-Testagram-API-Version
+      in: header
+      required: true
+      schema: { type: string, const: '1' }
+    RequestId:
+      name: X-Request-ID
+      in: header
+      required: false
+      schema: { type: string, minLength: 1, maxLength: 128 }
+  schemas:
+    Actor:
+      type: object
+      additionalProperties: false
+      required: [user_id, handle, display_name, summary, federation_enabled]
+      properties:
+        user_id: { type: string, format: uuid }
+        handle: { type: string }
+        display_name: { type: string }
+        summary: { type: string }
+        federation_enabled: { const: true }
+    ActorEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data: { $ref: '#/components/schemas/Actor' }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ReadyEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [status]
+          properties:
+            status: { const: ready }
+        error: { type: 'null' }
+        request_id: { type: string }

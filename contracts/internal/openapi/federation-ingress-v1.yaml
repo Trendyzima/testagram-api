@@ -1,0 +1,88 @@
+openapi: 3.1.0
+info:
+  title: Testagram Federation Private Activity Ingress
+  version: 1.0.0
+  license:
+    name: Proprietary
+    identifier: LicenseRef-Proprietary
+  description: >
+    Private Backend-to-Federation interface. The Backend is authoritative for
+    local account identity, eligibility, privacy and post visibility. This
+    endpoint durably accepts protocol outbox work; it does not synchronously
+    deliver to remote instances.
+servers:
+  - url: http://federation:8080
+    description: Private service network only; production origin is deployment-specific.
+security:
+  - federationServiceBearer: []
+paths:
+  /internal/v1/activities:
+    post:
+      operationId: enqueueAuthorizedActivity
+      summary: Durably enqueue a Backend-authorized ActivityPub activity
+      description: >
+        HTTP 202 means the activity and its delivery jobs were durably accepted.
+        Delivery is asynchronous. Durable idempotency is keyed by activity_id;
+        the optional Idempotency-Key header is not the authoritative deduplication key.
+      parameters:
+        - in: header
+          name: X-Request-ID
+          required: false
+          schema: { type: string, minLength: 1, maxLength: 128 }
+        - in: header
+          name: Idempotency-Key
+          required: false
+          schema: { type: string, minLength: 1, maxLength: 2048 }
+          description: Client-supplied correlation hint; activity_id is authoritative for deduplication.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [activity_id, actor_user_id, activity]
+              properties:
+                activity_id: { type: string, minLength: 1, maxLength: 2048, format: uri, pattern: '^https://' }
+                actor_user_id: { type: string, minLength: 1, maxLength: 128 }
+                activity:
+                  type: object
+                  required: [id, type, actor, object]
+                  properties:
+                    id: { type: string, format: uri, pattern: '^https://' }
+                    type: { type: string, enum: [Create, Update, Delete, Like, Announce] }
+                    actor: { type: string, format: uri, pattern: '^https://' }
+                    object: {}
+      responses:
+        '202':
+          description: Activity and delivery jobs durably accepted.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    required: [activity_id, recipient_count, accepted]
+                    properties:
+                      activity_id: { type: string, format: uri }
+                      recipient_count: { type: integer, minimum: 0, maximum: 1000 }
+                      accepted: { const: true }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '400': { description: "Invalid activity, actor or JSON envelope." }
+        '401': { description: Missing or invalid private Backend credential. }
+        '403': { description: Backend did not authorize the local actor or actor URI. }
+        '409': { description: Activity ID collision or durable enqueue conflict. }
+        '413': { description: Request exceeds 1 MiB. }
+        '415': { description: Content-Type must be application/json. }
+        '503': { description: Federation storage or Backend actor lookup is unavailable. }
+components:
+  securitySchemes:
+    federationServiceBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+      description: Distinct Backend-to-Federation service credential; private network only.

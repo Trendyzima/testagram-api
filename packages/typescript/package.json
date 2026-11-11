@@ -1,0 +1,27 @@
+{
+  "name": "@trendyzima/testagram-api-client",
+  "version": "0.1.0",
+  "description": "Typed Testagram public Backend API client",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Trendyzima/testagram-api.git",
+    "directory": "packages/typescript"
+  }
+}

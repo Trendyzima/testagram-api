@@ -1,6 +1,6 @@
 # Testagram API Platform
 
-The API contract, compatibility, client SDK and integration-governance repository for Testagram's seven-repository platform.
+The API contract, compatibility, client SDK and integration-governance repository coordinating Testagram's six runtime repositories.
 
 > **Boundary:** this repository does not replace the Go Backend, own product data, or expose private infrastructure services. The Backend remains the public product API runtime and authority. This repository defines and validates the contract consumed by Flutter and other clients, and coordinates compatibility across services.
 
@@ -10,7 +10,8 @@ The API contract, compatibility, client SDK and integration-governance repositor
 - Versioning, error-envelope, pagination, authentication and idempotency conventions.
 - Typed client SDK foundations and generated-client workflow.
 - Contract linting, breaking-change checks, examples and cross-repository integration tests.
-- A registry of service ownership and explicitly unimplemented/future capabilities.
+- A machine-readable registry for all six runtime repositories, pinned provider revisions and source snapshots.
+- Cross-repository CI that checks all six immutable source revisions and verifies that vendored contracts match their exact upstream files.
 
 ## System ownership
 
@@ -36,7 +37,7 @@ The API contract, compatibility, client SDK and integration-governance repositor
 
 ## Verified contract status
 
-The OpenAPI document includes only routes and semantics evidenced by the current Backend and Flutter repository documentation. In particular, the main-feed create-post operation is **not** declared because the Flutter migration ledger explicitly says the Backend does not yet register a first-class create-post route. TV catalogue/player, marketplace, advertising, wallet/M-Pesa, admin and several profile/messaging capabilities remain future contract work until their owning services expose and test real endpoints.
+The public OpenAPI contract includes a source-audited core route set. Backend mainline registers `POST /api/social/posts` for main-feed publishing; this is distinct from the Threads composer. The six-repository registry also tracks private Algorithm, Data Centre and Federation contracts plus CDN delivery semantics. Their source ownership and readiness are not conflated: Backend-to-Data-Centre typed client integration remains outstanding; Federation workers and CDN production wiring remain gated. Media, TV catalogue/player, marketplace, advertising, wallet/M-Pesa, admin and several profile/messaging capabilities remain registered-only or future work until their DTOs, authorization and tests are audited.
 
 See [API capability matrix](docs/capability-matrix.md), [service ownership](docs/architecture/service-ownership.md), and [contract contribution guide](docs/CONTRIBUTING.md).
 
@@ -45,10 +46,9 @@ See [API capability matrix](docs/capability-matrix.md), [service ownership](docs
 Requirements: Node.js 22+, npm 10+, Python 3.12+ only for optional tooling.
 
 ```sh
-npm ci
-npm run lint:openapi
-npm run typecheck
-npm test
+npm install
+npm run sources:checkout
+npm run check
 ```
 
 Validate the spec without installing project tooling:
@@ -59,13 +59,16 @@ npx --yes @redocly/cli lint contracts/openapi/testagram-v1.yaml
 
 ## Layout
 
-- `contracts/openapi/` — versioned OpenAPI source of truth.
+- `contracts/openapi/` — public Backend OpenAPI contract.
+- `contracts/internal/openapi/` — private Backend/Algorithm/Federation/Data Centre contracts; never export these to Flutter.
+- `contracts/upstream/` — immutable, read-only provider contract snapshots.
+- `contracts/registry/` and `contracts/sources.lock.json` — six-service registry and pinned upstream provenance.
 - `contracts/schemas/` — reusable JSON schemas.
-- `packages/typescript/` — typed fetch client foundation.
-- `packages/dart/` — Flutter-facing transport conventions and DTO foundation.
-- `docs/` — architecture, ownership, capability status, security and change process.
+- `packages/typescript/` — typed fetch client foundation, nested Backend error handling and idempotent post helper.
+- `packages/dart/` — reusable Dart HTTP client package with Appwrite JWT transport and tests.
+- `docs/` — six-repository topology, ownership, integration flows, downstream adoption, security, provider conformance audits, capability status and release gates.
 - `examples/` — safe request/response examples.
-- `.github/workflows/` — contract validation and tests.
+- `.github/workflows/` — OpenAPI, TypeScript, Dart, Backend route inventory and six-repository snapshot validation.
 
 ## Production status
 
