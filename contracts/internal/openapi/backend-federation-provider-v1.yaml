@@ -2,6 +2,8 @@ openapi: 3.1.0
 info:
   title: Testagram Backend Private Federation Provider API
   version: 1.0.0
+  license:
+    name: Proprietary
   description: >
     Private Federation-to-Backend interfaces. These routes resolve current
     canonical account eligibility; Federation must never maintain a second
