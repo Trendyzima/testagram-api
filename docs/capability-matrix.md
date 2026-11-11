@@ -34,3 +34,18 @@ Promote a registered-only route only after the owner supplies:
 4. Success, validation, conflict, rate-limit and dependency-failure behavior.
 5. Contract tests and client failure-state tests.
 6. Observability and rollback notes where operationally relevant.
+
+
+## Cross-repository services
+
+| Provider | Interface | API-repo evidence | Readiness |
+|---|---|---|---|
+| The Algorithm | Private `POST /v1/feed/rank` | Pinned upstream OpenAPI snapshot; Backend client and candidate validation documented | Provider and consumer interface implemented; staging test required |
+| Data Centre platform | Private `/v1/config/*`, `/v1/events`, `/v1/audit` on port 8095 | Pinned provider OpenAPI snapshot and source audit | Provider exists; Backend typed client and contract tests remain outstanding |
+| Data Centre video | `/v1/videos*`, `/v1/channels*`, `/v1/feed` | Service catalogue only | No client SDK or promoted contract until exact handler DTOs are audited |
+| Data Centre notifications | `/v1/devices`, `/v1/notifications`, `/v1/stream` | Service catalogue only | No client SDK or promoted contract until exact handler DTOs are audited |
+| CDN | `/v1/*`, HLS/DASH, media aliases, `/route`, restricted purge | Source-audited route contract | Production origin, DNS, TLS and private playback still require verification |
+| Federation | Public ActivityPub endpoints and private Backend activity/actor interfaces | Pinned public OpenAPI + private contract notes + event schema snapshot | Partial; public workers and complete projection/interoperability remain gated |
+| Flutter | Public Backend API consumer | Dart client package and public OpenAPI | Consumer integration is downstream; never expose internal APIs |
+
+The complete ownership and source provenance live in [services registry](../contracts/registry/services.json) and [source lock](../contracts/sources.lock.json).
