@@ -17,8 +17,8 @@ Federation must not create canonical local users/posts or grant local visibility
 Required headers:
 - `Authorization: Bearer <FEDERATION_INTERNAL_TOKEN>`
 - `Content-Type: application/json`
-- `X-Request-ID: <request-id>`
-- `Idempotency-Key: <activity-id>` (activity ID remains the durable deduplication identity)
+
+The Backend client also sends `X-Request-ID` and `Idempotency-Key` as correlation hints. The provider currently generates a request ID if absent and uses the body `activity_id` as its durable idempotency identity; it does not require the `Idempotency-Key` header.
 
 Request shape:
 ```json
@@ -53,6 +53,8 @@ These are private service interfaces, not public client APIs. Federation uses th
 Actor responses and outbox cursor DTOs must be promoted to strict machine-readable schemas after provider/consumer tests are aligned. This document does not invent response fields that are not currently frozen.
 
 ## Published-post event
+
+The private provider interfaces are specified in [Federation ingress OpenAPI](../../contracts/internal/openapi/federation-ingress-v1.yaml) and [Backend actor-provider OpenAPI](../../contracts/internal/openapi/backend-federation-provider-v1.yaml). Their source handlers are pinned in the source lock. Actor response DTOs are strict in the current Backend handler; outbox cursor DTOs must be promoted only when the exact provider endpoints are registered and tested.
 
 The canonical event schema is mirrored from `federated-content/api/events/post-published.v1.schema.json` at the exact commit in `contracts/sources.lock.json`.
 
