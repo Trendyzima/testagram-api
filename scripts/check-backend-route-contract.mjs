@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 
 const inventoryPath = resolve("contracts/route-inventory/backend-public-routes.json");
 const specPath = resolve("contracts/openapi/testagram-v1.yaml");
-const backendPath = resolve("../Testagram-backend-/cmd/api/main.go");
+const backendPath = resolve("source-repos/backend/cmd/api/main.go");
 
 const inventory = JSON.parse(readFileSync(inventoryPath, "utf8"));
 const source = readFileSync(backendPath, "utf8");
