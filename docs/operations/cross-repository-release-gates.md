@@ -16,6 +16,7 @@ This checklist is required before downstream repositories pin a new API contract
 - [ ] Backend/Federation tests cover distinct directional credentials, actor consent, durable acceptance, idempotency collisions, outbox cursor recovery and disabled-worker defaults.
 - [ ] Backend/Data Centre tests cover private network auth, 1 MiB body limit, feature config, event/audit intake and database outage; typed Backend client must exist before claiming integration.
 - [ ] Backend/CDN tests cover public delivery, private token expiry/wrong-key denial, ranges, cache headers, purge authorization and origin outage.
+- [ ] CDN private media fails closed when `PLAYBACK_SECRET` is missing; do not enable private media while the current fail-open configuration remains.
 - [ ] Data Centre video/notification service contracts are audited separately from the platform API.
 - [ ] Every provider and consumer CI passes against the same immutable source revisions.
 
