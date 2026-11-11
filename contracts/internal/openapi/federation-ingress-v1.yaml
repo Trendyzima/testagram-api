@@ -2,6 +2,8 @@ openapi: 3.1.0
 info:
   title: Testagram Federation Private Activity Ingress
   version: 1.0.0
+  license:
+    name: Proprietary
   description: >
     Private Backend-to-Federation interface. The Backend is authoritative for
     local account identity, eligibility, privacy and post visibility. This
@@ -69,7 +71,7 @@ paths:
                       accepted: { const: true }
                   error: { type: 'null' }
                   request_id: { type: string }
-        '400': { description: Invalid activity, actor or JSON envelope. }
+        '400': { description: "Invalid activity, actor or JSON envelope." }
         '401': { description: Missing or invalid private Backend credential. }
         '403': { description: Backend did not authorize the local actor or actor URI. }
         '409': { description: Activity ID collision or durable enqueue conflict. }
