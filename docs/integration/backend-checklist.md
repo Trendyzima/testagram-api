@@ -1,6 +1,6 @@
 # Backend integration checklist
 
-The route-registration inventory is checked in CI against the Backend `main` source. This verifies route existence and HTTP methods; it does **not** prove deployed availability or fully type every response.
+The route-registration inventory is checked in CI against the exact Backend commit pinned in `contracts/sources.lock.json`. This prevents an unreviewed upstream change from silently changing the API repository's evidence. This verifies route existence and HTTP methods; it does **not** prove deployed availability or fully type every response.
 
 - [x] Confirm source listener default: `:8080` (`LISTEN_ADDR`).
 - [x] Confirm `GET /healthz` and `GET /readyz` return plain text, not JSON.
@@ -16,4 +16,4 @@ The route-registration inventory is checked in CI against the Backend `main` sou
 - [ ] Verify production hostname, DNS, TLS and runtime health; the OpenAPI server URL is intended, not live-verified.
 - [ ] Promote registered-only operations only after auth, DTO and test evidence is linked.
 
-See [source route audit](backend-route-audit.md) and [route inventory](../../contracts/route-inventory/backend-public-routes.json).
+See [source route audit](backend-route-audit.md), [route inventory](../../contracts/route-inventory/backend-public-routes.json), [six-repository registry](../../contracts/registry/services.json), and [release gates](../operations/cross-repository-release-gates.md).
