@@ -49,7 +49,7 @@ paths:
               schema: { $ref: '#/components/schemas/ActorEnvelope' }
         '400': { description: Invalid handle or unsupported API version. }
         '401': { description: Invalid Federation service credential. }
-        '404': { description: Account missing, inactive, undiscoverable or federation-disabled. }
+        '404': { description: "Account missing, inactive, undiscoverable or federation-disabled." }
         '503': { description: Canonical account storage is unavailable. }
   /internal/v1/federation/actors/by-id/{user_id}:
     parameters:
