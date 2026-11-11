@@ -14,7 +14,7 @@
     "build:sdk": "tsc -p packages/typescript/tsconfig.build.json"
   },
   "devDependencies": {
-    "@redocly/cli": "^1.34.5",
+    "@redocly/cli": "^2.77.0",
     "typescript": "^5.8.3",
     "tsx": "^4.19.3"
   },
