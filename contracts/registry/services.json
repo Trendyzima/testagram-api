@@ -72,10 +72,11 @@
         "backend-public"
       ],
       "contracts": [
-        "contracts/upstream/datacentre/internal-platform.openapi.yaml"
+        "contracts/upstream/datacentre/internal-platform.openapi.yaml",
+        "docs/integration/data-centre-platform-contract.md"
       ],
-      "status": "provider-contract-present-consumer-not-integrated",
-      "notes": "The Backend main branch does not yet have a verified typed platform client. The platform API is not a product API. Video and notification services are separately catalogued and need their own audited contracts before client generation."
+      "status": "provider-contract-drift-consumer-not-integrated",
+      "notes": "The Backend main branch does not yet have a verified typed platform client. The platform API is not a product API. Video and notification services are separately catalogued and need their own audited contracts before client generation. Source audit found OpenAPI/handler drift: config/set returns 200 JSON while spec says 204; generic route handlers do not enforce documented methods; some schema constraints are not fully enforced. See conformance report."
     },
     {
       "id": "cdn-edge",
@@ -127,7 +128,7 @@
         "contracts/internal/openapi/federation-ingress-v1.yaml"
       ],
       "status": "protocol-and-private-ingress-partial",
-      "notes": "Backend remains authoritative for local identity, privacy, blocks, visibility and eligibility. Public federation workers remain gated; durable acceptance is not proof of completed delivery."
+      "notes": "Backend remains authoritative for local identity, privacy, blocks, visibility and eligibility. Public federation workers remain gated; durable acceptance is not proof of completed delivery. Provider public OpenAPI description says inbox ingestion is disabled while the spec and source register a signed inbox route; reconcile provider description and runtime rollout state before public activation."
     },
     {
       "id": "algorithm",
