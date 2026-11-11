@@ -426,6 +426,7 @@ paths:
   /api/tv/channels:
     get:
       operationId: listTvChannels
+      x-testagram-status: proposed-not-implemented
       tags: [TV]
       summary: List the normalized public TV catalogue
       description: |
@@ -471,6 +472,7 @@ paths:
         schema: { type: string, minLength: 1, maxLength: 256 }
     get:
       operationId: getTvChannel
+      x-testagram-status: proposed-not-implemented
       tags: [TV]
       summary: Get normalized TV channel metadata
       security: []
@@ -490,6 +492,7 @@ paths:
         schema: { type: string, minLength: 1, maxLength: 256 }
     post:
       operationId: createTvPlaybackGrant
+      x-testagram-status: proposed-not-implemented
       tags: [TV]
       summary: Create a short-lived viewer-authorized playback grant
       description: |
