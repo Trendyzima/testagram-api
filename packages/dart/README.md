@@ -9,7 +9,7 @@ dependencies:
   testagram_api:
     git:
       url: https://github.com/Trendyzima/testagram-api.git
-      ref: v0.1.0
+      ref: api-v0.1.0
       path: packages/dart
 ```
 
