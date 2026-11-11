@@ -1,0 +1,423 @@
+openapi: 3.1.0
+info:
+  title: Testagram Public API
+  version: 1.0.0
+  summary: Verified public product API contract for Testagram clients.
+  description: |
+    Contract catalogue for the public Testagram Backend API. The Backend is
+    the runtime and authorization authority. This repository owns the contract
+    and client tooling only; it is not a replacement API server.
+
+    Only routes documented by the current Backend/Flutter repositories are
+    included. Response payloads are intentionally represented as extensible
+    objects until their concrete wire shapes are verified from implementation
+    and tests. Do not infer an endpoint's existence from a roadmap entry.
+  contact:
+    name: Testagram Engineering
+    url: https://github.com/Trendyzima/testagram-api
+servers:
+  - url: https://api.testagram.site
+    description: Intended production public API origin; verify DNS/runtime before release.
+  - url: http://localhost:8080
+    description: Local Backend development; configure to match the Backend listener.
+tags:
+  - name: Health
+  - name: Feed
+  - name: Social
+  - name: Search
+  - name: Notifications
+  - name: Threads
+security:
+  - appwriteBearer: []
+paths:
+  /healthz:
+    get:
+      operationId: getHealth
+      tags: [Health]
+      summary: Check Backend process liveness
+      description: Process liveness only; it does not prove that dependencies are ready.
+      security: []
+      responses:
+        '200':
+          description: Backend process is alive.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+  /readyz:
+    get:
+      operationId: getReadiness
+      tags: [Health]
+      summary: Check Backend readiness
+      description: Readiness endpoint documented by the Backend repository.
+      security: []
+      responses:
+        '200': { description: Backend is ready. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/feed/home:
+    get:
+      operationId: getHomeFeed
+      tags: [Feed]
+      summary: Retrieve the authorized home timeline
+      description: Supports the Following filter and opaque cursor pagination. Backend performs authorization and ranking orchestration.
+      parameters:
+        - in: query
+          name: filter
+          required: false
+          schema: { type: string, enum: [for_you, following] }
+          description: Use following for the Following timeline; confirm supported values against Backend handler before relying on other values.
+        - in: query
+          name: cursor
+          required: false
+          schema: { type: string }
+          description: Opaque continuation cursor returned by the previous response.
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 100 }
+      responses:
+        '200':
+          description: Authorized feed page. Exact payload schema is pending wire-level verification.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/search:
+    get:
+      operationId: searchContent
+      tags: [Search]
+      summary: Search people and posts
+      description: Privacy-filtered product search. Backend applies visibility and authorization rules.
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 200 }
+        - in: query
+          name: type
+          required: false
+          schema: { type: string, enum: [all, people, posts] }
+        - in: query
+          name: cursor
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Search result page; exact payload shape must be confirmed from Backend tests.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/posts/{postId}/interaction-summary:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    get:
+      operationId: getPostInteractionSummary
+      tags: [Social]
+      summary: Get viewer-specific post interaction state
+      description: Returns interaction state and counters for the authenticated viewer.
+      responses:
+        '200':
+          description: Interaction summary.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/social/posts/{postId}/reaction:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    post:
+      operationId: createPostReaction
+      tags: [Social]
+      summary: Create or update a post reaction
+      description: Reaction lifecycle route documented by the Flutter integration ledger. Verify accepted reaction values and request body against Backend implementation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExtensibleObject' }
+      responses:
+        '200': { description: Reaction accepted or updated. }
+        '201': { description: Reaction created. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deletePostReaction
+      tags: [Social]
+      summary: Remove the authenticated viewer's post reaction
+      responses:
+        '200': { description: Reaction removed. }
+        '204': { description: Reaction removed with no response body. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/posts/{postId}/reposts:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    post:
+      operationId: createPostRepost
+      tags: [Social]
+      summary: Repost a post
+      responses:
+        '200': { description: Repost accepted. }
+        '201': { description: Repost created. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deletePostRepost
+      tags: [Social]
+      summary: Undo a repost
+      responses:
+        '200': { description: Repost removed. }
+        '204': { description: Repost removed with no response body. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/posts/{postId}/bookmarks:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    post:
+      operationId: createPostBookmark
+      tags: [Social]
+      summary: Bookmark a post
+      responses:
+        '200': { description: Bookmark accepted. }
+        '201': { description: Bookmark created. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deletePostBookmark
+      tags: [Social]
+      summary: Remove a post bookmark
+      responses:
+        '200': { description: Bookmark removed. }
+        '204': { description: Bookmark removed with no response body. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/posts/{postId}/replies:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    get:
+      operationId: listPostReplies
+      tags: [Social]
+      summary: List replies for a post
+      parameters:
+        - in: query
+          name: cursor
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Reply page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createPostReply
+      tags: [Social]
+      summary: Create a reply to a post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExtensibleObject' }
+      responses:
+        '200': { description: Reply created. }
+        '201': { description: Reply created. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/follows:
+    get:
+      operationId: listSocialFollows
+      tags: [Social]
+      summary: List follow relationships
+      description: The Flutter ledger confirms GET/POST/DELETE /api/social/follows... . Exact query and response shapes are pending wire verification.
+      parameters:
+        - in: query
+          name: userId
+          required: false
+          schema: { type: string }
+        - in: query
+          name: cursor
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Follow relationship page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createSocialFollow
+      tags: [Social]
+      summary: Follow a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExtensibleObject' }
+      responses:
+        '200': { description: Follow created or already active. }
+        '201': { description: Follow created. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    delete:
+      operationId: deleteSocialFollow
+      tags: [Social]
+      summary: Unfollow a user
+      parameters:
+        - in: query
+          name: userId
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Follow removed. }
+        '204': { description: Follow removed with no response body. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/notifications:
+    get:
+      operationId: listNotifications
+      tags: [Notifications]
+      summary: List authenticated user's notifications
+      parameters:
+        - in: query
+          name: cursor
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Notification page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/notifications/{notificationId}/read:
+    parameters:
+      - name: notificationId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: markNotificationRead
+      tags: [Notifications]
+      summary: Mark a notification as read
+      responses:
+        '200': { description: Notification marked read. }
+        '204': { description: Notification marked read with no response body. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/threads:
+    get:
+      operationId: listThreads
+      tags: [Threads]
+      summary: List threads
+      description: Distinct Threads product surface; do not treat this as the main-feed posts API.
+      parameters:
+        - in: query
+          name: cursor
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Thread page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createThread
+      tags: [Threads]
+      summary: Create a thread
+      description: This is the Threads surface, not a substitute for main-feed post publishing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExtensibleObject' }
+      responses:
+        '200': { description: Thread created. }
+        '201': { description: Thread created. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/threads/{threadId}:
+    parameters:
+      - name: threadId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getThread
+      tags: [Threads]
+      summary: Get a thread
+      responses:
+        '200':
+          description: Thread details.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+components:
+  securitySchemes:
+    appwriteBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Appwrite session JWT issued to the signed-in user. Backend validates it with Appwrite; this spec does not authorize a caller.
+  parameters:
+    PostId:
+      name: postId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1 }
+  schemas:
+    ExtensibleObject:
+      type: object
+      additionalProperties: true
+      description: Temporary extensible schema. Replace with an implementation-backed DTO when exact wire shape is verified.
+    ApiError:
+      type: object
+      additionalProperties: true
+      properties:
+        error:
+          type: string
+          description: Error code or message; exact Backend envelope is implementation-defined.
+        message:
+          type: string
+    CursorPage:
+      type: object
+      additionalProperties: true
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/ExtensibleObject' }
+        nextCursor:
+          type: [string, 'null']
+  responses:
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    Unauthorized:
+      description: Missing, expired or invalid Appwrite session JWT.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    NotFound:
+      description: Resource not found or not visible to the caller.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    RateLimited:
+      description: Request rate limit exceeded.
+      headers:
+        Retry-After:
+          schema: { type: integer }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    ServiceUnavailable:
+      description: Backend or required dependency is not ready.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
