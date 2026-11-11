@@ -423,6 +423,108 @@ paths:
               schema: { $ref: '#/components/schemas/ExtensibleObject' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
+  /api/tv/channels:
+    get:
+      operationId: listTvChannels
+      tags: [TV]
+      summary: List the normalized public TV catalogue
+      description: |
+        Backend-owned catalogue read model. Data Centre may ingest and normalize
+        upstream feeds, but Flutter must never call upstream sources or Data
+        Centre private APIs. This response MUST NOT contain an upstream stream
+        URL, provider credential, signed playback URL or private origin detail.
+        Proposed contract only until the Backend handler and wire tests ship.
+      security: []
+      parameters:
+        - in: query
+          name: cursor
+          schema: { type: string, maxLength: 2048 }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+        - in: query
+          name: country
+          schema: { type: string, pattern: "^[A-Z]{2}$" }
+        - in: query
+          name: category
+          schema: { type: string, maxLength: 64 }
+        - in: query
+          name: language
+          schema: { type: string, maxLength: 16 }
+        - in: query
+          name: query
+          schema: { type: string, minLength: 1, maxLength: 120 }
+      responses:
+        '200':
+          description: Stable normalized channel page; no source URLs.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TvChannelPage' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/tv/channels/{channelId}:
+    parameters:
+      - name: channelId
+        in: path
+        required: true
+        schema: { type: string, minLength: 1, maxLength: 256 }
+    get:
+      operationId: getTvChannel
+      tags: [TV]
+      summary: Get normalized TV channel metadata
+      security: []
+      responses:
+        '200':
+          description: Channel metadata without upstream or signed playback URL.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TvChannel' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/tv/channels/{channelId}/playback:
+    parameters:
+      - name: channelId
+        in: path
+        required: true
+        schema: { type: string, minLength: 1, maxLength: 256 }
+    post:
+      operationId: createTvPlaybackGrant
+      tags: [TV]
+      summary: Create a short-lived viewer-authorized playback grant
+      description: |
+        Backend authenticates the viewer and checks channel visibility,
+        entitlement, moderation, geography and source health. Caller-supplied
+        visibility flags, source URLs and object keys are forbidden. CDN must
+        validate a separate, narrow Backend issuer assertion before creating
+        the playback URL. Playback signing and issuer credentials are distinct.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                playback_profile:
+                  type: string
+                  enum: [auto, low, standard, high]
+                  default: auto
+      responses:
+        '200':
+          description: Short-lived CDN playback grant.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TvPlaybackGrant' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403':
+          description: Channel is not available to this viewer.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
 components:
   securitySchemes:
     appwriteBearer:
@@ -437,6 +539,49 @@ components:
       required: true
       schema: { type: string, minLength: 1 }
   schemas:
+    TvChannel:
+      type: object
+      additionalProperties: false
+      required: [id, name, playback_type, availability, updated_at]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 256 }
+        name: { type: string, minLength: 1, maxLength: 160 }
+        description: { type: string, maxLength: 2000 }
+        logo_url: { type: string, format: uri }
+        country_code: { type: string, pattern: "^[A-Z]{2}$" }
+        language: { type: string, maxLength: 16 }
+        categories:
+          type: array
+          maxItems: 20
+          items: { type: string, maxLength: 64 }
+        website_url: { type: string, format: uri }
+        playback_type: { type: string, enum: [hls, dash, mp4, external] }
+        availability: { type: string, enum: [available, degraded, offline, scheduled, unknown] }
+        health_checked_at: { type: [string, 'null'], format: date-time }
+        updated_at: { type: string, format: date-time }
+    TvChannelPage:
+      type: object
+      additionalProperties: false
+      required: [items, next_cursor]
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/TvChannel' }
+        next_cursor: { type: [string, 'null'], maxLength: 2048 }
+    TvPlaybackGrant:
+      type: object
+      additionalProperties: false
+      required: [channel_id, playback_url, expires_at, playback_type]
+      properties:
+        channel_id: { type: string, minLength: 1, maxLength: 256 }
+        playback_url: { type: string, format: uri }
+        expires_at: { type: string, format: date-time }
+        playback_type: { type: string, enum: [hls, dash, mp4, external] }
+        required_headers:
+          type: object
+          maxProperties: 8
+          additionalProperties: { type: string, maxLength: 512 }
     ExtensibleObject:
       type: object
       additionalProperties: true
