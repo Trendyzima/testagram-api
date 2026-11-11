@@ -133,7 +133,11 @@ paths:
         - in: header
           name: Idempotency-Key
           required: true
-          schema: { type: string, minLength: 8, maxLength: 128, pattern: '^[A-Za-z0-9._:-]+
+          schema:
+            type: string
+            minLength: 8
+            maxLength: 128
+            pattern: "^[A-Za-z0-9._:-]+$"
     parameters:
       - $ref: '#/components/parameters/PostId'
     get:
