@@ -82,7 +82,7 @@ Dashed lines are governance/artifact relationships, not runtime traffic. The API
 1. Backend authorizes upload intent, ownership, quota, visibility and retention.
 2. Bytes are stored through the configured S3-compatible/object-storage boundary managed by the Backend/Data Centre deployment.
 3. Data Centre video processing may produce HLS/DASH assets; its video service contracts remain distinct from the platform API.
-4. Backend publishes the appropriate public URL or expiring private playback authorization.
+4. Backend publishes the appropriate public URL or expiring private playback authorization. The CDN's current implementation fails open for asset authorization when `PLAYBACK_SECRET` is unset; private media is blocked until the CDN is corrected/configured to fail closed.
 5. CDN serves bytes, manifests and ranges. CDN cache/purge operations never alter product ownership or authorization.
 6. Deletion and retention originate in Backend; Data Centre performs durable storage operations and CDN invalidation is a delivery concern.
 
@@ -96,7 +96,7 @@ Dashed lines are governance/artifact relationships, not runtime traffic. The API
 
 ### Data Centre platform services
 
-The platform listener on private port 8095 currently exposes health/readiness/metrics, feature configuration, event intake and audit intake. Its OpenAPI snapshot is included. The Backend's typed platform client and matching producer/consumer tests are not yet verified. Video and notification services are separately catalogued; do not assume the platform listener covers their APIs.
+The platform listener on private port 8095 currently exposes health/readiness/metrics, feature configuration, event intake and audit intake. Its OpenAPI snapshot is included, but source audit found response/method/schema drift; see the [Data Centre conformance report](../integration/data-centre-platform-contract.md). The Backend's typed platform client and matching producer/consumer tests are not yet verified. Video and notification services are separately catalogued; do not assume the platform listener covers their APIs.
 
 ## Contract ownership and provenance
 
