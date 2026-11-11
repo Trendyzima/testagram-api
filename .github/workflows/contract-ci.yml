@@ -18,13 +18,48 @@ jobs:
         with:
           node-version: 22
       - run: npm install --ignore-scripts
-      - name: Checkout Backend source for route audit
-        run: git clone --depth 1 https://github.com/Trendyzima/Testagram-backend-.git ../Testagram-backend-
+      - uses: actions/checkout@v4
+        with:
+          repository: Trendyzima/Testagram-backend-
+          ref: dc03bafdd28eab7ea22e5a7cd32748eeabf29434
+          path: source-repos/backend
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: Trendyzima/Testagram-data-centre-
+          ref: 1261a3a60a3cc5f9ebcb2c183b78d25bf1faf9d6
+          path: source-repos/data-centre
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: Trendyzima/cdn-
+          ref: ba10911595d734c2b52c1e9034e428089690fba1
+          path: source-repos/cdn
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: Trendyzima/testagram-flutter-client-
+          ref: b634574f86c65f8962495744f114613cd47b9efc
+          path: source-repos/flutter-client
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: Trendyzima/federated-content
+          ref: 49050589d2715c36465d6bb766d69bb323324331
+          path: source-repos/federation
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: Trendyzima/the-algorithm
+          ref: 2a2c7a9c91a6d01474338d2b57fd031f8c478be8
+          path: source-repos/algorithm
+          persist-credentials: false
       - run: npm run lint:openapi
       - run: npm run typecheck
       - run: npm run build:sdk
       - run: npm test
       - run: npm run audit:backend-routes
+      - run: npm run audit:cross-repo
 
   validate-dart:
     runs-on: ubuntu-latest
