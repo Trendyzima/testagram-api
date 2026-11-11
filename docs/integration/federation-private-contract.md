@@ -1,0 +1,63 @@
+# Federation private API and event contract
+
+**Provider:** `Trendyzima/federated-content`  
+**Consumer:** Testagram Backend  
+**Status:** private activity ingress is implemented; complete public federation rollout remains gated.
+
+## Ownership
+
+Backend owns local canonical identity, account status, federation consent, blocks, local posts, visibility, moderation and authorization. Federation owns protocol state: actor key material, remote actor/object cache, inbox receipts, ActivityPub outbox and delivery attempts.
+
+Federation must not create canonical local users/posts or grant local visibility. Flutter must never call Federation's private API.
+
+## Backend -> Federation activity ingress
+
+`POST /internal/v1/activities`
+
+Required headers:
+- `Authorization: Bearer <FEDERATION_INTERNAL_TOKEN>`
+- `Content-Type: application/json`
+- `X-Request-ID: <request-id>`
+- `Idempotency-Key: <activity-id>` (activity ID remains the durable deduplication identity)
+
+Request shape:
+```json
+{
+  "activity_id": "https://testagram.site/activities/opaque-id",
+  "actor_user_id": "canonical-backend-user-id",
+  "activity": {
+    "id": "https://testagram.site/activities/opaque-id",
+    "type": "Create",
+    "actor": "https://federation.testagram.site/users/handle",
+    "object": {"id": "https://testagram.site/posts/opaque-id"}
+  }
+}
+```
+
+- Accepted first-slice activity types: Create, Update, Delete, Like and Announce.
+- Request body maximum: 1 MiB.
+- Unknown top-level JSON fields and trailing JSON values are rejected.
+- Activity ID is idempotent. Reusing an ID with a different actor or payload is rejected.
+- HTTP 202 is returned only after protocol outbox and delivery jobs are durably accepted.
+- Delivery happens asynchronously outside the database transaction.
+
+## Federation -> Backend private actor API
+
+The six-repository runtime agreement documents these Backend endpoints for Federation:
+- `GET /internal/v1/federation/readyz`
+- `GET /internal/v1/federation/actors/{handle}`
+- `GET /internal/v1/federation/actors/by-id/{user_id}`
+
+These are private service interfaces, not public client APIs. Federation uses the distinct `FEDERATION_BACKEND_INTERNAL_TOKEN`; Backend-to-Federation uses `FEDERATION_INTERNAL_TOKEN`. Never reuse Appwrite user JWTs or one directional token for the reverse direction.
+
+Actor responses and outbox cursor DTOs must be promoted to strict machine-readable schemas after provider/consumer tests are aligned. This document does not invent response fields that are not currently frozen.
+
+## Published-post event
+
+The canonical event schema is mirrored from `federated-content/api/events/post-published.v1.schema.json` at the exact commit in `contracts/sources.lock.json`.
+
+The transport is the Backend transactional PostgreSQL outbox and Federation's bounded poller, not a generic message broker. Federation must fetch canonical content and recipients through authenticated Backend APIs, recheck federation consent, and exclude direct/private content. Event payload is a notification of a committed change, not proof of authorization.
+
+## Public ActivityPub endpoints
+
+Public WebFinger, actor, inbox and outbox routes are owned by Federation and documented in the provider's own OpenAPI snapshot. Inbound HTTP Signatures are separate from service bearer authentication. Keep public inbox processing and outbound workers disabled until signature verification, replay protection, consent, durable processing, fan-out, monitoring and interoperability gates pass.
