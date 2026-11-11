@@ -178,7 +178,7 @@ paths:
           description: Content moderation requires review; no post is published.
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApiError' }
+              schema: { $ref: '#/components/schemas/ModerationReviewEnvelope' }
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/social/posts/{postId}/interaction-summary:
@@ -468,6 +468,23 @@ components:
             id: { type: string }
             idempotent_replay: { const: true }
         error: { type: 'null' }
+        request_id: { type: string }
+    ModerationReviewEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: false }
+        data:
+          type: object
+          additionalProperties: true
+          description: Moderation result returned for review; exact provider DTO remains owned by the Backend.
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { const: CONTENT_REQUIRES_REVIEW }
+            message: { type: string }
+          additionalProperties: false
         request_id: { type: string }
     ApiError:
       type: object
