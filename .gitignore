@@ -1,0 +1,10 @@
+node_modules/
+dist/
+coverage/
+.dart_tool/
+.packages
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
