@@ -393,13 +393,19 @@ components:
       description: Temporary extensible schema. Replace with an implementation-backed DTO when exact wire shape is verified.
     ApiError:
       type: object
-      additionalProperties: true
+      required: [ok, data, error, request_id]
       properties:
+        ok: { const: false }
+        data: { type: 'null' }
         error:
-          type: string
-          description: Error code or message; exact Backend envelope is implementation-defined.
-        message:
-          type: string
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }
+          additionalProperties: false
+        request_id: { type: string }
+      additionalProperties: true
     CursorPage:
       type: object
       additionalProperties: true
