@@ -20,6 +20,7 @@ jobs:
       - run: npm install --ignore-scripts
       - run: npm run sources:checkout
       - run: npm run lint:openapi
+      - run: npm run lint:internal-openapi
       - run: npm run typecheck
       - run: npm run build:sdk
       - run: npm test
