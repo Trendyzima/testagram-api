@@ -12,7 +12,8 @@
     "check": "npm run lint:openapi && npm run typecheck && npm test && npm run audit:backend-routes && npm run build:sdk && npm run audit:cross-repo",
     "audit:backend-routes": "node scripts/check-backend-route-contract.mjs",
     "build:sdk": "tsc -p packages/typescript/tsconfig.build.json",
-    "audit:cross-repo": "node scripts/check-cross-repo-contracts.mjs"
+    "audit:cross-repo": "node scripts/check-cross-repo-contracts.mjs",
+    "sources:checkout": "bash scripts/checkout-contract-sources.sh"
   },
   "devDependencies": {
     "@redocly/cli": "^2.77.0",
