@@ -99,8 +99,8 @@
       "contracts": [
         "docs/integration/cdn-edge-contract.md"
       ],
-      "status": "route-inventory-audited-hosting-not-verified",
-      "notes": "CDN never decides product ownership or post visibility. Hostname, origin, TLS and private-media end-to-end behavior remain deployment gates."
+      "status": "route-inventory-audited-private-playback-fail-open-gate",
+      "notes": "CDN never decides product ownership or post visibility. Hostname, origin, TLS and private-media end-to-end behavior remain deployment gates. Source audit found that asset authorization currently allows requests when PLAYBACK_SECRET is empty; fail-closed behavior and private playback tests are required before production use."
     },
     {
       "id": "federation",
