@@ -46,9 +46,8 @@ Requirements: Node.js 22+, npm 10+, Python 3.12+ only for optional tooling.
 
 ```sh
 npm install
-npm run lint:openapi
-npm run typecheck
-npm test
+git clone --depth 1 https://github.com/Trendyzima/Testagram-backend-.git ../Testagram-backend-
+npm run check
 ```
 
 Validate the spec without installing project tooling:
@@ -61,11 +60,11 @@ npx --yes @redocly/cli lint contracts/openapi/testagram-v1.yaml
 
 - `contracts/openapi/` — versioned OpenAPI source of truth.
 - `contracts/schemas/` — reusable JSON schemas.
-- `packages/typescript/` — typed fetch client foundation.
+- `packages/typescript/` — typed fetch client foundation, nested Backend error handling and idempotent post helper.
 - `packages/dart/` — reusable Dart HTTP client package with Appwrite JWT transport and tests.
 - `docs/` — architecture, ownership, capability status, security and change process.
 - `examples/` — safe request/response examples.
-- `.github/workflows/` — contract validation and tests.
+- `.github/workflows/` — OpenAPI, TypeScript, Backend route-inventory and Dart package validation.
 
 ## Production status
 
