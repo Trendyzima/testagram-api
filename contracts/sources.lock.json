@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "policy": "Each repository is pinned to an immutable commit captured during the six-repository audit. Update pins deliberately when provider source changes.",
+  "repositories": {
+    "backend": {
+      "fullName": "Trendyzima/Testagram-backend-",
+      "ref": "dc03bafdd28eab7ea22e5a7cd32748eeabf29434",
+      "checkoutPath": "source-repos/backend",
+      "sourcePaths": [
+        "cmd/api/main.go",
+        "docs/six-repository-runtime-integration-contract.md"
+      ]
+    },
+    "data-centre": {
+      "fullName": "Trendyzima/Testagram-data-centre-",
+      "ref": "1261a3a60a3cc5f9ebcb2c183b78d25bf1faf9d6",
+      "checkoutPath": "source-repos/data-centre",
+      "sourcePaths": [
+        "backend/services/platform/main.go",
+        "docs/platform/openapi/internal-platform.yaml",
+        "docs/platform/service-catalog.md"
+      ]
+    },
+    "cdn": {
+      "fullName": "Trendyzima/cdn-",
+      "ref": "ba10911595d734c2b52c1e9034e428089690fba1",
+      "checkoutPath": "source-repos/cdn",
+      "sourcePaths": [
+        "internal/edge/server.go",
+        "docs/six-repository-runtime-integration-contract.md"
+      ]
+    },
+    "flutter-client": {
+      "fullName": "Trendyzima/testagram-flutter-client-",
+      "ref": "b634574f86c65f8962495744f114613cd47b9efc",
+      "checkoutPath": "source-repos/flutter-client",
+      "sourcePaths": [
+        "pubspec.yaml",
+        "docs/six-repository-runtime-integration-contract.md"
+      ]
+    },
+    "federation": {
+      "fullName": "Trendyzima/federated-content",
+      "ref": "49050589d2715c36465d6bb766d69bb323324331",
+      "checkoutPath": "source-repos/federation",
+      "sourcePaths": [
+        "internal/httpapi/server.go",
+        "internal/httpapi/internal_activities.go",
+        "api/openapi.yaml",
+        "api/events/post-published.v1.schema.json",
+        "docs/six-repository-runtime-integration-contract.md"
+      ]
+    },
+    "algorithm": {
+      "fullName": "Trendyzima/the-algorithm",
+      "ref": "2a2c7a9c91a6d01474338d2b57fd031f8c478be8",
+      "checkoutPath": "source-repos/algorithm",
+      "sourcePaths": [
+        "testagram-feed/api/openapi.yaml",
+        "testagram-feed/API-CONTRACT.md",
+        "testagram-feed/INTEGRATION.md"
+      ]
+    }
+  },
+  "snapshots": [
+    {
+      "repository": "algorithm",
+      "sourcePath": "testagram-feed/api/openapi.yaml",
+      "snapshotPath": "contracts/upstream/algorithm/openapi.yaml"
+    },
+    {
+      "repository": "data-centre",
+      "sourcePath": "docs/platform/openapi/internal-platform.yaml",
+      "snapshotPath": "contracts/upstream/datacentre/internal-platform.openapi.yaml"
+    },
+    {
+      "repository": "federation",
+      "sourcePath": "api/openapi.yaml",
+      "snapshotPath": "contracts/upstream/federation/public-activitypub.openapi.yaml"
+    },
+    {
+      "repository": "federation",
+      "sourcePath": "api/events/post-published.v1.schema.json",
+      "snapshotPath": "contracts/upstream/federation/post-published.v1.schema.json"
+    }
+  ]
+}
