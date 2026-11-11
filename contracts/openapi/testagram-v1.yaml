@@ -2,6 +2,9 @@ openapi: 3.1.0
 info:
   title: Testagram Public API
   version: 1.0.0
+  license:
+    name: MIT
+    identifier: MIT
   summary: Source-audited public API contract with provisional DTOs.
   description: |
     Contract catalogue for the public Testagram Backend API. The Backend is
@@ -18,15 +21,19 @@ info:
 servers:
   - url: https://api.testagram.site
     description: Intended production public API origin; verify DNS/runtime before release.
-  - url: http://localhost:8080
-    description: Local Backend development; configure to match the Backend listener.
 tags:
   - name: Health
+    description: Process liveness and dependency readiness.
   - name: Feed
+    description: Authorized home timeline retrieval.
   - name: Social
+    description: Posts, reactions, replies and follow relationships.
   - name: Search
+    description: Privacy-filtered people and post discovery.
   - name: Notifications
+    description: Authenticated notification retrieval and read state.
   - name: Threads
+    description: The separate long-form Threads product surface.
 security:
   - appwriteBearer: []
 paths:
@@ -138,6 +145,26 @@ paths:
             minLength: 8
             maxLength: 128
             pattern: "^[A-Za-z0-9._:-]+$"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [content, visibility]
+              properties:
+                content: { type: string, minLength: 1, maxLength: 5000 }
+                visibility: { type: string, enum: [public, followers, private] }
+      responses:
+        '200': { description: Idempotent replay of a previously created post. }
+        '201': { description: Post created. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { description: Idempotency key conflict. }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/posts/{postId}/interaction-summary:
     parameters:
       - $ref: '#/components/parameters/PostId'
     get:
@@ -410,15 +437,6 @@ components:
           additionalProperties: false
         request_id: { type: string }
       additionalProperties: true
-    CursorPage:
-      type: object
-      additionalProperties: true
-      properties:
-        items:
-          type: array
-          items: { $ref: '#/components/schemas/ExtensibleObject' }
-        nextCursor:
-          type: [string, 'null']
   responses:
     BadRequest:
       description: Invalid request.
