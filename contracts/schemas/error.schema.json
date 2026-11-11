@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://testagram.site/schemas/api-error.schema.json",
+  "title": "API Error",
+  "description": "Compatibility schema only; align exact fields with the Backend's actual error envelope before strict client decoding.",
+  "type": "object",
+  "properties": {
+    "error": { "type": "string" },
+    "message": { "type": "string" },
+    "code": { "type": "string" },
+    "requestId": { "type": "string" }
+  },
+  "additionalProperties": true
+}
