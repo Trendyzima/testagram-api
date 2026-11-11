@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "repository": "Trendyzima/testagram-api",
+  "purpose": "Contract governance, SDK distribution and cross-repository compatibility. Not a runtime gateway.",
+  "services": [
+    {
+      "id": "backend-public",
+      "repository": "Trendyzima/Testagram-backend-",
+      "role": "public-api-provider",
+      "authority": [
+        "Appwrite JWT validation",
+        "canonical user identity",
+        "product authorization",
+        "canonical product records",
+        "social graph and post lifecycle",
+        "public API orchestration"
+      ],
+      "baseUrl": "https://api.testagram.site",
+      "exposure": "public",
+      "auth": "Appwrite session JWT; Backend validates and derives identity",
+      "consumers": [
+        "flutter-client"
+      ],
+      "contracts": [
+        "contracts/openapi/testagram-v1.yaml",
+        "contracts/route-inventory/backend-public-routes.json"
+      ],
+      "status": "implemented-core-contract",
+      "notes": "Backend is the only public product API runtime. Route registration is source-audited; response DTOs are not all strict yet."
+    },
+    {
+      "id": "flutter-client",
+      "repository": "Trendyzima/testagram-flutter-client-",
+      "role": "public-api-consumer",
+      "authority": [
+        "native UI",
+        "navigation",
+        "device permissions",
+        "local presentation state",
+        "Appwrite session acquisition"
+      ],
+      "baseUrl": null,
+      "exposure": "client",
+      "auth": "Obtains Appwrite JWT and sends it only to Backend public API",
+      "consumers": [
+        "backend-public"
+      ],
+      "contracts": [
+        "packages/dart/README.md",
+        "packages/dart/lib/testagram_api.dart"
+      ],
+      "status": "consumer",
+      "notes": "Must never call private services, PostgreSQL, storage credentials, Federation or Algorithm directly."
+    },
+    {
+      "id": "data-centre-platform",
+      "repository": "Trendyzima/Testagram-data-centre-",
+      "role": "private-platform-provider",
+      "authority": [
+        "infrastructure configuration",
+        "platform event/audit intake",
+        "storage nodes",
+        "video processing",
+        "notification delivery",
+        "operations and backups"
+      ],
+      "baseUrl": "http://platform:8095",
+      "exposure": "private-network",
+      "auth": "PLATFORM_INTERNAL_TOKEN for protected writes; public config read is restricted to enabled public keys",
+      "consumers": [
+        "backend-public"
+      ],
+      "contracts": [
+        "contracts/upstream/datacentre/internal-platform.openapi.yaml"
+      ],
+      "status": "provider-contract-present-consumer-not-integrated",
+      "notes": "The Backend main branch does not yet have a verified typed platform client. The platform API is not a product API. Video and notification services are separately catalogued and need their own audited contracts before client generation."
+    },
+    {
+      "id": "cdn-edge",
+      "repository": "Trendyzima/cdn-",
+      "role": "media-delivery-provider",
+      "authority": [
+        "media byte delivery",
+        "HLS/DASH segment delivery",
+        "edge routing",
+        "cache and shield",
+        "range requests",
+        "playback-token enforcement"
+      ],
+      "baseUrl": "https://media.testagram.site",
+      "exposure": "public-media-and-restricted-operations",
+      "auth": "Public objects by policy; private media requires expiring key-bound playback authorization; purge uses PURGE_TOKEN",
+      "consumers": [
+        "backend-public",
+        "flutter-client"
+      ],
+      "contracts": [
+        "docs/integration/cdn-edge-contract.md"
+      ],
+      "status": "route-inventory-audited-hosting-not-verified",
+      "notes": "CDN never decides product ownership or post visibility. Hostname, origin, TLS and private-media end-to-end behavior remain deployment gates."
+    },
+    {
+      "id": "federation",
+      "repository": "Trendyzima/federated-content",
+      "role": "federation-protocol-provider",
+      "authority": [
+        "ActivityPub actor keys and documents",
+        "remote actor/object cache",
+        "signed inbox receipts",
+        "protocol outbox and delivery state",
+        "remote delivery"
+      ],
+      "baseUrl": "https://federation.testagram.site",
+      "exposure": "public-activitypub-and-private-backend-api",
+      "auth": "Public ActivityPub ingress uses HTTP Signatures; Backend-to-Federation uses a distinct service bearer; Federation-to-Backend uses a different service bearer",
+      "consumers": [
+        "backend-public",
+        "remote-activitypub-peers"
+      ],
+      "contracts": [
+        "contracts/upstream/federation/public-activitypub.openapi.yaml",
+        "docs/integration/federation-private-contract.md",
+        "contracts/upstream/federation/post-published.v1.schema.json"
+      ],
+      "status": "protocol-and-private-ingress-partial",
+      "notes": "Backend remains authoritative for local identity, privacy, blocks, visibility and eligibility. Public federation workers remain gated; durable acceptance is not proof of completed delivery."
+    },
+    {
+      "id": "algorithm",
+      "repository": "Trendyzima/the-algorithm",
+      "role": "private-ranking-provider",
+      "authority": [
+        "ranking order and ranking scores only"
+      ],
+      "baseUrl": "http://algorithm:8092",
+      "exposure": "private-network",
+      "auth": "ALGORITHM_INTERNAL_TOKEN bearer; X-Testagram-API-Version: 1; X-Request-ID",
+      "consumers": [
+        "backend-public"
+      ],
+      "contracts": [
+        "contracts/upstream/algorithm/openapi.yaml"
+      ],
+      "status": "provider-contract-and-backend-client-present",
+      "notes": "Backend submits at most 200 already-authorized candidates and requests at most 50. Ranker may return only submitted IDs; Backend rechecks visibility and hydrates canonical records."
+    }
+  ]
+}
