@@ -34,6 +34,8 @@ tags:
     description: Authenticated notification retrieval and read state.
   - name: Threads
     description: The separate long-form Threads product surface.
+  - name: TV
+    description: Backend-owned TV catalogue and viewer-authorized playback grants.
 security:
   - appwriteBearer: []
 paths:
