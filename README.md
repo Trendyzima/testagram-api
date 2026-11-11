@@ -36,7 +36,7 @@ The API contract, compatibility, client SDK and integration-governance repositor
 
 ## Verified contract status
 
-The OpenAPI document includes only routes and semantics evidenced by the current Backend and Flutter repository documentation. In particular, the main-feed create-post operation is **not** declared because the Flutter migration ledger explicitly says the Backend does not yet register a first-class create-post route. TV catalogue/player, marketplace, advertising, wallet/M-Pesa, admin and several profile/messaging capabilities remain future contract work until their owning services expose and test real endpoints.
+The OpenAPI document includes a source-audited core route set. Backend mainline registers `POST /api/social/posts` for main-feed publishing (with an idempotency key); this is distinct from the Threads composer and is now represented in the contract. The Flutter migration ledger has not yet demonstrated end-to-end integration of that route, so client adoption still requires Flutter contract tests. Media upload/attachment, TV catalogue/player, marketplace, advertising, wallet/M-Pesa, admin and several profile/messaging operations remain registered-only or future contract work until their DTOs, authorization and tests are audited.
 
 See [API capability matrix](docs/capability-matrix.md), [service ownership](docs/architecture/service-ownership.md), and [contract contribution guide](docs/CONTRIBUTING.md).
 
@@ -62,7 +62,7 @@ npx --yes @redocly/cli lint contracts/openapi/testagram-v1.yaml
 - `contracts/openapi/` — versioned OpenAPI source of truth.
 - `contracts/schemas/` — reusable JSON schemas.
 - `packages/typescript/` — typed fetch client foundation.
-- `packages/dart/` — Flutter-facing transport conventions and DTO foundation.
+- `packages/dart/` — reusable Dart HTTP client package with Appwrite JWT transport and tests.
 - `docs/` — architecture, ownership, capability status, security and change process.
 - `examples/` — safe request/response examples.
 - `.github/workflows/` — contract validation and tests.
