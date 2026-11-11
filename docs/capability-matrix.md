@@ -1,37 +1,36 @@
 # API capability and readiness matrix
 
-Status labels: **documented** means repository documentation identifies a route; it does not mean this repository independently verified a live deployment. **Not contracted** means no route is declared here until an owner supplies an implementation and tests.
+**Source registered** means the Backend `main` branch registers the route. **Contracted** means its path and method are represented in this repository's OpenAPI file. Neither status alone proves production deployment readiness. **Registered-only** operations must not be consumed by clients until DTO, auth and error semantics are promoted.
 
-| Capability | Known route/surface | Owning service | Contract status | Notes |
+| Capability | Backend route | Owner | Contract status | Integration note |
 |---|---|---|---|---|
-| Process health | GET /healthz | Backend | Documented | Liveness only |
-| Readiness | GET /readyz | Backend | Documented | Dependency readiness |
-| Home feed | GET /api/feed/home | Backend | Documented | Following filter and opaque cursor |
-| Post interaction summary | GET /api/social/posts/{id}/interaction-summary | Backend | Documented | Viewer state and counters |
-| Reaction lifecycle | POST/DELETE /api/social/posts/{id}/reaction | Backend | Documented | Verify payload fields/enums |
-| Repost lifecycle | POST/DELETE /api/social/posts/{id}/reposts | Backend | Documented | |
-| Bookmark lifecycle | POST/DELETE /api/social/posts/{id}/bookmarks | Backend | Documented | |
-| Replies | GET/POST /api/social/posts/{id}/replies | Backend | Documented | |
-| Search | GET /api/search | Backend | Documented | Privacy-filtered |
-| Follow graph | GET/POST/DELETE /api/social/follows... | Backend | Documented | Exact query/body shapes need handler verification |
-| Notifications | GET /api/social/notifications | Backend | Documented | |
-| Mark notification read | POST /api/social/notifications/{id}/read | Backend | Documented | |
-| Threads | GET/POST /api/threads and thread interactions | Backend | Documented | Separate product surface |
-| Main feed post creation | None verified | Backend | **Not implemented/contracted** | Do not fake it with Threads |
-| Main feed media lifecycle | No complete public contract verified | Backend + Data Centre + CDN | Not contracted | Backend must own upload authorization and post attachment |
-| TV catalogue/player/studio | No public client route verified | Backend + Data Centre + CDN | Not contracted | Private video services stay private |
-| Ads/creator marketplace | No public route verified | Backend | Not contracted | Include billing, consent and moderation controls only after owner design |
-| Marketplace/orders/wallet/M-Pesa | No public route verified | Backend | Not contracted | Payment state must be server-authoritative and idempotent |
-| Admin/moderation | No public route verified | Backend | Not contracted | Staff-only auth and audit requirements |
-| Federation | Public ActivityPub routes belong to Federation service | Federation + Backend | Separate protocol boundary | Do not expose private federation internals to clients |
+| Liveness/readiness | GET /healthz, GET /readyz | Backend | Contracted | Plain-text responses |
+| Home feed | GET /api/feed/home | Backend + Algorithm | Contracted | Appwrite JWT; following_only/before/limit |
+| Search | GET /api/search | Backend | Contracted | Optional auth; q/kind/limit/media_only |
+| Main-feed post creation | POST /api/social/posts | Backend | Contracted | Idempotency-Key required; Flutter integration tests still needed |
+| Post interaction summary | GET /api/social/posts/{id}/interaction-summary | Backend | Contracted | Viewer-specific state |
+| Reactions/reposts/bookmarks | POST/DELETE /api/social/posts/{id}/reaction, /reposts, /bookmarks | Backend | Contracted | Mutation DTO/status audit continues |
+| Replies | GET/POST /api/social/posts/{id}/replies | Backend | Contracted | Reply DTOs still provisional |
+| Follow state/create/delete | GET/DELETE /api/social/follows/{target_user_id}; POST /api/social/follows | Backend | Contracted | Correct target-scoped path |
+| Notifications | GET /api/social/notifications; POST /{notification_id}/read | Backend + Data Centre | Contracted | DTOs provisional |
+| Threads list/create/read | GET/POST /api/threads; GET /api/threads/{thread_id} | Backend | Contracted | Separate product surface from main-feed posts |
+| Profiles/connections/follow requests/blocks | /api/social/profiles/*, /api/social/follow-requests/*, /api/social/blocks* | Backend | Registered-only | Do not consume until schemas/auth are promoted |
+| Polls/history | /api/social/polls*, /api/social/history | Backend | Registered-only | Handler-specific DTOs pending |
+| Thread interactions/media | /api/threads/* interaction and media routes | Backend | Registered-only | Route exists; client contract pending |
+| Media lifecycle | /api/media/upload-intent, PUT /api/media/upload, /complete, /delete, /attach, /private-download-url, /list | Backend + Data Centre + CDN | Registered-only | Backend controls upload authorization; CDN only delivers bytes |
+| TV health | GET /api/tv/health | Backend + Data Centre | Registered-only | Not a TV catalogue/player contract |
+| Capability dispatcher | POST /api/capability | Backend | Registered-only | Allow-listed capability calls only; never generic arbitrary RPC |
+| Auth lifecycle | POST /api/auth/{signup,resend-verification,verify-email,login,forgot-password,reset-password} | Backend | Registered-only | Dynamic routes; dedicated auth contract required |
+| Federation preferences | GET/PUT /api/me/federation | Backend + Federation | Registered-only | Separate privacy/security review |
+| M-Pesa callback | POST /api/wallet/mpesa/callback | Backend | Webhook-only | Not a client SDK operation |
+| TV catalogue/player, ads, marketplace, creator tools, admin | No complete public client contract verified | Backend + Data Centre + CDN | Not contracted | Do not infer from private services or legacy UI |
 
 ## Promotion gate
 
-A row may move to production-ready only after all of the following are linked:
-
-1. Owning implementation route and handler.
-2. OpenAPI request/response schemas copied from actual DTOs, not guessed.
+Promote a registered-only route only after the owner supplies:
+1. Handler and DTO references.
+2. Strict OpenAPI request/response schemas.
 3. Authentication and resource-level authorization tests.
-4. Contract tests run against the owner service.
-5. Client integration and failure-state tests.
-6. Observability, rate-limit and rollback plan where relevant.
+4. Success, validation, conflict, rate-limit and dependency-failure behavior.
+5. Contract tests and client failure-state tests.
+6. Observability and rollback notes where operationally relevant.
