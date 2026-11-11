@@ -10,7 +10,24 @@ permissions:
   packages: write
 
 jobs:
+  validate-dart:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+      - working-directory: packages/dart
+        run: dart pub get
+      - working-directory: packages/dart
+        run: dart format .
+      - working-directory: packages/dart
+        run: dart analyze
+      - working-directory: packages/dart
+        run: dart test
+
   publish-typescript:
+    needs: validate-dart
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +37,9 @@ jobs:
           registry-url: https://npm.pkg.github.com
           scope: "@trendyzima"
       - run: npm install --ignore-scripts
-      - run: npm run build:sdk
+      - name: Checkout Backend source for route audit
+        run: git clone --depth 1 https://github.com/Trendyzima/Testagram-backend-.git ../Testagram-backend-
+      - run: npm run check
       - name: Publish TypeScript client to GitHub Packages
         working-directory: packages/typescript
         run: npm publish
