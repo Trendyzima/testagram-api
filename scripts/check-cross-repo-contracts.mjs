@@ -1,5 +1,5 @@
 import { readFileSync, existsSync } from "node:fs";
-import { resolve, dirname } from "node:path";
+import { resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 
 const lock = JSON.parse(readFileSync("contracts/sources.lock.json", "utf8"));
@@ -11,6 +11,17 @@ if (JSON.stringify(keys) !== JSON.stringify([...required].sort())) {
   fail.push(`Expected exactly six pinned repositories; found: ${keys.join(", ")}`);
 }
 const registryRepos = new Set(registry.services.map((s) => s.repository.toLowerCase()));
+const serviceIds = new Set();
+for (const service of registry.services) {
+  if (serviceIds.has(service.id)) fail.push(`Duplicate service registry ID: ${service.id}`);
+  serviceIds.add(service.id);
+  if (!service.status || !service.role || !service.repository) fail.push(`Incomplete service registry entry: ${service.id}`);
+  if (!Array.isArray(service.contracts) || service.contracts.length === 0) fail.push(`No contract references registered for: ${service.id}`);
+  for (const contractPath of service.contracts || []) {
+    if (!existsSync(resolve(contractPath))) fail.push(`${service.id}: contract reference missing: ${contractPath}`);
+  }
+}
+if (registry.services.length !== 6) fail.push(`Expected six runtime services; found ${registry.services.length}`);
 for (const key of required) {
   const entry = lock.repositories[key];
   if (!entry) continue;
