@@ -135,7 +135,7 @@ paths:
       operationId: createSocialPost
       tags: [Social]
       summary: Create a main-feed post
-      description: Backend source registers this route. The operation is idempotent and requires an Idempotency-Key header. This is not the Threads composer.
+      description: Backend source registers this route. The operation is idempotent per author and key; reusing a key with a different normalized payload returns 409. Backend rejects unknown JSON fields and limits the request body to 16 KiB. This is not the Threads composer.
       parameters:
         - in: header
           name: Idempotency-Key
