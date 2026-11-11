@@ -42,7 +42,7 @@ paths:
           description: Backend process is alive.
           content:
             text/plain:
-              schema: { type: string, example: "ok\\n" }
+              schema: { type: string, example: "ok\n" }
   /readyz:
     get:
       operationId: getReadiness
@@ -55,7 +55,7 @@ paths:
           description: Backend process and PostgreSQL are ready.
           content:
             text/plain:
-              schema: { type: string, example: "ready\\n" }
+              schema: { type: string, example: "ready\n" }
         '503':
           description: Backend database is unavailable.
           content:
