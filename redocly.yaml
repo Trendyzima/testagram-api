@@ -1,0 +1,11 @@
+extends:
+  - recommended
+apis:
+  testagram@v1:
+    root: contracts/openapi/testagram-v1.yaml
+rules:
+  operation-operationId: error
+  operation-summary: error
+  no-unresolved-refs: error
+  no-unused-components: warn
+  security-defined: error
