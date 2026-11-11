@@ -23,7 +23,8 @@
       ],
       "contracts": [
         "contracts/openapi/testagram-v1.yaml",
-        "contracts/route-inventory/backend-public-routes.json"
+        "contracts/route-inventory/backend-public-routes.json",
+        "contracts/internal/openapi/backend-federation-provider-v1.yaml"
       ],
       "status": "implemented-core-contract",
       "notes": "Backend is the only public product API runtime. Route registration is source-audited; response DTOs are not all strict yet."
@@ -122,7 +123,8 @@
       "contracts": [
         "contracts/upstream/federation/public-activitypub.openapi.yaml",
         "docs/integration/federation-private-contract.md",
-        "contracts/upstream/federation/post-published.v1.schema.json"
+        "contracts/upstream/federation/post-published.v1.schema.json",
+        "contracts/internal/openapi/federation-ingress-v1.yaml"
       ],
       "status": "protocol-and-private-ingress-partial",
       "notes": "Backend remains authoritative for local identity, privacy, blocks, visibility and eligibility. Public federation workers remain gated; durable acceptance is not proof of completed delivery."
