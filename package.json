@@ -8,11 +8,12 @@
     "lint:openapi": "redocly lint contracts/openapi/testagram-v1.yaml",
     "bundle:openapi": "redocly bundle contracts/openapi/testagram-v1.yaml -o dist/openapi.yaml",
     "typecheck": "tsc --noEmit",
-    "test": "node --test",
+    "test": "tsx --test",
     "check": "npm run lint:openapi && npm run typecheck && npm test"
   },
   "devDependencies": {
     "@redocly/cli": "^1.34.5",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "tsx": "^4.19.3"
   }
 }
