@@ -61,9 +61,16 @@ export class TestagramApiClient {
     }
     if (!response.ok) {
       const candidate = body && typeof body === "object" ? body as Record<string, unknown> : {};
-      const message = typeof candidate.message === "string"
-        ? candidate.message
-        : typeof candidate.error === "string" ? candidate.error : `Testagram API request failed (${response.status})`;
+      const nestedError = candidate.error && typeof candidate.error === "object"
+        ? candidate.error as Record<string, unknown>
+        : undefined;
+      const message = typeof nestedError?.message === "string"
+        ? nestedError.message
+        : typeof candidate.message === "string"
+          ? candidate.message
+          : typeof candidate.error === "string"
+            ? candidate.error
+            : `Testagram API request failed (${response.status})`;
       throw new TestagramApiError(message, response.status, body, requestId);
     }
     return body as T;
