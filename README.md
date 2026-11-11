@@ -45,7 +45,7 @@ See [API capability matrix](docs/capability-matrix.md), [service ownership](docs
 Requirements: Node.js 22+, npm 10+, Python 3.12+ only for optional tooling.
 
 ```sh
-npm ci
+npm install
 npm run lint:openapi
 npm run typecheck
 npm test
