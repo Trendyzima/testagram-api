@@ -8,7 +8,12 @@
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "cmd/api/main.go",
-        "docs/six-repository-runtime-integration-contract.md"
+        "docs/six-repository-runtime-integration-contract.md",
+        "cmd/api/social_post_create.go",
+        "cmd/api/social_post_create_test.go",
+        "cmd/api/federation_api.go",
+        "internal/algorithmclient/client.go",
+        "internal/federationclient/client.go"
       ]
     },
     "data-centre": {
@@ -48,7 +53,8 @@
         "internal/httpapi/internal_activities.go",
         "api/openapi.yaml",
         "api/events/post-published.v1.schema.json",
-        "docs/six-repository-runtime-integration-contract.md"
+        "docs/six-repository-runtime-integration-contract.md",
+        "internal/httpapi/internal_activities.go"
       ]
     },
     "algorithm": {
