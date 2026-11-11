@@ -60,12 +60,13 @@ npx --yes @redocly/cli lint contracts/openapi/testagram-v1.yaml
 ## Layout
 
 - `contracts/openapi/` — public Backend OpenAPI contract.
+- `contracts/internal/openapi/` — private Backend/Algorithm/Federation/Data Centre contracts; never export these to Flutter.
 - `contracts/upstream/` — immutable, read-only provider contract snapshots.
 - `contracts/registry/` and `contracts/sources.lock.json` — six-service registry and pinned upstream provenance.
 - `contracts/schemas/` — reusable JSON schemas.
 - `packages/typescript/` — typed fetch client foundation, nested Backend error handling and idempotent post helper.
 - `packages/dart/` — reusable Dart HTTP client package with Appwrite JWT transport and tests.
-- `docs/` — six-repository topology, ownership, integration flows, security, provider conformance audits, capability status and release gates.
+- `docs/` — six-repository topology, ownership, integration flows, downstream adoption, security, provider conformance audits, capability status and release gates.
 - `examples/` — safe request/response examples.
 - `.github/workflows/` — OpenAPI, TypeScript, Dart, Backend route inventory and six-repository snapshot validation.
 
