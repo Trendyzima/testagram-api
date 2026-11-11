@@ -2,13 +2,16 @@
 
 ## Before changing a route
 
-1. Identify the owning service and inspect its current mainline handler, DTOs and tests.
-2. Confirm method, path, auth, request body, response body, status codes and pagination semantics from source/tests.
-3. Add or update the OpenAPI operation and stable operationId.
-4. Add examples for success and failure cases.
-5. Add/adjust SDK types only from the verified schema.
-6. Run `npm run check`.
-7. For breaking changes, propose a versioned migration and update the compatibility notes.
+1. Identify the owning service and inspect its pinned source revision, current handler, DTOs and tests.
+2. Confirm the provider repository owns the implementation and source contract. Do not move business logic into this repository.
+3. Update `contracts/sources.lock.json` when intentionally advancing a provider revision; refresh upstream snapshots from that exact commit only.
+4. Update `contracts/registry/services.json` and the relevant integration flow/status when an interface or readiness state changes.
+5. Confirm method, path, auth, request body, response body, status codes and pagination semantics from source/tests.
+6. Add or update the OpenAPI operation and stable operationId.
+7. Add examples for success and failure cases.
+8. Add/adjust SDK types only from the verified schema.
+9. Run `npm run sources:checkout` and `npm run check`.
+10. For breaking changes, propose a versioned migration and update the compatibility notes.
 
 ## Compatibility rules
 
