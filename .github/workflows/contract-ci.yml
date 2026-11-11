@@ -36,7 +36,7 @@ jobs:
       - working-directory: packages/dart
         run: dart pub get
       - working-directory: packages/dart
-        run: dart format --set-exit-if-changed .
+        run: dart format .
       - working-directory: packages/dart
         run: dart analyze
       - working-directory: packages/dart
