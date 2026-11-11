@@ -9,12 +9,16 @@
     "bundle:openapi": "redocly bundle contracts/openapi/testagram-v1.yaml -o dist/openapi.yaml",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test",
-    "check": "npm run lint:openapi && npm run typecheck && npm test && npm run audit:backend-routes",
-    "audit:backend-routes": "node scripts/check-backend-route-contract.mjs"
+    "check": "npm run lint:openapi && npm run typecheck && npm test && npm run audit:backend-routes && npm run build:sdk",
+    "audit:backend-routes": "node scripts/check-backend-route-contract.mjs",
+    "build:sdk": "tsc -p packages/typescript/tsconfig.build.json"
   },
   "devDependencies": {
     "@redocly/cli": "^1.34.5",
     "typescript": "^5.8.3",
     "tsx": "^4.19.3"
-  }
+  },
+  "workspaces": [
+    "packages/typescript"
+  ]
 }
