@@ -42,15 +42,15 @@ paths:
               additionalProperties: false
               required: [activity_id, actor_user_id, activity]
               properties:
-                activity_id: { type: string, minLength: 1, maxLength: 2048, format: uri }
+                activity_id: { type: string, minLength: 1, maxLength: 2048, format: uri, pattern: '^https://' }
                 actor_user_id: { type: string, minLength: 1, maxLength: 128 }
                 activity:
                   type: object
                   required: [id, type, actor, object]
                   properties:
-                    id: { type: string, format: uri }
+                    id: { type: string, format: uri, pattern: '^https://' }
                     type: { type: string, enum: [Create, Update, Delete, Like, Announce] }
-                    actor: { type: string, format: uri }
+                    actor: { type: string, format: uri, pattern: '^https://' }
                     object: {}
       responses:
         '202':
