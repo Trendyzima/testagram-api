@@ -90,11 +90,31 @@ export class TestagramApiClient {
   delete<T>(path: string): Promise<T> {
     return this.request<T>(path, { method: "DELETE" });
   }
+
+  createPost<T = unknown>(input: {
+    content: string;
+    visibility: "public" | "followers" | "private";
+    idempotencyKey: string;
+  }): Promise<T> {
+    if (!/^[A-Za-z0-9._:-]{8,128}$/.test(input.idempotencyKey)) {
+      throw new Error("Idempotency-Key must contain 8-128 safe characters");
+    }
+    return this.request<T>("/api/social/posts", {
+      method: "POST",
+      headers: { "Idempotency-Key": input.idempotencyKey },
+      body: JSON.stringify({
+        content: input.content,
+        visibility: input.visibility,
+      }),
+    });
+  }
 }
 
 export const endpoints = {
   homeFeed: "/api/feed/home",
   search: "/api/search",
+  socialPosts: "/api/social/posts",
+  follow: "/api/social/follows",
   notifications: "/api/social/notifications",
   threads: "/api/threads",
   postInteractionSummary: (postId: string) =>
