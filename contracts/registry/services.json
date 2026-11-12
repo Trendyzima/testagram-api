@@ -128,7 +128,7 @@
         "contracts/internal/openapi/federation-ingress-v1.yaml"
       ],
       "status": "protocol-and-private-ingress-partial",
-      "notes": "Backend remains authoritative for local identity, privacy, blocks, visibility and eligibility. Public routing and workers remain gated; durable inbox acceptance is not proof of completed delivery. Provider OpenAPI and source now document the registered signed inbox accurately; readiness requires Federation PostgreSQL plus the private Backend dependency. Follow/Undo are the only active inbound projections; other accepted types remain quarantined. Backend-to-Federation and Federation-to-Backend use independent service credentials."
+      "notes": "Backend remains authoritative for local identity, privacy, blocks, visibility and eligibility. Public routing and workers remain gated; durable inbox acceptance is not proof of completed delivery. Provider OpenAPI and source now document the registered signed inbox accurately; readiness requires Federation PostgreSQL plus the private Backend dependency. Verified Follow/Undo are projected into Backend's canonical remote_follows table; Federation retains only a routing cache. Other accepted inbound types remain quarantined. Backend-to-Federation and Federation-to-Backend use independent service credentials."
     },
     {
       "id": "algorithm",
