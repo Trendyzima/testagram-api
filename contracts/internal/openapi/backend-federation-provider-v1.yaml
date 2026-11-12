@@ -153,6 +153,7 @@ paths:
                   request_id: { type: string }
         '400': { description: Invalid remote actor or Undo activity identity. }
         '401': { description: Missing or invalid Federation service credential. }
+        '409': { description: Undo activity ID conflicts with an existing canonical relationship event. }
         '503': { description: Backend database or private authentication is unavailable. }
 components:
   securitySchemes:
