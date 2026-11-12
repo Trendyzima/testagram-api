@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "545126421dd2b0fe1cbdbe5d720412e2e0cc5d92",
+      "ref": "63b8a1d464f464f0bb5d6695186e23a2387b82d2",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "Dockerfile.fresh",
@@ -96,7 +96,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "a01accf65630dc0e91c63228bbde71cb5d27c4f7",
+      "ref": "8f28ef5d06e50ba0930501de9fadd6beee97d672",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         "cloudflare/worker.js",
@@ -135,7 +135,7 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "4e8d7db1d67f397952377f6c4f84af7680cdf121",
+      "ref": "edf4f59f843514596d35273c888ff1c16ec0f73e",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
         "api/events/post-published.v1.schema.json",
