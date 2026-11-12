@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "e8af5cade1c02de5e026a8e0b0a5f9e085e2af69",
+      "ref": "237cb6408881115ebb7592502840fae053eb8ca8",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "cmd/api/main.go",
@@ -14,7 +14,8 @@
         "cmd/api/federation_api.go",
         "internal/algorithmclient/client.go",
         "internal/federationclient/client.go"
-      ]
+      ,
+        "migrations/20261112_federation_remote_follows.sql"]
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
@@ -46,7 +47,7 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "85eca68feeedb1a7fa998aa129577d77c7c55cf8",
+      "ref": "61c2742c2a9e4404bf9648c45cea5635c02787be",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
         "internal/httpapi/server.go",
