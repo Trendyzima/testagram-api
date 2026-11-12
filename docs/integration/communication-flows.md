@@ -1,6 +1,6 @@
-# Six-repository communication flows
+# Seven-repository communication flows (API control plane + six runtime repositories)
 
-## Direction and trust matrix
+This system contains **seven repositories total**: this API governance repository plus six runtime repositories. The API repository is not a seventh runtime service and must never appear in the production request path. The six runtime repositories are Backend, Flutter, Data Centre, CDN, Federated Content and The Algorithm.\n\n## Direction and trust matrix
 
 | Caller | Receiver | Interface | Credential / trust | Current status |
 |---|---|---|---|---|
@@ -9,10 +9,10 @@
 | Federation | Backend | Actor resolution, readiness and outbox reads | `FEDERATION_BACKEND_INTERNAL_TOKEN` | Private client path documented; keep internal |
 | Backend | Federation | `POST /internal/v1/activities` | Distinct `FEDERATION_INTERNAL_TOKEN` bearer | Private ingress exists; delivery remains gated |
 | Backend | Data Centre platform | `/v1/config/*`, `/v1/events`, `/v1/audit` | `PLATFORM_INTERNAL_TOKEN` for protected writes | Provider API exists; Backend typed client is not verified |
-| Backend | CDN | Media URL/origin configuration; CDN is fetched by clients | Public URL or expiring private playback token; purge token is operator-only | Edge routes exist; production wiring not verified |
+| Backend | CDN | Backend-authorized media issuance and byte-delivery contract | Dedicated Backend-to-CDN issuer assertion, key/scope/expiry-bound; playback token separate; purge token operator-only | Issuer contract is a release gate; CDN must not infer visibility from a caller-controlled query flag |
 | Data Centre | CDN / object storage | Origin and media byte paths | Server-side origin credentials; never browser-visible | Deployment-specific |
 | Federation | remote instances | ActivityPub WebFinger, actor, inbox/outbox | HTTP Signatures and HTTPS | Protocol surface exists; public rollout gated |
-| API repo | all six repos | Versioned contracts, pinned snapshots, SDKs, CI | GitHub source artifacts; no runtime credentials | Governance only; not a runtime hop |
+| API control plane | Backend, Flutter, Data Centre, CDN, Federation and Algorithm | Versioned contracts, pinned snapshots, SDKs, fixtures and CI | GitHub source artifacts; no runtime credentials | Governance only; not a runtime hop |
 
 ## Correlation and error rules
 

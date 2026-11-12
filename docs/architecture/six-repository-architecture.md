@@ -1,10 +1,10 @@
-# Testagram six-repository architecture
+# Testagram seven-repository architecture (one API control plane + six runtime repositories)
 
 Status: integration architecture and compatibility policy. This document does not authorize production cutover.
 
 ## The API repository's job
 
-`testagram-api` is the **contract control plane**, not a seventh runtime service and not a second Go Backend. It coordinates the interfaces shared by the six runtime repositories:
+`testagram-api` is the **contract control plane**, not a seventh runtime service and not a second Go Backend. The system contains seven repositories total: this API control plane and six runtime repositories. It coordinates the interfaces shared by those six runtime repositories:
 
 - machine-readable contracts and schemas;
 - immutable upstream contract snapshots and provenance;
@@ -60,7 +60,7 @@ flowchart TD
   API -.->|Pinned ranking contract| Algo
 ```
 
-Dashed lines are governance/artifact relationships, not runtime traffic. The API repository is not in the request path.
+Dashed lines are governance/artifact relationships, not runtime traffic. The API repository is not in the request path and is not counted as a seventh runtime service.
 
 ## Runtime paths
 
