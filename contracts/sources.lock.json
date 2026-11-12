@@ -76,11 +76,11 @@
       "ref": "fba5a27b654804aeccbabd483c3df4560438cf97",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
+        "cloudflare/worker.js",
+        "cloudflare/worker.test.js",
         "docs/six-repository-runtime-integration-contract.md",
         "internal/edge/server.go",
-        "internal/edge/server_test.go",
-        "worker/src/index.ts",
-        "worker/test/index.test.ts"
+        "internal/edge/server_test.go"
       ]
     },
     "flutter-client": {
