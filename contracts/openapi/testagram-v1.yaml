@@ -957,6 +957,11 @@ components:
       content:
         application/json:
           schema: { $ref: '#/components/schemas/ApiError' }
+    RequestTooLarge:
+      description: Request body or uploaded media exceeds the configured byte limit.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
     RateLimited:
       description: Request rate limit exceeded.
       headers:
