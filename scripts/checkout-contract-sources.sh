@@ -19,11 +19,11 @@ while IFS=$'\t' read -r key full_name sha path sparse_dirs; do
 done < <(node -e '
   const x=require(process.argv[1]);
   const sparse = {
-    backend: ["cmd/api", "internal/algorithmclient", "internal/federationclient", "docs"],
+    backend: ["cmd/api", "internal/algorithmclient", "internal/federationclient", "deploy/self-hosted", "migrations", "docs"],
     "data-centre": ["backend/services/platform", "docs/platform"],
     cdn: ["internal/edge", "docs"],
     "flutter-client": ["docs"],
-    federation: ["internal/httpapi", "api", "docs"],
+    federation: ["internal/httpapi", "internal/backend", "internal/worker", "api", "docs"],
     algorithm: ["testagram-feed"]
   };
   for (const [key,r] of Object.entries(x.repositories)) {
