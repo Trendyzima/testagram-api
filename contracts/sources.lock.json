@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "041bc6a6ec3f5dc8a0b9b38fa38f1610f24aad8d",
+      "ref": "2ac236ede0b776a1f23381fcf64811fc4d5b0da8",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "cmd/api/federation_api.go",
@@ -54,7 +54,7 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "6ba44ef985fa6e212d0cea8f58cd22e09bab14e0",
+      "ref": "0299143c1205b6849171153cd95b3853a9d7da9c",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
         "api/events/post-published.v1.schema.json",
