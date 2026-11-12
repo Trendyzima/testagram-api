@@ -55,7 +55,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "c62ee6e3e9f01632a1577ec36071d7dc807e09f3",
+      "ref": "d76bc44a154b83de8ba0dddd61372b0ea887b743",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "lib/core/backend_api.dart",
@@ -74,7 +74,10 @@
         "lib/features/discovery/hashtags_screen.dart",
         "lib/features/discovery/explore_screen.dart",
         "test/features/discovery/hashtag_screen_test.dart",
-        "test/features/discovery/hashtags_screen_test.dart"
+        "test/features/discovery/hashtags_screen_test.dart",
+        "lib/features/feed/feed_screen.dart",
+        "test/features/feed/feed_screen_test.dart",
+        "docs/migration-progress.md"
       ]
     },
     "federation": {
