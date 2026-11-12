@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "b69a570c21fabe717fb3f2bf4084d42708066ece",
+      "ref": "545126421dd2b0fe1cbdbe5d720412e2e0cc5d92",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "Dockerfile.fresh",
@@ -96,7 +96,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "afc36f4b73605c5e87de2d4835adfd3b0bf3a9b7",
+      "ref": "a01accf65630dc0e91c63228bbde71cb5d27c4f7",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         "cloudflare/worker.js",
