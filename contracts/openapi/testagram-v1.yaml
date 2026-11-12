@@ -278,7 +278,7 @@ paths:
               schema: { $ref: '#/components/schemas/ExtensibleObject' }
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
-        '403': {description: Upload intent is missing, expired or belongs to another account}
+        '403': {description: "Upload intent is missing, expired or belongs to another account"}
         '409': {description: Upload intent was already consumed}
         '413': { $ref: '#/components/responses/RequestTooLarge' }
         '415': {description: Content type does not match the upload intent}
