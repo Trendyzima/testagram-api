@@ -15,7 +15,7 @@ Federation must not create canonical local users/posts or grant local visibility
 `POST /internal/v1/activities`
 
 Required headers:
-- `Authorization: Bearer <FEDERATION_INTERNAL_TOKEN>`
+- `Authorization: Bearer <FEDERATION_INTERNAL_TOKEN>` (the Backend-to-Federation secret; injected into the Federation container as `FEDERATION_INGRESS_TOKEN`)
 - `Content-Type: application/json`
 
 The Backend client also sends `X-Request-ID` and `Idempotency-Key` as correlation hints. The provider currently generates a request ID if absent and uses the body `activity_id` as its durable idempotency identity; it does not require the `Idempotency-Key` header.
@@ -43,12 +43,12 @@ Request shape:
 
 ## Federation -> Backend private actor API
 
-The six-repository runtime agreement documents these Backend endpoints for Federation:
+The six-runtime-repository integration contract documents these Backend endpoints for Federation:
 - `GET /internal/v1/federation/readyz`
 - `GET /internal/v1/federation/actors/{handle}`
 - `GET /internal/v1/federation/actors/by-id/{user_id}`
 
-These are private service interfaces, not public client APIs. Federation uses the distinct `FEDERATION_BACKEND_INTERNAL_TOKEN`; Backend-to-Federation uses `FEDERATION_INTERNAL_TOKEN`. Never reuse Appwrite user JWTs or one directional token for the reverse direction.
+These are private service interfaces, not public client APIs. Federation uses the distinct `FEDERATION_BACKEND_INTERNAL_TOKEN` (injected into the Federation container as `BACKEND_INTERNAL_TOKEN`); Backend-to-Federation uses `FEDERATION_INTERNAL_TOKEN` (injected as `FEDERATION_INGRESS_TOKEN`). These values must be independently generated and at least 32 characters. No shared-token fallback is permitted. Never reuse Appwrite user JWTs or one directional token for the reverse direction.
 
 Actor responses and outbox cursor DTOs must be promoted to strict machine-readable schemas after provider/consumer tests are aligned. This document does not invent response fields that are not currently frozen.
 
@@ -62,4 +62,4 @@ The transport is the Backend transactional PostgreSQL outbox and Federation's bo
 
 ## Public ActivityPub endpoints
 
-Public WebFinger, actor, inbox and outbox routes are owned by Federation and documented in the provider's own OpenAPI snapshot. **Provider documentation currently conflicts:** the OpenAPI top-level description says inbox ingestion is disabled, while the same spec contains POST /users/{username}/inbox and the pinned server source registers that route. Treat this as a provider documentation/rollout discrepancy; the API repository does not infer public exposure or worker readiness from route registration alone. Inbound HTTP Signatures are separate from service bearer authentication. Keep public inbox processing and outbound workers disabled until signature verification, replay protection, consent, durable processing, fan-out, monitoring and interoperability gates pass.
+Public WebFinger, actor, inbox and outbox routes are owned by Federation and documented in the provider's OpenAPI snapshot. The provider registers `POST /users/{username}/inbox`; it verifies the remote HTTP Signature, rechecks local Backend eligibility, persists the inbox receipt and only then returns HTTP 202. Readiness requires both Federation PostgreSQL and the private Backend identity dependency; unavailable dependencies return HTTP 503. Route registration and durable acceptance do not mean that public routing or background workers are enabled. Follow and Undo are the only inbound activity types with active domain processing in the current implementation; other accepted types remain quarantined until their Backend-authorized projections exist. Inbound HTTP Signatures are separate from private service bearer authentication. Keep public inbox routing and delivery/inbox/outbox workers disabled until projection, replay, consent, fan-out, monitoring, restore, key rotation and external interoperability gates pass.
