@@ -19,9 +19,9 @@ while IFS=$'\t' read -r key full_name sha path sparse_dirs; do
 done < <(node -e '
   const x=require(process.argv[1]);
   const sparse = {
-    backend: ["cmd/api", "cmd/fresh-api", "internal/freshapi", "internal/algorithmclient", "internal/federationclient", "internal/federationoutbox", "internal/virtualstorage", "deploy/self-hosted", "migrations", "docs"],
+    backend: ["cmd/api", "cmd/fresh-api", "internal/freshapi", "internal/freshfeed", "internal/freshstorage", "internal/mediaassertion", "internal/algorithmclient", "internal/federationclient", "internal/federationoutbox", "internal/virtualstorage", "deploy/self-hosted", "migrations", "docs"],
     "data-centre": ["backend/services/platform", "docs/platform"],
-    cdn: ["internal/edge", "docs"],
+    cdn: ["internal/edge", "cloudflare", "docs"],
     "flutter-client": ["docs", "lib/core", "lib/features/discovery", "lib/features/feed", "lib/features/federation", "lib/features/profile", "lib/features/settings", "lib/features/wallet", "test/features/discovery", "test/features/feed", "test/features/federation", "test/features/profile", "test/features/wallet"],
     federation: ["internal/httpapi", "internal/backend", "internal/store", "internal/worker", "api", "docs"],
     algorithm: ["testagram-feed"]
