@@ -96,14 +96,18 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "8f28ef5d06e50ba0930501de9fadd6beee97d672",
+      "ref": "7cce8b6aa9ca1ae7e282d468dac673c7af8c22fe",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         "cloudflare/worker.js",
         "cloudflare/worker.test.js",
         "docs/six-repository-runtime-integration-contract.md",
         "internal/edge/server.go",
-        "internal/edge/server_test.go"
+        "internal/edge/server_test.go",
+        "cloudflare/wrangler.toml",
+        "cloudflare/RELEASE.md",
+        ".github/workflows/deploy-private-r2-worker.yml",
+        ".github/workflows/production-media-smoke.yml"
       ]
     },
     "flutter-client": {
