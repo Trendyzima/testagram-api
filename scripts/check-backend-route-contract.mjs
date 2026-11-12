@@ -1,14 +1,23 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 
 const inventoryPath = resolve("contracts/route-inventory/backend-public-routes.json");
 const specPath = resolve("contracts/openapi/testagram-v1.yaml");
-const backendPath = resolve("source-repos/backend/cmd/api/main.go");
+const backendDir = resolve("source-repos/backend/cmd/api");
+const backendFiles = [];
+function collectGoFiles(directory) {
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const path = resolve(directory, entry.name);
+    if (entry.isDirectory()) collectGoFiles(path);
+    else if (entry.isFile() && entry.name.endsWith(".go") && !entry.name.endsWith("_test.go")) backendFiles.push(path);
+  }
+}
+collectGoFiles(backendDir);
+const source = backendFiles.map((path) => readFileSync(path, "utf8")).join("\\n");
 const postHandlerPath = resolve("source-repos/backend/cmd/api/social_post_create.go");
 const postTestsPath = resolve("source-repos/backend/cmd/api/social_post_create_test.go");
 
 const inventory = JSON.parse(readFileSync(inventoryPath, "utf8"));
-const source = readFileSync(backendPath, "utf8");
 const postHandler = readFileSync(postHandlerPath, "utf8");
 const postTests = readFileSync(postTestsPath, "utf8");
 const spec = readFileSync(specPath, "utf8");
@@ -77,7 +86,7 @@ if (missingFromInventory.length || staleInventory.length || missingFromOpenApi.l
   console.error(JSON.stringify({ missingFromInventory, staleInventory, missingFromOpenApi }, null, 2));
   process.exit(1);
 }
-console.log(`Backend route audit passed: ${registered.size} static routes inventoried; ${inventory.routes.filter((item) => item.status === "contracted").length} contracted operations covered by OpenAPI; post idempotency behavior backed by handler and tests.`);
+console.log(`Backend route audit passed: ${registered.size} static routes inventoried across ${backendFiles.length} production Go files; ${inventory.routes.filter((item) => item.status === "contracted").length} contracted operations covered by OpenAPI; post idempotency behavior backed by handler and tests.`);
 
 
 // The Render/standalone runtime is cmd/fresh-api, whose routes are registered
