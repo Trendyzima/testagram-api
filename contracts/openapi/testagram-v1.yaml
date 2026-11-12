@@ -34,6 +34,8 @@ tags:
     description: Authenticated notification retrieval and read state.
   - name: Threads
     description: The separate long-form Threads product surface.
+  - name: Federation
+    description: Authenticated Testagram federation preferences. ActivityPub protocol traffic is handled by the private Federation service, not by clients.
 security:
   - appwriteBearer: []
 paths:
@@ -421,6 +423,77 @@ paths:
               schema: { $ref: '#/components/schemas/ExtensibleObject' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
+  /api/me/federation:
+    get:
+      operationId: getMyFederationPreference
+      tags: [Federation]
+      summary: Read the authenticated user's federation preference
+      description: Returns the canonical Backend preference. Enabling federation requires username discovery to be enabled.
+      responses:
+        '200':
+          description: Current federation preference.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [enabled]
+                    properties:
+                      enabled: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    put:
+      operationId: updateMyFederationPreference
+      tags: [Federation]
+      summary: Update the authenticated user's federation preference
+      description: Backend validates the Appwrite session, account status and username discoverability. This endpoint changes preference only; it does not create a separate Mastodon account or bypass federation rollout gates.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [enabled]
+              properties:
+                enabled: { type: boolean }
+      responses:
+        '200':
+          description: Updated federation preference.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [enabled]
+                    properties:
+                      enabled: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409':
+          description: Username discovery must be enabled before federation can be enabled.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+
 components:
   securitySchemes:
     appwriteBearer:
