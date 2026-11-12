@@ -86,11 +86,15 @@ console.log(`Backend route audit passed: ${registered.size} static routes invent
 const freshInventoryPath = resolve("contracts/route-inventory/fresh-api-public-routes.json");
 const freshServerPath = resolve("source-repos/backend/internal/freshapi/server.go");
 const freshMainPath = resolve("source-repos/backend/cmd/fresh-api/main.go");
+const freshDockerfilePath = resolve("source-repos/backend/Dockerfile.fresh");
+const freshRenderPath = resolve("source-repos/backend/render.yaml");
 const freshInventory = JSON.parse(readFileSync(freshInventoryPath, "utf8"));
 const freshServer = readFileSync(freshServerPath, "utf8");
 const freshMain = readFileSync(freshMainPath, "utf8");
+const freshDockerfile = readFileSync(freshDockerfilePath, "utf8");
+const freshRender = readFileSync(freshRenderPath, "utf8");
 const freshRegistered = new Set();
-for (const match of freshServer.matchAll(/mux\\.HandleFunc\\("([A-Z]+) ([^"]+)"\\s*,/g)) {
+for (const match of freshServer.matchAll(/mux\.HandleFunc\\("([A-Z]+) ([^"]+)"\\s*,/g)) {
   freshRegistered.add(key(match[1], match[2]));
 }
 const freshExpected = new Set(freshInventory.routes.map(({ method, path }) => key(method, path)));
@@ -100,7 +104,9 @@ if (freshMissing.length || freshStale.length) {
   console.error(JSON.stringify({ freshMissing, freshStale }, null, 2));
   process.exit(1);
 }
+const validContractStatuses = new Set(["uncontracted", "compatibility-review", "contracted"]);
 for (const route of freshInventory.routes) {
+  if (!validContractStatuses.has(route.contractStatus)) throw new Error(`Unknown Fresh API contract status: ${route.contractStatus}`);
   if (route.exposure === "internal" && !route.path.startsWith("/internal/")) {
     throw new Error(`Fresh API internal route has a public path: ${route.method} ${route.path}`);
   }
@@ -114,5 +120,9 @@ for (const route of freshInventory.routes) {
 for (const marker of ["IDENTITY_PREAUTH_SECRET", "APPWRITE_SERVER_API_KEY", "FRESH_FEDERATION_INTERNAL_TOKEN", "FRESH_MEDIA_ENABLED"]) {
   if (!freshMain.includes(marker)) throw new Error(`Fresh API runtime configuration marker missing: ${marker}`);
 }
+for (const marker of ["/healthz", "HEALTHCHECK", "healthcheck"]) {
+  if (!freshDockerfile.includes(marker)) throw new Error(`Fresh API Docker healthcheck marker missing: ${marker}`);
+}
+if (!freshRender.includes("healthCheckPath: /healthz")) throw new Error("Render Blueprint must use the Fresh API /healthz endpoint.");
 const freshUncontracted = freshInventory.routes.filter((route) => route.contractStatus !== "contracted").length;
 console.log(`Fresh API runtime audit passed: ${freshRegistered.size} routes match the pinned runtime inventory; ${freshUncontracted} remain explicitly blocked from public contract adoption pending wire-level review.`);
