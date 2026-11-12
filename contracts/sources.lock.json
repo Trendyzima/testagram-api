@@ -13,9 +13,9 @@
         "cmd/api/social_post_create_test.go",
         "cmd/api/federation_api.go",
         "internal/algorithmclient/client.go",
-        "internal/federationclient/client.go"
-      ,
-        "migrations/20261112_federation_remote_follows.sql"]
+        "internal/federationclient/client.go",
+        "migrations/20261112_federation_remote_follows.sql"
+      ]
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
@@ -50,12 +50,16 @@
       "ref": "61c2742c2a9e4404bf9648c45cea5635c02787be",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
-        "internal/httpapi/server.go",
-        "internal/httpapi/internal_activities.go",
-        "api/openapi.yaml",
         "api/events/post-published.v1.schema.json",
+        "api/openapi.yaml",
         "docs/six-repository-runtime-integration-contract.md",
-        "internal/httpapi/internal_activities.go"
+        "internal/backend/client.go",
+        "internal/backend/client_test.go",
+        "internal/httpapi/internal_activities.go",
+        "internal/httpapi/internal_activities.go",
+        "internal/httpapi/server.go",
+        "internal/worker/inbox.go",
+        "internal/worker/inbox_test.go"
       ]
     },
     "algorithm": {
