@@ -18,6 +18,10 @@ const postHandlerPath = resolve("source-repos/backend/cmd/api/social_post_create
 const postTestsPath = resolve("source-repos/backend/cmd/api/social_post_create_test.go");
 
 const inventory = JSON.parse(readFileSync(inventoryPath, "utf8"));
+const sourceLock = JSON.parse(readFileSync(resolve("contracts/sources.lock.json"), "utf8"));
+if (inventory.sourceRef !== sourceLock.repositories.backend.ref) {
+  throw new Error("Legacy Backend route inventory sourceRef does not match contracts/sources.lock.json.");
+}
 const postHandler = readFileSync(postHandlerPath, "utf8");
 const postTests = readFileSync(postTestsPath, "utf8");
 const spec = readFileSync(specPath, "utf8");
@@ -98,6 +102,9 @@ const freshMainPath = resolve("source-repos/backend/cmd/fresh-api/main.go");
 const freshDockerfilePath = resolve("source-repos/backend/Dockerfile.fresh");
 const freshRenderPath = resolve("source-repos/backend/render.yaml");
 const freshInventory = JSON.parse(readFileSync(freshInventoryPath, "utf8"));
+if (freshInventory.sourceRef !== sourceLock.repositories.backend.ref) {
+  throw new Error("Fresh API route inventory sourceRef does not match contracts/sources.lock.json.");
+}
 const freshServer = readFileSync(freshServerPath, "utf8");
 const freshMain = readFileSync(freshMainPath, "utf8");
 const freshDockerfile = readFileSync(freshDockerfilePath, "utf8");
