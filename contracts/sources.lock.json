@@ -67,7 +67,6 @@
         "test/features/profile/profile_edit_screen_test.dart",
         "test/features/wallet/wallet_screen_test.dart",
         "docs/six-repository-runtime-integration-contract.md",
-        "lib/features/feed/feed_screen.dart",
         "test/backend_api_test.dart"
       ]
     },
