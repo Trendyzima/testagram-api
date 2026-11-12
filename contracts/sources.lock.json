@@ -60,7 +60,6 @@
         "internal/backend/client.go",
         "internal/backend/client_test.go",
         "internal/httpapi/internal_activities.go",
-        "internal/httpapi/internal_activities.go",
         "internal/httpapi/server.go",
         "internal/worker/inbox.go",
         "internal/worker/inbox_test.go"
