@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "623d2516ad1a5d43d322f39d70d9f401ec9de622",
+      "ref": "45b874ed52fc75e13dcac117c41381083ea01c16",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "cmd/api/main.go",
