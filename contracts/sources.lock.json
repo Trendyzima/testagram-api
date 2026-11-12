@@ -4,14 +4,17 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "45b874ed52fc75e13dcac117c41381083ea01c16",
+      "ref": "37b900a79920c7d4768727e5cd33d0e477cfb01b",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
+        "cmd/api/federation_api.go",
         "cmd/api/main.go",
-        "docs/six-repository-runtime-integration-contract.md",
         "cmd/api/social_post_create.go",
         "cmd/api/social_post_create_test.go",
-        "cmd/api/federation_api.go",
+        "deploy/self-hosted/README.md",
+        "deploy/self-hosted/apply-federation-outbox-migration.sh",
+        "deploy/self-hosted/docker-compose.yml",
+        "docs/six-repository-runtime-integration-contract.md",
         "internal/algorithmclient/client.go",
         "internal/federationclient/client.go",
         "migrations/20261112_federation_remote_follows.sql"
