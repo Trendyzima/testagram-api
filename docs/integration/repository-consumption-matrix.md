@@ -1,6 +1,6 @@
-# Six-repository integration map
+# Seven-repository integration map (API control plane + six runtime repositories)
 
-This API repository is the shared contract/SDK authority. It is not a proxy, service mesh, data store, or runtime replacement for the Backend.
+There are seven repositories in the Testagram system: this API repository plus six runtime repositories. This API repository is the shared contract/SDK authority. It is not a proxy, service mesh, data store, or runtime replacement for the Backend.
 
 | Repository | Consume from this API repo | Must not do |
 |---|---|---|

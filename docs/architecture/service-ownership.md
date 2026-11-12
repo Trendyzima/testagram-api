@@ -35,4 +35,4 @@ Flutter client -- Appwrite session JWT --> Testagram Backend public API
 
 Service-to-service credentials are separate, directional and server-side only. Never forward an Appwrite JWT as a private service token. Federation public ingress uses ActivityPub HTTP Signatures, not Appwrite authentication.
 
-See [six-repository architecture](six-repository-architecture.md), [communication flows](../integration/communication-flows.md), and [service-to-service security](../security/service-to-service-security.md).
+See [seven-repository architecture](six-repository-architecture.md), [communication flows](../integration/communication-flows.md), and [service-to-service security](../security/service-to-service-security.md).

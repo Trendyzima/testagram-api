@@ -2,7 +2,7 @@
 
 **Provider:** `Trendyzima/cdn-`  
 **Implementation source:** `internal/edge/server.go`  
-**Status:** route inventory source-audited; production DNS/origin/private playback are not verified by this document.
+**Status:** route inventory source-audited; URL helper issuer trust is a P0 release blocker (CDN issue #54); production DNS/origin/private playback are not verified by this document.
 
 ## Responsibility
 
@@ -10,7 +10,7 @@ CDN is a byte-delivery plane. It owns edge routing, local/shield caching, HLS/DA
 
 Backend remains responsible for deciding whether an object may be uploaded, attached, downloaded or played. CDN must enforce a short-lived, key-bound playback authorization for private content or use an authenticated private origin path. **Current source has a fail-open configuration edge:** when `PLAYBACK_SECRET` is empty, the asset authorization helper accepts requests without a token. Production private-media use is blocked until the CDN is changed to fail closed when private authorization is expected and staging proves missing/expired/wrong-key denial.
 
-## Registered HTTP surface
+## Critical media URL issuance boundary\n\nThe current Go CDN `GET /v1/media/url` helper accepts a caller-controlled `private=1` query flag and signs the requested normalized path itself. That flag is not a Backend authorization decision: a caller can request a signed URL for a path without proving ownership, visibility, relationship access or moderation eligibility. Omitting the flag also defaults to a public URL. Therefore this helper must not be treated as the private-media authorization API. Track and close [CDN issue #54](https://github.com/Trendyzima/cdn-/issues/54) before enabling private product media.\n\nThe required design is Backend-authorized issuance: Backend authenticates the user and resolves canonical object visibility, then sends a narrowly scoped, short-lived service assertion to CDN bound to the normalized object key, action/scope, expiry, issuer/audience and viewer where needed. CDN validates that assertion before minting a distinct playback token. Playback HMAC and Backend issuer authentication must use separate credentials and must not be interchangeable. Public delivery must be explicitly classified by Backend policy, not inferred from a missing query flag. Go CDN and R2 Worker must share the same authorization and cache semantics.\n\n## Registered HTTP surface
 
 | Method/path | Purpose | Exposure |
 |---|---|---|
