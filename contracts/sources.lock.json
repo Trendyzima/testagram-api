@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "3f1bb483ce6d839596dccb1ef50a0e0a11f32589",
+      "ref": "9a5486ea29eb62e85578d8de1fe303cb2846ddd3",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "cmd/api/federation_api.go",
@@ -53,7 +53,9 @@
         "cmd/api/thread_read.go",
         "cmd/api/thread_reposts.go",
         "cmd/api/threads_history.go",
-        "cmd/api/tv_health.go"
+        "cmd/api/tv_health.go",
+        "cmd/api/profile_avatar.go",
+        "cmd/api/profile_avatar_test.go"
       ]
     },
     "data-centre": {
