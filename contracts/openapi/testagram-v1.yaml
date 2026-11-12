@@ -106,7 +106,7 @@ paths:
       operationId: getTrendingHashtags
       tags: [Hashtags]
       summary: Retrieve trending public hashtags
-      description: Returns the most-used distinct public hashtags from the previous seven days. This is a recent-volume baseline; personalized ranking is owned by the private Algorithm service.
+      description: Returns distinct public hashtags from the previous seven days. When authenticated, followed hashtags receive viewer-specific ranking affinity; the Backend retains public visibility filtering.
       security:
         - appwriteBearer: []
         - {}
@@ -128,7 +128,7 @@ paths:
       operationId: getHashtagTimeline
       tags: [Hashtags]
       summary: Retrieve posts for a hashtag
-      description: Returns a cursor-paginated timeline. Backend applies account visibility, accepted-follow, block, mute and media authorization rules before returning records.
+      description: Returns a cursor-paginated timeline and the current viewer's private follow state. Backend applies account visibility, accepted-follow, block, mute and media authorization rules before returning records.
       security:
         - appwriteBearer: []
         - {}
@@ -153,6 +153,72 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ExtensibleObject' }
         '400': { $ref: '#/components/responses/BadRequest' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/hashtags/{tag}/follow:
+    get:
+      operationId: getHashtagFollowState
+      tags: [Hashtags]
+      summary: Get the current viewer's hashtag follow state
+      description: Authentication is optional. Anonymous viewers always receive is_following=false.
+      security:
+        - appwriteBearer: []
+        - {}
+      parameters:
+        - in: path
+          name: tag
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 64 }
+      responses:
+        '200':
+          description: Private follow state for the authenticated viewer.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    post:
+      operationId: followHashtag
+      tags: [Hashtags]
+      summary: Follow a hashtag
+      description: Creates a private interest signal used to personalize Explore. The follow is not public and is not federated.
+      security:
+        - appwriteBearer: []
+      parameters:
+        - in: path
+          name: tag
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 64 }
+      responses:
+        '200':
+          description: Hashtag follow is active.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    delete:
+      operationId: unfollowHashtag
+      tags: [Hashtags]
+      summary: Unfollow a hashtag
+      description: Removes the current viewer's private Explore interest signal.
+      security:
+        - appwriteBearer: []
+      parameters:
+        - in: path
+          name: tag
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 64 }
+      responses:
+        '200':
+          description: Hashtag follow is inactive.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/search:
     get:
