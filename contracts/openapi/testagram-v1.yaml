@@ -487,7 +487,7 @@ paths:
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '409':
-          description: Username discovery must be enabled before federation can be enabled.
+          description: The account must be public and username-discoverable before federation can be enabled.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ApiError' }
