@@ -94,7 +94,7 @@ const freshMain = readFileSync(freshMainPath, "utf8");
 const freshDockerfile = readFileSync(freshDockerfilePath, "utf8");
 const freshRender = readFileSync(freshRenderPath, "utf8");
 const freshRegistered = new Set();
-for (const match of freshServer.matchAll(/mux\.HandleFunc\\("([A-Z]+) ([^"]+)"\\s*,/g)) {
+for (const match of freshServer.matchAll(/mux\.HandleFunc\("([A-Z]+) ([^"]+)"\s*,/g)) {
   freshRegistered.add(key(match[1], match[2]));
 }
 const freshExpected = new Set(freshInventory.routes.map(({ method, path }) => key(method, path)));
