@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "sourceRepository": "Trendyzima/Testagram-backend-",
+  "sourceRef": "9a5486ea29eb62e85578d8de1fe303cb2846ddd3",
+  "sourceFile": "internal/freshapi/server.go",
+  "runtime": "cmd/fresh-api",
+  "note": "This inventory audits the Render/standalone fresh-api runtime, not the legacy cmd/api runtime. Route presence does not imply production enablement: conditional registrations require their named configuration. Routes marked uncontracted or compatibility-review are not approved for Flutter/public-client adoption. Internal routes are service-to-service only.",
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/healthz",
+      "exposure": "public",
+      "registrationCondition": "always",
+      "contractStatus": "compatibility-review"
+    },
+    {
+      "method": "GET",
+      "path": "/readyz",
+      "exposure": "public",
+      "registrationCondition": "always",
+      "contractStatus": "compatibility-review"
+    },
+    {
+      "method": "GET",
+      "path": "/readyz/platform",
+      "exposure": "public",
+      "registrationCondition": "always",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/me",
+      "exposure": "public",
+      "registrationCondition": "always",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/me/profile",
+      "exposure": "public",
+      "registrationCondition": "always",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/identity/register",
+      "exposure": "public",
+      "registrationCondition": "identity_secret_and_appwrite_server_key_configured",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/me/legal",
+      "exposure": "public",
+      "registrationCondition": "always",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/me/legal",
+      "exposure": "public",
+      "registrationCondition": "always",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/me/federation",
+      "exposure": "public",
+      "registrationCondition": "always",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "PUT",
+      "path": "/v1/me/federation",
+      "exposure": "public",
+      "registrationCondition": "always",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/feed/home",
+      "exposure": "public",
+      "registrationCondition": "always",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/feed/public",
+      "exposure": "public",
+      "registrationCondition": "always",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/posts",
+      "exposure": "public",
+      "registrationCondition": "always",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/moderation/check",
+      "exposure": "public",
+      "registrationCondition": "always",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "GET",
+      "path": "/internal/v1/federation/readyz",
+      "exposure": "internal",
+      "registrationCondition": "internal_token_configured",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "GET",
+      "path": "/internal/v1/federation/outbox",
+      "exposure": "internal",
+      "registrationCondition": "internal_token_configured",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "GET",
+      "path": "/internal/v1/federation/actors/{handle}",
+      "exposure": "internal",
+      "registrationCondition": "internal_token_configured",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "GET",
+      "path": "/internal/v1/federation/actors/by-id/{userID}",
+      "exposure": "internal",
+      "registrationCondition": "internal_token_configured",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/media/uploads/reservations",
+      "exposure": "public",
+      "registrationCondition": "storage_service_configured",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/media/uploads/{reservationID}/complete",
+      "exposure": "public",
+      "registrationCondition": "storage_service_configured",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "GET",
+      "path": "/v1/media/{objectID}/download",
+      "exposure": "public",
+      "registrationCondition": "storage_service_configured",
+      "contractStatus": "uncontracted"
+    },
+    {
+      "method": "POST",
+      "path": "/v1/media/{objectID}/restore",
+      "exposure": "public",
+      "registrationCondition": "storage_service_configured",
+      "contractStatus": "uncontracted"
+    }
+  ]
+}
