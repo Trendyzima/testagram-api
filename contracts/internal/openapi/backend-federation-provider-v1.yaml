@@ -24,13 +24,13 @@ paths:
         - $ref: '#/components/parameters/RequestId'
       responses:
         '200':
-          description: Backend database is ready.
+          description: Backend database and transactional Federation publisher are ready.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ReadyEnvelope' }
         '400': { description: Unsupported API version. }
         '401': { description: Invalid Federation service credential. }
-        '503': { description: Backend database or internal authentication is unavailable. }
+        '503': { description: Backend database, transactional publisher or internal authentication is unavailable. }
   /internal/v1/federation/actors/{handle}:
     parameters:
       - name: handle
@@ -73,6 +73,50 @@ paths:
         '401': { description: Invalid Federation service credential. }
         '404': { description: "Account missing, inactive, undiscoverable or federation-disabled." }
         '503': { description: Canonical account storage is unavailable. }
+  /internal/v1/federation/objects/{post_id}:
+    get:
+      operationId: resolveCanonicalPublicFederationObject
+      summary: Resolve a currently public canonical post as an ActivityPub Note
+      description: >
+        Federation dereferences public object URIs through this private Backend endpoint.
+        Backend rechecks post visibility, author status, public account privacy and federation
+        consent on every request. Deleted, private, protected or opted-out content is not exposed.
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '200':
+          description: Canonical public ActivityPub Note.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    required: [id, type, attributedTo, content, mediaType, published, to]
+                    properties:
+                      id: { type: string, format: uri, pattern: '^https://' }
+                      type: { const: Note }
+                      attributedTo: { type: string, format: uri, pattern: '^https://' }
+                      content: { type: string }
+                      mediaType: { const: text/html }
+                      published: { type: string, format: date-time }
+                      to:
+                        type: array
+                        items: { type: string, format: uri }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '400': { description: Invalid canonical post ID. }
+        '401': { description: Missing or invalid Federation service credential. }
+        '404': { description: Post is absent, deleted, private, protected or no longer federation-eligible. }
+        '503': { description: Backend database or private authentication is unavailable. }
   /internal/v1/federation/remote-follows:
     post:
       operationId: acceptVerifiedRemoteFollow
