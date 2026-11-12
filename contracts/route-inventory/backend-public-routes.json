@@ -35,12 +35,12 @@
     {
       "method": "GET",
       "path": "/api/me/federation",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "PUT",
       "path": "/api/me/federation",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
