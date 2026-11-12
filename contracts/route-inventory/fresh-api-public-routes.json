@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "3f1bb483ce6d839596dccb1ef50a0e0a11f32589",
+  "sourceRef": "9a5486ea29eb62e85578d8de1fe303cb2846ddd3",
   "sourceFile": "internal/freshapi/server.go",
   "runtime": "cmd/fresh-api",
   "note": "This inventory audits the Render/standalone fresh-api runtime, not the legacy cmd/api runtime. Route presence does not imply production enablement: conditional registrations require their named configuration. Routes marked uncontracted or compatibility-review are not approved for Flutter/public-client adoption. Internal routes are service-to-service only.",
