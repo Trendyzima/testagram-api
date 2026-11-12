@@ -136,7 +136,7 @@ paths:
         - in: path
           name: tag
           required: true
-          schema: { type: string, minLength: 1, maxLength: 64, pattern: "^[\\p{L}\\p{N}_]+$" }
+          schema: { type: string, minLength: 1, maxLength: 64, description: "Unicode letters, numbers or underscores; an optional leading # is accepted by the Backend." }
         - in: query
           name: before
           required: false
