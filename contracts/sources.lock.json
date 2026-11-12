@@ -54,7 +54,7 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "8f8ea255a2960871d4891278cc55a0c7ad7986e7",
+      "ref": "39de2d94195dde69da4b239cfb7816cc08f519a0",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
         "api/events/post-published.v1.schema.json",
