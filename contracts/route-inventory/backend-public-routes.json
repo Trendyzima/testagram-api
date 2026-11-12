@@ -80,17 +80,17 @@
     {
       "method": "POST",
       "path": "/api/media/attach",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
       "path": "/api/media/complete",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
       "path": "/api/media/delete",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
@@ -105,12 +105,12 @@
     {
       "method": "PUT",
       "path": "/api/media/upload",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
       "path": "/api/media/upload-intent",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "GET",
