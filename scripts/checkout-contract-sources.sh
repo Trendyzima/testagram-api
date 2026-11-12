@@ -22,7 +22,7 @@ done < <(node -e '
     backend: ["cmd/api", "internal/algorithmclient", "internal/federationclient", "internal/federationoutbox", "deploy/self-hosted", "migrations", "docs"],
     "data-centre": ["backend/services/platform", "docs/platform"],
     cdn: ["internal/edge", "docs"],
-    "flutter-client": ["docs", "lib/core", "lib/features/discovery", "lib/features/federation", "lib/features/profile", "lib/features/settings", "lib/features/wallet", "test/features/discovery", "test/features/federation", "test/features/profile", "test/features/wallet"],
+    "flutter-client": ["docs", "lib/core", "lib/features/discovery", "lib/features/feed", "lib/features/federation", "lib/features/profile", "lib/features/settings", "lib/features/wallet", "test/features/discovery", "test/features/feed", "test/features/federation", "test/features/profile", "test/features/wallet"],
     federation: ["internal/httpapi", "internal/backend", "internal/store", "internal/worker", "api", "docs"],
     algorithm: ["testagram-feed"]
   };
