@@ -23,7 +23,7 @@ done < <(node -e '
     "data-centre": ["backend/services/platform", "docs/platform"],
     cdn: ["internal/edge", "docs"],
     "flutter-client": ["docs"],
-    federation: ["internal/httpapi", "internal/backend", "internal/worker", "api", "docs"],
+    federation: ["internal/httpapi", "internal/backend", "internal/store", "internal/worker", "api", "docs"],
     algorithm: ["testagram-feed"]
   };
   for (const [key,r] of Object.entries(x.repositories)) {
