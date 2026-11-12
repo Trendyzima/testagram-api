@@ -30,7 +30,7 @@ paths:
               schema: { $ref: '#/components/schemas/ReadyEnvelope' }
         '400': { description: Unsupported API version. }
         '401': { description: Invalid Federation service credential. }
-        '503': { description: Backend database, transactional publisher or internal authentication is unavailable. }
+        '503': { description: "Backend database, transactional publisher or internal authentication is unavailable." }
   /internal/v1/federation/actors/{handle}:
     parameters:
       - name: handle
@@ -115,7 +115,7 @@ paths:
                   request_id: { type: string }
         '400': { description: Invalid canonical post ID. }
         '401': { description: Missing or invalid Federation service credential. }
-        '404': { description: Post is absent, deleted, private, protected or no longer federation-eligible. }
+        '404': { description: "Post is absent, deleted, private, protected or no longer federation-eligible." }
         '503': { description: Backend database or private authentication is unavailable. }
   /internal/v1/federation/remote-follows:
     post:
