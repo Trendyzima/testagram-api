@@ -443,7 +443,7 @@ paths:
                   data:
                     type: object
                     additionalProperties: false
-                    required: [id, user_id, username, display_name, bio, website, avatar_key, avatar_url, protected_account, followers_count, following_count, follow_status, is_following, is_followed_by, can_view_posts, is_self]
+                    required: [id, user_id, username, display_name, bio, website, location, social_links, avatar_key, avatar_url, cover_key, cover_url, protected_account, followers_count, following_count, follow_status, is_following, is_followed_by, can_view_posts, is_self]
                     properties:
                       id: { type: string, format: uuid }
                       user_id: { type: string, format: uuid }
@@ -451,8 +451,20 @@ paths:
                       display_name: { type: string }
                       bio: { type: string }
                       website: { type: string }
+                      location: { type: string, maxLength: 120 }
+                      social_links:
+                        type: object
+                        additionalProperties: false
+                        properties:
+                          x: { type: string, maxLength: 256 }
+                          twitter: { type: string, maxLength: 256 }
+                          instagram: { type: string, maxLength: 256 }
+                          linkedin: { type: string, maxLength: 256 }
+                          facebook: { type: string, maxLength: 256 }
                       avatar_key: { type: string }
                       avatar_url: { type: string }
+                      cover_key: { type: string }
+                      cover_url: { type: string }
                       protected_account: { type: boolean }
                       followers_count: { type: integer, minimum: 0 }
                       following_count: { type: integer, minimum: 0 }
@@ -466,6 +478,46 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404':
           description: The authenticated account profile is unavailable.
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    put:
+      operationId: updateMyProfile
+      tags: [Social]
+      summary: Update the authenticated user's canonical profile
+      description: Backend validates the Appwrite session, active account, profile fields and ownership/readiness of uploaded public image assets. Clients upload media through the Backend media gateway first; raw object keys are never accepted unless owned and ready.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [display_name, bio, website, location, avatar_key, cover_key, social_links]
+              properties:
+                display_name: { type: string, maxLength: 80 }
+                bio: { type: string, maxLength: 500 }
+                website: { type: string, maxLength: 2048, format: uri }
+                location: { type: string, maxLength: 120 }
+                avatar_key: { type: string, maxLength: 512 }
+                cover_key: { type: string, maxLength: 512 }
+                social_links:
+                  type: object
+                  additionalProperties: false
+                  maxProperties: 5
+                  properties:
+                    x: { type: string, maxLength: 256 }
+                    twitter: { type: string, maxLength: 256 }
+                    instagram: { type: string, maxLength: 256 }
+                    linkedin: { type: string, maxLength: 256 }
+                    facebook: { type: string, maxLength: 256 }
+      responses:
+        '200':
+          description: Updated canonical profile.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Account is not active. }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/me/federation:
     get:
