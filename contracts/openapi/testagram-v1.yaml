@@ -34,6 +34,8 @@ tags:
     description: Authenticated notification retrieval and read state.
   - name: Threads
     description: The separate long-form Threads product surface.
+  - name: Federation
+    description: Authenticated Testagram federation preferences. ActivityPub protocol traffic is handled by the private Federation service, not by clients.
 security:
   - appwriteBearer: []
 paths:
@@ -421,6 +423,121 @@ paths:
               schema: { $ref: '#/components/schemas/ExtensibleObject' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
+  /api/me/profile:
+    get:
+      operationId: getMyProfile
+      tags: [Social]
+      summary: Read the authenticated user's canonical Testagram profile
+      description: Resolves the canonical Testagram UUID from the verified Appwrite session; clients must not substitute the Appwrite user ID.
+      responses:
+        '200':
+          description: Current canonical profile and viewer relationship flags.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [id, user_id, username, display_name, bio, website, avatar_key, avatar_url, protected_account, followers_count, following_count, follow_status, is_following, is_followed_by, can_view_posts, is_self]
+                    properties:
+                      id: { type: string, format: uuid }
+                      user_id: { type: string, format: uuid }
+                      username: { type: string }
+                      display_name: { type: string }
+                      bio: { type: string }
+                      website: { type: string }
+                      avatar_key: { type: string }
+                      avatar_url: { type: string }
+                      protected_account: { type: boolean }
+                      followers_count: { type: integer, minimum: 0 }
+                      following_count: { type: integer, minimum: 0 }
+                      follow_status: { type: string, enum: ["", pending, accepted] }
+                      is_following: { type: boolean }
+                      is_followed_by: { type: boolean }
+                      can_view_posts: { type: boolean }
+                      is_self: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404':
+          description: The authenticated account profile is unavailable.
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/me/federation:
+    get:
+      operationId: getMyFederationPreference
+      tags: [Federation]
+      summary: Read the authenticated user's federation preference
+      description: Returns the canonical Backend preference. Enabling federation requires username discovery to be enabled.
+      responses:
+        '200':
+          description: Current federation preference.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [enabled]
+                    properties:
+                      enabled: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    put:
+      operationId: updateMyFederationPreference
+      tags: [Federation]
+      summary: Update the authenticated user's federation preference
+      description: Backend validates the Appwrite session, account status and username discoverability. This endpoint changes preference only; it does not create a separate Mastodon account or bypass federation rollout gates.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [enabled]
+              properties:
+                enabled: { type: boolean }
+      responses:
+        '200':
+          description: Updated federation preference.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [enabled]
+                    properties:
+                      enabled: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409':
+          description: The account must be public and username-discoverable before federation can be enabled.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+
 components:
   securitySchemes:
     appwriteBearer:

@@ -1,19 +1,27 @@
 {
   "schemaVersion": 1,
-  "policy": "Each repository is pinned to an immutable commit captured during the six-repository audit. Update pins deliberately when provider source changes.",
+  "policy": "Each of the six runtime repositories is pinned to an immutable commit; this repository is the API contract control plane. Update pins deliberately when provider source changes.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "dc03bafdd28eab7ea22e5a7cd32748eeabf29434",
+      "ref": "2ac236ede0b776a1f23381fcf64811fc4d5b0da8",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
+        "cmd/api/federation_api.go",
+        "cmd/api/federation_publish.go",
         "cmd/api/main.go",
-        "docs/six-repository-runtime-integration-contract.md",
         "cmd/api/social_post_create.go",
         "cmd/api/social_post_create_test.go",
-        "cmd/api/federation_api.go",
+        "cmd/api/social_profile.go",
+        "deploy/self-hosted/README.md",
+        "deploy/self-hosted/apply-federation-outbox-migration.sh",
+        "deploy/self-hosted/docker-compose.yml",
+        "docs/six-repository-runtime-integration-contract.md",
         "internal/algorithmclient/client.go",
-        "internal/federationclient/client.go"
+        "internal/federationclient/client.go",
+        "internal/federationoutbox/store.go",
+        "internal/federationoutbox/worker.go",
+        "migrations/20261112_federation_remote_follows.sql"
       ]
     },
     "data-centre": {
@@ -37,7 +45,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "b634574f86c65f8962495744f114613cd47b9efc",
+      "ref": "aad22ab15facd43949a2d81d7452962e5ffa203f",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "pubspec.yaml",
@@ -46,15 +54,24 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "49050589d2715c36465d6bb766d69bb323324331",
+      "ref": "7110360bd0e4c9ef42cc83a4af9044447095682d",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
-        "internal/httpapi/server.go",
-        "internal/httpapi/internal_activities.go",
-        "api/openapi.yaml",
         "api/events/post-published.v1.schema.json",
+        "api/openapi.yaml",
         "docs/six-repository-runtime-integration-contract.md",
-        "internal/httpapi/internal_activities.go"
+        "internal/backend/client.go",
+        "internal/backend/client_test.go",
+        "internal/httpapi/internal_activities.go",
+        "internal/httpapi/server.go",
+        "internal/httpapi/server_test.go",
+        "internal/store/followers.go",
+        "internal/store/schema.sql",
+        "internal/store/store_test.go",
+        "internal/worker/inbox.go",
+        "internal/worker/inbox_test.go",
+        "internal/worker/outbox.go",
+        "internal/worker/outbox_test.go"
       ]
     },
     "algorithm": {

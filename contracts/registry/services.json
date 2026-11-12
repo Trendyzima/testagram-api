@@ -13,7 +13,9 @@
         "product authorization",
         "canonical product records",
         "social graph and post lifecycle",
-        "public API orchestration"
+        "public API orchestration",
+        "canonical remote follower relationships",
+        "canonical public ActivityPub post objects"
       ],
       "baseUrl": "https://api.testagram.site",
       "exposure": "public",
@@ -27,7 +29,7 @@
         "contracts/internal/openapi/backend-federation-provider-v1.yaml"
       ],
       "status": "implemented-core-contract",
-      "notes": "Backend is the only public product API runtime. Route registration is source-audited; response DTOs are not all strict yet."
+      "notes": "Backend is the only public product API runtime and canonical authority for local and remote social relationships, public posts and privacy. It transactionally enqueues opted-in public posts for Federation and rechecks public eligibility on object dereference."
     },
     {
       "id": "flutter-client",
@@ -112,7 +114,9 @@
         "remote actor/object cache",
         "signed inbox receipts",
         "protocol outbox and delivery state",
-        "remote delivery"
+        "remote delivery",
+        "signed delivery of Backend-authorized public Create activities",
+        "public dereferencing of Backend-canonical ActivityPub Notes"
       ],
       "baseUrl": "https://federation.testagram.site",
       "exposure": "public-activitypub-and-private-backend-api",
@@ -128,7 +132,7 @@
         "contracts/internal/openapi/federation-ingress-v1.yaml"
       ],
       "status": "protocol-and-private-ingress-partial",
-      "notes": "Backend remains authoritative for local identity, privacy, blocks, visibility and eligibility. Public federation workers remain gated; durable acceptance is not proof of completed delivery. Provider public OpenAPI description says inbox ingestion is disabled while the spec and source register a signed inbox route; reconcile provider description and runtime rollout state before public activation."
+      "notes": "Backend remains authoritative for local identity, privacy, blocks, visibility, remote-follow relationships and canonical public post objects. Federation owns ActivityPub execution, signed inbox receipts, actor keys and delivery state. Public routing and workers remain gated; durable inbox acceptance is not proof of completed delivery. Follow/Undo are projected into Backend's canonical remote_follows table; unimplemented inbound Create/Update/Delete/Like/Announce/Accept/Reject/Block activities are rejected with 422 until Backend projections exist. Public Note dereferencing is proxied through Backend's eligibility-checked private object endpoint. Directional service credentials are independent."
     },
     {
       "id": "algorithm",

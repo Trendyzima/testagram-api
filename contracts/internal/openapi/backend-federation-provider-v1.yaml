@@ -24,13 +24,13 @@ paths:
         - $ref: '#/components/parameters/RequestId'
       responses:
         '200':
-          description: Backend database is ready.
+          description: Backend database and transactional Federation publisher are ready.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ReadyEnvelope' }
         '400': { description: Unsupported API version. }
         '401': { description: Invalid Federation service credential. }
-        '503': { description: Backend database or internal authentication is unavailable. }
+        '503': { description: "Backend database, transactional publisher or internal authentication is unavailable." }
   /internal/v1/federation/actors/{handle}:
     parameters:
       - name: handle
@@ -50,7 +50,7 @@ paths:
               schema: { $ref: '#/components/schemas/ActorEnvelope' }
         '400': { description: Invalid handle or unsupported API version. }
         '401': { description: Invalid Federation service credential. }
-        '404': { description: "Account missing, inactive, undiscoverable or federation-disabled." }
+        '404': { description: "Account missing, inactive, protected, undiscoverable or federation-disabled." }
         '503': { description: Canonical account storage is unavailable. }
   /internal/v1/federation/actors/by-id/{user_id}:
     parameters:
@@ -73,6 +73,132 @@ paths:
         '401': { description: Invalid Federation service credential. }
         '404': { description: "Account missing, inactive, undiscoverable or federation-disabled." }
         '503': { description: Canonical account storage is unavailable. }
+  /internal/v1/federation/objects/{post_id}:
+    get:
+      operationId: resolveCanonicalPublicFederationObject
+      summary: Resolve a currently public canonical post as an ActivityPub Note
+      description: >
+        Federation dereferences public object URIs through this private Backend endpoint.
+        Backend rechecks post visibility, author status, public account privacy and federation
+        consent on every request. Deleted, private, protected or opted-out content is not exposed.
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - $ref: '#/components/parameters/ApiVersion'
+        - $ref: '#/components/parameters/RequestId'
+      responses:
+        '200':
+          description: Canonical public ActivityPub Note.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    required: [id, type, attributedTo, content, mediaType, published, to]
+                    properties:
+                      id: { type: string, format: uri, pattern: '^https://' }
+                      type: { const: Note }
+                      attributedTo: { type: string, format: uri, pattern: '^https://' }
+                      content: { type: string }
+                      mediaType: { const: text/html }
+                      published: { type: string, format: date-time }
+                      to:
+                        type: array
+                        items: { type: string, format: uri }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '400': { description: Invalid canonical post ID. }
+        '401': { description: Missing or invalid Federation service credential. }
+        '404': { description: "Post is absent, deleted, private, protected or no longer federation-eligible." }
+        '503': { description: Backend database or private authentication is unavailable. }
+  /internal/v1/federation/remote-follows:
+    post:
+      operationId: acceptVerifiedRemoteFollow
+      summary: Record a verified remote follower in the canonical Backend social graph
+      description: >
+        Federation calls this only after validating the remote actor's signed Follow activity.
+        Backend rechecks local account status, federation consent, discoverability and public
+        account privacy before persisting the relationship. Federation's remote-follower table
+        is only a delivery-routing cache, never the canonical relationship authority.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [local_user_id, remote_actor_uri, activity_id]
+              properties:
+                local_user_id: { type: string, format: uuid }
+                remote_actor_uri: { type: string, format: uri, pattern: '^https://' }
+                activity_id: { type: string, format: uri, pattern: '^https://' }
+      responses:
+        '200':
+          description: Canonical remote follow durably recorded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    required: [status]
+                    properties:
+                      status: { const: accepted }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '400': { description: Invalid remote actor or activity identity. }
+        '401': { description: Missing or invalid Federation service credential. }
+        '403': { description: Backend account eligibility or privacy policy rejected the follow. }
+        '409': { description: Remote follow activity conflicts with an existing canonical relationship. }
+        '503': { description: Backend database or private authentication is unavailable. }
+  /internal/v1/federation/remote-follows/undo:
+    post:
+      operationId: removeVerifiedRemoteFollow
+      summary: Remove a verified remote follower from the canonical Backend social graph
+      description: Idempotently records an ActivityPub Undo Follow after Federation verifies the signed activity.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [local_user_id, remote_actor_uri, activity_id, follow_activity_id]
+              properties:
+                local_user_id: { type: string, format: uuid }
+                remote_actor_uri: { type: string, format: uri, pattern: '^https://' }
+                activity_id: { type: string, format: uri, pattern: '^https://' }
+                follow_activity_id: { type: string, format: uri, pattern: '^https://' }
+      responses:
+        '200':
+          description: Canonical remote follow removed or already absent.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    required: [removed]
+                    properties:
+                      removed: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '400': { description: Invalid remote actor or Undo activity identity. }
+        '401': { description: Missing or invalid Federation service credential. }
+        '409': { description: Undo activity ID conflicts with an existing canonical relationship event. }
+        '503': { description: Backend database or private authentication is unavailable. }
 components:
   securitySchemes:
     federationBackendBearer:
