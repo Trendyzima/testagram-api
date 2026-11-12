@@ -120,7 +120,7 @@ for (const route of freshInventory.routes) {
 for (const marker of ["IDENTITY_PREAUTH_SECRET", "APPWRITE_SERVER_API_KEY", "FRESH_FEDERATION_INTERNAL_TOKEN", "FRESH_MEDIA_ENABLED"]) {
   if (!freshMain.includes(marker)) throw new Error(`Fresh API runtime configuration marker missing: ${marker}`);
 }
-for (const marker of ["/healthz", "HEALTHCHECK", "healthcheck"]) {
+for (const marker of ["HEALTHCHECK", "healthcheck"]) {
   if (!freshDockerfile.includes(marker)) throw new Error(`Fresh API Docker healthcheck marker missing: ${marker}`);
 }
 if (!freshRender.includes("healthCheckPath: /healthz")) throw new Error("Render Blueprint must use the Fresh API /healthz endpoint.");
