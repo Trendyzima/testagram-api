@@ -52,6 +52,17 @@ These are private service interfaces, not public client APIs. Federation uses th
 
 Actor responses and outbox cursor DTOs must be promoted to strict machine-readable schemas after provider/consumer tests are aligned. This document does not invent response fields that are not currently frozen.
 
+## Verified inbound remote follows
+
+Federation validates the remote actor's HTTP Signature and the activity identity before calling the Backend private API:
+
+- `POST /internal/v1/federation/remote-follows` records the remote follower in Backend's canonical social graph.
+- `POST /internal/v1/federation/remote-follows/undo` removes that canonical relationship for a verified Undo Follow.
+- Backend rechecks local account activity, federation consent, discoverability and public-account privacy on every mutation.
+- Federation's `remote_followers` rows are a delivery-routing cache only. They are updated only after the Backend transaction succeeds.
+- Backend failure is retryable. A policy rejection is permanent and must not trigger an ActivityPub Accept.
+- The Backend migration is `migrations/20261112_federation_remote_follows.sql`; the Neon mirror is `migrations/neon/003_federation_remote_follows.sql`.
+
 ## Published-post event
 
 The private provider interfaces are specified in [Federation ingress OpenAPI](../../contracts/internal/openapi/federation-ingress-v1.yaml) and [Backend actor-provider OpenAPI](../../contracts/internal/openapi/backend-federation-provider-v1.yaml). Their source handlers are pinned in the source lock. Actor response DTOs are strict in the current Backend handler; outbox cursor DTOs must be promoted only when the exact provider endpoints are registered and tested.
