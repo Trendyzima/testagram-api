@@ -73,6 +73,86 @@ paths:
         '401': { description: Invalid Federation service credential. }
         '404': { description: "Account missing, inactive, undiscoverable or federation-disabled." }
         '503': { description: Canonical account storage is unavailable. }
+  /internal/v1/federation/remote-follows:
+    post:
+      operationId: acceptVerifiedRemoteFollow
+      summary: Record a verified remote follower in the canonical Backend social graph
+      description: >
+        Federation calls this only after validating the remote actor's signed Follow activity.
+        Backend rechecks local account status, federation consent, discoverability and public
+        account privacy before persisting the relationship. Federation's remote-follower table
+        is only a delivery-routing cache, never the canonical relationship authority.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [local_user_id, remote_actor_uri, activity_id]
+              properties:
+                local_user_id: { type: string, format: uuid }
+                remote_actor_uri: { type: string, format: uri, pattern: '^https://' }
+                activity_id: { type: string, format: uri, pattern: '^https://' }
+      responses:
+        '200':
+          description: Canonical remote follow durably recorded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    required: [status]
+                    properties:
+                      status: { const: accepted }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '400': { description: Invalid remote actor or activity identity. }
+        '401': { description: Missing or invalid Federation service credential. }
+        '403': { description: Backend account eligibility or privacy policy rejected the follow. }
+        '409': { description: Remote follow activity conflicts with an existing canonical relationship. }
+        '503': { description: Backend database or private authentication is unavailable. }
+  /internal/v1/federation/remote-follows/undo:
+    post:
+      operationId: removeVerifiedRemoteFollow
+      summary: Remove a verified remote follower from the canonical Backend social graph
+      description: Idempotently records an ActivityPub Undo Follow after Federation verifies the signed activity.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [local_user_id, remote_actor_uri, activity_id]
+              properties:
+                local_user_id: { type: string, format: uuid }
+                remote_actor_uri: { type: string, format: uri, pattern: '^https://' }
+                activity_id: { type: string, format: uri, pattern: '^https://' }
+      responses:
+        '200':
+          description: Canonical remote follow removed or already absent.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    required: [removed]
+                    properties:
+                      removed: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '400': { description: Invalid remote actor or Undo activity identity. }
+        '401': { description: Missing or invalid Federation service credential. }
+        '503': { description: Backend database or private authentication is unavailable. }
 components:
   securitySchemes:
     federationBackendBearer:
