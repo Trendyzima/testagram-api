@@ -220,6 +220,156 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/media/upload-intent:
+    post:
+      operationId: createMediaUploadIntent
+      tags: [Media]
+      summary: Reserve a bounded public-media upload
+      description: Backend authenticates the owner, enforces content type, visibility and byte limits, and returns a short-lived upload URL and opaque object key.
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [name, content_type, visibility, size_bytes]
+              properties:
+                name: {type: string, maxLength: 255}
+                content_type: {type: string, enum: [image/jpeg, image/png, image/webp, image/gif, image/avif]}
+                visibility: {type: string, enum: [public]}
+                size_bytes: {type: integer, minimum: 1, maximum: 20971520}
+      responses:
+        '201':
+          description: Reserved upload intent with object key and short-lived PUT URL.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '413': { $ref: '#/components/responses/RequestTooLarge' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/media/upload:
+    put:
+      operationId: uploadMediaBytes
+      tags: [Media]
+      summary: Stream bytes into a reserved upload intent
+      description: The client must use the URL returned by the upload-intent response, preserve its key query parameter, send the matching Content-Type, and stay within the reserved byte limit.
+      security:
+        - appwriteBearer: []
+      parameters:
+        - in: query
+          name: key
+          required: true
+          schema: {type: string, minLength: 1, maxLength: 1024}
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema: {type: string, format: binary}
+      responses:
+        '200':
+          description: Upload bytes accepted and intent moved to uploaded state.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': {description: "Upload intent is missing, expired or belongs to another account"}
+        '409': {description: Upload intent was already consumed}
+        '413': { $ref: '#/components/responses/RequestTooLarge' }
+        '415': {description: Content type does not match the upload intent}
+  /api/media/complete:
+    post:
+      operationId: completeMediaUpload
+      tags: [Media]
+      summary: Verify uploaded media and persist its metadata
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [key, visibility, content_type, checksum_sha256]
+              properties:
+                key: {type: string, minLength: 1, maxLength: 1024}
+                visibility: {type: string, enum: [public]}
+                content_type: {type: string}
+                checksum_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+      responses:
+        '200':
+          description: Verified media asset is ready for attachment.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': {description: Upload intent does not belong to the authenticated account}
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/media/attach:
+    post:
+      operationId: attachMediaToPost
+      tags: [Media]
+      summary: Attach a verified public media asset to an owned post
+      description: Only ready, owner-matched public assets can be attached. The Backend checks post ownership and visibility transactionally; attachment is idempotent.
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [key, post_id]
+              properties:
+                key: {type: string, minLength: 1, maxLength: 1024}
+                post_id: {type: string, minLength: 1, maxLength: 128}
+      responses:
+        '200':
+          description: Media is attached to the post.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': {description: Media asset or post is not owned by the authenticated account}
+        '404': {description: Media asset or post was not found}
+        '409': {description: Media is not ready or the post is not eligible}
+  /api/media/delete:
+    post:
+      operationId: deleteMediaAsset
+      tags: [Media]
+      summary: Delete an unattached media asset
+      description: Starts durable deletion for an asset owned by the authenticated account. Used to clean up un-attached uploads after a failed publish.
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [key]
+              properties:
+                key: {type: string, minLength: 1, maxLength: 1024}
+      responses:
+        '200':
+          description: Deletion accepted or already completed.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': {description: Media asset was not found}
+        '409': {description: Media asset cannot be deleted in its current state}
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/search:
     get:
       operationId: searchContent
@@ -804,6 +954,11 @@ components:
           schema: { $ref: '#/components/schemas/ApiError' }
     NotFound:
       description: Resource not found or not visible to the caller.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    RequestTooLarge:
+      description: Request body or uploaded media exceeds the configured byte limit.
       content:
         application/json:
           schema: { $ref: '#/components/schemas/ApiError' }
