@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "a386c71471c5abcffbe768660d73d597657e8566",
+      "ref": "226e17e42a0ce34392ca2b1b4b46c8ebb8ca02b6",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "Dockerfile.fresh",
@@ -86,7 +86,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "67108754bff23ac68af020a60c6dfcb421d26178",
+      "ref": "54d2d13cd0c03865d8b9c978c866388ea344e2ec",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         "backend/services/platform/main.go",
@@ -96,7 +96,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "6501a1a0e557944b94cf61b1a630923999e56015",
+      "ref": "873e56629fc3b565c16d3dfc8811bd3b5a085211",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         "cloudflare/worker.js",
@@ -108,7 +108,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "8c3feefc10bb16b9bfd7b0a3a24959575c6f3214",
+      "ref": "3b288ac5f8a6fabe67b3d6f94c40fc01b3dbc132",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "docs/migration-progress.md",
@@ -157,7 +157,7 @@
     },
     "algorithm": {
       "fullName": "Trendyzima/the-algorithm",
-      "ref": "8af83e18d45a8eec33eec6f16f0621aa82a86303",
+      "ref": "c14c8dcba960861016980bd26c87050dbc23a195",
       "checkoutPath": "source-repos/algorithm",
       "sourcePaths": [
         "testagram-feed/api/openapi.yaml",
