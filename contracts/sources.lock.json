@@ -8,6 +8,7 @@
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "cmd/api/federation_api.go",
+        "cmd/api/federation_publish.go",
         "cmd/api/main.go",
         "cmd/api/social_post_create.go",
         "cmd/api/social_post_create_test.go",
@@ -18,6 +19,8 @@
         "docs/six-repository-runtime-integration-contract.md",
         "internal/algorithmclient/client.go",
         "internal/federationclient/client.go",
+        "internal/federationoutbox/store.go",
+        "internal/federationoutbox/worker.go",
         "migrations/20261112_federation_remote_follows.sql"
       ]
     },
@@ -61,6 +64,7 @@
         "internal/backend/client_test.go",
         "internal/httpapi/internal_activities.go",
         "internal/httpapi/server.go",
+        "internal/httpapi/server_test.go",
         "internal/worker/inbox.go",
         "internal/worker/inbox_test.go"
       ]
