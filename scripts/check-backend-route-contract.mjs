@@ -13,7 +13,7 @@ function collectGoFiles(directory) {
   }
 }
 collectGoFiles(backendDir);
-const source = backendFiles.map((path) => readFileSync(path, "utf8")).join("\\n");
+const source = backendFiles.map((path) => readFileSync(path, "utf8")).join("\n");
 const postHandlerPath = resolve("source-repos/backend/cmd/api/social_post_create.go");
 const postTestsPath = resolve("source-repos/backend/cmd/api/social_post_create_test.go");
 
