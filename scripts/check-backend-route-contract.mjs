@@ -78,3 +78,41 @@ if (missingFromInventory.length || staleInventory.length || missingFromOpenApi.l
   process.exit(1);
 }
 console.log(`Backend route audit passed: ${registered.size} static routes inventoried; ${inventory.routes.filter((item) => item.status === "contracted").length} contracted operations covered by OpenAPI; post idempotency behavior backed by handler and tests.`);
+
+
+// The Render/standalone runtime is cmd/fresh-api, whose routes are registered
+// in internal/freshapi/server.go. Keep this audit separate from the legacy
+// cmd/api inventory: identical paths do not imply identical wire contracts.
+const freshInventoryPath = resolve("contracts/route-inventory/fresh-api-public-routes.json");
+const freshServerPath = resolve("source-repos/backend/internal/freshapi/server.go");
+const freshMainPath = resolve("source-repos/backend/cmd/fresh-api/main.go");
+const freshInventory = JSON.parse(readFileSync(freshInventoryPath, "utf8"));
+const freshServer = readFileSync(freshServerPath, "utf8");
+const freshMain = readFileSync(freshMainPath, "utf8");
+const freshRegistered = new Set();
+for (const match of freshServer.matchAll(/mux\\.HandleFunc\\("([A-Z]+) ([^"]+)"\\s*,/g)) {
+  freshRegistered.add(key(match[1], match[2]));
+}
+const freshExpected = new Set(freshInventory.routes.map(({ method, path }) => key(method, path)));
+const freshMissing = [...freshRegistered].filter((route) => !freshExpected.has(route)).sort();
+const freshStale = [...freshExpected].filter((route) => !freshRegistered.has(route)).sort();
+if (freshMissing.length || freshStale.length) {
+  console.error(JSON.stringify({ freshMissing, freshStale }, null, 2));
+  process.exit(1);
+}
+for (const route of freshInventory.routes) {
+  if (route.exposure === "internal" && !route.path.startsWith("/internal/")) {
+    throw new Error(`Fresh API internal route has a public path: ${route.method} ${route.path}`);
+  }
+  if (route.path.startsWith("/internal/") && route.exposure !== "internal") {
+    throw new Error(`Fresh API private route is incorrectly marked public: ${route.method} ${route.path}`);
+  }
+  if (route.registrationCondition !== "always" && !["identity_secret_and_appwrite_server_key_configured", "internal_token_configured", "storage_service_configured"].includes(route.registrationCondition)) {
+    throw new Error(`Unknown Fresh API registration condition: ${route.registrationCondition}`);
+  }
+}
+for (const marker of ["IDENTITY_PREAUTH_SECRET", "APPWRITE_SERVER_API_KEY", "FRESH_FEDERATION_INTERNAL_TOKEN", "FRESH_MEDIA_ENABLED"]) {
+  if (!freshMain.includes(marker)) throw new Error(`Fresh API runtime configuration marker missing: ${marker}`);
+}
+const freshUncontracted = freshInventory.routes.filter((route) => route.contractStatus !== "contracted").length;
+console.log(`Fresh API runtime audit passed: ${freshRegistered.size} routes match the pinned runtime inventory; ${freshUncontracted} remain explicitly blocked from public contract adoption pending wire-level review.`);
