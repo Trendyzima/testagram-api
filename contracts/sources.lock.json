@@ -128,7 +128,7 @@
     },
     "algorithm": {
       "fullName": "Trendyzima/the-algorithm",
-      "ref": "75ece601733f44960700a71b5b9f77de27758415",
+      "ref": "8af83e18d45a8eec33eec6f16f0621aa82a86303",
       "checkoutPath": "source-repos/algorithm",
       "sourcePaths": [
         "testagram-feed/api/openapi.yaml",
