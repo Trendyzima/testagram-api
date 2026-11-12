@@ -48,6 +48,11 @@
       "status": "contracted"
     },
     {
+      "method": "PUT",
+      "path": "/api/me/profile",
+      "status": "registered-only"
+    },
+    {
       "method": "POST",
       "path": "/api/media/attach",
       "status": "registered-only"
