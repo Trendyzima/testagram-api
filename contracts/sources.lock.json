@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "55f0f74a25f4978b5dccd5d36f5b2faab5eaeb45",
+      "ref": "27ec4effb22f7a75f270acce7f99f4f4033b00a1",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "cmd/api/federation_api.go",
@@ -50,14 +50,19 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "46757df6e48373659882c466e60d9904567cdf49",
+      "ref": "3386ba970cf589897084d8a63b30881efeda0e54",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "lib/core/backend_api.dart",
         "lib/features/federation/federation_settings_screen.dart",
+        "lib/features/profile/profile_edit_screen.dart",
+        "lib/features/profile/profile_screen.dart",
         "lib/features/settings/settings_screen.dart",
+        "lib/features/wallet/wallet_screen.dart",
         "pubspec.yaml",
         "test/features/federation/federation_settings_screen_test.dart",
+        "test/features/profile/profile_edit_screen_test.dart",
+        "test/features/wallet/wallet_screen_test.dart",
         "docs/six-repository-runtime-integration-contract.md"
       ]
     },
