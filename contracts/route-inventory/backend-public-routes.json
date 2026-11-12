@@ -1,6 +1,6 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "c5c92fff6d468308564bb25d09a9772f588d01bf",
+  "sourceRef": "9a5486ea29eb62e85578d8de1fe303cb2846ddd3",
   "sourceFile": "cmd/api/main.go",
   "note": "Static public/API route registrations. Dynamic auth actions are asserted separately. registered-only routes are not approved for client adoption until promoted into OpenAPI.",
   "dynamicAuthActions": [
@@ -30,6 +30,21 @@
     {
       "method": "GET",
       "path": "/api/hashtags/{tag}",
+      "status": "contracted"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hashtags/{tag}/follow",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hashtags/{tag}/follow",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hashtags/{tag}/follow",
       "status": "contracted"
     },
     {
