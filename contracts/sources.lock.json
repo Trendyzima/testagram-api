@@ -31,7 +31,9 @@
         "cmd/api/social_hashtags_test.go",
         "cmd/api/federation_publish_test.go",
         "internal/algorithmclient/client_test.go",
-        "migrations/20261112_hashtag_follows.sql"
+        "migrations/20261112_hashtag_follows.sql",
+        "cmd/api/media.go",
+        "cmd/api/media_upload_gateway_test.go"
       ]
     },
     "data-centre": {
