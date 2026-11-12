@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "a0caa00da7ef50f5f34d505d9a20ff0eb015f579",
+      "ref": "0f0b4ab2f4a1f7e4398c2332bec385882e2fa108",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "Dockerfile.fresh",
@@ -17,6 +17,7 @@
         "cmd/api/main.go",
         "cmd/api/media.go",
         "cmd/api/media_cdn_origin_test.go",
+        "cmd/api/media_replication.go",
         "cmd/api/media_upload_gateway_test.go",
         "cmd/api/polls.go",
         "cmd/api/post_views.go",
@@ -44,6 +45,7 @@
         "cmd/fresh-api/main.go",
         "deploy/self-hosted/README.md",
         "deploy/self-hosted/apply-federation-outbox-migration.sh",
+        "deploy/self-hosted/apply-media-replication-migrations.sh",
         "deploy/self-hosted/docker-compose.yml",
         "docs/six-repository-runtime-integration-contract.md",
         "internal/algorithmclient/client.go",
@@ -55,8 +57,13 @@
         "internal/freshapi/identity_test.go",
         "internal/freshapi/server.go",
         "internal/freshapi/server_test.go",
+        "internal/virtualstorage/replication.go",
+        "internal/virtualstorage/replication_test.go",
+        "internal/virtualstorage/s3provider.go",
+        "migrations/20261111_media_replica_ledger.sql",
         "migrations/20261112_federation_remote_follows.sql",
         "migrations/20261112_hashtag_follows.sql",
+        "migrations/20261112_media_replication_outbox.sql",
         "migrations/20261112_profile_presentation_fields.sql",
         "render.yaml"
       ]
