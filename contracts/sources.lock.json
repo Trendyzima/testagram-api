@@ -79,7 +79,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "bbc2bacbdc1d0516fcccfdefb5cafdd54e3e4d65",
+      "ref": "50cdd7164cf103ad4d736ea4191640bbb593315e",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "lib/core/backend_api.dart",
