@@ -22,7 +22,7 @@ done < <(node -e '
     backend: ["cmd/api", "internal/algorithmclient", "internal/federationclient", "internal/federationoutbox", "deploy/self-hosted", "migrations", "docs"],
     "data-centre": ["backend/services/platform", "docs/platform"],
     cdn: ["internal/edge", "docs"],
-    "flutter-client": ["docs"],
+    "flutter-client": ["docs", "lib/core", "lib/features/federation", "lib/features/settings", "test/features/federation"],
     federation: ["internal/httpapi", "internal/backend", "internal/store", "internal/worker", "api", "docs"],
     algorithm: ["testagram-feed"]
   };

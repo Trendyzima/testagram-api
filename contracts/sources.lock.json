@@ -45,10 +45,14 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "aad22ab15facd43949a2d81d7452962e5ffa203f",
+      "ref": "46757df6e48373659882c466e60d9904567cdf49",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
+        "lib/core/backend_api.dart",
+        "lib/features/federation/federation_settings_screen.dart",
+        "lib/features/settings/settings_screen.dart",
         "pubspec.yaml",
+        "test/features/federation/federation_settings_screen_test.dart",
         "docs/six-repository-runtime-integration-contract.md"
       ]
     },
