@@ -52,6 +52,15 @@ These are private service interfaces, not public client APIs. Federation uses th
 
 Actor responses and outbox cursor DTOs must be promoted to strict machine-readable schemas after provider/consumer tests are aligned. This document does not invent response fields that are not currently frozen.
 
+## Backend-owned public ActivityPub objects and outbound Create
+
+- Backend inserts a `Create` activity into its transactional outbox in the same PostgreSQL transaction as an opted-in account's public post.
+- Federation's dispatcher performs asynchronous signed delivery to the accepted remote-follower routing cache; a post request never waits for remote network delivery.
+- Public object IDs use `https://<federation-origin>/objects/{post_id}`.
+- Federation dereferences those IDs through `GET /internal/v1/federation/objects/{post_id}`; Backend rechecks that the post is public and its author remains active, discoverable, non-protected and federation-enabled.
+- The public object route is `GET /objects/{post_id}` and returns ActivityPub JSON only. Private, deleted, protected or opted-out posts return 404.
+- Backend readiness and actor resolution fail closed if the transactional Federation publisher is not configured. Users cannot newly enable federation without that publisher.
+
 ## Verified inbound remote follows
 
 Federation validates the remote actor's HTTP Signature and the activity identity before calling the Backend private API:
