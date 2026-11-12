@@ -84,6 +84,11 @@
     },
     {
       "method": "POST",
+      "path": "/api/media/cdn-download-url",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
       "path": "/api/media/complete",
       "status": "contracted"
     },
