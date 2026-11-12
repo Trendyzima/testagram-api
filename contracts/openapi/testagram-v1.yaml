@@ -282,6 +282,35 @@ paths:
         '409': {description: Upload intent was already consumed}
         '413': { $ref: '#/components/responses/RequestTooLarge' }
         '415': {description: Content type does not match the upload intent}
+  /api/media/cdn-download-url:
+    post:
+      operationId: issuePrivateMediaCDNAuthorization
+      tags: [Media]
+      summary: Issue viewer-bound authorization for one private media object
+      description: Backend authenticates the viewer, verifies ownership and ready/private state in the canonical media ledger, and issues a short-lived exact-object CDN assertion. The returned URL is not a bearer credential; send the returned Authorization value to the CDN. HLS multi-object playback is not covered by this exact-object grant.
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [key]
+              properties:
+                key: {type: string, minLength: 1, maxLength: 1024}
+      responses:
+        '200':
+          description: Viewer-bound CDN URL and short-lived Authorization header value.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': {description: Viewer is not authorized to access this media object}
+        '404': {description: No ready private media object owned by this viewer exists}
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/media/complete:
     post:
       operationId: completeMediaUpload
