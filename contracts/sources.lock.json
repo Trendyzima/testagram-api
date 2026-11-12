@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "d7b432af55de373901e4b782865c7d01d1f58c41",
+      "ref": "382f44a89ec2476acb4cce785f70e500eccbd184",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "cmd/api/federation_api.go",
@@ -53,7 +53,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "03e213d3f58ee6cfaca0ae3638901d89281cbc91",
+      "ref": "c62ee6e3e9f01632a1577ec36071d7dc807e09f3",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "lib/core/backend_api.dart",
@@ -67,7 +67,12 @@
         "test/features/profile/profile_edit_screen_test.dart",
         "test/features/wallet/wallet_screen_test.dart",
         "docs/six-repository-runtime-integration-contract.md",
-        "test/backend_api_test.dart"
+        "test/backend_api_test.dart",
+        "lib/features/discovery/hashtag_screen.dart",
+        "lib/features/discovery/hashtags_screen.dart",
+        "lib/features/discovery/explore_screen.dart",
+        "test/features/discovery/hashtag_screen_test.dart",
+        "test/features/discovery/hashtags_screen_test.dart"
       ]
     },
     "federation": {
@@ -94,12 +99,16 @@
     },
     "algorithm": {
       "fullName": "Trendyzima/the-algorithm",
-      "ref": "2a2c7a9c91a6d01474338d2b57fd031f8c478be8",
+      "ref": "a600b865dc650f9417f7ae40585992932f1ceef1",
       "checkoutPath": "source-repos/algorithm",
       "sourcePaths": [
         "testagram-feed/api/openapi.yaml",
         "testagram-feed/API-CONTRACT.md",
-        "testagram-feed/INTEGRATION.md"
+        "testagram-feed/INTEGRATION.md",
+        "testagram-feed/internal/ranking/topics.go",
+        "testagram-feed/internal/ranking/topics_test.go",
+        "testagram-feed/cmd/feed-api/topics.go",
+        "testagram-feed/cmd/feed-api/topics_test.go"
       ]
     }
   },
