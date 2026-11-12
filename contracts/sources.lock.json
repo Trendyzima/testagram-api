@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "382f44a89ec2476acb4cce785f70e500eccbd184",
+      "ref": "498e2d5cfba06c1a6baa73b13da68a5f3e7839b7",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "cmd/api/federation_api.go",
@@ -29,7 +29,8 @@
         "migrations/20261112_profile_presentation_fields.sql",
         "cmd/api/social_hashtags.go",
         "cmd/api/social_hashtags_test.go",
-        "cmd/api/federation_publish_test.go"
+        "cmd/api/federation_publish_test.go",
+        "internal/algorithmclient/client_test.go"
       ]
     },
     "data-centre": {
