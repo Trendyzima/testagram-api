@@ -128,11 +128,12 @@ paths:
             schema:
               type: object
               additionalProperties: false
-              required: [local_user_id, remote_actor_uri, activity_id]
+              required: [local_user_id, remote_actor_uri, activity_id, follow_activity_id]
               properties:
                 local_user_id: { type: string, format: uuid }
                 remote_actor_uri: { type: string, format: uri, pattern: '^https://' }
                 activity_id: { type: string, format: uri, pattern: '^https://' }
+                follow_activity_id: { type: string, format: uri, pattern: '^https://' }
       responses:
         '200':
           description: Canonical remote follow removed or already absent.
