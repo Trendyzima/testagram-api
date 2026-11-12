@@ -57,7 +57,7 @@ Actor responses and outbox cursor DTOs must be promoted to strict machine-readab
 Federation validates the remote actor's HTTP Signature and the activity identity before calling the Backend private API:
 
 - `POST /internal/v1/federation/remote-follows` records the remote follower in Backend's canonical social graph.
-- `POST /internal/v1/federation/remote-follows/undo` removes that canonical relationship for a verified Undo Follow.
+- `POST /internal/v1/federation/remote-follows/undo` removes that canonical relationship only when the request includes the exact original `follow_activity_id` referenced by the signed Undo.
 - Backend rechecks local account activity, federation consent, discoverability and public-account privacy on every mutation.
 - Federation's `remote_followers` rows are a delivery-routing cache only. They are updated only after the Backend transaction succeeds.
 - Backend failure is retryable. A policy rejection is permanent and must not trigger an ActivityPub Accept.
