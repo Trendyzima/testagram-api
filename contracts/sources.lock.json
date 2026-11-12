@@ -60,7 +60,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "976471b1bf443fc882b52921c8f207ad73c0f2ce",
+      "ref": "67108754bff23ac68af020a60c6dfcb421d26178",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         "backend/services/platform/main.go",
@@ -106,7 +106,7 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "4c94a813107bc6d5f70fc3186d8377cb275d7475",
+      "ref": "4e8d7db1d67f397952377f6c4f84af7680cdf121",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
         "api/events/post-published.v1.schema.json",
@@ -128,7 +128,7 @@
     },
     "algorithm": {
       "fullName": "Trendyzima/the-algorithm",
-      "ref": "75ece601733f44960700a71b5b9f77de27758415",
+      "ref": "8af83e18d45a8eec33eec6f16f0621aa82a86303",
       "checkoutPath": "source-repos/algorithm",
       "sourcePaths": [
         "testagram-feed/api/openapi.yaml",
