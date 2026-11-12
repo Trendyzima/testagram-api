@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "policy": "Each repository is pinned to an immutable commit captured during the six-repository audit. Update pins deliberately when provider source changes.",
+  "policy": "Each of the six runtime repositories is pinned to an immutable commit; this repository is the API contract control plane. Update pins deliberately when provider source changes.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
@@ -46,7 +46,7 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "49050589d2715c36465d6bb766d69bb323324331",
+      "ref": "3a1a90ef95f6ad61779f802d402daa33e2083d08",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
         "internal/httpapi/server.go",
