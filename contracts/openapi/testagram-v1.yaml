@@ -77,7 +77,7 @@ paths:
       operationId: getHomeFeed
       tags: [Feed]
       summary: Retrieve the authorized home timeline
-      description: Supports the Following filter and opaque cursor pagination. Backend performs authorization and ranking orchestration.
+      description: Supports the Following filter and opaque cursor pagination. Backend performs authorization and ranking orchestration. Private media URLs may include a parallel `media_auth_headers` map keyed by exact URL; clients must attach the matching Authorization header and must not cache these short-lived bearer assertions.
       parameters:
         - in: query
           name: following_only
