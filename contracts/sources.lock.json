@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "dc03bafdd28eab7ea22e5a7cd32748eeabf29434",
+      "ref": "e8af5cade1c02de5e026a8e0b0a5f9e085e2af69",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "cmd/api/main.go",
@@ -37,7 +37,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "b634574f86c65f8962495744f114613cd47b9efc",
+      "ref": "aad22ab15facd43949a2d81d7452962e5ffa203f",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "pubspec.yaml",
