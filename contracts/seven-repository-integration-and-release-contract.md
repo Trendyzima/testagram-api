@@ -67,6 +67,10 @@ The exact revisions used by contract CI are in `contracts/sources.lock.json`. Ba
 - CDN deployment is also not established: Data Centre issue #53 tracks the canonical pinned Go CDN deployment controller, readiness, rollback and post-deploy smoke. The Cloudflare R2 Worker is separate and must remain unrouted.
 - Preserve GET, HEAD, Range, If-Range, ETag, Last-Modified, Content-Range, content type and size bounds. No untrusted redirects or direct-provider fallback.
 
+### Fresh API runtime boundary
+
+The Data Centre Compose `api` container runs Backend `cmd/fresh-api`, which is distinct from the self-hosted Backend `cmd/api` runtime. The current `cmd/api` integration branch has the typed Data Centre media client described above. The `cmd/fresh-api` runtime still uses its own `freshstorage.FromEnv()` provider path and does not yet consume `DATA_CENTRE_MEDIA_API_URL` / `FRESH_DATA_CENTRE_INTERNAL_TOKEN`. Do not pass B2/R2 credentials into the Fresh API container or enable its media flag until a Data Centre-backed adapter and canonical metadata-ledger reconciliation are implemented and tested. Keep `FRESH_MEDIA_ENABLED=false` in that profile.
+
 ### TV / HLS
 
 - Data Centre may ingest/normalize approved catalogue sources.
