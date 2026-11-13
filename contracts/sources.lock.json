@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "policy": "Each of the six runtime repositories is pinned to an immutable commit; this repository is the API contract control plane. Update pins deliberately when provider source changes.",
+  "policy": "Each of the six runtime repositories is pinned to an immutable commit reachable from its reviewed mainline; this repository is the API contract control plane. Update pins deliberately when provider source changes.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
@@ -111,7 +111,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "bf2c8fd859a2d14aa92e0344f361b42c42619c72",
+      "ref": "620589ee44ba2eb7ae793fb8cb0777356ad4d252",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         "cloudflare/worker.js",
@@ -127,7 +127,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "6a7ded08c82f65377d50f37ea8f41777bcc15c9e",
+      "ref": "015ce9f5dac13139ec8bdddbe8023b05ed19a6c2",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "docs/migration-progress.md",
