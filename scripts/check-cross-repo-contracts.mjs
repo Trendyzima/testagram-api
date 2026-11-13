@@ -200,8 +200,8 @@ for (const [label, source, marker] of [
 // profile, with a separate database and no public host port.
 const dataCentreOverlay = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/docker-compose.yml"), "utf8");
 for (const marker of [
-  'media-migrate:\\n    profiles: ["media"]',
-  'media:\\n    profiles: ["media"]',
+  "media-migrate:",
+  "media:",
   "MEDIA_DATABASE_URL",
   "MEDIA_DATABASE_NAME",
   "CREATE DATABASE",
