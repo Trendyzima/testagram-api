@@ -54,7 +54,7 @@ The exact revisions used by contract CI are in `contracts/sources.lock.json`. Ba
 - Data Centre maps the same token to the media service's `MEDIA_INTERNAL_TOKEN`; every request also carries `X-Testagram-API-Version: 1`.
 - The service exposes five private routes: upload-url, verify, status, download-url and delete under `/internal/v1/media/*`. It is not a public product API.
 - The service owns only media object lifecycle and provider operations. Backend retains ownership/visibility/quota/moderation decisions.
-- Backend's self-hosted Compose stack creates the internal Docker network named `testagram-platform`. Data Centre's media service joins that external network; start the Backend stack first. Do not publish port 8096.
+- Backend's self-hosted Compose stack creates the internal Docker network named `testagram-platform`. Data Centre's media service joins that external network; start the Backend stack first. Do not publish port 8096. This is a statically verified configuration contract, not proof that the live VPS containers are currently attached or reachable.
 - B2 credentials and R2 credentials exist only in the Data Centre media container. Backend receives only the private URL and service token.
 - The media service uses its own `MEDIA_DATABASE_URL`, not the Data Centre platform/control-plane database. `FRESH_MEDIA_ENABLED` stays false until real provider-backed staging acceptance passes.
 
@@ -69,7 +69,7 @@ The exact revisions used by contract CI are in `contracts/sources.lock.json`. Ba
 
 ### Fresh API runtime boundary
 
-The Data Centre Compose `api` container runs Backend `cmd/fresh-api`, which is distinct from the self-hosted Backend `cmd/api` runtime. The current `cmd/api` integration branch has the typed Data Centre media client described above. The `cmd/fresh-api` runtime still uses its own `freshstorage.FromEnv()` provider path and does not yet consume `DATA_CENTRE_MEDIA_API_URL` / `FRESH_DATA_CENTRE_INTERNAL_TOKEN`. Do not pass B2/R2 credentials into the Fresh API container or enable its media flag until a Data Centre-backed adapter and canonical metadata-ledger reconciliation are implemented and tested. Keep `FRESH_MEDIA_ENABLED=false` in that profile.
+The Data Centre Compose `api` container runs Backend `cmd/fresh-api`, which is distinct from the self-hosted Backend `cmd/api` runtime. The pinned Backend mainline contains the typed Data Centre media client described above, and the API contract audit checks all five client/provider/OpenAPI routes plus private Compose-network and service-token wiring. The `cmd/fresh-api` runtime still uses its own `freshstorage.FromEnv()` provider path and does not yet consume `DATA_CENTRE_MEDIA_API_URL` / `FRESH_DATA_CENTRE_INTERNAL_TOKEN`. Do not pass B2/R2 credentials into the Fresh API container or enable its media flag until a Data Centre-backed adapter and canonical metadata-ledger reconciliation are implemented and tested. Keep `FRESH_MEDIA_ENABLED=false` in that profile.
 
 ### TV / HLS
 
