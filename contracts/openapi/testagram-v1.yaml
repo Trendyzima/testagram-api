@@ -232,7 +232,7 @@ paths:
               schema: { $ref: '#/components/schemas/ExtensibleObject' }
         '400': { $ref: '#/components/responses/BadRequest' }
         '404': { description: Session or evidence reservation not found. }
-        '409': { description: Upload incomplete, checksum mismatch, or session is no longer submittable. }
+        '409': { description: "Upload incomplete, checksum mismatch, or session is no longer submittable." }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/identity/applications/{application_id}/provisioning-token:
     post:
@@ -290,7 +290,7 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { description: Appwrite email mismatch or invalid approval authorization. }
         '404': { description: Application or authorization not found. }
-        '409': { description: Approval authorization expired, consumed or replayed. }
+        '409': { description: "Approval authorization expired, consumed or replayed." }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/feed/home:
     get:
