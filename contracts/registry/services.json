@@ -77,8 +77,8 @@
         "contracts/upstream/datacentre/internal-platform.openapi.yaml",
         "docs/integration/data-centre-platform-contract.md"
       ],
-      "status": "provider-contract-drift-consumer-not-integrated",
-      "notes": "The Backend main branch does not yet have a verified typed platform client. The platform API is not a product API. Video and notification services are separately catalogued and need their own audited contracts before client generation. Source audit found OpenAPI/handler drift: config/set returns 200 JSON while spec says 204; generic route handlers do not enforce documented methods; some schema constraints are not fully enforced. See conformance report."
+      "status": "media-lifecycle-client-contract-verified-live-provider-acceptance-pending",
+      "notes": "The pinned Backend mainline contains a typed Data Centre media client and matching client tests for all five private media lifecycle routes (upload-url, verify, status, download-url and delete). API cross-repository CI statically verifies those routes against the Data Centre handler, OpenAPI snapshot, Backend Compose network and dedicated service-token wiring. This does not yet prove live B2/R2 provider write/read/hash/replication/delete/restore behavior. The separate Data Centre platform event/audit/config API still has no verified typed Backend client; do not conflate it with the media lifecycle service. Video and notification services require separately audited contracts."
     },
     {
       "id": "cdn-edge",
@@ -102,8 +102,8 @@
       "contracts": [
         "docs/integration/cdn-edge-contract.md"
       ],
-      "status": "route-inventory-audited-private-playback-fail-open-gate",
-      "notes": "CDN never decides product ownership or post visibility. Hostname, origin, TLS and private-media end-to-end behavior remain deployment gates. Source audit found that asset authorization currently allows requests when PLAYBACK_SECRET is empty; fail-closed behavior and private playback tests are required before production use."
+      "status": "private-origin-auth-and-viewer-assertion-fail-closed-static-tests-passing-deployment-acceptance-pending",
+      "notes": "The pinned Go CDN requires a trusted origin service credential for readiness and private requests, forwards the Backend viewer assertion and separate origin credential, requires the Backend origin to classify public objects explicitly, bypasses shared cache for private responses (private, no-store), and has tests for denial, origin failover, redirects, HEAD and Range. This corrects the older PLAYBACK_SECRET-empty fail-open finding. Production DNS/TLS/origin deployment, Backend public-object origin behavior and real private-media staging acceptance remain separate release gates."
     },
     {
       "id": "federation",
@@ -131,8 +131,8 @@
         "contracts/upstream/federation/post-published.v1.schema.json",
         "contracts/internal/openapi/federation-ingress-v1.yaml"
       ],
-      "status": "protocol-and-private-ingress-partial",
-      "notes": "Backend remains authoritative for local identity, privacy, blocks, visibility, remote-follow relationships and canonical public post objects. Federation owns ActivityPub execution, signed inbox receipts, actor keys and delivery state. Public routing and workers remain gated; durable inbox acceptance is not proof of completed delivery. Follow/Undo are projected into Backend's canonical remote_follows table; unimplemented inbound Create/Update/Delete/Like/Announce/Accept/Reject/Block activities are rejected with 422 until Backend projections exist. Public Note dereferencing is proxied through Backend's eligibility-checked private object endpoint. Directional service credentials are independent."
+      "status": "private-ingress-and-backend-client-implemented-public-worker-interoperability-gated",
+      "notes": "Backend publishes authorized activities to the private /internal/v1/activities ingress using a dedicated direction-specific service bearer and activity ID idempotency key. Federation authenticates the ingress, verifies Backend actor eligibility, durably enqueues the outbox item and acknowledges 202 only after acceptance. Federation-to-Backend uses a separate bearer. Public routing, inbound activity projections, delivery workers and external-peer interoperability remain gated; durable acceptance is not proof of delivery."
     },
     {
       "id": "algorithm",
@@ -150,8 +150,8 @@
       "contracts": [
         "contracts/upstream/algorithm/openapi.yaml"
       ],
-      "status": "provider-contract-and-backend-client-present",
-      "notes": "Backend submits at most 200 already-authorized candidates and requests at most 50. Ranker may return only submitted IDs; Backend rechecks visibility and hydrates canonical records."
+      "status": "feed-ranking-contract-and-backend-client-static-contract-aligned-staging-acceptance-pending",
+      "notes": "Backend submits at most 200 already-authorized candidates to POST /v1/feed/rank and requests at most 50 results. The pinned Backend client and Algorithm OpenAPI agree on the path and API-version/service-bearer headers. Backend rejects unknown/duplicate IDs and rechecks current authorization before hydration. Staging service-authentication, timeout/fallback and load acceptance remain required."
     }
   ]
 }
