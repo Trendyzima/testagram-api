@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "policy": "Immutable source pins identify exact reviewed commits on each repository mainline. Backend and Data Centre now point to merged mainline commits; CDN and Flutter point to merged mainline commits; Federation and Algorithm point to reviewed mainline commits. Fresh media remains disabled until live B2/R2, CDN authorization and Flutter playback acceptance pass.",
+  "policy": "Immutable source pins identify exact reviewed commits on repository mainlines. Backend, Data Centre, CDN and Flutter pins include the current merged integration revisions; Federation and Algorithm are pinned to reviewed mainline commits. Fresh media remains disabled until the separate Fresh API adapter, live B2/R2, CDN authorization and Flutter playback acceptance pass.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "0f370e2e81c57b7736535d7baa92a11ca096b095",
+      "ref": "68423db47447fbe39756120f6535ad07cc476b1a",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "Dockerfile.fresh",
