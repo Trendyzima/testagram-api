@@ -84,6 +84,25 @@ for (const route of mediaRoutes) {
 if (!backendMediaClient.includes('"X-Testagram-API-Version"')) fail.push("Backend Data Centre client must send X-Testagram-API-Version");
 if (!dataCentreMediaServer.includes('r.Header.Get("X-Testagram-API-Version")')) fail.push("Data Centre media server must enforce X-Testagram-API-Version");
 
+ // Deployment wiring is part of the Backend <-> Data Centre contract. Keep
+ // the media API private on the Backend-owned platform network and share only
+ // the dedicated service token; provider credentials must remain Data Centre-only.
+ const backendCompose = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/docker-compose.yml"), "utf8");
+ const backendEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
+ const dataCentreCompose = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "vps/docker-compose.fresh.yml"), "utf8");
+ const dataCentreEnvExample = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "vps/.env.example"), "utf8");
+ for (const variable of ["FRESH_MEDIA_ENABLED", "DATA_CENTRE_MEDIA_API_URL", "FRESH_DATA_CENTRE_INTERNAL_TOKEN"]) {
+   if (!backendCompose.includes(variable)) fail.push(`Backend Compose missing Data Centre media variable: ${variable}`);
+   if (!backendEnvExample.includes(variable)) fail.push(`Backend env example missing Data Centre media variable: ${variable}`);
+ }
+ if (!backendEnvExample.includes("DATA_CENTRE_MEDIA_API_URL=http://media:8096")) fail.push("Backend env example must use the private media service DNS endpoint");
+ if (!dataCentreCompose.includes("MEDIA_INTERNAL_TOKEN: ${FRESH_DATA_CENTRE_INTERNAL_TOKEN:-}")) fail.push("Data Centre media service token must use FRESH_DATA_CENTRE_INTERNAL_TOKEN");
+ if (!dataCentreEnvExample.includes("FRESH_DATA_CENTRE_INTERNAL_TOKEN=")) fail.push("Data Centre env example must document the shared internal token");
+ if (!dataCentreCompose.includes("name: testagram-platform") || !dataCentreCompose.includes("external: true")) fail.push("Data Centre media service must join the externally-created Backend platform network");
+ if (!dataCentreCompose.includes("networks: [services, platform]")) fail.push("Data Centre media service must join both its private services and Backend platform networks");
+ if (!dataCentreCompose.includes('expose: ["8096"]')) fail.push("Data Centre media API must expose only the private container port, not publish it publicly");
+ if (/B2_S3_(ACCESS_KEY_ID|SECRET_ACCESS_KEY)|R2_(ACCESS_KEY_ID|SECRET_ACCESS_KEY)/.test(backendCompose)) fail.push("B2/R2 provider credentials must not be configured in Backend Compose");
+
 const publicSpec = readFileSync("contracts/openapi/testagram-v1.yaml", "utf8");
 if (/^  \/internal\//m.test(publicSpec) || publicSpec.includes("/api/cache/purge")) {
   fail.push("Private service or operator-only route leaked into public Backend OpenAPI");
