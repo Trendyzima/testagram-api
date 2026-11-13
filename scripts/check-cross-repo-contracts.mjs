@@ -196,6 +196,28 @@ for (const [label, source, marker] of [
   if (!source.includes(marker)) fail.push(`${label} missing CDN origin contract marker: ${marker}`);
 }
 
+// The active Backend overlay must carry the optional private Data Centre media
+// profile, with a separate database and no public host port.
+const dataCentreOverlay = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/docker-compose.yml"), "utf8");
+for (const marker of [
+  'media-migrate:\\n    profiles: ["media"]',
+  'media:\\n    profiles: ["media"]',
+  "MEDIA_DATABASE_URL",
+  "MEDIA_DATABASE_NAME",
+  "CREATE DATABASE",
+  "MEDIA_INTERNAL_TOKEN: ${FRESH_DATA_CENTRE_INTERNAL_TOKEN:-}",
+  "B2_S3_BUCKET",
+  "CLOUDFLARE_R2_BUCKET",
+  'expose: ["8096"]',
+  "networks: [platform]",
+  "http://127.0.0.1:8096/readyz",
+]) {
+  if (!dataCentreOverlay.includes(marker)) fail.push(`Data Centre active overlay missing private media lifecycle contract: ${marker}`);
+}
+if (/^\\s+ports:\\s*\\n\\s+- ["']?8096:/m.test(dataCentreOverlay)) {
+  fail.push("Data Centre media service must not publish port 8096 to the host");
+}
+
 const publicSpec = readFileSync("contracts/openapi/testagram-v1.yaml", "utf8");
 if (/^  \/internal\//m.test(publicSpec) || publicSpec.includes("/api/cache/purge")) {
   fail.push("Private service or operator-only route leaked into public Backend OpenAPI");
