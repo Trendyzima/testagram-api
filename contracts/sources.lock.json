@@ -175,6 +175,7 @@
         "internal/backend/client.go",
         "internal/backend/client_test.go",
         "internal/httpapi/internal_activities.go",
+        "internal/httpapi/internal_activities_test.go",
         "internal/httpapi/server.go",
         "internal/httpapi/server_test.go",
         "internal/store/followers.go",
