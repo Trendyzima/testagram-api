@@ -78,7 +78,7 @@
         "docs/integration/data-centre-platform-contract.md"
       ],
       "status": "media-lifecycle-client-contract-verified-live-provider-acceptance-pending",
-      "notes": "The pinned Backend mainline contains a typed Data Centre media client and matching client tests for all five private media lifecycle routes (upload-url, verify, status, download-url and delete). API cross-repository CI statically verifies those routes against the Data Centre handler, OpenAPI snapshot, Backend Compose network and dedicated service-token wiring. This does not yet prove live B2/R2 provider write/read/hash/replication/delete/restore behavior. The separate Data Centre platform event/audit/config API still has no verified typed Backend client; do not conflate it with the media lifecycle service. Video and notification services require separately audited contracts."
+      "notes": "The pinned Backend mainline contains a typed Data Centre media client and matching client tests for all five private media lifecycle routes (upload-url, verify, status, download-url and delete). API cross-repository CI statically verifies those routes against the Data Centre handler, OpenAPI snapshot, Backend Compose network and dedicated service-token wiring. Live B2/R2 provider write/read/hash/replication/delete/restore acceptance remains pending. The dedicated media service does not yet have a verified Instabox adapter or full-inventory reconciliation; the separate Fresh API runtime still needs a Data Centre-backed adapter and canonical metadata-ledger reconciliation before its media flag can be enabled. The separate Data Centre platform event/audit/config API has no verified typed Backend client; video and notification services need separately audited contracts."
     },
     {
       "id": "cdn-edge",
@@ -102,8 +102,8 @@
       "contracts": [
         "docs/integration/cdn-edge-contract.md"
       ],
-      "status": "private-origin-auth-and-viewer-assertion-fail-closed-static-tests-passing-deployment-acceptance-pending",
-      "notes": "The pinned Go CDN requires a trusted origin service credential for readiness and private requests, forwards the Backend viewer assertion and separate origin credential, requires the Backend origin to classify public objects explicitly, bypasses shared cache for private responses (private, no-store), and has tests for denial, origin failover, redirects, HEAD and Range. This corrects the older PLAYBACK_SECRET-empty fail-open finding. Production DNS/TLS/origin deployment, Backend public-object origin behavior and real private-media staging acceptance remain separate release gates."
+      "status": "public-and-private-backend-origin-code-implemented-handler-acceptance-and-canonical-deployment-pending",
+      "notes": "The pinned Go CDN requires a trusted origin service credential, forwards Backend viewer assertions only for private requests, requires explicit Backend visibility classification for public cache misses, bypasses shared cache for private responses, and has fail-closed denial/redirect/range/HEAD tests. Backend PR #206 now implements the canonical ready/public origin branch and method-correct GET/HEAD signing; Backend issue #205 remains open for handler-level PostgreSQL/storage integration tests across the public/private/deleted/quarantined matrix. Data Centre issue #53 remains open because immutable Go CDN deployment, external smoke and rollback are not yet evidenced. The Cloudflare R2 Worker remains unrouted."
     },
     {
       "id": "federation",

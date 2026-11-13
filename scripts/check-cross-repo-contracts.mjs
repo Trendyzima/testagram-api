@@ -154,6 +154,26 @@ for (const [label, source, marker] of [
   if (!source.includes(marker)) fail.push(`${label} missing fail-closed media authorization marker: ${marker}`);
 }
 
+// The Backend public/private CDN origin branch is now present on the pinned mainline.
+// Keep its authorization and method-correct signing path coupled to the CDN contract.
+const backendMediaOrigin = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/media.go"), "utf8");
+const backendMediaOriginTests = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/media_cdn_origin_test.go"), "utf8");
+for (const [label, source, marker] of [
+  ["Backend CDN origin", backendMediaOrigin, "func (s *service) mediaCDNOrigin"],
+  ["Backend CDN origin", backendMediaOrigin, 'r.Header.Get("X-Testagram-Origin-Auth")'],
+  ["Backend CDN origin", backendMediaOrigin, 'assetStatus != "ready"'],
+  ["Backend CDN origin", backendMediaOrigin, 'else if visibility != "public"'],
+  ["Backend CDN origin", backendMediaOrigin, "VerifyForKey"],
+  ["Backend CDN origin", backendMediaOrigin, "PresignObjectHead"],
+  ["Backend CDN origin", backendMediaOrigin, "PresignObjectGet"],
+  ["Backend CDN origin", backendMediaOrigin, "writeCDNOriginResponse"],
+  ["Backend CDN origin tests", backendMediaOriginTests, "TestCDNOriginRequestForwardsRangeValidators"],
+  ["Backend CDN origin tests", backendMediaOriginTests, "TestWriteCDNOriginResponseHEADHasHeadersButNoBody"],
+  ["Backend CDN origin tests", backendMediaOriginTests, "TestWriteCDNOriginResponsePublicUsesSharedCachePolicy"],
+]) {
+  if (!source.includes(marker)) fail.push(`${label} missing canonical public/private origin marker: ${marker}`);
+}
+
 const publicSpec = readFileSync("contracts/openapi/testagram-v1.yaml", "utf8");
 if (/^  \/internal\//m.test(publicSpec) || publicSpec.includes("/api/cache/purge")) {
   fail.push("Private service or operator-only route leaked into public Backend OpenAPI");
