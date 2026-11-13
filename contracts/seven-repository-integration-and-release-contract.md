@@ -9,7 +9,7 @@ The six runtime repositories are Flutter, Backend, Data Centre, CDN, Federation 
 
 ## Immutable source revisions
 
-The exact revisions used by contract CI are in `contracts/sources.lock.json`. Backend and Data Centre currently point at reviewed open integration-PR heads, not merged production mainline commits. CDN and Flutter point at merged mainline commits; Federation and Algorithm point at reviewed mainline commits. A source pin is not evidence that a service is deployed.
+The exact revisions used by contract CI are in `contracts/sources.lock.json`. All six runtime source pins identify immutable commits on their repositories' main branches: Backend `ee302313a8c6a8136740e696d6b00c7fe4246a47`, Data Centre `97fda1143578400d99f175d418953e8864a57ad9`, CDN `620589ee44ba2eb7ae793fb8cb0777356ad4d252`, Flutter `32c7a033469f5bd796dc0b4b650367c1ebc3f50c`, Federation `edf4f59f843514596d35273c888ff1c16ec0f73e`, and Algorithm `6ae0532c171383b84731063d590d775524f9da1e`. Contract CI checks exact immutable checkouts and snapshots. A source pin is not evidence that a service is deployed.
 
 ## Ownership and allowed calls
 
