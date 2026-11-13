@@ -111,7 +111,8 @@
         "vps/.env.example",
         "vps/docker-compose.fresh.yml",
         "vps/FRESH-DEPLOYMENT.md",
-        "vps/docker-compose.yml"
+        "vps/docker-compose.yml",
+        "scripts/validate-testagram-platform-contracts.sh"
       ]
     },
     "cdn": {
