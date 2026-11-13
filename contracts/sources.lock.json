@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "policy": "Each of the six runtime repositories is pinned to an immutable commit reachable from its reviewed mainline; this repository is the API contract control plane. Update pins deliberately when provider source changes.",
+  "policy": "Immutable source pins identify the exact reviewed commits used by cross-repository CI. Backend and Data Centre pins may target open integration PR heads; those revisions are not deployable mainline until merged. CDN, Flutter, Federation and Algorithm pins currently target reviewed mainline commits. Update pins only with corresponding contract/source review.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
@@ -91,7 +91,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "c1a405a080410fe7e3b7754be88f5efd206f81dd",
+      "ref": "09278f36d295f142382cd8648cbff28fb4a7fb44",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         "backend/services/platform/main.go",
@@ -108,7 +108,8 @@
         "docs/platform/media-service-operations.md",
         "vps/.env.example",
         "vps/docker-compose.fresh.yml",
-        "vps/FRESH-DEPLOYMENT.md"
+        "vps/FRESH-DEPLOYMENT.md",
+        "vps/docker-compose.yml"
       ]
     },
     "cdn": {
