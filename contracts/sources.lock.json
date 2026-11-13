@@ -86,7 +86,9 @@
         "cmd/api/storage_virtual_test.go",
         "internal/media/signer.go",
         "internal/virtualstorage/storage.go",
-        "deploy/self-hosted/.env.example"
+        "deploy/self-hosted/.env.example",
+        "internal/datacentreclient/client.go",
+        "internal/datacentreclient/client_test.go"
       ]
     },
     "data-centre": {
