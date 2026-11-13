@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "policy": "Each of the six runtime repositories is pinned to an immutable commit; this repository is the API contract control plane. Update pins deliberately when provider source changes.",
+  "policy": "Immutable source pins identify exact reviewed commits on repository mainlines. Backend, Data Centre, CDN and Flutter pins include merged integration revisions; Federation and Algorithm are pinned to reviewed mainline commits. Fresh media remains disabled until the separate Fresh API adapter, live B2/R2, CDN authorization and Flutter playback acceptance pass.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "63b8a1d464f464f0bb5d6695186e23a2387b82d2",
+      "ref": "68423db47447fbe39756120f6535ad07cc476b1a",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "Dockerfile.fresh",
@@ -81,34 +81,59 @@
         "migrations/20261112_hashtag_follows.sql",
         "migrations/20261112_media_replication_outbox.sql",
         "migrations/20261112_profile_presentation_fields.sql",
-        "render.yaml"
+        "render.yaml",
+        "cmd/api/social.go",
+        "cmd/api/storage_virtual_test.go",
+        "internal/media/signer.go",
+        "internal/virtualstorage/storage.go",
+        "deploy/self-hosted/.env.example",
+        "internal/datacentreclient/client.go",
+        "internal/datacentreclient/client_test.go"
       ]
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "d57739343ec7a84acfbb276cb5a977fcedb32031",
+      "ref": "716d810ae2c7af9bb58fcb5b864288cd6de8b6d3",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         "backend/services/platform/main.go",
         "docs/platform/openapi/internal-platform.yaml",
-        "docs/platform/service-catalog.md"
+        "docs/platform/service-catalog.md",
+        ".github/workflows/media-provider-smoke.yml",
+        ".github/workflows/vps-ci.yml",
+        "backend/services/media/main.go",
+        "backend/services/media/main_test.go",
+        "backend/services/media/migrations/001_media_lifecycle.sql",
+        "backend/services/media/provider_smoke_test.go",
+        "backend/services/media/reconcile.go",
+        "docs/platform/openapi/media-lifecycle-v1.yaml",
+        "docs/platform/media-service-operations.md",
+        "vps/.env.example",
+        "vps/docker-compose.fresh.yml",
+        "vps/FRESH-DEPLOYMENT.md",
+        "vps/docker-compose.yml",
+        "scripts/validate-testagram-platform-contracts.sh"
       ]
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "8f28ef5d06e50ba0930501de9fadd6beee97d672",
+      "ref": "620589ee44ba2eb7ae793fb8cb0777356ad4d252",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         "cloudflare/worker.js",
         "cloudflare/worker.test.js",
         "docs/six-repository-runtime-integration-contract.md",
         "internal/edge/server.go",
-        "internal/edge/server_test.go"
+        "internal/edge/server_test.go",
+        "cloudflare/wrangler.toml",
+        "cloudflare/RELEASE.md",
+        ".github/workflows/deploy-private-r2-worker.yml",
+        ".github/workflows/production-media-smoke.yml"
       ]
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "7e57c03e169f75c38b972c84ddf68fbc4a964ca2",
+      "ref": "015ce9f5dac13139ec8bdddbe8023b05ed19a6c2",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "docs/migration-progress.md",
@@ -130,7 +155,13 @@
         "test/features/federation/federation_settings_screen_test.dart",
         "test/features/feed/feed_screen_test.dart",
         "test/features/profile/profile_edit_screen_test.dart",
-        "test/features/wallet/wallet_screen_test.dart"
+        "test/features/wallet/wallet_screen_test.dart",
+        "lib/core/media/media_upload_policy.dart",
+        "lib/features/posts/post_detail_screen.dart",
+        "lib/features/tv/tv_playback_policy.dart",
+        "test/core/media/media_upload_policy_test.dart",
+        "test/features/posts/post_detail_media_headers_test.dart",
+        "test/features/tv/tv_playback_policy_test.dart"
       ]
     },
     "federation": {
@@ -157,7 +188,7 @@
     },
     "algorithm": {
       "fullName": "Trendyzima/the-algorithm",
-      "ref": "c14c8dcba960861016980bd26c87050dbc23a195",
+      "ref": "6ae0532c171383b84731063d590d775524f9da1e",
       "checkoutPath": "source-repos/algorithm",
       "sourcePaths": [
         "testagram-feed/api/openapi.yaml",
@@ -190,6 +221,11 @@
       "repository": "federation",
       "sourcePath": "api/events/post-published.v1.schema.json",
       "snapshotPath": "contracts/upstream/federation/post-published.v1.schema.json"
+    },
+    {
+      "repository": "data-centre",
+      "sourcePath": "docs/platform/openapi/media-lifecycle-v1.yaml",
+      "snapshotPath": "contracts/upstream/datacentre/media-lifecycle-v1.openapi.yaml"
     }
   ]
 }
