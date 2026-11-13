@@ -124,7 +124,7 @@ if (!algorithmClient.includes("len(input.Candidates) > 200") || !algorithmClient
 const backendFederationClient = readFileSync(resolve(lock.repositories.backend.checkoutPath, "internal/federationclient/client.go"), "utf8");
 const federationServer = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/server.go"), "utf8");
 const federationIngress = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/internal_activities.go"), "utf8");
-const federationTests = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/server_test.go"), "utf8");
+const federationTests = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/internal_activities_test.go"), "utf8");
 for (const [label, source, marker] of [
   ["Backend Federation client", backendFederationClient, "/internal/v1/activities"],
   ["Backend Federation client", backendFederationClient, 'req.Header.Set("Idempotency-Key", input.ActivityID)'],
@@ -135,8 +135,8 @@ for (const [label, source, marker] of [
 ]) {
   if (!source.includes(marker)) fail.push(`${label} missing agreed durable-ingress contract marker: ${marker}`);
 }
-if (!federationTests.includes("internal/v1/activities")) {
-  fail.push("Federation HTTP integration tests must cover the private activity ingress");
+if (!federationTests.includes("TestInternalActivityEndpointRejectsMissingServiceCredential") || !federationTests.includes("TestInternalActivityEndpointUsesDedicatedIngressCredential")) {
+  fail.push("Federation ingress tests must prove missing and wrong-direction service credentials are rejected");
 }
 
 const cdnServer = readFileSync(resolve(lock.repositories.cdn.checkoutPath, "internal/edge/server.go"), "utf8");
