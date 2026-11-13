@@ -78,8 +78,8 @@
         "contracts/upstream/datacentre/internal-platform.openapi.yaml",
         "docs/integration/data-centre-platform-contract.md"
       ],
-      "status": "private-media-profile-available-explicit-activation-and-staging-acceptance-pending",
-      "notes": "The Backend mainline has a typed Data Centre media client for five private lifecycle routes. The active Data Centre Backend overlay now contains an opt-in media profile with a separate media database, private platform-network exposure, B2/R2 provider configuration and readiness healthcheck. Backend deployment PR #224 adds explicit DATA_CENTRE_MEDIA_ENABLED gating, shared service-token mapping and runtime readiness checks; until that PR is green and merged, the service is not deployed by the InstaBox workflow. Live B2/R2 provider smoke and FRESH_MEDIA_ENABLED acceptance remain required."
+      "status": "private-media-profile-merged-compose-optional-and-ci-verified-runtime-deployment-and-live-b2-r2-acceptance-pending",
+      "notes": "Data Centre PR #66 added the opt-in `media` profile with a separate media database, private `testagram-platform` network, five authenticated lifecycle routes, durable verify/replicate/delete outbox and reconciliation worker. Data Centre PR #67 fixed Compose shell-variable escaping so the disabled profile no longer blocks core production deployment; CI now validates both disabled and enabled profile models and runs the dedicated media service smoke. Backend's typed client and API contract checks cover the five routes. Backend deployment has not yet enabled this profile; `DATA_CENTRE_MEDIA_ENABLED` must remain false until dedicated B2/R2 staging write/read/hash/replication/delete/restore acceptance passes. Keep `FRESH_MEDIA_ENABLED=false` because the separate Fresh API runtime still lacks the canonical Data Centre adapter/metadata-ledger integration."
     },
     {
       "id": "cdn-edge",
@@ -103,8 +103,8 @@
       "contracts": [
         "docs/integration/cdn-edge-contract.md"
       ],
-      "status": "public-and-private-backend-origin-code-implemented-handler-acceptance-and-canonical-deployment-pending",
-      "notes": "The pinned Go CDN requires a trusted origin service credential, forwards Backend viewer assertions only for private requests, requires explicit Backend visibility classification for public cache misses, bypasses shared cache for private responses, and has fail-closed denial/redirect/range/HEAD tests. Backend PR #206 now implements the canonical ready/public origin branch and method-correct GET/HEAD signing; Backend issue #205 remains open for handler-level PostgreSQL/storage integration tests across the public/private/deleted/quarantined matrix. Data Centre issue #53 remains open because immutable Go CDN deployment, external smoke and rollback are not yet evidenced. The Cloudflare R2 Worker remains unrouted."
+      "status": "go-cdn-instabox-deployment-wired-live-rollout-and-domain-cutover-pending",
+      "notes": "Backend PR #223 is merged. It replaces the legacy Nginx cache with the immutable Go CDN image (`sha256:e4c014a043b761d6f84b05d3973a3a6831522b863eef08685b7ca6db17f55ce9`), gives it a persistent bounded cache, private Backend origin, distinct origin/viewer-assertion/purge credentials, cache purge-before-delete, Instabox container verification and external health/readiness/unauthenticated-denial smoke. The PostgreSQL-backed Backend origin matrix, Go security checks, Backend race/static tests and self-hosted Compose validation passed pre-merge. The first production deployment attempt reached the VPS but stopped at Data Centre Compose interpolation; Data Centre PR #67 fixed that defect and the failed deployment job is being rerun. Do not claim live CDN service until that rerun and external HTTPS smoke pass. CDN issues #61/#65 still report `media.testagram.site` serving the older R2 Worker; custom-domain/DNS cutover and rollback are not yet evidenced. Cloudflare deployment/DNS credentials are not available through the current repository integration."
     },
     {
       "id": "federation",
