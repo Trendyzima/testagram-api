@@ -49,11 +49,12 @@
         "backend-public"
       ],
       "contracts": [
+        "contracts/openapi/testagram-v1.yaml",
         "packages/dart/README.md",
         "packages/dart/lib/testagram_api.dart"
       ],
-      "status": "consumer",
-      "notes": "Must never call private services, PostgreSQL, storage credentials, Federation or Algorithm directly."
+      "status": "consumer-with-native-identity-and-public-api-contract",
+      "notes": "Flutter obtains Appwrite session JWTs and calls only the Backend public API. The shared OpenAPI contract is the source of truth for contracted public operations, including the applicant-scoped native identity application/evidence/status/provisioning routes. Applicant and verification-session tokens are limited to their own identity operations; the Appwrite JWT is used for final approved provisioning redemption. Flutter must never receive service tokens, storage-provider keys, database credentials or private service URLs."
     },
     {
       "id": "data-centre-platform",
