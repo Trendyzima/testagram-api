@@ -9,7 +9,7 @@ The six runtime repositories are Flutter, Backend, Data Centre, CDN, Federation 
 
 ## Immutable source revisions
 
-The exact revisions used by contract CI are in `contracts/sources.lock.json`. All six runtime source pins identify immutable commits on their repositories' main branches: Backend `ee302313a8c6a8136740e696d6b00c7fe4246a47`, Data Centre `97fda1143578400d99f175d418953e8864a57ad9`, CDN `620589ee44ba2eb7ae793fb8cb0777356ad4d252`, Flutter `32c7a033469f5bd796dc0b4b650367c1ebc3f50c`, Federation `edf4f59f843514596d35273c888ff1c16ec0f73e`, and Algorithm `6ae0532c171383b84731063d590d775524f9da1e`. Contract CI checks exact immutable checkouts and snapshots. A source pin is not evidence that a service is deployed.
+The exact revisions used by contract CI are in `contracts/sources.lock.json`. All six runtime source pins identify immutable commits on their repositories' main branches: Backend `ee302313a8c6a8136740e696d6b00c7fe4246a47`, Data Centre `8f683b511ed87cb8ae2ef708621bed3d8e9ce9fc`, CDN `620589ee44ba2eb7ae793fb8cb0777356ad4d252`, Flutter `32c7a033469f5bd796dc0b4b650367c1ebc3f50c`, Federation `edf4f59f843514596d35273c888ff1c16ec0f73e`, and Algorithm `6ae0532c171383b84731063d590d775524f9da1e`. Contract CI checks exact immutable checkouts and snapshots. A source pin is not evidence that a service is deployed.
 
 ## Ownership and allowed calls
 
@@ -56,7 +56,7 @@ The exact revisions used by contract CI are in `contracts/sources.lock.json`. Al
 - The service owns only media object lifecycle and provider operations. Backend retains ownership/visibility/quota/moderation decisions.
 - Backend's self-hosted Compose stack creates the internal Docker network named `testagram-platform`. Data Centre's media service joins that external network; start the Backend stack first. Do not publish port 8096. This is a statically verified configuration contract, not proof that the live VPS containers are currently attached or reachable.
 - B2 credentials and R2 credentials exist only in the Data Centre media container. Backend receives only the private URL and service token.
-- The media service uses its own `MEDIA_DATABASE_URL`, not the Data Centre platform/control-plane database. `FRESH_MEDIA_ENABLED` stays false until real provider-backed staging acceptance passes.
+- The active Data Centre `backend/docker-compose.yml` now includes `media-migrate` and `media` in an opt-in `media` profile. It uses a separate `testagram_media` database, joins only the private `testagram-platform` network and exposes no host port. The deployment profile remains off unless `DATA_CENTRE_MEDIA_ENABLED=true` and complete B2/R2 configuration is present. Backend PR #224 adds the matching token/URL/provider mapping, readiness checks and redacted runtime verification; it must pass CI and merge before this can be considered deployed. `FRESH_MEDIA_ENABLED` stays false until real provider-backed staging acceptance passes.
 
 ### Backend -> CDN -> trusted origin -> storage
 
