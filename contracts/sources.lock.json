@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "54fa107074406af19354e0c96b3d741861c6c7fa",
+      "ref": "fc436584b6deb470e00142d1d22ef4fe553c5b40",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "Dockerfile.fresh",
