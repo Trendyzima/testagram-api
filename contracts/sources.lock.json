@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "10e17ad3a3b530bca809c70e424c6bdff384e317",
+      "ref": "54fa107074406af19354e0c96b3d741861c6c7fa",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "Dockerfile.fresh",
@@ -85,12 +85,13 @@
         "cmd/api/social.go",
         "cmd/api/storage_virtual_test.go",
         "internal/media/signer.go",
-        "internal/virtualstorage/storage.go"
+        "internal/virtualstorage/storage.go",
+        "deploy/self-hosted/.env.example"
       ]
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "213c69c821c5254110d83c3d0f0960fdadb52267",
+      "ref": "40a190d731f0bb2e2d686406451937a2c05da66e",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         "backend/services/platform/main.go",
@@ -106,7 +107,8 @@
         "docs/platform/openapi/media-lifecycle-v1.yaml",
         "docs/platform/media-service-operations.md",
         "vps/.env.example",
-        "vps/docker-compose.fresh.yml"
+        "vps/docker-compose.fresh.yml",
+        "vps/FRESH-DEPLOYMENT.md"
       ]
     },
     "cdn": {
