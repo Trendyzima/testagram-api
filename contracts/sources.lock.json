@@ -91,7 +91,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "09278f36d295f142382cd8648cbff28fb4a7fb44",
+      "ref": "e315e477eb6996d2da83368e0dd05f7fc9a906a8",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         "backend/services/platform/main.go",
