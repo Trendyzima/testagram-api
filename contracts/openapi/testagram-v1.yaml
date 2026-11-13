@@ -40,6 +40,8 @@ tags:
     description: The separate long-form Threads product surface.
   - name: Federation
     description: Authenticated Testagram federation preferences. ActivityPub protocol traffic is handled by the private Federation service, not by clients.
+  - name: Identity
+    description: Applicant-facing native age-assurance application and private evidence submission. No account is provisioned until manual verification and independent two-person approval complete.
 security:
   - appwriteBearer: []
 paths:
@@ -74,6 +76,3460 @@ paths:
           content:
             text/plain:
               schema: { type: string }
+  /api/identity/applications:
+    post:
+      operationId: createIdentityApplication
+      tags: [Identity]
+      summary: Create a native age-assurance application
+      description: Pre-authentication registration entry point. Registration is fail-closed unless Backend registration, policy versions, PostgreSQL, private evidence storage and verified replication are configured. Requires age, Terms and Privacy declarations plus a high-entropy idempotency key. This does not create an account.
+      security: []
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema: { type: string, minLength: 43, maxLength: 43, pattern: '^[A-Za-z0-9_-]{43}    get:
+      operationId: getHomeFeed
+      tags: [Feed]
+      summary: Retrieve the authorized home timeline
+      description: Supports the Following filter and opaque cursor pagination. Backend performs authorization and ranking orchestration. Private media URLs may include a parallel `media_auth_headers` map keyed by exact URL; clients must attach the matching Authorization header and must not cache these short-lived bearer assertions.
+      parameters:
+        - in: query
+          name: following_only
+          required: false
+          schema: { type: boolean, default: false }
+          description: Set true to restrict the feed to followed accounts.
+        - in: query
+          name: before
+          required: false
+          schema: { type: string }
+          description: Opaque cursor returned by the previous feed page.
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      responses:
+        '200':
+          description: Authorized feed page. Exact payload schema is pending wire-level verification.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/hashtags/trending:
+    get:
+      operationId: getTrendingHashtags
+      tags: [Hashtags]
+      summary: Retrieve trending public hashtags
+      description: Returns distinct public hashtags from the previous seven days. When authenticated, followed hashtags receive viewer-specific ranking affinity; the Backend retains public visibility filtering.
+      security:
+        - appwriteBearer: []
+        - {}
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      responses:
+        '200':
+          description: Trending hashtag list and ranking window.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/hashtags/{tag}:
+    get:
+      operationId: getHashtagTimeline
+      tags: [Hashtags]
+      summary: Retrieve posts for a hashtag
+      description: Returns a cursor-paginated timeline and the current viewer's private follow state. Backend applies account visibility, accepted-follow, block, mute and media authorization rules before returning records.
+      security:
+        - appwriteBearer: []
+        - {}
+      parameters:
+        - in: path
+          name: tag
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 64, description: "Unicode letters, numbers or underscores; an optional leading # is accepted by the Backend." }
+        - in: query
+          name: before
+          required: false
+          schema: { type: string }
+          description: Opaque cursor returned by the previous page.
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      responses:
+        '200':
+          description: Privacy-filtered hashtag timeline.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/hashtags/{tag}/follow:
+    get:
+      operationId: getHashtagFollowState
+      tags: [Hashtags]
+      summary: Get the current viewer's hashtag follow state
+      description: Authentication is optional. Anonymous viewers always receive is_following=false.
+      security:
+        - appwriteBearer: []
+        - {}
+      parameters:
+        - in: path
+          name: tag
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 64 }
+      responses:
+        '200':
+          description: Private follow state for the authenticated viewer.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    post:
+      operationId: followHashtag
+      tags: [Hashtags]
+      summary: Follow a hashtag
+      description: Creates a private interest signal used to personalize Explore. The follow is not public and is not federated.
+      security:
+        - appwriteBearer: []
+      parameters:
+        - in: path
+          name: tag
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 64 }
+      responses:
+        '200':
+          description: Hashtag follow is active.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    delete:
+      operationId: unfollowHashtag
+      tags: [Hashtags]
+      summary: Unfollow a hashtag
+      description: Removes the current viewer's private Explore interest signal.
+      security:
+        - appwriteBearer: []
+      parameters:
+        - in: path
+          name: tag
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 64 }
+      responses:
+        '200':
+          description: Hashtag follow is inactive.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/media/upload-intent:
+    post:
+      operationId: createMediaUploadIntent
+      tags: [Media]
+      summary: Reserve a bounded public-media upload
+      description: Backend authenticates the owner, enforces content type, visibility and byte limits, and returns a short-lived upload URL and opaque object key.
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [name, content_type, visibility, size_bytes]
+              properties:
+                name: {type: string, maxLength: 255}
+                content_type: {type: string, enum: [image/jpeg, image/png, image/webp, image/gif, image/avif]}
+                visibility: {type: string, enum: [public]}
+                size_bytes: {type: integer, minimum: 1, maximum: 20971520}
+      responses:
+        '201':
+          description: Reserved upload intent with object key and short-lived PUT URL.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '413': { $ref: '#/components/responses/RequestTooLarge' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/media/upload:
+    put:
+      operationId: uploadMediaBytes
+      tags: [Media]
+      summary: Stream bytes into a reserved upload intent
+      description: The client must use the URL returned by the upload-intent response, preserve its key query parameter, send the matching Content-Type, and stay within the reserved byte limit.
+      security:
+        - appwriteBearer: []
+      parameters:
+        - in: query
+          name: key
+          required: true
+          schema: {type: string, minLength: 1, maxLength: 1024}
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema: {type: string, format: binary}
+      responses:
+        '200':
+          description: Upload bytes accepted and intent moved to uploaded state.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': {description: "Upload intent is missing, expired or belongs to another account"}
+        '409': {description: Upload intent was already consumed}
+        '413': { $ref: '#/components/responses/RequestTooLarge' }
+        '415': {description: Content type does not match the upload intent}
+  /api/media/cdn-download-url:
+    post:
+      operationId: issuePrivateMediaCDNAuthorization
+      tags: [Media]
+      summary: Issue viewer-bound authorization for one private media object
+      description: Backend authenticates the viewer, verifies ownership and ready/private state in the canonical media ledger, and issues a short-lived exact-object CDN assertion. The returned URL is not a bearer credential; send the returned Authorization value to the CDN. HLS multi-object playback is not covered by this exact-object grant.
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [key]
+              properties:
+                key: {type: string, minLength: 1, maxLength: 1024}
+      responses:
+        '200':
+          description: Viewer-bound CDN URL and short-lived Authorization header value.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': {description: Viewer is not authorized to access this media object}
+        '404': {description: No ready private media object owned by this viewer exists}
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/media/complete:
+    post:
+      operationId: completeMediaUpload
+      tags: [Media]
+      summary: Verify uploaded media and persist its metadata
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [key, visibility, content_type, checksum_sha256]
+              properties:
+                key: {type: string, minLength: 1, maxLength: 1024}
+                visibility: {type: string, enum: [public]}
+                content_type: {type: string}
+                checksum_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+      responses:
+        '200':
+          description: Verified media asset is ready for attachment.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': {description: Upload intent does not belong to the authenticated account}
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/media/attach:
+    post:
+      operationId: attachMediaToPost
+      tags: [Media]
+      summary: Attach a verified public media asset to an owned post
+      description: Only ready, owner-matched public assets can be attached. The Backend checks post ownership and visibility transactionally; attachment is idempotent.
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [key, post_id]
+              properties:
+                key: {type: string, minLength: 1, maxLength: 1024}
+                post_id: {type: string, minLength: 1, maxLength: 128}
+      responses:
+        '200':
+          description: Media is attached to the post.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': {description: Media asset or post is not owned by the authenticated account}
+        '404': {description: Media asset or post was not found}
+        '409': {description: Media is not ready or the post is not eligible}
+  /api/media/delete:
+    post:
+      operationId: deleteMediaAsset
+      tags: [Media]
+      summary: Delete an unattached media asset
+      description: Starts durable deletion for an asset owned by the authenticated account. Used to clean up un-attached uploads after a failed publish.
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [key]
+              properties:
+                key: {type: string, minLength: 1, maxLength: 1024}
+      responses:
+        '200':
+          description: Deletion accepted or already completed.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': {description: Media asset was not found}
+        '409': {description: Media asset cannot be deleted in its current state}
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/search:
+    get:
+      operationId: searchContent
+      tags: [Search]
+      summary: Search people and posts
+      description: Privacy-filtered product search. Authentication is optional for public results; Backend applies visibility and authorization rules.
+      security:
+        - appwriteBearer: []
+        - {}
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema: { type: string, minLength: 2, maxLength: 120 }
+        - in: query
+          name: kind
+          required: false
+          schema: { type: string, enum: [all, people, posts], default: all }
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+        - in: query
+          name: media_only
+          required: false
+          schema: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Search result page; exact payload shape must be confirmed from Backend tests.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/posts:
+    post:
+      operationId: createSocialPost
+      tags: [Social]
+      summary: Create a main-feed post
+      description: Backend source registers this route. The operation is idempotent per author and key; reusing a key with a different normalized payload returns 409. Backend rejects unknown JSON fields and limits the request body to 16 KiB. This is not the Threads composer.
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+            minLength: 8
+            maxLength: 128
+            pattern: "^[A-Za-z0-9._:-]+$"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [content, visibility]
+              properties:
+                content: { type: string, minLength: 1, maxLength: 5000 }
+                visibility: { type: string, enum: [public, followers, private] }
+      responses:
+        '200':
+          description: Existing post returned for a retry with the same author, key and normalized payload.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PostCreateReplayEnvelope' }
+        '201':
+          description: New post committed successfully.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PostCreateEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409':
+          description: Idempotency key was already used with a different normalized payload.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+        '422':
+          description: Content moderation requires review; no post is published.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ModerationReviewEnvelope' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/posts/{postId}/interaction-summary:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    get:
+      operationId: getPostInteractionSummary
+      tags: [Social]
+      summary: Get viewer-specific post interaction state
+      description: Returns interaction state and counters for the authenticated viewer.
+      responses:
+        '200':
+          description: Interaction summary.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/social/posts/{postId}/reaction:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    post:
+      operationId: createPostReaction
+      tags: [Social]
+      summary: Create or update a post reaction
+      description: Reaction lifecycle route documented by the Flutter integration ledger. Verify accepted reaction values and request body against Backend implementation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExtensibleObject' }
+      responses:
+        '200': { description: Reaction accepted or updated. }
+        '201': { description: Reaction created. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deletePostReaction
+      tags: [Social]
+      summary: Remove the authenticated viewer's post reaction
+      responses:
+        '200': { description: Reaction removed. }
+        '204': { description: Reaction removed with no response body. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/posts/{postId}/reposts:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    post:
+      operationId: createPostRepost
+      tags: [Social]
+      summary: Repost a post
+      responses:
+        '200': { description: Repost accepted. }
+        '201': { description: Repost created. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deletePostRepost
+      tags: [Social]
+      summary: Undo a repost
+      responses:
+        '200': { description: Repost removed. }
+        '204': { description: Repost removed with no response body. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/posts/{postId}/bookmarks:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    post:
+      operationId: createPostBookmark
+      tags: [Social]
+      summary: Bookmark a post
+      responses:
+        '200': { description: Bookmark accepted. }
+        '201': { description: Bookmark created. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deletePostBookmark
+      tags: [Social]
+      summary: Remove a post bookmark
+      responses:
+        '200': { description: Bookmark removed. }
+        '204': { description: Bookmark removed with no response body. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/posts/{postId}/replies:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    get:
+      operationId: listPostReplies
+      tags: [Social]
+      summary: List replies for a post
+      parameters:
+        - in: query
+          name: cursor
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Reply page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createPostReply
+      tags: [Social]
+      summary: Create a reply to a post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExtensibleObject' }
+      responses:
+        '200': { description: Reply created. }
+        '201': { description: Reply created. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/follows:
+    post:
+      operationId: followUser
+      tags: [Social]
+      summary: Follow a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target_user_id]
+              properties:
+                target_user_id: { type: string, format: uuid }
+      responses:
+        '200': { description: Follow relationship created or already active. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { description: Follow request or relationship conflict. }
+  /api/social/follows/{targetUserId}:
+    parameters:
+      - name: targetUserId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getFollowState
+      tags: [Social]
+      summary: Read follow state for a target account
+      responses:
+        '200': { description: Follow state. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: unfollowUser
+      tags: [Social]
+      summary: Unfollow a target account
+      responses:
+        '200': { description: Follow relationship removed. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/social/notifications:
+    get:
+      operationId: listNotifications
+      tags: [Notifications]
+      summary: List authenticated user's notifications
+      parameters:
+        - in: query
+          name: cursor
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Notification page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/notifications/{notificationId}/read:
+    parameters:
+      - name: notificationId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: markNotificationRead
+      tags: [Notifications]
+      summary: Mark a notification as read
+      responses:
+        '200': { description: Notification marked read. }
+        '204': { description: Notification marked read with no response body. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/threads:
+    get:
+      operationId: listThreads
+      tags: [Threads]
+      summary: List threads
+      description: Distinct Threads product surface; do not treat this as the main-feed posts API.
+      parameters:
+        - in: query
+          name: cursor
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Thread page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createThread
+      tags: [Threads]
+      summary: Create a thread
+      description: This is the Threads surface, not a substitute for main-feed post publishing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExtensibleObject' }
+      responses:
+        '200': { description: Thread created. }
+        '201': { description: Thread created. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/threads/{threadId}:
+    parameters:
+      - name: threadId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getThread
+      tags: [Threads]
+      summary: Get a thread
+      responses:
+        '200':
+          description: Thread details.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/me/profile:
+    get:
+      operationId: getMyProfile
+      tags: [Social]
+      summary: Read the authenticated user's canonical Testagram profile
+      description: Resolves the canonical Testagram UUID from the verified Appwrite session; clients must not substitute the Appwrite user ID.
+      responses:
+        '200':
+          description: Current canonical profile and viewer relationship flags.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [id, user_id, username, display_name, bio, website, location, social_links, avatar_key, avatar_url, cover_key, cover_url, protected_account, followers_count, following_count, follow_status, is_following, is_followed_by, can_view_posts, is_self]
+                    properties:
+                      id: { type: string, format: uuid }
+                      user_id: { type: string, format: uuid }
+                      username: { type: string }
+                      display_name: { type: string }
+                      bio: { type: string }
+                      website: { type: string }
+                      location: { type: string, maxLength: 120 }
+                      social_links:
+                        type: object
+                        additionalProperties: false
+                        properties:
+                          x: { type: string, maxLength: 256 }
+                          twitter: { type: string, maxLength: 256 }
+                          instagram: { type: string, maxLength: 256 }
+                          linkedin: { type: string, maxLength: 256 }
+                          facebook: { type: string, maxLength: 256 }
+                      avatar_key: { type: string }
+                      avatar_url: { type: string }
+                      cover_key: { type: string }
+                      cover_url: { type: string }
+                      protected_account: { type: boolean }
+                      followers_count: { type: integer, minimum: 0 }
+                      following_count: { type: integer, minimum: 0 }
+                      follow_status: { type: string, enum: ["", pending, accepted] }
+                      is_following: { type: boolean }
+                      is_followed_by: { type: boolean }
+                      can_view_posts: { type: boolean }
+                      is_self: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404':
+          description: The authenticated account profile is unavailable.
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    put:
+      operationId: updateMyProfile
+      tags: [Social]
+      summary: Update the authenticated user's canonical profile
+      description: Backend validates the Appwrite session, active account, profile fields and ownership/readiness of uploaded public image assets. Clients upload media through the Backend media gateway first; raw object keys are never accepted unless owned and ready.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [display_name, bio, website, location, avatar_key, cover_key, social_links]
+              properties:
+                display_name: { type: string, maxLength: 80 }
+                bio: { type: string, maxLength: 500 }
+                website: { type: string, maxLength: 2048, format: uri }
+                location: { type: string, maxLength: 120 }
+                avatar_key: { type: string, maxLength: 512 }
+                cover_key: { type: string, maxLength: 512 }
+                social_links:
+                  type: object
+                  additionalProperties: false
+                  maxProperties: 5
+                  properties:
+                    x: { type: string, maxLength: 256 }
+                    twitter: { type: string, maxLength: 256 }
+                    instagram: { type: string, maxLength: 256 }
+                    linkedin: { type: string, maxLength: 256 }
+                    facebook: { type: string, maxLength: 256 }
+      responses:
+        '200':
+          description: Updated canonical profile.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Account is not active. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/me/federation:
+    get:
+      operationId: getMyFederationPreference
+      tags: [Federation]
+      summary: Read the authenticated user's federation preference
+      description: Returns the canonical Backend preference. Enabling federation requires username discovery to be enabled.
+      responses:
+        '200':
+          description: Current federation preference.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [enabled]
+                    properties:
+                      enabled: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    put:
+      operationId: updateMyFederationPreference
+      tags: [Federation]
+      summary: Update the authenticated user's federation preference
+      description: Backend validates the Appwrite session, account status and username discoverability. This endpoint changes preference only; it does not create a separate Mastodon account or bypass federation rollout gates.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [enabled]
+              properties:
+                enabled: { type: boolean }
+      responses:
+        '200':
+          description: Updated federation preference.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [enabled]
+                    properties:
+                      enabled: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409':
+          description: The account must be public and username-discoverable before federation can be enabled.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+
+  /api/tv/channels:
+    get:
+      operationId: listTvChannels
+      x-testagram-status: proposed-not-implemented
+      tags: [TV]
+      summary: List the normalized public TV catalogue
+      description: |
+        Backend-owned catalogue read model. Data Centre may ingest and normalize
+        upstream feeds, but Flutter must never call upstream sources or Data
+        Centre private APIs. This response MUST NOT contain an upstream stream
+        URL, provider credential, signed playback URL or private origin detail.
+        Proposed contract only until the Backend handler and wire tests ship.
+      security: []
+      parameters:
+        - in: query
+          name: cursor
+          schema: { type: string, maxLength: 2048 }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+        - in: query
+          name: country
+          schema: { type: string, pattern: "^[A-Z]{2}$" }
+        - in: query
+          name: category
+          schema: { type: string, maxLength: 64 }
+        - in: query
+          name: language
+          schema: { type: string, maxLength: 16 }
+        - in: query
+          name: query
+          schema: { type: string, minLength: 1, maxLength: 120 }
+      responses:
+        '200':
+          description: Stable normalized channel page; no source URLs.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TvChannelPage' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/tv/channels/{channelId}:
+    parameters:
+      - name: channelId
+        in: path
+        required: true
+        schema: { type: string, minLength: 1, maxLength: 256 }
+    get:
+      operationId: getTvChannel
+      x-testagram-status: proposed-not-implemented
+      tags: [TV]
+      summary: Get normalized TV channel metadata
+      security: []
+      responses:
+        '200':
+          description: Channel metadata without upstream or signed playback URL.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TvChannel' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/tv/channels/{channelId}/playback:
+    parameters:
+      - name: channelId
+        in: path
+        required: true
+        schema: { type: string, minLength: 1, maxLength: 256 }
+    post:
+      operationId: createTvPlaybackGrant
+      x-testagram-status: proposed-not-implemented
+      tags: [TV]
+      summary: Create a short-lived viewer-authorized playback grant
+      description: |
+        Backend authenticates the viewer and checks channel visibility,
+        entitlement, moderation, geography and source health. Caller-supplied
+        visibility flags, source URLs and object keys are forbidden. CDN must
+        validate a separate, narrow Backend issuer assertion before creating
+        the playback URL. Playback signing and issuer credentials are distinct.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                playback_profile:
+                  type: string
+                  enum: [auto, low, standard, high]
+                  default: auto
+      responses:
+        '200':
+          description: Short-lived CDN playback grant.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TvPlaybackGrant' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403':
+          description: Channel is not available to this viewer.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+components:
+  securitySchemes:
+    appwriteBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Appwrite session JWT issued to the signed-in user. Backend validates it with Appwrite; this spec does not authorize a caller.
+  parameters:
+    PostId:
+      name: postId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1 }
+  schemas:
+    TvChannel:
+      type: object
+      additionalProperties: false
+      required: [id, name, playback_type, availability, updated_at]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 256 }
+        name: { type: string, minLength: 1, maxLength: 160 }
+        description: { type: string, maxLength: 2000 }
+        logo_url: { type: string, format: uri }
+        country_code: { type: string, pattern: "^[A-Z]{2}$" }
+        language: { type: string, maxLength: 16 }
+        categories:
+          type: array
+          maxItems: 20
+          items: { type: string, maxLength: 64 }
+        website_url: { type: string, format: uri }
+        playback_type: { type: string, enum: [hls, dash, mp4, external] }
+        availability: { type: string, enum: [available, degraded, offline, scheduled, unknown] }
+        health_checked_at: { type: [string, 'null'], format: date-time }
+        updated_at: { type: string, format: date-time }
+    TvChannelPage:
+      type: object
+      additionalProperties: false
+      required: [items, next_cursor]
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/TvChannel' }
+        next_cursor: { type: [string, 'null'], maxLength: 2048 }
+    TvPlaybackGrant:
+      type: object
+      additionalProperties: false
+      required: [channel_id, playback_url, expires_at, playback_type]
+      properties:
+        channel_id: { type: string, minLength: 1, maxLength: 256 }
+        playback_url: { type: string, format: uri }
+        expires_at: { type: string, format: date-time }
+        playback_type: { type: string, enum: [hls, dash, mp4, external] }
+        required_headers:
+          type: object
+          maxProperties: 8
+          additionalProperties: { type: string, maxLength: 512 }
+    ExtensibleObject:
+      type: object
+      additionalProperties: true
+      description: Temporary extensible schema. Replace with an implementation-backed DTO when exact wire shape is verified.
+    PostCreateEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [id, author_id, content, visibility, created_at, idempotent_replay]
+          properties:
+            id: { type: string }
+            author_id: { type: string, format: uuid }
+            content: { type: string, minLength: 1, maxLength: 5000 }
+            visibility: { type: string, enum: [public, followers, private] }
+            created_at: { type: string, format: date-time }
+            idempotent_replay: { const: false }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PostCreateReplayEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [id, idempotent_replay]
+          properties:
+            id: { type: string }
+            idempotent_replay: { const: true }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ModerationReviewEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: false }
+        data:
+          type: object
+          additionalProperties: true
+          description: Moderation result returned for review; exact provider DTO remains owned by the Backend.
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { const: CONTENT_REQUIRES_REVIEW }
+            message: { type: string }
+          additionalProperties: false
+        request_id: { type: string }
+    ApiError:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: false }
+        data: { type: 'null' }
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }
+          additionalProperties: false
+        request_id: { type: string }
+      additionalProperties: true
+  responses:
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    Unauthorized:
+      description: Missing, expired or invalid Appwrite session JWT.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    NotFound:
+      description: Resource not found or not visible to the caller.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    RequestTooLarge:
+      description: Request body or uploaded media exceeds the configured byte limit.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    RateLimited:
+      description: Request rate limit exceeded.
+      headers:
+        Retry-After:
+          schema: { type: integer }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    ServiceUnavailable:
+      description: Backend or required dependency is not ready.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+ }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [email, username, display_name, adult_confirmed, terms_accepted, privacy_accepted]
+              properties:
+                email: { type: string, format: email, maxLength: 254 }
+                username: { type: string, minLength: 3, maxLength: 30, pattern: '^[a-z0-9_]+    get:
+      operationId: getHomeFeed
+      tags: [Feed]
+      summary: Retrieve the authorized home timeline
+      description: Supports the Following filter and opaque cursor pagination. Backend performs authorization and ranking orchestration. Private media URLs may include a parallel `media_auth_headers` map keyed by exact URL; clients must attach the matching Authorization header and must not cache these short-lived bearer assertions.
+      parameters:
+        - in: query
+          name: following_only
+          required: false
+          schema: { type: boolean, default: false }
+          description: Set true to restrict the feed to followed accounts.
+        - in: query
+          name: before
+          required: false
+          schema: { type: string }
+          description: Opaque cursor returned by the previous feed page.
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      responses:
+        '200':
+          description: Authorized feed page. Exact payload schema is pending wire-level verification.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/hashtags/trending:
+    get:
+      operationId: getTrendingHashtags
+      tags: [Hashtags]
+      summary: Retrieve trending public hashtags
+      description: Returns distinct public hashtags from the previous seven days. When authenticated, followed hashtags receive viewer-specific ranking affinity; the Backend retains public visibility filtering.
+      security:
+        - appwriteBearer: []
+        - {}
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      responses:
+        '200':
+          description: Trending hashtag list and ranking window.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/hashtags/{tag}:
+    get:
+      operationId: getHashtagTimeline
+      tags: [Hashtags]
+      summary: Retrieve posts for a hashtag
+      description: Returns a cursor-paginated timeline and the current viewer's private follow state. Backend applies account visibility, accepted-follow, block, mute and media authorization rules before returning records.
+      security:
+        - appwriteBearer: []
+        - {}
+      parameters:
+        - in: path
+          name: tag
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 64, description: "Unicode letters, numbers or underscores; an optional leading # is accepted by the Backend." }
+        - in: query
+          name: before
+          required: false
+          schema: { type: string }
+          description: Opaque cursor returned by the previous page.
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      responses:
+        '200':
+          description: Privacy-filtered hashtag timeline.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/hashtags/{tag}/follow:
+    get:
+      operationId: getHashtagFollowState
+      tags: [Hashtags]
+      summary: Get the current viewer's hashtag follow state
+      description: Authentication is optional. Anonymous viewers always receive is_following=false.
+      security:
+        - appwriteBearer: []
+        - {}
+      parameters:
+        - in: path
+          name: tag
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 64 }
+      responses:
+        '200':
+          description: Private follow state for the authenticated viewer.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    post:
+      operationId: followHashtag
+      tags: [Hashtags]
+      summary: Follow a hashtag
+      description: Creates a private interest signal used to personalize Explore. The follow is not public and is not federated.
+      security:
+        - appwriteBearer: []
+      parameters:
+        - in: path
+          name: tag
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 64 }
+      responses:
+        '200':
+          description: Hashtag follow is active.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    delete:
+      operationId: unfollowHashtag
+      tags: [Hashtags]
+      summary: Unfollow a hashtag
+      description: Removes the current viewer's private Explore interest signal.
+      security:
+        - appwriteBearer: []
+      parameters:
+        - in: path
+          name: tag
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 64 }
+      responses:
+        '200':
+          description: Hashtag follow is inactive.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/media/upload-intent:
+    post:
+      operationId: createMediaUploadIntent
+      tags: [Media]
+      summary: Reserve a bounded public-media upload
+      description: Backend authenticates the owner, enforces content type, visibility and byte limits, and returns a short-lived upload URL and opaque object key.
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [name, content_type, visibility, size_bytes]
+              properties:
+                name: {type: string, maxLength: 255}
+                content_type: {type: string, enum: [image/jpeg, image/png, image/webp, image/gif, image/avif]}
+                visibility: {type: string, enum: [public]}
+                size_bytes: {type: integer, minimum: 1, maximum: 20971520}
+      responses:
+        '201':
+          description: Reserved upload intent with object key and short-lived PUT URL.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '413': { $ref: '#/components/responses/RequestTooLarge' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/media/upload:
+    put:
+      operationId: uploadMediaBytes
+      tags: [Media]
+      summary: Stream bytes into a reserved upload intent
+      description: The client must use the URL returned by the upload-intent response, preserve its key query parameter, send the matching Content-Type, and stay within the reserved byte limit.
+      security:
+        - appwriteBearer: []
+      parameters:
+        - in: query
+          name: key
+          required: true
+          schema: {type: string, minLength: 1, maxLength: 1024}
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema: {type: string, format: binary}
+      responses:
+        '200':
+          description: Upload bytes accepted and intent moved to uploaded state.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': {description: "Upload intent is missing, expired or belongs to another account"}
+        '409': {description: Upload intent was already consumed}
+        '413': { $ref: '#/components/responses/RequestTooLarge' }
+        '415': {description: Content type does not match the upload intent}
+  /api/media/cdn-download-url:
+    post:
+      operationId: issuePrivateMediaCDNAuthorization
+      tags: [Media]
+      summary: Issue viewer-bound authorization for one private media object
+      description: Backend authenticates the viewer, verifies ownership and ready/private state in the canonical media ledger, and issues a short-lived exact-object CDN assertion. The returned URL is not a bearer credential; send the returned Authorization value to the CDN. HLS multi-object playback is not covered by this exact-object grant.
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [key]
+              properties:
+                key: {type: string, minLength: 1, maxLength: 1024}
+      responses:
+        '200':
+          description: Viewer-bound CDN URL and short-lived Authorization header value.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': {description: Viewer is not authorized to access this media object}
+        '404': {description: No ready private media object owned by this viewer exists}
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/media/complete:
+    post:
+      operationId: completeMediaUpload
+      tags: [Media]
+      summary: Verify uploaded media and persist its metadata
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [key, visibility, content_type, checksum_sha256]
+              properties:
+                key: {type: string, minLength: 1, maxLength: 1024}
+                visibility: {type: string, enum: [public]}
+                content_type: {type: string}
+                checksum_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+      responses:
+        '200':
+          description: Verified media asset is ready for attachment.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': {description: Upload intent does not belong to the authenticated account}
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/media/attach:
+    post:
+      operationId: attachMediaToPost
+      tags: [Media]
+      summary: Attach a verified public media asset to an owned post
+      description: Only ready, owner-matched public assets can be attached. The Backend checks post ownership and visibility transactionally; attachment is idempotent.
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [key, post_id]
+              properties:
+                key: {type: string, minLength: 1, maxLength: 1024}
+                post_id: {type: string, minLength: 1, maxLength: 128}
+      responses:
+        '200':
+          description: Media is attached to the post.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': {description: Media asset or post is not owned by the authenticated account}
+        '404': {description: Media asset or post was not found}
+        '409': {description: Media is not ready or the post is not eligible}
+  /api/media/delete:
+    post:
+      operationId: deleteMediaAsset
+      tags: [Media]
+      summary: Delete an unattached media asset
+      description: Starts durable deletion for an asset owned by the authenticated account. Used to clean up un-attached uploads after a failed publish.
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [key]
+              properties:
+                key: {type: string, minLength: 1, maxLength: 1024}
+      responses:
+        '200':
+          description: Deletion accepted or already completed.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': {description: Media asset was not found}
+        '409': {description: Media asset cannot be deleted in its current state}
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/search:
+    get:
+      operationId: searchContent
+      tags: [Search]
+      summary: Search people and posts
+      description: Privacy-filtered product search. Authentication is optional for public results; Backend applies visibility and authorization rules.
+      security:
+        - appwriteBearer: []
+        - {}
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema: { type: string, minLength: 2, maxLength: 120 }
+        - in: query
+          name: kind
+          required: false
+          schema: { type: string, enum: [all, people, posts], default: all }
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+        - in: query
+          name: media_only
+          required: false
+          schema: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Search result page; exact payload shape must be confirmed from Backend tests.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/posts:
+    post:
+      operationId: createSocialPost
+      tags: [Social]
+      summary: Create a main-feed post
+      description: Backend source registers this route. The operation is idempotent per author and key; reusing a key with a different normalized payload returns 409. Backend rejects unknown JSON fields and limits the request body to 16 KiB. This is not the Threads composer.
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+            minLength: 8
+            maxLength: 128
+            pattern: "^[A-Za-z0-9._:-]+$"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [content, visibility]
+              properties:
+                content: { type: string, minLength: 1, maxLength: 5000 }
+                visibility: { type: string, enum: [public, followers, private] }
+      responses:
+        '200':
+          description: Existing post returned for a retry with the same author, key and normalized payload.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PostCreateReplayEnvelope' }
+        '201':
+          description: New post committed successfully.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PostCreateEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409':
+          description: Idempotency key was already used with a different normalized payload.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+        '422':
+          description: Content moderation requires review; no post is published.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ModerationReviewEnvelope' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/posts/{postId}/interaction-summary:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    get:
+      operationId: getPostInteractionSummary
+      tags: [Social]
+      summary: Get viewer-specific post interaction state
+      description: Returns interaction state and counters for the authenticated viewer.
+      responses:
+        '200':
+          description: Interaction summary.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/social/posts/{postId}/reaction:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    post:
+      operationId: createPostReaction
+      tags: [Social]
+      summary: Create or update a post reaction
+      description: Reaction lifecycle route documented by the Flutter integration ledger. Verify accepted reaction values and request body against Backend implementation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExtensibleObject' }
+      responses:
+        '200': { description: Reaction accepted or updated. }
+        '201': { description: Reaction created. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deletePostReaction
+      tags: [Social]
+      summary: Remove the authenticated viewer's post reaction
+      responses:
+        '200': { description: Reaction removed. }
+        '204': { description: Reaction removed with no response body. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/posts/{postId}/reposts:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    post:
+      operationId: createPostRepost
+      tags: [Social]
+      summary: Repost a post
+      responses:
+        '200': { description: Repost accepted. }
+        '201': { description: Repost created. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deletePostRepost
+      tags: [Social]
+      summary: Undo a repost
+      responses:
+        '200': { description: Repost removed. }
+        '204': { description: Repost removed with no response body. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/posts/{postId}/bookmarks:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    post:
+      operationId: createPostBookmark
+      tags: [Social]
+      summary: Bookmark a post
+      responses:
+        '200': { description: Bookmark accepted. }
+        '201': { description: Bookmark created. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deletePostBookmark
+      tags: [Social]
+      summary: Remove a post bookmark
+      responses:
+        '200': { description: Bookmark removed. }
+        '204': { description: Bookmark removed with no response body. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/posts/{postId}/replies:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    get:
+      operationId: listPostReplies
+      tags: [Social]
+      summary: List replies for a post
+      parameters:
+        - in: query
+          name: cursor
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Reply page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createPostReply
+      tags: [Social]
+      summary: Create a reply to a post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExtensibleObject' }
+      responses:
+        '200': { description: Reply created. }
+        '201': { description: Reply created. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/follows:
+    post:
+      operationId: followUser
+      tags: [Social]
+      summary: Follow a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target_user_id]
+              properties:
+                target_user_id: { type: string, format: uuid }
+      responses:
+        '200': { description: Follow relationship created or already active. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { description: Follow request or relationship conflict. }
+  /api/social/follows/{targetUserId}:
+    parameters:
+      - name: targetUserId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getFollowState
+      tags: [Social]
+      summary: Read follow state for a target account
+      responses:
+        '200': { description: Follow state. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: unfollowUser
+      tags: [Social]
+      summary: Unfollow a target account
+      responses:
+        '200': { description: Follow relationship removed. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/social/notifications:
+    get:
+      operationId: listNotifications
+      tags: [Notifications]
+      summary: List authenticated user's notifications
+      parameters:
+        - in: query
+          name: cursor
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Notification page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/notifications/{notificationId}/read:
+    parameters:
+      - name: notificationId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: markNotificationRead
+      tags: [Notifications]
+      summary: Mark a notification as read
+      responses:
+        '200': { description: Notification marked read. }
+        '204': { description: Notification marked read with no response body. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/threads:
+    get:
+      operationId: listThreads
+      tags: [Threads]
+      summary: List threads
+      description: Distinct Threads product surface; do not treat this as the main-feed posts API.
+      parameters:
+        - in: query
+          name: cursor
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Thread page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createThread
+      tags: [Threads]
+      summary: Create a thread
+      description: This is the Threads surface, not a substitute for main-feed post publishing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExtensibleObject' }
+      responses:
+        '200': { description: Thread created. }
+        '201': { description: Thread created. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/threads/{threadId}:
+    parameters:
+      - name: threadId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getThread
+      tags: [Threads]
+      summary: Get a thread
+      responses:
+        '200':
+          description: Thread details.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/me/profile:
+    get:
+      operationId: getMyProfile
+      tags: [Social]
+      summary: Read the authenticated user's canonical Testagram profile
+      description: Resolves the canonical Testagram UUID from the verified Appwrite session; clients must not substitute the Appwrite user ID.
+      responses:
+        '200':
+          description: Current canonical profile and viewer relationship flags.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [id, user_id, username, display_name, bio, website, location, social_links, avatar_key, avatar_url, cover_key, cover_url, protected_account, followers_count, following_count, follow_status, is_following, is_followed_by, can_view_posts, is_self]
+                    properties:
+                      id: { type: string, format: uuid }
+                      user_id: { type: string, format: uuid }
+                      username: { type: string }
+                      display_name: { type: string }
+                      bio: { type: string }
+                      website: { type: string }
+                      location: { type: string, maxLength: 120 }
+                      social_links:
+                        type: object
+                        additionalProperties: false
+                        properties:
+                          x: { type: string, maxLength: 256 }
+                          twitter: { type: string, maxLength: 256 }
+                          instagram: { type: string, maxLength: 256 }
+                          linkedin: { type: string, maxLength: 256 }
+                          facebook: { type: string, maxLength: 256 }
+                      avatar_key: { type: string }
+                      avatar_url: { type: string }
+                      cover_key: { type: string }
+                      cover_url: { type: string }
+                      protected_account: { type: boolean }
+                      followers_count: { type: integer, minimum: 0 }
+                      following_count: { type: integer, minimum: 0 }
+                      follow_status: { type: string, enum: ["", pending, accepted] }
+                      is_following: { type: boolean }
+                      is_followed_by: { type: boolean }
+                      can_view_posts: { type: boolean }
+                      is_self: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404':
+          description: The authenticated account profile is unavailable.
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    put:
+      operationId: updateMyProfile
+      tags: [Social]
+      summary: Update the authenticated user's canonical profile
+      description: Backend validates the Appwrite session, active account, profile fields and ownership/readiness of uploaded public image assets. Clients upload media through the Backend media gateway first; raw object keys are never accepted unless owned and ready.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [display_name, bio, website, location, avatar_key, cover_key, social_links]
+              properties:
+                display_name: { type: string, maxLength: 80 }
+                bio: { type: string, maxLength: 500 }
+                website: { type: string, maxLength: 2048, format: uri }
+                location: { type: string, maxLength: 120 }
+                avatar_key: { type: string, maxLength: 512 }
+                cover_key: { type: string, maxLength: 512 }
+                social_links:
+                  type: object
+                  additionalProperties: false
+                  maxProperties: 5
+                  properties:
+                    x: { type: string, maxLength: 256 }
+                    twitter: { type: string, maxLength: 256 }
+                    instagram: { type: string, maxLength: 256 }
+                    linkedin: { type: string, maxLength: 256 }
+                    facebook: { type: string, maxLength: 256 }
+      responses:
+        '200':
+          description: Updated canonical profile.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Account is not active. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/me/federation:
+    get:
+      operationId: getMyFederationPreference
+      tags: [Federation]
+      summary: Read the authenticated user's federation preference
+      description: Returns the canonical Backend preference. Enabling federation requires username discovery to be enabled.
+      responses:
+        '200':
+          description: Current federation preference.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [enabled]
+                    properties:
+                      enabled: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    put:
+      operationId: updateMyFederationPreference
+      tags: [Federation]
+      summary: Update the authenticated user's federation preference
+      description: Backend validates the Appwrite session, account status and username discoverability. This endpoint changes preference only; it does not create a separate Mastodon account or bypass federation rollout gates.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [enabled]
+              properties:
+                enabled: { type: boolean }
+      responses:
+        '200':
+          description: Updated federation preference.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [enabled]
+                    properties:
+                      enabled: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409':
+          description: The account must be public and username-discoverable before federation can be enabled.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+
+  /api/tv/channels:
+    get:
+      operationId: listTvChannels
+      x-testagram-status: proposed-not-implemented
+      tags: [TV]
+      summary: List the normalized public TV catalogue
+      description: |
+        Backend-owned catalogue read model. Data Centre may ingest and normalize
+        upstream feeds, but Flutter must never call upstream sources or Data
+        Centre private APIs. This response MUST NOT contain an upstream stream
+        URL, provider credential, signed playback URL or private origin detail.
+        Proposed contract only until the Backend handler and wire tests ship.
+      security: []
+      parameters:
+        - in: query
+          name: cursor
+          schema: { type: string, maxLength: 2048 }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+        - in: query
+          name: country
+          schema: { type: string, pattern: "^[A-Z]{2}$" }
+        - in: query
+          name: category
+          schema: { type: string, maxLength: 64 }
+        - in: query
+          name: language
+          schema: { type: string, maxLength: 16 }
+        - in: query
+          name: query
+          schema: { type: string, minLength: 1, maxLength: 120 }
+      responses:
+        '200':
+          description: Stable normalized channel page; no source URLs.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TvChannelPage' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/tv/channels/{channelId}:
+    parameters:
+      - name: channelId
+        in: path
+        required: true
+        schema: { type: string, minLength: 1, maxLength: 256 }
+    get:
+      operationId: getTvChannel
+      x-testagram-status: proposed-not-implemented
+      tags: [TV]
+      summary: Get normalized TV channel metadata
+      security: []
+      responses:
+        '200':
+          description: Channel metadata without upstream or signed playback URL.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TvChannel' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/tv/channels/{channelId}/playback:
+    parameters:
+      - name: channelId
+        in: path
+        required: true
+        schema: { type: string, minLength: 1, maxLength: 256 }
+    post:
+      operationId: createTvPlaybackGrant
+      x-testagram-status: proposed-not-implemented
+      tags: [TV]
+      summary: Create a short-lived viewer-authorized playback grant
+      description: |
+        Backend authenticates the viewer and checks channel visibility,
+        entitlement, moderation, geography and source health. Caller-supplied
+        visibility flags, source URLs and object keys are forbidden. CDN must
+        validate a separate, narrow Backend issuer assertion before creating
+        the playback URL. Playback signing and issuer credentials are distinct.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                playback_profile:
+                  type: string
+                  enum: [auto, low, standard, high]
+                  default: auto
+      responses:
+        '200':
+          description: Short-lived CDN playback grant.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TvPlaybackGrant' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403':
+          description: Channel is not available to this viewer.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+components:
+  securitySchemes:
+    appwriteBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Appwrite session JWT issued to the signed-in user. Backend validates it with Appwrite; this spec does not authorize a caller.
+  parameters:
+    PostId:
+      name: postId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1 }
+  schemas:
+    TvChannel:
+      type: object
+      additionalProperties: false
+      required: [id, name, playback_type, availability, updated_at]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 256 }
+        name: { type: string, minLength: 1, maxLength: 160 }
+        description: { type: string, maxLength: 2000 }
+        logo_url: { type: string, format: uri }
+        country_code: { type: string, pattern: "^[A-Z]{2}$" }
+        language: { type: string, maxLength: 16 }
+        categories:
+          type: array
+          maxItems: 20
+          items: { type: string, maxLength: 64 }
+        website_url: { type: string, format: uri }
+        playback_type: { type: string, enum: [hls, dash, mp4, external] }
+        availability: { type: string, enum: [available, degraded, offline, scheduled, unknown] }
+        health_checked_at: { type: [string, 'null'], format: date-time }
+        updated_at: { type: string, format: date-time }
+    TvChannelPage:
+      type: object
+      additionalProperties: false
+      required: [items, next_cursor]
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/TvChannel' }
+        next_cursor: { type: [string, 'null'], maxLength: 2048 }
+    TvPlaybackGrant:
+      type: object
+      additionalProperties: false
+      required: [channel_id, playback_url, expires_at, playback_type]
+      properties:
+        channel_id: { type: string, minLength: 1, maxLength: 256 }
+        playback_url: { type: string, format: uri }
+        expires_at: { type: string, format: date-time }
+        playback_type: { type: string, enum: [hls, dash, mp4, external] }
+        required_headers:
+          type: object
+          maxProperties: 8
+          additionalProperties: { type: string, maxLength: 512 }
+    ExtensibleObject:
+      type: object
+      additionalProperties: true
+      description: Temporary extensible schema. Replace with an implementation-backed DTO when exact wire shape is verified.
+    PostCreateEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [id, author_id, content, visibility, created_at, idempotent_replay]
+          properties:
+            id: { type: string }
+            author_id: { type: string, format: uuid }
+            content: { type: string, minLength: 1, maxLength: 5000 }
+            visibility: { type: string, enum: [public, followers, private] }
+            created_at: { type: string, format: date-time }
+            idempotent_replay: { const: false }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PostCreateReplayEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [id, idempotent_replay]
+          properties:
+            id: { type: string }
+            idempotent_replay: { const: true }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ModerationReviewEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: false }
+        data:
+          type: object
+          additionalProperties: true
+          description: Moderation result returned for review; exact provider DTO remains owned by the Backend.
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { const: CONTENT_REQUIRES_REVIEW }
+            message: { type: string }
+          additionalProperties: false
+        request_id: { type: string }
+    ApiError:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: false }
+        data: { type: 'null' }
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }
+          additionalProperties: false
+        request_id: { type: string }
+      additionalProperties: true
+  responses:
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    Unauthorized:
+      description: Missing, expired or invalid Appwrite session JWT.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    NotFound:
+      description: Resource not found or not visible to the caller.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    RequestTooLarge:
+      description: Request body or uploaded media exceeds the configured byte limit.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    RateLimited:
+      description: Request rate limit exceeded.
+      headers:
+        Retry-After:
+          schema: { type: integer }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    ServiceUnavailable:
+      description: Backend or required dependency is not ready.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+ }
+                display_name: { type: string, minLength: 2, maxLength: 80 }
+                adult_confirmed: { type: boolean, const: true }
+                terms_accepted: { type: boolean, const: true }
+                privacy_accepted: { type: boolean, const: true }
+      responses:
+        '202':
+          description: Application and age-assurance session created; account provisioning has not occurred.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { description: Request origin is not allowed. }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/identity/applications/{application_id}:
+    get:
+      operationId: getIdentityApplicationStatus
+      tags: [Identity]
+      summary: Retrieve applicant-scoped application status
+      security: []
+      parameters:
+        - in: path
+          name: application_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: header
+          name: X-Application-Token
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+      responses:
+        '200':
+          description: Application status and age-assurance state; never implies approval unless explicitly returned by Backend.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '404': { description: Application not found or applicant token invalid. }
+  /api/identity/sessions/{session_id}:
+    get:
+      operationId: getIdentitySessionStatus
+      tags: [Identity]
+      summary: Retrieve applicant-scoped verification session status
+      security: []
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: header
+          name: X-Verification-Session-Token
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+      responses:
+        '200':
+          description: Verification session state and expiry.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '404': { description: Session not found or applicant token invalid. }
+  /api/identity/sessions/{session_id}/evidence/upload-url:
+    post:
+      operationId: reserveIdentityEvidenceUpload
+      tags: [Identity]
+      summary: Reserve a private evidence upload
+      description: Reserves one supported JPEG, PNG, WebP or PDF evidence object and returns a short-lived HTTPS upload URL. The URL is not a public media URL.
+      security: []
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: header
+          name: X-Verification-Session-Token
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [content_type, size_bytes, sha256]
+              properties:
+                content_type: { type: string, enum: [image/jpeg, image/png, image/webp, application/pdf] }
+                size_bytes: { type: integer, minimum: 1, maximum: 15728640 }
+                sha256: { type: string, pattern: '^[a-fA-F0-9]{64}    get:
+      operationId: getHomeFeed
+      tags: [Feed]
+      summary: Retrieve the authorized home timeline
+      description: Supports the Following filter and opaque cursor pagination. Backend performs authorization and ranking orchestration. Private media URLs may include a parallel `media_auth_headers` map keyed by exact URL; clients must attach the matching Authorization header and must not cache these short-lived bearer assertions.
+      parameters:
+        - in: query
+          name: following_only
+          required: false
+          schema: { type: boolean, default: false }
+          description: Set true to restrict the feed to followed accounts.
+        - in: query
+          name: before
+          required: false
+          schema: { type: string }
+          description: Opaque cursor returned by the previous feed page.
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      responses:
+        '200':
+          description: Authorized feed page. Exact payload schema is pending wire-level verification.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /api/hashtags/trending:
+    get:
+      operationId: getTrendingHashtags
+      tags: [Hashtags]
+      summary: Retrieve trending public hashtags
+      description: Returns distinct public hashtags from the previous seven days. When authenticated, followed hashtags receive viewer-specific ranking affinity; the Backend retains public visibility filtering.
+      security:
+        - appwriteBearer: []
+        - {}
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      responses:
+        '200':
+          description: Trending hashtag list and ranking window.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/hashtags/{tag}:
+    get:
+      operationId: getHashtagTimeline
+      tags: [Hashtags]
+      summary: Retrieve posts for a hashtag
+      description: Returns a cursor-paginated timeline and the current viewer's private follow state. Backend applies account visibility, accepted-follow, block, mute and media authorization rules before returning records.
+      security:
+        - appwriteBearer: []
+        - {}
+      parameters:
+        - in: path
+          name: tag
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 64, description: "Unicode letters, numbers or underscores; an optional leading # is accepted by the Backend." }
+        - in: query
+          name: before
+          required: false
+          schema: { type: string }
+          description: Opaque cursor returned by the previous page.
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      responses:
+        '200':
+          description: Privacy-filtered hashtag timeline.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/hashtags/{tag}/follow:
+    get:
+      operationId: getHashtagFollowState
+      tags: [Hashtags]
+      summary: Get the current viewer's hashtag follow state
+      description: Authentication is optional. Anonymous viewers always receive is_following=false.
+      security:
+        - appwriteBearer: []
+        - {}
+      parameters:
+        - in: path
+          name: tag
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 64 }
+      responses:
+        '200':
+          description: Private follow state for the authenticated viewer.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    post:
+      operationId: followHashtag
+      tags: [Hashtags]
+      summary: Follow a hashtag
+      description: Creates a private interest signal used to personalize Explore. The follow is not public and is not federated.
+      security:
+        - appwriteBearer: []
+      parameters:
+        - in: path
+          name: tag
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 64 }
+      responses:
+        '200':
+          description: Hashtag follow is active.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    delete:
+      operationId: unfollowHashtag
+      tags: [Hashtags]
+      summary: Unfollow a hashtag
+      description: Removes the current viewer's private Explore interest signal.
+      security:
+        - appwriteBearer: []
+      parameters:
+        - in: path
+          name: tag
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 64 }
+      responses:
+        '200':
+          description: Hashtag follow is inactive.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/media/upload-intent:
+    post:
+      operationId: createMediaUploadIntent
+      tags: [Media]
+      summary: Reserve a bounded public-media upload
+      description: Backend authenticates the owner, enforces content type, visibility and byte limits, and returns a short-lived upload URL and opaque object key.
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [name, content_type, visibility, size_bytes]
+              properties:
+                name: {type: string, maxLength: 255}
+                content_type: {type: string, enum: [image/jpeg, image/png, image/webp, image/gif, image/avif]}
+                visibility: {type: string, enum: [public]}
+                size_bytes: {type: integer, minimum: 1, maximum: 20971520}
+      responses:
+        '201':
+          description: Reserved upload intent with object key and short-lived PUT URL.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '413': { $ref: '#/components/responses/RequestTooLarge' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/media/upload:
+    put:
+      operationId: uploadMediaBytes
+      tags: [Media]
+      summary: Stream bytes into a reserved upload intent
+      description: The client must use the URL returned by the upload-intent response, preserve its key query parameter, send the matching Content-Type, and stay within the reserved byte limit.
+      security:
+        - appwriteBearer: []
+      parameters:
+        - in: query
+          name: key
+          required: true
+          schema: {type: string, minLength: 1, maxLength: 1024}
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema: {type: string, format: binary}
+      responses:
+        '200':
+          description: Upload bytes accepted and intent moved to uploaded state.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': {description: "Upload intent is missing, expired or belongs to another account"}
+        '409': {description: Upload intent was already consumed}
+        '413': { $ref: '#/components/responses/RequestTooLarge' }
+        '415': {description: Content type does not match the upload intent}
+  /api/media/cdn-download-url:
+    post:
+      operationId: issuePrivateMediaCDNAuthorization
+      tags: [Media]
+      summary: Issue viewer-bound authorization for one private media object
+      description: Backend authenticates the viewer, verifies ownership and ready/private state in the canonical media ledger, and issues a short-lived exact-object CDN assertion. The returned URL is not a bearer credential; send the returned Authorization value to the CDN. HLS multi-object playback is not covered by this exact-object grant.
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [key]
+              properties:
+                key: {type: string, minLength: 1, maxLength: 1024}
+      responses:
+        '200':
+          description: Viewer-bound CDN URL and short-lived Authorization header value.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': {description: Viewer is not authorized to access this media object}
+        '404': {description: No ready private media object owned by this viewer exists}
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/media/complete:
+    post:
+      operationId: completeMediaUpload
+      tags: [Media]
+      summary: Verify uploaded media and persist its metadata
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [key, visibility, content_type, checksum_sha256]
+              properties:
+                key: {type: string, minLength: 1, maxLength: 1024}
+                visibility: {type: string, enum: [public]}
+                content_type: {type: string}
+                checksum_sha256: {type: string, pattern: '^[a-f0-9]{64}$'}
+      responses:
+        '200':
+          description: Verified media asset is ready for attachment.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': {description: Upload intent does not belong to the authenticated account}
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/media/attach:
+    post:
+      operationId: attachMediaToPost
+      tags: [Media]
+      summary: Attach a verified public media asset to an owned post
+      description: Only ready, owner-matched public assets can be attached. The Backend checks post ownership and visibility transactionally; attachment is idempotent.
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [key, post_id]
+              properties:
+                key: {type: string, minLength: 1, maxLength: 1024}
+                post_id: {type: string, minLength: 1, maxLength: 128}
+      responses:
+        '200':
+          description: Media is attached to the post.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': {description: Media asset or post is not owned by the authenticated account}
+        '404': {description: Media asset or post was not found}
+        '409': {description: Media is not ready or the post is not eligible}
+  /api/media/delete:
+    post:
+      operationId: deleteMediaAsset
+      tags: [Media]
+      summary: Delete an unattached media asset
+      description: Starts durable deletion for an asset owned by the authenticated account. Used to clean up un-attached uploads after a failed publish.
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [key]
+              properties:
+                key: {type: string, minLength: 1, maxLength: 1024}
+      responses:
+        '200':
+          description: Deletion accepted or already completed.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': {description: Media asset was not found}
+        '409': {description: Media asset cannot be deleted in its current state}
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/search:
+    get:
+      operationId: searchContent
+      tags: [Search]
+      summary: Search people and posts
+      description: Privacy-filtered product search. Authentication is optional for public results; Backend applies visibility and authorization rules.
+      security:
+        - appwriteBearer: []
+        - {}
+      parameters:
+        - in: query
+          name: q
+          required: true
+          schema: { type: string, minLength: 2, maxLength: 120 }
+        - in: query
+          name: kind
+          required: false
+          schema: { type: string, enum: [all, people, posts], default: all }
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+        - in: query
+          name: media_only
+          required: false
+          schema: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Search result page; exact payload shape must be confirmed from Backend tests.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/posts:
+    post:
+      operationId: createSocialPost
+      tags: [Social]
+      summary: Create a main-feed post
+      description: Backend source registers this route. The operation is idempotent per author and key; reusing a key with a different normalized payload returns 409. Backend rejects unknown JSON fields and limits the request body to 16 KiB. This is not the Threads composer.
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+            minLength: 8
+            maxLength: 128
+            pattern: "^[A-Za-z0-9._:-]+$"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [content, visibility]
+              properties:
+                content: { type: string, minLength: 1, maxLength: 5000 }
+                visibility: { type: string, enum: [public, followers, private] }
+      responses:
+        '200':
+          description: Existing post returned for a retry with the same author, key and normalized payload.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PostCreateReplayEnvelope' }
+        '201':
+          description: New post committed successfully.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PostCreateEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409':
+          description: Idempotency key was already used with a different normalized payload.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+        '422':
+          description: Content moderation requires review; no post is published.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ModerationReviewEnvelope' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/posts/{postId}/interaction-summary:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    get:
+      operationId: getPostInteractionSummary
+      tags: [Social]
+      summary: Get viewer-specific post interaction state
+      description: Returns interaction state and counters for the authenticated viewer.
+      responses:
+        '200':
+          description: Interaction summary.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/social/posts/{postId}/reaction:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    post:
+      operationId: createPostReaction
+      tags: [Social]
+      summary: Create or update a post reaction
+      description: Reaction lifecycle route documented by the Flutter integration ledger. Verify accepted reaction values and request body against Backend implementation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExtensibleObject' }
+      responses:
+        '200': { description: Reaction accepted or updated. }
+        '201': { description: Reaction created. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deletePostReaction
+      tags: [Social]
+      summary: Remove the authenticated viewer's post reaction
+      responses:
+        '200': { description: Reaction removed. }
+        '204': { description: Reaction removed with no response body. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/posts/{postId}/reposts:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    post:
+      operationId: createPostRepost
+      tags: [Social]
+      summary: Repost a post
+      responses:
+        '200': { description: Repost accepted. }
+        '201': { description: Repost created. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deletePostRepost
+      tags: [Social]
+      summary: Undo a repost
+      responses:
+        '200': { description: Repost removed. }
+        '204': { description: Repost removed with no response body. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/posts/{postId}/bookmarks:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    post:
+      operationId: createPostBookmark
+      tags: [Social]
+      summary: Bookmark a post
+      responses:
+        '200': { description: Bookmark accepted. }
+        '201': { description: Bookmark created. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deletePostBookmark
+      tags: [Social]
+      summary: Remove a post bookmark
+      responses:
+        '200': { description: Bookmark removed. }
+        '204': { description: Bookmark removed with no response body. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/posts/{postId}/replies:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    get:
+      operationId: listPostReplies
+      tags: [Social]
+      summary: List replies for a post
+      parameters:
+        - in: query
+          name: cursor
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Reply page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createPostReply
+      tags: [Social]
+      summary: Create a reply to a post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExtensibleObject' }
+      responses:
+        '200': { description: Reply created. }
+        '201': { description: Reply created. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/follows:
+    post:
+      operationId: followUser
+      tags: [Social]
+      summary: Follow a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [target_user_id]
+              properties:
+                target_user_id: { type: string, format: uuid }
+      responses:
+        '200': { description: Follow relationship created or already active. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { description: Follow request or relationship conflict. }
+  /api/social/follows/{targetUserId}:
+    parameters:
+      - name: targetUserId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getFollowState
+      tags: [Social]
+      summary: Read follow state for a target account
+      responses:
+        '200': { description: Follow state. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: unfollowUser
+      tags: [Social]
+      summary: Unfollow a target account
+      responses:
+        '200': { description: Follow relationship removed. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/social/notifications:
+    get:
+      operationId: listNotifications
+      tags: [Notifications]
+      summary: List authenticated user's notifications
+      parameters:
+        - in: query
+          name: cursor
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Notification page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/notifications/{notificationId}/read:
+    parameters:
+      - name: notificationId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: markNotificationRead
+      tags: [Notifications]
+      summary: Mark a notification as read
+      responses:
+        '200': { description: Notification marked read. }
+        '204': { description: Notification marked read with no response body. }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/threads:
+    get:
+      operationId: listThreads
+      tags: [Threads]
+      summary: List threads
+      description: Distinct Threads product surface; do not treat this as the main-feed posts API.
+      parameters:
+        - in: query
+          name: cursor
+          required: false
+          schema: { type: string }
+      responses:
+        '200':
+          description: Thread page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createThread
+      tags: [Threads]
+      summary: Create a thread
+      description: This is the Threads surface, not a substitute for main-feed post publishing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ExtensibleObject' }
+      responses:
+        '200': { description: Thread created. }
+        '201': { description: Thread created. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/threads/{threadId}:
+    parameters:
+      - name: threadId
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getThread
+      tags: [Threads]
+      summary: Get a thread
+      responses:
+        '200':
+          description: Thread details.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /api/me/profile:
+    get:
+      operationId: getMyProfile
+      tags: [Social]
+      summary: Read the authenticated user's canonical Testagram profile
+      description: Resolves the canonical Testagram UUID from the verified Appwrite session; clients must not substitute the Appwrite user ID.
+      responses:
+        '200':
+          description: Current canonical profile and viewer relationship flags.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [id, user_id, username, display_name, bio, website, location, social_links, avatar_key, avatar_url, cover_key, cover_url, protected_account, followers_count, following_count, follow_status, is_following, is_followed_by, can_view_posts, is_self]
+                    properties:
+                      id: { type: string, format: uuid }
+                      user_id: { type: string, format: uuid }
+                      username: { type: string }
+                      display_name: { type: string }
+                      bio: { type: string }
+                      website: { type: string }
+                      location: { type: string, maxLength: 120 }
+                      social_links:
+                        type: object
+                        additionalProperties: false
+                        properties:
+                          x: { type: string, maxLength: 256 }
+                          twitter: { type: string, maxLength: 256 }
+                          instagram: { type: string, maxLength: 256 }
+                          linkedin: { type: string, maxLength: 256 }
+                          facebook: { type: string, maxLength: 256 }
+                      avatar_key: { type: string }
+                      avatar_url: { type: string }
+                      cover_key: { type: string }
+                      cover_url: { type: string }
+                      protected_account: { type: boolean }
+                      followers_count: { type: integer, minimum: 0 }
+                      following_count: { type: integer, minimum: 0 }
+                      follow_status: { type: string, enum: ["", pending, accepted] }
+                      is_following: { type: boolean }
+                      is_followed_by: { type: boolean }
+                      can_view_posts: { type: boolean }
+                      is_self: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404':
+          description: The authenticated account profile is unavailable.
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    put:
+      operationId: updateMyProfile
+      tags: [Social]
+      summary: Update the authenticated user's canonical profile
+      description: Backend validates the Appwrite session, active account, profile fields and ownership/readiness of uploaded public image assets. Clients upload media through the Backend media gateway first; raw object keys are never accepted unless owned and ready.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [display_name, bio, website, location, avatar_key, cover_key, social_links]
+              properties:
+                display_name: { type: string, maxLength: 80 }
+                bio: { type: string, maxLength: 500 }
+                website: { type: string, maxLength: 2048, format: uri }
+                location: { type: string, maxLength: 120 }
+                avatar_key: { type: string, maxLength: 512 }
+                cover_key: { type: string, maxLength: 512 }
+                social_links:
+                  type: object
+                  additionalProperties: false
+                  maxProperties: 5
+                  properties:
+                    x: { type: string, maxLength: 256 }
+                    twitter: { type: string, maxLength: 256 }
+                    instagram: { type: string, maxLength: 256 }
+                    linkedin: { type: string, maxLength: 256 }
+                    facebook: { type: string, maxLength: 256 }
+      responses:
+        '200':
+          description: Updated canonical profile.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Account is not active. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/me/federation:
+    get:
+      operationId: getMyFederationPreference
+      tags: [Federation]
+      summary: Read the authenticated user's federation preference
+      description: Returns the canonical Backend preference. Enabling federation requires username discovery to be enabled.
+      responses:
+        '200':
+          description: Current federation preference.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [enabled]
+                    properties:
+                      enabled: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    put:
+      operationId: updateMyFederationPreference
+      tags: [Federation]
+      summary: Update the authenticated user's federation preference
+      description: Backend validates the Appwrite session, account status and username discoverability. This endpoint changes preference only; it does not create a separate Mastodon account or bypass federation rollout gates.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [enabled]
+              properties:
+                enabled: { type: boolean }
+      responses:
+        '200':
+          description: Updated federation preference.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [enabled]
+                    properties:
+                      enabled: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409':
+          description: The account must be public and username-discoverable before federation can be enabled.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+
+  /api/tv/channels:
+    get:
+      operationId: listTvChannels
+      x-testagram-status: proposed-not-implemented
+      tags: [TV]
+      summary: List the normalized public TV catalogue
+      description: |
+        Backend-owned catalogue read model. Data Centre may ingest and normalize
+        upstream feeds, but Flutter must never call upstream sources or Data
+        Centre private APIs. This response MUST NOT contain an upstream stream
+        URL, provider credential, signed playback URL or private origin detail.
+        Proposed contract only until the Backend handler and wire tests ship.
+      security: []
+      parameters:
+        - in: query
+          name: cursor
+          schema: { type: string, maxLength: 2048 }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+        - in: query
+          name: country
+          schema: { type: string, pattern: "^[A-Z]{2}$" }
+        - in: query
+          name: category
+          schema: { type: string, maxLength: 64 }
+        - in: query
+          name: language
+          schema: { type: string, maxLength: 16 }
+        - in: query
+          name: query
+          schema: { type: string, minLength: 1, maxLength: 120 }
+      responses:
+        '200':
+          description: Stable normalized channel page; no source URLs.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TvChannelPage' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/tv/channels/{channelId}:
+    parameters:
+      - name: channelId
+        in: path
+        required: true
+        schema: { type: string, minLength: 1, maxLength: 256 }
+    get:
+      operationId: getTvChannel
+      x-testagram-status: proposed-not-implemented
+      tags: [TV]
+      summary: Get normalized TV channel metadata
+      security: []
+      responses:
+        '200':
+          description: Channel metadata without upstream or signed playback URL.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TvChannel' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/tv/channels/{channelId}/playback:
+    parameters:
+      - name: channelId
+        in: path
+        required: true
+        schema: { type: string, minLength: 1, maxLength: 256 }
+    post:
+      operationId: createTvPlaybackGrant
+      x-testagram-status: proposed-not-implemented
+      tags: [TV]
+      summary: Create a short-lived viewer-authorized playback grant
+      description: |
+        Backend authenticates the viewer and checks channel visibility,
+        entitlement, moderation, geography and source health. Caller-supplied
+        visibility flags, source URLs and object keys are forbidden. CDN must
+        validate a separate, narrow Backend issuer assertion before creating
+        the playback URL. Playback signing and issuer credentials are distinct.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                playback_profile:
+                  type: string
+                  enum: [auto, low, standard, high]
+                  default: auto
+      responses:
+        '200':
+          description: Short-lived CDN playback grant.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TvPlaybackGrant' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403':
+          description: Channel is not available to this viewer.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+components:
+  securitySchemes:
+    appwriteBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Appwrite session JWT issued to the signed-in user. Backend validates it with Appwrite; this spec does not authorize a caller.
+  parameters:
+    PostId:
+      name: postId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1 }
+  schemas:
+    TvChannel:
+      type: object
+      additionalProperties: false
+      required: [id, name, playback_type, availability, updated_at]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 256 }
+        name: { type: string, minLength: 1, maxLength: 160 }
+        description: { type: string, maxLength: 2000 }
+        logo_url: { type: string, format: uri }
+        country_code: { type: string, pattern: "^[A-Z]{2}$" }
+        language: { type: string, maxLength: 16 }
+        categories:
+          type: array
+          maxItems: 20
+          items: { type: string, maxLength: 64 }
+        website_url: { type: string, format: uri }
+        playback_type: { type: string, enum: [hls, dash, mp4, external] }
+        availability: { type: string, enum: [available, degraded, offline, scheduled, unknown] }
+        health_checked_at: { type: [string, 'null'], format: date-time }
+        updated_at: { type: string, format: date-time }
+    TvChannelPage:
+      type: object
+      additionalProperties: false
+      required: [items, next_cursor]
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/TvChannel' }
+        next_cursor: { type: [string, 'null'], maxLength: 2048 }
+    TvPlaybackGrant:
+      type: object
+      additionalProperties: false
+      required: [channel_id, playback_url, expires_at, playback_type]
+      properties:
+        channel_id: { type: string, minLength: 1, maxLength: 256 }
+        playback_url: { type: string, format: uri }
+        expires_at: { type: string, format: date-time }
+        playback_type: { type: string, enum: [hls, dash, mp4, external] }
+        required_headers:
+          type: object
+          maxProperties: 8
+          additionalProperties: { type: string, maxLength: 512 }
+    ExtensibleObject:
+      type: object
+      additionalProperties: true
+      description: Temporary extensible schema. Replace with an implementation-backed DTO when exact wire shape is verified.
+    PostCreateEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [id, author_id, content, visibility, created_at, idempotent_replay]
+          properties:
+            id: { type: string }
+            author_id: { type: string, format: uuid }
+            content: { type: string, minLength: 1, maxLength: 5000 }
+            visibility: { type: string, enum: [public, followers, private] }
+            created_at: { type: string, format: date-time }
+            idempotent_replay: { const: false }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PostCreateReplayEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [id, idempotent_replay]
+          properties:
+            id: { type: string }
+            idempotent_replay: { const: true }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ModerationReviewEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: false }
+        data:
+          type: object
+          additionalProperties: true
+          description: Moderation result returned for review; exact provider DTO remains owned by the Backend.
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { const: CONTENT_REQUIRES_REVIEW }
+            message: { type: string }
+          additionalProperties: false
+        request_id: { type: string }
+    ApiError:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: false }
+        data: { type: 'null' }
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }
+          additionalProperties: false
+        request_id: { type: string }
+      additionalProperties: true
+  responses:
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    Unauthorized:
+      description: Missing, expired or invalid Appwrite session JWT.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    NotFound:
+      description: Resource not found or not visible to the caller.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    RequestTooLarge:
+      description: Request body or uploaded media exceeds the configured byte limit.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    RateLimited:
+      description: Request rate limit exceeded.
+      headers:
+        Retry-After:
+          schema: { type: integer }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    ServiceUnavailable:
+      description: Backend or required dependency is not ready.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+ }
+      responses:
+        '201':
+          description: Private upload reservation created.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { description: Session not found or no longer accepts evidence. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/identity/sessions/{session_id}/evidence/submit:
+    post:
+      operationId: submitIdentityEvidence
+      tags: [Identity]
+      summary: Verify and submit uploaded evidence for manual review
+      description: Backend independently verifies upload size and SHA-256, confirms replication, seals evidence and moves the application into manual review. Submission is not an approval.
+      security: []
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: header
+          name: X-Verification-Session-Token
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [evidence_id]
+              properties:
+                evidence_id: { type: string, format: uuid }
+      responses:
+        '202':
+          description: Evidence accepted into manual review after integrity and replication checks.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { description: Session or evidence reservation not found. }
+        '409': { description: Upload incomplete, checksum mismatch, or session is no longer submittable. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/identity/applications/{application_id}/provisioning-token:
+    post:
+      operationId: requestIdentityProvisioningAuthorization
+      tags: [Identity]
+      summary: Request a one-time provisioning authorization after approval
+      description: Returns a short-lived single-use token only after the application has completed both independent approval stages.
+      security: []
+      parameters:
+        - in: path
+          name: application_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: header
+          name: X-Application-Token
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+      responses:
+        '200':
+          description: Single-use approval token and JTI issued for 15 minutes.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '404': { description: Application not found or applicant token invalid. }
+        '409': { description: Application is not approved or authorization is unavailable. }
+  /api/identity/applications/{application_id}/redeem:
+    post:
+      operationId: redeemIdentityProvisioningAuthorization
+      tags: [Identity]
+      summary: Redeem approved provisioning authorization against an Appwrite session
+      description: Backend verifies the Appwrite session email matches the approved application, consumes the approval token and JTI once, and provisions the canonical account transactionally.
+      parameters:
+        - in: path
+          name: application_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: header
+          name: X-Application-Token
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+        - in: header
+          name: X-Identity-Approval-Token
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+        - in: header
+          name: X-Identity-Approval-JTI
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: false }
+      responses:
+        '200':
+          description: Canonical account provisioned or an idempotent replay for the same Appwrite account.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Appwrite email mismatch or invalid approval authorization. }
+        '404': { description: Application or authorization not found. }
+        '409': { description: Approval authorization expired, consumed or replayed. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/feed/home:
     get:
       operationId: getHomeFeed
