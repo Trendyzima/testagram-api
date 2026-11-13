@@ -40,6 +40,8 @@ tags:
     description: The separate long-form Threads product surface.
   - name: Federation
     description: Authenticated Testagram federation preferences. ActivityPub protocol traffic is handled by the private Federation service, not by clients.
+  - name: Identity
+    description: Applicant-facing native age-assurance application and private evidence submission. No account is provisioned until manual verification and independent two-person approval complete.
 security:
   - appwriteBearer: []
 paths:
@@ -74,6 +76,222 @@ paths:
           content:
             text/plain:
               schema: { type: string }
+  /api/identity/applications:
+    post:
+      operationId: createIdentityApplication
+      tags: [Identity]
+      summary: Create a native age-assurance application
+      description: Pre-authentication registration entry point. Registration is fail-closed unless Backend registration, policy versions, PostgreSQL, private evidence storage and verified replication are configured. Requires age, Terms and Privacy declarations plus a high-entropy idempotency key. This does not create an account.
+      security: []
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+            minLength: 43
+            maxLength: 43
+            pattern: '^[A-Za-z0-9_-]{43}$'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [email, username, display_name, adult_confirmed, terms_accepted, privacy_accepted]
+              properties:
+                email: { type: string, format: email, maxLength: 254 }
+                username: { type: string, minLength: 3, maxLength: 30, pattern: '^[a-z0-9_]+$' }
+                display_name: { type: string, minLength: 2, maxLength: 80 }
+                adult_confirmed: { type: boolean, const: true }
+                terms_accepted: { type: boolean, const: true }
+                privacy_accepted: { type: boolean, const: true }
+      responses:
+        '202':
+          description: Application and age-assurance session created; account provisioning has not occurred.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { description: Request origin is not allowed. }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/identity/applications/{application_id}:
+    get:
+      operationId: getIdentityApplicationStatus
+      tags: [Identity]
+      summary: Retrieve applicant-scoped application status
+      security: []
+      parameters:
+        - in: path
+          name: application_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: header
+          name: X-Application-Token
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+      responses:
+        '200':
+          description: Application status and age-assurance state; never implies approval unless explicitly returned by Backend.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '404': { description: Application not found or applicant token invalid. }
+  /api/identity/sessions/{session_id}:
+    get:
+      operationId: getIdentitySessionStatus
+      tags: [Identity]
+      summary: Retrieve applicant-scoped verification session status
+      security: []
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: header
+          name: X-Verification-Session-Token
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+      responses:
+        '200':
+          description: Verification session state and expiry.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '404': { description: Session not found or applicant token invalid. }
+  /api/identity/sessions/{session_id}/evidence/upload-url:
+    post:
+      operationId: reserveIdentityEvidenceUpload
+      tags: [Identity]
+      summary: Reserve a private evidence upload
+      description: Reserves one supported JPEG, PNG, WebP or PDF evidence object and returns a short-lived HTTPS upload URL. The URL is not a public media URL.
+      security: []
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: header
+          name: X-Verification-Session-Token
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [content_type, size_bytes, sha256]
+              properties:
+                content_type: { type: string, enum: [image/jpeg, image/png, image/webp, application/pdf] }
+                size_bytes: { type: integer, minimum: 1, maximum: 15728640 }
+                sha256: { type: string, pattern: '^[a-fA-F0-9]{64}$' }
+      responses:
+        '201':
+          description: Private upload reservation created.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { description: Session not found or no longer accepts evidence. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/identity/sessions/{session_id}/evidence/submit:
+    post:
+      operationId: submitIdentityEvidence
+      tags: [Identity]
+      summary: Verify and submit uploaded evidence for manual review
+      description: Backend independently verifies upload size and SHA-256, confirms replication, seals evidence and moves the application into manual review. Submission is not an approval.
+      security: []
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: header
+          name: X-Verification-Session-Token
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [evidence_id]
+              properties:
+                evidence_id: { type: string, format: uuid }
+      responses:
+        '202':
+          description: Evidence accepted into manual review after integrity and replication checks.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { description: Session or evidence reservation not found. }
+        '409': { description: Upload incomplete, checksum mismatch, or session is no longer submittable. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/identity/applications/{application_id}/provisioning-token:
+    post:
+      operationId: requestIdentityProvisioningAuthorization
+      tags: [Identity]
+      summary: Request a one-time provisioning authorization after approval
+      description: Returns a short-lived single-use token only after the application has completed both independent approval stages.
+      security: []
+      parameters:
+        - in: path
+          name: application_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: header
+          name: X-Application-Token
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+      responses:
+        '200':
+          description: Single-use approval token and JTI issued for 15 minutes.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '404': { description: Application not found or applicant token invalid. }
+        '409': { description: Application is not approved or authorization is unavailable. }
+  /api/identity/applications/{application_id}/redeem:
+    post:
+      operationId: redeemIdentityProvisioningAuthorization
+      tags: [Identity]
+      summary: Redeem approved provisioning authorization against an Appwrite session
+      description: Backend verifies the Appwrite session email matches the approved application, consumes the approval token and JTI once, and provisions the canonical account transactionally.
+      parameters:
+        - in: path
+          name: application_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: header
+          name: X-Application-Token
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+        - in: header
+          name: X-Identity-Approval-Token
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+        - in: header
+          name: X-Identity-Approval-JTI
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+      responses:
+        '200':
+          description: Canonical account provisioned or an idempotent replay for the same Appwrite account.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Appwrite email mismatch or invalid approval authorization. }
+        '404': { description: Application or authorization not found. }
+        '409': { description: Approval authorization expired, consumed or replayed. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/feed/home:
     get:
       operationId: getHomeFeed
