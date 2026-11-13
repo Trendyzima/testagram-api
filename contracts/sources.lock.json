@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "68423db47447fbe39756120f6535ad07cc476b1a",
+      "ref": "ee302313a8c6a8136740e696d6b00c7fe4246a47",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "Dockerfile.fresh",
@@ -93,7 +93,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "716d810ae2c7af9bb58fcb5b864288cd6de8b6d3",
+      "ref": "4244c20ee839a419e9f1ebdac6172bd828ecbfd1",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         "backend/services/platform/main.go",
@@ -133,7 +133,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "015ce9f5dac13139ec8bdddbe8023b05ed19a6c2",
+      "ref": "dcbeecf6d019e7d3531aeda19789b37ba00c7d97",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "docs/migration-progress.md",

@@ -21,6 +21,7 @@
 | TV health | GET /api/tv/health | Backend + Data Centre | Registered-only | Not a TV catalogue/player contract |
 | Capability dispatcher | POST /api/capability | Backend | Registered-only | Allow-listed capability calls only; never generic arbitrary RPC |
 | Auth lifecycle | POST /api/auth/{signup,resend-verification,verify-email,login,forgot-password,reset-password} | Backend | Registered-only | Dynamic routes; dedicated auth contract required |
+| Native identity verification | POST /api/identity/applications; GET /api/identity/applications/{application_id}; GET /api/identity/sessions/{session_id}; POST /api/identity/sessions/{session_id}/evidence/*; POST /api/admin/identity/* | Backend | Registered-only | Native session, secure evidence upload and reviewer/two-person decision APIs are registered; strict public/private DTOs and Flutter end-to-end contract promotion remain required |
 | Federation preferences | GET/PUT /api/me/federation | Backend + Federation | Registered-only | Separate privacy/security review |
 | M-Pesa callback | POST /api/wallet/mpesa/callback | Backend | Webhook-only | Not a client SDK operation |
 | TV catalogue/player, ads, marketplace, creator tools, admin | No complete public client contract verified | Backend + Data Centre + CDN | Not contracted | Do not infer from private services or legacy UI |
