@@ -78,8 +78,8 @@
         "contracts/upstream/datacentre/internal-platform.openapi.yaml",
         "docs/integration/data-centre-platform-contract.md"
       ],
-      "status": "media-lifecycle-client-contract-verified-live-provider-acceptance-pending",
-      "notes": "The pinned Backend mainline contains a typed Data Centre media client and matching client tests for all five private media lifecycle routes (upload-url, verify, status, download-url and delete). API cross-repository CI statically verifies those routes against the Data Centre handler, OpenAPI snapshot, Backend Compose network and dedicated service-token wiring. Live B2/R2 provider write/read/hash/replication/delete/restore acceptance remains pending. The dedicated media service does not yet have a verified Instabox adapter or full-inventory reconciliation; the separate Fresh API runtime still needs a Data Centre-backed adapter and canonical metadata-ledger reconciliation before its media flag can be enabled. The separate Data Centre platform event/audit/config API has no verified typed Backend client; video and notification services need separately audited contracts."
+      "status": "private-media-profile-available-explicit-activation-and-staging-acceptance-pending",
+      "notes": "The Backend mainline has a typed Data Centre media client for five private lifecycle routes. The active Data Centre Backend overlay now contains an opt-in media profile with a separate media database, private platform-network exposure, B2/R2 provider configuration and readiness healthcheck. Backend deployment PR #224 adds explicit DATA_CENTRE_MEDIA_ENABLED gating, shared service-token mapping and runtime readiness checks; until that PR is green and merged, the service is not deployed by the InstaBox workflow. Live B2/R2 provider smoke and FRESH_MEDIA_ENABLED acceptance remain required."
     },
     {
       "id": "cdn-edge",
