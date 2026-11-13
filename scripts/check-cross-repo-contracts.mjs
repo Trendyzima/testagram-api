@@ -61,6 +61,29 @@ for (const snapshot of lock.snapshots) {
   if (sourceText !== targetText) fail.push(`Snapshot drift: ${snapshot.snapshotPath} differs from pinned ${snapshot.repository}:${snapshot.sourcePath}`);
 }
 
+// The Data Centre media API is a three-party contract: Backend client, OpenAPI
+// snapshot, and Data Centre provider handlers must expose the same five routes.
+const backendMediaClient = readFileSync(resolve(lock.repositories.backend.checkoutPath, "internal/datacentreclient/client.go"), "utf8");
+const backendMediaTests = readFileSync(resolve(lock.repositories.backend.checkoutPath, "internal/datacentreclient/client_test.go"), "utf8");
+const dataCentreMediaServer = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/media/main.go"), "utf8");
+const dataCentreMediaOpenAPI = readFileSync("contracts/upstream/datacentre/media-lifecycle-v1.openapi.yaml", "utf8");
+const mediaRoutes = [
+  { path: "/internal/v1/media/upload-url", method: "POST", client: "post(ctx,", provider: 'mux.HandleFunc("/internal/v1/media/upload-url"' },
+  { path: "/internal/v1/media/verify", method: "POST", client: "post(ctx,", provider: 'mux.HandleFunc("/internal/v1/media/verify"' },
+  { path: "/internal/v1/media/status", method: "GET", client: "get(ctx,", provider: 'mux.HandleFunc("/internal/v1/media/status"' },
+  { path: "/internal/v1/media/download-url", method: "POST", client: "post(ctx,", provider: 'mux.HandleFunc("/internal/v1/media/download-url"' },
+  { path: "/internal/v1/media/delete", method: "POST", client: "post(ctx,", provider: 'mux.HandleFunc("/internal/v1/media/delete"' },
+];
+for (const route of mediaRoutes) {
+  if (!backendMediaClient.includes(route.path)) fail.push(`Backend Data Centre client missing route: ${route.path}`);
+  if (!dataCentreMediaServer.includes(route.provider)) fail.push(`Data Centre media server missing handler: ${route.path}`);
+  if (!dataCentreMediaOpenAPI.includes(route.path)) fail.push(`Data Centre media OpenAPI missing route: ${route.path}`);
+  if (!dataCentreMediaOpenAPI.includes(`    ${route.path}:\n      ${route.method.toLowerCase()}:`)) fail.push(`Data Centre media OpenAPI method mismatch: ${route.method} ${route.path}`);
+  if (!backendMediaTests.includes(route.path)) fail.push(`Backend Data Centre client tests missing route coverage: ${route.path}`);
+}
+if (!backendMediaClient.includes('"X-Testagram-API-Version"')) fail.push("Backend Data Centre client must send X-Testagram-API-Version");
+if (!dataCentreMediaServer.includes('r.Header.Get("X-Testagram-API-Version")')) fail.push("Data Centre media server must enforce X-Testagram-API-Version");
+
 const publicSpec = readFileSync("contracts/openapi/testagram-v1.yaml", "utf8");
 if (/^  \/internal\//m.test(publicSpec) || publicSpec.includes("/api/cache/purge")) {
   fail.push("Private service or operator-only route leaked into public Backend OpenAPI");
