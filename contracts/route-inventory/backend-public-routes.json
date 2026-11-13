@@ -85,12 +85,12 @@
     {
       "method": "GET",
       "path": "/api/identity/applications/{application_id}",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "GET",
       "path": "/api/identity/sessions/{session_id}",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "GET",
@@ -280,27 +280,27 @@
     {
       "method": "POST",
       "path": "/api/identity/applications",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
       "path": "/api/identity/applications/{application_id}/provisioning-token",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
       "path": "/api/identity/applications/{application_id}/redeem",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
       "path": "/api/identity/sessions/{session_id}/evidence/submit",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
       "path": "/api/identity/sessions/{session_id}/evidence/upload-url",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
