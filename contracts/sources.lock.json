@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "policy": "Immutable source pins identify the exact reviewed commits used by cross-repository CI. Backend and Data Centre pins may target open integration PR heads; those revisions are not deployable mainline until merged. CDN, Flutter, Federation and Algorithm pins currently target reviewed mainline commits. Update pins only with corresponding contract/source review.",
+  "policy": "Immutable source pins identify exact reviewed commits on each repository mainline. Backend and Data Centre now point to merged mainline commits; CDN and Flutter point to merged mainline commits; Federation and Algorithm point to reviewed mainline commits. Fresh media remains disabled until live B2/R2, CDN authorization and Flutter playback acceptance pass.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "fc436584b6deb470e00142d1d22ef4fe553c5b40",
+      "ref": "30a56d0224f835f050b9bfc29842d8c56862220f",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         "Dockerfile.fresh",
@@ -93,7 +93,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "e315e477eb6996d2da83368e0dd05f7fc9a906a8",
+      "ref": "716d810ae2c7af9bb58fcb5b864288cd6de8b6d3",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         "backend/services/platform/main.go",
