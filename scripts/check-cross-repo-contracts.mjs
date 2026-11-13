@@ -103,6 +103,57 @@ if (!dataCentreMediaServer.includes('r.Header.Get("X-Testagram-API-Version")')) 
  if (!dataCentreCompose.includes('expose: ["8096"]')) fail.push("Data Centre media API must expose only the private container port, not publish it publicly");
  if (/B2_S3_(ACCESS_KEY_ID|SECRET_ACCESS_KEY)|R2_(ACCESS_KEY_ID|SECRET_ACCESS_KEY)/.test(backendCompose)) fail.push("B2/R2 provider credentials must not be configured in Backend Compose");
 
+// Verify the other service-to-service edges against both pinned producers and consumers.
+// These are source-level contract guards; staging tests remain separate release gates.
+const algorithmClient = readFileSync(resolve(lock.repositories.backend.checkoutPath, "internal/algorithmclient/client.go"), "utf8");
+const algorithmOpenAPI = readFileSync(resolve(lock.repositories.algorithm.checkoutPath, "testagram-feed/api/openapi.yaml"), "utf8");
+const algorithmRankTests = readFileSync(resolve(lock.repositories.backend.checkoutPath, "internal/algorithmclient/client_test.go"), "utf8");
+for (const [label, source, marker] of [
+  ["Backend Algorithm client", algorithmClient, "/v1/feed/rank"],
+  ["Algorithm OpenAPI", algorithmOpenAPI, "/v1/feed/rank:"],
+  ["Backend Algorithm client", algorithmClient, 'req.Header.Set("X-Testagram-API-Version", "1")'],
+  ["Backend Algorithm client", algorithmClient, 'req.Header.Set("Authorization", "Bearer "+c.token)'],
+  ["Backend Algorithm tests", algorithmRankTests, "/v1/feed/rank"],
+]) {
+  if (!source.includes(marker)) fail.push(`${label} missing agreed ranking contract marker: ${marker}`);
+}
+if (!algorithmClient.includes("len(input.Candidates) > 200") || !algorithmClient.includes("input.Limit > 50")) {
+  fail.push("Backend Algorithm client must enforce the 200-candidate / 50-result bounds");
+}
+
+const backendFederationClient = readFileSync(resolve(lock.repositories.backend.checkoutPath, "internal/federationclient/client.go"), "utf8");
+const federationServer = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/server.go"), "utf8");
+const federationIngress = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/internal_activities.go"), "utf8");
+const federationTests = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/server_test.go"), "utf8");
+for (const [label, source, marker] of [
+  ["Backend Federation client", backendFederationClient, "/internal/v1/activities"],
+  ["Backend Federation client", backendFederationClient, 'req.Header.Set("Idempotency-Key", input.ActivityID)'],
+  ["Federation server", federationServer, 'HandleFunc("POST /internal/v1/activities"'],
+  ["Federation ingress", federationIngress, "validInternalBearer(r, ingressToken)"],
+  ["Federation ingress", federationIngress, "EnqueueOutbox"],
+  ["Federation ingress", federationIngress, "http.StatusAccepted"],
+]) {
+  if (!source.includes(marker)) fail.push(`${label} missing agreed durable-ingress contract marker: ${marker}`);
+}
+if (!federationTests.includes("internal/v1/activities")) {
+  fail.push("Federation HTTP integration tests must cover the private activity ingress");
+}
+
+const cdnServer = readFileSync(resolve(lock.repositories.cdn.checkoutPath, "internal/edge/server.go"), "utf8");
+const cdnTests = readFileSync(resolve(lock.repositories.cdn.checkoutPath, "internal/edge/server_test.go"), "utf8");
+for (const [label, source, marker] of [
+  ["CDN server", cdnServer, 'strings.TrimSpace(s.cfg.OriginAuthToken)==""'],
+  ["CDN server", cdnServer, '"X-Testagram-Viewer-Authorization"'],
+  ["CDN server", cdnServer, '"X-Testagram-Origin-Auth"'],
+  ["CDN server", cdnServer, '"private, no-store"'],
+  ["CDN server", cdnServer, '"X-Testagram-Visibility"'],
+  ["CDN tests", cdnTests, "TestPrivateAuthorizationDenialCannotFailOverToAnotherOrigin"],
+  ["CDN tests", cdnTests, "TestReadyRequiresOriginServiceCredential"],
+  ["CDN tests", cdnTests, "TestViewerAuthorizationIsNotForwardedAcrossOriginRedirect"],
+]) {
+  if (!source.includes(marker)) fail.push(`${label} missing fail-closed media authorization marker: ${marker}`);
+}
+
 const publicSpec = readFileSync("contracts/openapi/testagram-v1.yaml", "utf8");
 if (/^  \/internal\//m.test(publicSpec) || publicSpec.includes("/api/cache/purge")) {
   fail.push("Private service or operator-only route leaked into public Backend OpenAPI");
