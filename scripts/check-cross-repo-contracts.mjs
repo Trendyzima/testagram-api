@@ -174,6 +174,28 @@ for (const [label, source, marker] of [
   if (!source.includes(marker)) fail.push(`${label} missing canonical public/private origin marker: ${marker}`);
 }
 
+// Verify the Backend's canonical CDN origin is paired with the Go edge's
+// viewer-assertion relay, method-correct HEAD signing and private cache bypass.
+const backendRouter = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/main.go"), "utf8");
+const backendMedia = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/media.go"), "utf8");
+const backendOriginTests = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/media_cdn_origin_test.go"), "utf8");
+for (const [label, source, marker] of [
+  ["Backend router", backendRouter, 'HandleFunc("GET /internal/cdn/v1/{key...}", s.mediaCDNOrigin)'],
+  ["Backend router", backendRouter, 'HandleFunc("HEAD /internal/cdn/v1/{key...}", s.mediaCDNOrigin)'],
+  ["Backend CDN origin", backendMedia, 'r.Header.Get("X-Testagram-Origin-Auth")'],
+  ["Backend CDN origin", backendMedia, "VerifyForKey"],
+  ["Backend CDN origin", backendMedia, 'else if visibility != "public"'],
+  ["Backend CDN origin", backendMedia, "s.dataCentreMedia.HeadURL"],
+  ["Backend CDN origin", backendMedia, "s.virtualStorage.HeadURL"],
+  ["Backend CDN origin", backendMedia, "s.media.PresignObjectHead"],
+  ["Backend CDN origin", backendMedia, "writeCDNOriginResponse"],
+  ["Backend CDN origin tests", backendOriginTests, "TestWriteCDNOriginResponseHEADHasHeadersButNoBody"],
+  ["Backend CDN origin tests", backendOriginTests, "TestCDNOriginRequestForwardsRangeValidators"],
+  ["Backend CDN origin tests", backendOriginTests, "TestWriteCDNOriginResponsePublicUsesSharedCachePolicy"],
+]) {
+  if (!source.includes(marker)) fail.push(`${label} missing CDN origin contract marker: ${marker}`);
+}
+
 const publicSpec = readFileSync("contracts/openapi/testagram-v1.yaml", "utf8");
 if (/^  \/internal\//m.test(publicSpec) || publicSpec.includes("/api/cache/purge")) {
   fail.push("Private service or operator-only route leaked into public Backend OpenAPI");
