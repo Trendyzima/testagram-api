@@ -78,7 +78,7 @@ for (const route of mediaRoutes) {
   if (!backendMediaClient.includes(route.path)) fail.push(`Backend Data Centre client missing route: ${route.path}`);
   if (!dataCentreMediaServer.includes(route.provider)) fail.push(`Data Centre media server missing handler: ${route.path}`);
   if (!dataCentreMediaOpenAPI.includes(route.path)) fail.push(`Data Centre media OpenAPI missing route: ${route.path}`);
-  if (!dataCentreMediaOpenAPI.includes(`    ${route.path}:\n      ${route.method.toLowerCase()}:`)) fail.push(`Data Centre media OpenAPI method mismatch: ${route.method} ${route.path}`);
+  if (!dataCentreMediaOpenAPI.includes(`  ${route.path}:\n    ${route.method.toLowerCase()}:`)) fail.push(`Data Centre media OpenAPI method mismatch: ${route.method} ${route.path}`);
   if (!backendMediaTests.includes(route.path)) fail.push(`Backend Data Centre client tests missing route coverage: ${route.path}`);
 }
 if (!backendMediaClient.includes('"X-Testagram-API-Version"')) fail.push("Backend Data Centre client must send X-Testagram-API-Version");
