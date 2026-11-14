@@ -166,7 +166,7 @@ paths:
       operationId: reserveIdentityEvidenceUpload
       tags: [Identity]
       summary: Reserve a private evidence upload
-      description: Reserves one supported JPEG, PNG, WebP or PDF evidence object and returns a short-lived HTTPS upload URL. The URL is not a public media URL.
+      description: Reserves one supported JPEG, PNG, WebP or PDF evidence object. Returns a relative Backend API upload path, not a presigned object-store URL; the applicant must PUT bytes to that path with the same verification-session token. Backend streams bytes to private storage and never exposes MinIO or provider URLs.
       security: []
       parameters:
         - in: path
@@ -191,12 +191,73 @@ paths:
                 sha256: { type: string, pattern: '^[a-fA-F0-9]{64}$' }
       responses:
         '201':
-          description: Private upload reservation created.
+          description: Private upload reservation created. upload_url is a relative Backend route, not an object-store URL.
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+              schema:
+                type: object
+                additionalProperties: false
+                required: [evidence_id, upload_url, method, content_type, size_bytes, expires_in_seconds]
+                properties:
+                  evidence_id: { type: string, format: uuid }
+                  upload_url: { type: string, pattern: '^/api/identity/sessions/' }
+                  method: { type: string, const: PUT }
+                  content_type: { type: string, enum: [image/jpeg, image/png, image/webp, application/pdf] }
+                  size_bytes: { type: integer, minimum: 1, maximum: 15728640 }
+                  expires_in_seconds: { type: integer, const: 300 }
         '400': { $ref: '#/components/responses/BadRequest' }
         '404': { description: Session not found or no longer accepts evidence. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/identity/sessions/{session_id}/evidence/{evidence_id}/upload:
+    put:
+      operationId: uploadIdentityEvidence
+      tags: [Identity]
+      summary: Upload reserved identity evidence through Backend
+      description: Authenticated, bounded upload proxy. Backend verifies the reserved size, declared media type, SHA-256 digest and file signature before forwarding bytes to the private evidence bucket. Provider URLs and credentials are never returned to the applicant.
+      security: []
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: path
+          name: evidence_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: header
+          name: X-Verification-Session-Token
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+        - in: header
+          name: Content-Type
+          required: true
+          schema: { type: string, enum: [image/jpeg, image/png, image/webp, application/pdf] }
+      requestBody:
+        required: true
+        content:
+          image/jpeg:
+            schema: { type: string, format: binary }
+          image/png:
+            schema: { type: string, format: binary }
+          image/webp:
+            schema: { type: string, format: binary }
+          application/pdf:
+            schema: { type: string, format: binary }
+      responses:
+        '204':
+          description: Evidence bytes stored in private storage; no response body.
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { description: Request origin is not allowed. }
+        '404': { description: Session or upload reservation not found. }
+        '409': { description: 'Evidence size, content type, checksum or file signature does not match the reservation.' }
+        '413': { $ref: '#/components/responses/RequestTooLarge' }
+        '502': { description: Private object storage rejected or failed the upload. }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/identity/sessions/{session_id}/evidence/submit:
     post:
@@ -233,6 +294,123 @@ paths:
         '400': { $ref: '#/components/responses/BadRequest' }
         '404': { description: Session or evidence reservation not found. }
         '409': { description: "Upload incomplete, checksum mismatch, or session is no longer submittable." }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/admin/identity/review-queue:
+    get:
+      operationId: getIdentityReviewQueue
+      tags: [Identity]
+      summary: List applications awaiting manual identity review
+      description: Requires a verified Appwrite staff account with the identity.review permission. Queue metadata contains opaque evidence references only; raw evidence is served by the separate no-store reviewer endpoint and every retrieval attempt is audited.
+      security:
+        - appwriteBearer: []
+      responses:
+        '200':
+          description: Authorized manual-review queue.
+          headers:
+            Cache-Control:
+              schema: { type: string, const: no-store }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Verified staff identity.review permission is required. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/admin/identity/sessions/{session_id}/evidence/{evidence_id}:
+    get:
+      operationId: getIdentityReviewEvidence
+      tags: [Identity]
+      summary: Stream private identity evidence to an authorized reviewer
+      description: Requires verified Appwrite staff identity.review permission. Backend audits the access attempt before streaming, verifies byte length and SHA-256 before returning evidence, restores a missing or drifted VPS primary from a checksum-verified B2/R2 replica when possible, and otherwise serves only a checksum-verified private replica through the Backend proxy. No storage URL is returned; responses are private, no-store and nosniff.
+      security:
+        - appwriteBearer: []
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: path
+          name: evidence_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Private evidence bytes.
+          headers:
+            Cache-Control:
+              schema: { type: string, const: 'private, no-store, max-age=0' }
+            X-Content-Type-Options:
+              schema: { type: string, const: nosniff }
+            Content-Disposition:
+              schema: { type: string }
+          content:
+            application/octet-stream:
+              schema: { type: string, format: binary }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Verified staff identity.review permission is required. }
+        '404': { description: Evidence is not available for review. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/admin/identity/sessions/{session_id}/decision:
+    post:
+      operationId: recordIdentityReviewDecision
+      tags: [Identity]
+      summary: Record one independent reviewer decision
+      description: Requires verified Appwrite staff identity.review permission. A reviewer can decide once per session. Two distinct matching verified or failed decisions are required; a verified review creates a separate two-person account-approval request and does not itself provision an account.
+      security:
+        - appwriteBearer: []
+      parameters:
+        - in: path
+          name: session_id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [decision, reason_code]
+              properties:
+                decision: { type: string, enum: [verified, failed, escalate] }
+                reason_code: { type: string, minLength: 2, maxLength: 64 }
+      responses:
+        '200': { description: Two matching failed reviews finalized rejection. }
+        '202': { description: Review recorded; another independent review or escalation is pending. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Reviewer lacks permission or attempted self-review. }
+        '409': { description: Session is not reviewable or reviewer already decided. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/admin/identity/applications/{application_id}/approve:
+    post:
+      operationId: approveIdentityAccountProvisioning
+      tags: [Identity]
+      summary: Record one of the two independent account-activation approvals
+      description: Requires verified Appwrite staff identity.review permission. Only the two reviewers who independently verified the evidence may approve; two distinct approvals are required before provisioning authorization can be issued.
+      security:
+        - appwriteBearer: []
+      parameters:
+        - in: path
+          name: application_id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 8, maxLength: 1000 }
+      responses:
+        '200': { description: Two-person approval completed; provisioning can be authorized. }
+        '202': { description: First independent approval recorded; second approval is pending. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Reviewer is not one of the independent evidence reviewers or attempted self-approval. }
+        '409': { description: Application is not awaiting approval or this reviewer already decided. }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/identity/applications/{application_id}/provisioning-token:
     post:

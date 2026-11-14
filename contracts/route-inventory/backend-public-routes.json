@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "a5e4ce7d502a9b68f8f321d038fca4d9eb990261",
+  "sourceRef": "e8f2c1e36c76443495cd8becd65a10ebf521f446",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across all production Go files in cmd/api at the pinned Backend mainline commit. Dynamic auth actions are asserted separately. registered-only routes are not approved for client adoption until promoted into OpenAPI.",
+  "note": "Static public/API route registrations across all production Go files in cmd/api at the pinned Backend integration commit. Dynamic auth actions are asserted separately. registered-only routes are not approved for client adoption until promoted into OpenAPI.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
@@ -55,7 +55,12 @@
     {
       "method": "GET",
       "path": "/api/admin/identity/review-queue",
-      "status": "registered-only"
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/admin/identity/sessions/{session_id}/evidence/{evidence_id}",
+      "status": "contracted"
     },
     {
       "method": "GET",
@@ -260,12 +265,12 @@
     {
       "method": "POST",
       "path": "/api/admin/identity/applications/{application_id}/approve",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
       "path": "/api/admin/identity/sessions/{session_id}/decision",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
@@ -456,6 +461,11 @@
       "method": "POST",
       "path": "/api/wallet/mpesa/callback",
       "status": "registered-only"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/identity/sessions/{session_id}/evidence/{evidence_id}/upload",
+      "status": "contracted"
     },
     {
       "method": "PUT",

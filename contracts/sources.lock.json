@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "policy": "Immutable source pins identify exact reviewed commits on repository mainlines. Backend Go CDN runtime/origin/purge wiring and Data Centre optional media profile/Compose fix are merged. Runtime deployment and public-domain routing are separately evidenced; live B2/R2, identity activation, CDN custom-domain cutover and full device acceptance remain gated.",
+  "policy": "Immutable source pins identify exact reviewed commits. Integration pins may reference current successor PR heads until acceptance and merge; production release pins must then be retargeted to merged mainline SHAs. Runtime deployment and public-domain routing are separately evidenced; live B2/R2 lifecycle, identity activation, CDN custom-domain cutover and full device acceptance remain gated.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "a5e4ce7d502a9b68f8f321d038fca4d9eb990261",
+      "ref": "e8f2c1e36c76443495cd8becd65a10ebf521f446",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
@@ -94,12 +94,40 @@
         ".github/workflows/cdn-origin-integration.yml",
         ".github/workflows/self-hosted-stack.yml",
         "cmd/api/cdn_purge.go",
-        "cmd/api/cdn_purge_test.go"
+        "cmd/api/cdn_purge_test.go",
+        ".github/workflows/media-provider-smoke.yml",
+        "admin-console/main.go",
+        "admin-console/web/app.js",
+        "admin-console/web/index.html",
+        "admin-console/web/app.css",
+        "cmd/api/identity_evidence_retention.go",
+        "cmd/api/identity_media_replication.go",
+        "cmd/api/identity_media_replication_test.go",
+        "cmd/api/identity_native.go",
+        "cmd/api/identity_native_test.go",
+        "cmd/api/identity_review.go",
+        "cmd/api/identity_review_evidence_test.go",
+        "deploy/self-hosted/apply-native-identity-migrations.sh",
+        "deploy/self-hosted/minio-tools/init.sh",
+        "internal/virtualstorage/identity_replication_live_test.go",
+        "migrations/20261111_admin_security_controls.sql",
+        "migrations/20261111_identity_registration_pipeline.sql",
+        "migrations/20261113_identity_registration_hardening.sql",
+        "migrations/20261113_native_identity_verification.sql",
+        "migrations/20261114_native_identity_evidence.sql",
+        "migrations/20261114_native_identity_integrity.sql",
+        "migrations/20261115_identity_evidence_access_audit.sql",
+        "scripts/test-identity-registration-migration.sh",
+        "migrations/20261115_native_identity_status_access.sql",
+        "admin-console/security.go",
+        "admin-console/identity_review_integration_test.go",
+        ".github/workflows/identity-evidence-staging-smoke.yml",
+        "docs/identity-evidence-staging-acceptance.md"
       ]
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "18930b7707b97fec44c6ffc42eae4220c32a848f",
+      "ref": "528f324f6b14b5995bcee77b4cdd974622571f9a",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/media-provider-smoke.yml",
@@ -144,7 +172,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "32c7a033469f5bd796dc0b4b650367c1ebc3f50c",
+      "ref": "a2454a9e3a67a03162b973c80f5a457d353cd2eb",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "docs/migration-progress.md",
@@ -174,7 +202,10 @@
         "test/features/posts/post_detail_media_headers_test.dart",
         "test/features/profile/profile_edit_screen_test.dart",
         "test/features/tv/tv_playback_policy_test.dart",
-        "test/features/wallet/wallet_screen_test.dart"
+        "test/features/wallet/wallet_screen_test.dart",
+        ".github/workflows/client-validation.yml",
+        ".github/workflows/flutter-ci.yml",
+        ".github/workflows/deploy-cloudflare-pages.yml"
       ]
     },
     "federation": {

@@ -19,10 +19,10 @@ while IFS=$'\t' read -r key full_name sha path sparse_dirs; do
 done < <(node -e '
   const x=require(process.argv[1]);
   const sparse = {
-    backend: [".github/workflows", "cmd/api", "cmd/fresh-api", "internal/freshapi", "internal/freshfeed", "internal/freshstorage", "internal/media", "internal/mediaassertion", "internal/datacentreclient", "internal/algorithmclient", "internal/federationclient", "internal/federationoutbox", "internal/virtualstorage", "deploy/self-hosted", "migrations", "docs"],
+    backend: [".github/workflows", "admin-console", "cmd/api", "cmd/fresh-api", "internal/freshapi", "internal/freshfeed", "internal/freshstorage", "internal/media", "internal/mediaassertion", "internal/datacentreclient", "internal/algorithmclient", "internal/federationclient", "internal/federationoutbox", "internal/virtualstorage", "deploy/self-hosted", "migrations", "docs", "scripts"],
     "data-centre": ["backend", "backend/services/platform", "backend/services/media", "docs/platform", ".github/workflows", "vps", "scripts"],
     cdn: [".github", "cmd", "internal/edge", "cloudflare", "docs"],
-    "flutter-client": ["docs", "lib/core", "lib/features/auth", "lib/features/discovery", "lib/features/feed", "lib/features/federation", "lib/features/profile", "lib/features/posts", "lib/features/settings", "lib/features/wallet", "lib/features/tv", "test/core", "test/features/auth", "test/features/discovery", "test/features/feed", "test/features/federation", "test/features/posts", "test/features/profile", "test/features/settings", "test/features/tv", "test/features/wallet"],
+    "flutter-client": [".github/workflows", "docs", "lib/core", "lib/features/auth", "lib/features/discovery", "lib/features/feed", "lib/features/federation", "lib/features/profile", "lib/features/posts", "lib/features/settings", "lib/features/wallet", "lib/features/tv", "test/core", "test/features/auth", "test/features/discovery", "test/features/feed", "test/features/federation", "test/features/posts", "test/features/profile", "test/features/settings", "test/features/tv", "test/features/wallet"],
     federation: ["internal/httpapi", "internal/backend", "internal/store", "internal/worker", "api", "docs"],
     algorithm: ["testagram-feed"]
   };
