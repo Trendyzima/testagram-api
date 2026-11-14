@@ -127,7 +127,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "1d3e84437a9523b1c41d889e2dad18768ae531c1",
+      "ref": "528f324f6b14b5995bcee77b4cdd974622571f9a",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/media-provider-smoke.yml",
