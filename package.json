@@ -9,12 +9,14 @@
     "bundle:openapi": "redocly bundle contracts/openapi/testagram-v1.yaml -o dist/openapi.yaml",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test",
-    "check": "npm run lint:openapi && npm run lint:internal-openapi && npm run typecheck && npm test && npm run audit:backend-routes && npm run build:sdk && npm run audit:cross-repo",
+    "check": "npm run lint:openapi && npm run lint:internal-openapi && npm run typecheck && npm test && npm run audit:backend-routes && npm run build:sdk && npm run audit:cross-repo && npm run audit:tv-health-contract && npm run audit:flutter-backend",
     "audit:backend-routes": "node scripts/check-backend-route-contract.mjs",
     "build:sdk": "tsc -p packages/typescript/tsconfig.build.json",
     "audit:cross-repo": "node scripts/check-cross-repo-contracts.mjs",
     "sources:checkout": "bash scripts/checkout-contract-sources.sh",
-    "lint:internal-openapi": "redocly lint contracts/internal/openapi/federation-ingress-v1.yaml && redocly lint contracts/internal/openapi/backend-federation-provider-v1.yaml"
+    "lint:internal-openapi": "redocly lint contracts/internal/openapi/federation-ingress-v1.yaml && redocly lint contracts/internal/openapi/backend-federation-provider-v1.yaml && redocly lint contracts/internal/openapi/backend-tv-health-monitor-v1.yaml",
+    "audit:tv-health-contract": "node scripts/check-tv-health-contract.mjs",
+    "audit:flutter-backend": "node scripts/check-flutter-backend-contract.mjs"
   },
   "devDependencies": {
     "@redocly/cli": "^2.77.0",

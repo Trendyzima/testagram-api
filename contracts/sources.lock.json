@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "e8f2c1e36c76443495cd8becd65a10ebf521f446",
+      "ref": "2bd5c6352bf5d753c814b704f53781d3e7ebf734",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
@@ -122,7 +122,9 @@
         "admin-console/security.go",
         "admin-console/identity_review_integration_test.go",
         ".github/workflows/identity-evidence-staging-smoke.yml",
-        "docs/identity-evidence-staging-acceptance.md"
+        "docs/identity-evidence-staging-acceptance.md",
+        "cmd/api/tv_health_test.go",
+        "migrations/20261106_tv_health_postgres.sql"
       ]
     },
     "data-centre": {
@@ -172,7 +174,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "a2454a9e3a67a03162b973c80f5a457d353cd2eb",
+      "ref": "693882a3f16bd9c6ef953c371570088cbb1ba03a",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "docs/migration-progress.md",
@@ -205,12 +207,14 @@
         "test/features/wallet/wallet_screen_test.dart",
         ".github/workflows/client-validation.yml",
         ".github/workflows/flutter-ci.yml",
-        ".github/workflows/deploy-cloudflare-pages.yml"
+        ".github/workflows/deploy-cloudflare-pages.yml",
+        ".github/workflows/tv-health-monitor.yml",
+        "tool/tv_health_monitor.mjs"
       ]
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "edf4f59f843514596d35273c888ff1c16ec0f73e",
+      "ref": "872fc20022aac43f9d4c92ecac9e77a24442d4bb",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
         "api/events/post-published.v1.schema.json",
