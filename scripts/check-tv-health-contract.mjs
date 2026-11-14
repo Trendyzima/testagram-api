@@ -37,7 +37,7 @@ for (const [label, source, marker] of [
   if (!source.includes(marker)) fail.push(label + " missing contract marker: " + marker);
 }
 if (/^  \/internal\/tv\//m.test(publicSpec)) fail.push("Private TV monitor routes must not leak into public Backend OpenAPI");
-if (!privateSpec.includes("401:") || !privateSpec.includes("503:")) fail.push("Private TV contract must document authentication and dependency failures");
+if (!privateSpec.includes("\'401\':") || !privateSpec.includes("\'503\':")) fail.push("Private TV contract must document authentication and dependency failures");
 if (fail.length) {
   console.error(fail.map((item) => "- " + item).join("\n"));
   process.exit(1);
