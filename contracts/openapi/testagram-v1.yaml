@@ -500,6 +500,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ExtensibleObject' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '429': { $ref: '#/components/responses/RateLimited' }
   /api/hashtags/trending:
     get:
@@ -649,6 +650,7 @@ paths:
               schema: { $ref: '#/components/schemas/ExtensibleObject' }
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '413': { $ref: '#/components/responses/RequestTooLarge' }
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
@@ -871,6 +873,7 @@ paths:
               schema: { $ref: '#/components/schemas/PostCreateEnvelope' }
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '409':
           description: Idempotency key was already used with a different normalized payload.
           content:
@@ -1188,7 +1191,7 @@ paths:
       operationId: getMyProfile
       tags: [Social]
       summary: Read the authenticated user's canonical Testagram profile
-      description: Resolves the canonical Testagram UUID from the verified Appwrite session; clients must not substitute the Appwrite user ID.
+      description: Resolves the canonical Testagram UUID only from an Appwrite identity linked by the completed two-person approval and provisioning workflow; clients must not substitute the Appwrite user ID.
       responses:
         '200':
           description: Current canonical profile and viewer relationship flags.
@@ -1236,6 +1239,7 @@ paths:
                   error: { type: 'null' }
                   request_id: { type: string }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '404':
           description: The authenticated account profile is unavailable.
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
@@ -1277,7 +1281,7 @@ paths:
               schema: { $ref: '#/components/schemas/ExtensibleObject' }
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
-        '403': { description: Account is not active. }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/me/federation:
     get:
@@ -2270,6 +2274,11 @@ components:
           schema: { $ref: '#/components/schemas/ApiError' }
     Unauthorized:
       description: Missing, expired or invalid Appwrite session JWT.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    Forbidden:
+      description: The Appwrite session is valid, but the account is inactive or has not completed Testagram's independent identity review, two-person approval and canonical provisioning workflow. Use IDENTITY_APPROVAL_REQUIRED for missing approval, EMAIL_VERIFICATION_REQUIRED for an unverified email, and AUTH_FORBIDDEN for another account-level denial.
       content:
         application/json:
           schema: { $ref: '#/components/schemas/ApiError' }
