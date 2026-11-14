@@ -320,7 +320,7 @@ paths:
       operationId: getIdentityReviewEvidence
       tags: [Identity]
       summary: Stream private identity evidence to an authorized reviewer
-      description: Requires verified Appwrite staff identity.review permission. Backend audits the access attempt before streaming, serves only verified evidence in manual_review, never returns a storage URL, and sends private no-store and nosniff headers.
+      description: Requires verified Appwrite staff identity.review permission. Backend audits the access attempt before streaming, verifies byte length and SHA-256 before returning evidence, restores a missing or drifted VPS primary from a checksum-verified B2/R2 replica when possible, and otherwise serves only a checksum-verified private replica through the Backend proxy. No storage URL is returned; responses are private, no-store and nosniff.
       security:
         - appwriteBearer: []
       parameters:
