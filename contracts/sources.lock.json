@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "d06e47e448b62597b4f251fe581a50cb0bec637a",
+      "ref": "41ba057f10e932dde5f13c982a032aeade0f4cfd",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
@@ -116,6 +116,8 @@
         "migrations/20261113_native_identity_verification.sql",
         "migrations/20261114_native_identity_evidence.sql",
         "migrations/20261114_native_identity_integrity.sql",
+      "migrations/20261114_tv_channel_catalog.sql",
+      "docs/tv-catalogue-operations.md",
         "migrations/20261115_identity_evidence_access_audit.sql",
         "scripts/test-identity-registration-migration.sh",
         "migrations/20261115_native_identity_status_access.sql",
