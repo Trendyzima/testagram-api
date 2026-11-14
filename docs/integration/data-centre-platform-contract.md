@@ -2,41 +2,48 @@
 
 **Provider:** `Trendyzima/Testagram-data-centre-`  
 **Listener:** private `:8095` (`PLATFORM_ADDR`)  
-**Provider OpenAPI snapshot:** `contracts/upstream/datacentre/internal-platform.openapi.yaml`  
-**Status:** provider routes exist, but source/spec discrepancies and the missing Backend typed client prevent this interface from being marked integration-ready.
+**Provider OpenAPI:** `contracts/upstream/datacentre/internal-platform.openapi.yaml`  
+**Reviewed provider mainline:** `acf3911b63477cd9f4eee62e2c4c711c6e8ba4e4`  
+**Status:** provider method, response and validation behavior now match the pinned OpenAPI for the inspected routes. The Backend consumer is still not implemented/verified, so the service-to-service edge is not end-to-end complete.
 
-## Registered interface
+## Verified provider behavior
 
-| Path | Intended method | Behavior | Authentication |
-|---|---|---|---|
-| `/healthz` | GET probe | Plain-text process liveness | None |
-| `/readyz` | GET probe | PostgreSQL readiness | None |
-| `/metrics` | GET probe | Prometheus text | Private network only |
-| `/v1/config/set` | POST | Insert/update versioned feature flag | `PLATFORM_INTERNAL_TOKEN` bearer |
-| `/v1/config/{key}` | GET | Read only enabled, public configuration | Public key/value only |
-| `/v1/events` | POST | Store platform event intake | `PLATFORM_INTERNAL_TOKEN` bearer |
-| `/v1/audit` | POST | Store audit record | `PLATFORM_INTERNAL_TOKEN` bearer |
+| Path | Contract | Source evidence |
+|---|---|---|
+| `GET /healthz` | 200 plain-text liveness | Explicit GET guard |
+| `GET /readyz` | 200 or 503 based on PostgreSQL readiness | Explicit GET guard and database ping |
+| `GET /metrics` | 200 Prometheus text | Explicit GET guard |
+| `POST /v1/config/set` | Bearer-authenticated JSON; 204 on success | Explicit POST guard, strict decoder, constant-time bearer comparison, 204 response |
+| `GET /v1/config/{key}` | Public and enabled config only | Explicit GET guard; key validation and public/enabled SQL predicate |
+| `POST /v1/events` | Bearer-authenticated JSON; 204 on success | Explicit POST guard; event name bounds and object-only properties |
+| `POST /v1/audit` | Bearer-authenticated JSON; 204 on success | Explicit POST guard; non-empty action/resource fields and object-only metadata |
 
-## Source/spec discrepancies found
+The provider requires `PLATFORM_INTERNAL_TOKEN` at startup and rejects values shorter than 32 non-whitespace characters. Request bodies are bounded to 1 MiB, unknown JSON fields and trailing JSON values are rejected, and authorization uses constant-time comparison.
 
-These are findings from comparing `backend/services/platform/main.go` with the provider's `docs/platform/openapi/internal-platform.yaml`. The upstream snapshot is preserved byte-for-byte; this report does not silently rewrite the provider's contract.
+## Tests present in provider mainline
 
-1. **Feature flag write status:** the OpenAPI snapshot declares HTTP 204, but the handler calls `writeJSON` and returns HTTP 200 with `{"ok":true}`.
-2. **Method enforcement:** the mux registers generic path handlers (`/v1/config/set`, `/v1/events`, `/v1/audit`, `/v1/config/`) rather than method-qualified Go ServeMux patterns. The handlers do not explicitly reject unexpected methods with 405. The OpenAPI method restriction is therefore not enforced by the current handler.
-3. **Event/audit schema:** implementation validates required names/actions and JSON validity, but does not enforce every schema constraint currently declared in OpenAPI (for example, object type for `properties`/metadata and all required non-empty identifiers).
-4. **Platform credential:** `PLATFORM_INTERNAL_TOKEN` is required at startup and compared in constant time, but the provider does not currently enforce the same 32-character minimum required by the other internal service clients.
+`backend/services/platform/main_test.go` covers:
+- method guards and `Allow` headers for all public handlers;
+- bearer scheme and token validation;
+- bounded, single-object JSON decoding and rejection of unknown/trailing fields;
+- object-only event properties and audit metadata;
+- key validation and length bounds.
 
-## Required provider corrections before typed client generation
+## Remaining provider test gap
 
-- Add explicit method guards and stable 405 responses.
-- Align `/v1/config/set` response code/body with the OpenAPI contract (prefer one documented response shape).
-- Enforce strict JSON object types and every documented required field/length.
-- Enforce a high-entropy minimum token length and document rotation.
-- Add handler tests for wrong methods, malformed/oversized payloads, unauthorized calls, database outage and exact response envelopes.
-- Publish the corrected provider OpenAPI and update the pinned source revision only after those tests pass.
+The current unit suite does not include a database-backed successful handler test asserting the exact `204 No Content` behavior for config, event and audit writes, nor a database outage integration test. Add these when a deterministic PostgreSQL test harness is available. Do not describe these untested cases as verified.
+
+## Backend consumer gap — still open
+
+The Backend currently has a typed `internal/datacentreclient` for the **media lifecycle API** (`:8096`), not this **platform API** (`:8095`). Its Compose configuration and environment example do not expose a `PLATFORM_API_URL` / `PLATFORM_INTERNAL_TOKEN` connection, and no Backend call to `/v1/config/set`, `/v1/events`, `/v1/audit` was found in the inspected mainline.
+
+Before this edge can be marked integrated:
+1. Decide which Backend-owned workflows actually require platform config, event intake or audit intake; do not add a generic dependency that makes core posting/authentication fail when the platform service is unavailable.
+2. Add a bounded typed Backend client with HTTPS/private-network validation, minimum 32-character token enforcement, redirect rejection, request IDs, response/body limits and explicit timeouts.
+3. Wire only justified producer call sites. Audit records must not contain credentials, JWTs, raw evidence, private post content or signed URLs. Define whether each call is synchronous, best-effort or backed by a durable outbox.
+4. Add consumer/provider contract tests, including wrong method, unauthorized, malformed payload, 204 success, timeout and provider outage.
+5. Add private Compose network wiring and separate server-only credentials; never expose the platform token to Flutter or OpenAPI public SDKs.
 
 ## Integration boundary
 
-This service owns infrastructure configuration, platform event intake and audit intake. It is not the user/product API. It must not decide user identity, post visibility, media ownership, quota, retention or user authorization.
-
-The Backend's six-repository architecture document explicitly states that a verified typed Backend-to-Data-Centre client is not yet present. Do not make Flutter call this API or mark the Backend/Data Centre integration complete until the provider corrections, typed client and producer/consumer contract tests are merged together.
+The platform service owns infrastructure configuration, platform event intake and audit intake. It is not the user/product API. It must not decide user identity, post visibility, media ownership, quota, retention or user authorization. The separate Data Centre media service and Backend `datacentreclient` must not be confused with this platform API.
