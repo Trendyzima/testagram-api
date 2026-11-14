@@ -412,7 +412,7 @@ paths:
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { description: Reviewer is not one of the independent evidence reviewers or attempted self-approval. }
-        '409': { description: Application is not awaiting approval, the linked two-person request is expired or no longer pending (APPROVAL_REQUEST_EXPIRED_OR_INVALID), or this reviewer already decided. }
+        '409': { description: 'Application is not awaiting approval; the linked two-person request is expired or no longer pending (APPROVAL_REQUEST_EXPIRED_OR_INVALID); or this reviewer already decided.' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/identity/applications/{application_id}/provisioning-token:
     post:
