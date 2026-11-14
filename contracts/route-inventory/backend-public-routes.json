@@ -274,6 +274,11 @@
     },
     {
       "method": "POST",
+      "path": "/api/auth/registration-consent",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
       "path": "/api/capability",
       "status": "contracted"
     },
