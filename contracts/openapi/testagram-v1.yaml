@@ -26,6 +26,8 @@ tags:
     description: Proposed normalized catalogue and viewer-authorized playback contract.
   - name: Health
     description: Process liveness and dependency readiness.
+  - name: Authentication
+    description: Appwrite-backed account session and registration consent operations.
   - name: Feed
     description: Authorized home timeline retrieval.
   - name: Social
@@ -1121,6 +1123,59 @@ paths:
               schema: { $ref: '#/components/schemas/ExtensibleObject' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
+  /api/auth/registration-consent:
+    post:
+      operationId: recordAppwriteRegistrationConsent
+      tags: [Authentication]
+      summary: Record age, Terms and Privacy declarations for an Appwrite account
+      description: >
+        Requires an authenticated Appwrite session, but intentionally permits
+        an unverified email so consent can be durably recorded immediately
+        after account creation. The Backend resolves the account ID and email
+        from Appwrite, assigns acceptance timestamps and policy versions, and
+        records an append-only consent ledger. This endpoint does not provision
+        a canonical Testagram account; product access remains blocked until
+        Appwrite email verification and Backend identity provisioning succeed.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [adult_confirmed, terms_accepted, privacy_accepted]
+              properties:
+                adult_confirmed: { type: boolean, const: true }
+                terms_accepted: { type: boolean, const: true }
+                privacy_accepted: { type: boolean, const: true }
+      responses:
+        '200':
+          description: Consent recorded idempotently for the authenticated Appwrite account.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, consent_recorded, terms_version, privacy_version, email_verified]
+                properties:
+                  ok: { const: true }
+                  consent_recorded: { type: boolean, const: true }
+                  terms_version: { type: string, minLength: 1, maxLength: 64 }
+                  privacy_version: { type: string, minLength: 1, maxLength: 64 }
+                  email_verified: { type: boolean }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '405':
+          description: Only POST is accepted.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+        '429':
+          description: Registration consent rate limit exceeded.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/me/profile:
     get:
       operationId: getMyProfile
