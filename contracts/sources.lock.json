@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "8c4fe1a4c954f8ddfa3bb77b1a32edf33d4dae4d",
+      "ref": "7f818df72a8a15cf31239c81be9d67f94aa15cf8",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
@@ -137,7 +137,10 @@
         "cmd/api/appwrite_auth.go",
         "cmd/api/appwrite_auth_test.go",
         "scripts/guard-no-render.py",
-        "docs/architecture/instabox-only-deployment.md"
+        "docs/architecture/instabox-only-deployment.md",
+        "cmd/api/appwrite_registration_consent.go",
+        "cmd/api/appwrite_registration_consent_test.go",
+        "migrations/20261114_appwrite_registration_consent.sql"
       ]
     },
     "data-centre": {
@@ -191,7 +194,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "bcb52e845ad09faed2af16024e63e4d7d99b8fe0",
+      "ref": "3a6f7950df32dea2f83dde4372bb73ec56176255",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "docs/migration-progress.md",
@@ -234,7 +237,9 @@
         "lib/features/auth/auth_screen.dart",
         "lib/app/main_shell.dart",
         "lib/core/testagram_theme.dart",
-        "docs/authentication-and-media-circuit.md"
+        "docs/authentication-and-media-circuit.md",
+        "test/features/auth/auth_screen_test.dart",
+        "lib/app.dart"
       ]
     },
     "federation": {
