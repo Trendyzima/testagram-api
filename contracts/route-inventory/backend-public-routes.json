@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "fc4405ca3329544c754e16b549ea37f8adc654ad",
+  "sourceRef": "30a0be4c0669c1a1f617ea1bec97c4be519eb88b",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across all production Go files in cmd/api at the Backend integration commit fc4405ca3329544c754e16b549ea37f8adc654ad (PR #258, based on merged PR #256). Dynamic auth actions are asserted separately. registered-only routes are not approved for client adoption until promoted into OpenAPI.",
+  "note": "Static public/API route registrations across all production Go files in cmd/api at the Backend integration commit 30a0be4c0669c1a1f617ea1bec97c4be519eb88b (PR #258, based on merged PR #256). Dynamic auth actions are asserted separately. registered-only routes are not approved for client adoption until promoted into OpenAPI.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
