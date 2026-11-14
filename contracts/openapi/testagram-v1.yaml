@@ -388,7 +388,7 @@ paths:
       operationId: approveIdentityAccountProvisioning
       tags: [Identity]
       summary: Record one of the two independent account-activation approvals
-      description: Requires verified Appwrite staff identity.review permission. Only the two reviewers who independently verified the evidence may approve; two distinct approvals are required before provisioning authorization can be issued.
+      description: Requires a currently authorized, non-revoked Appwrite staff identity with identity.review permission. Only the two reviewers who independently verified the evidence may approve. The linked sensitive-action request must still be pending, target this application, require exactly two approvals and be unexpired; the application and approval request are finalized atomically before provisioning authorization can be issued.
       security:
         - appwriteBearer: []
       parameters:
@@ -412,7 +412,7 @@ paths:
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { description: Reviewer is not one of the independent evidence reviewers or attempted self-approval. }
-        '409': { description: Application is not awaiting approval or this reviewer already decided. }
+        '409': { description: Application is not awaiting approval, the linked two-person request is expired or no longer pending (APPROVAL_REQUEST_EXPIRED_OR_INVALID), or this reviewer already decided. }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/identity/applications/{application_id}/provisioning-token:
     post:
