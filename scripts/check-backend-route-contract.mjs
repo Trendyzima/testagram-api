@@ -93,14 +93,17 @@ if (missingFromInventory.length || staleInventory.length || missingFromOpenApi.l
 console.log(`Backend route audit passed: ${registered.size} static routes inventoried across ${backendFiles.length} production Go files; ${inventory.routes.filter((item) => item.status === "contracted").length} contracted operations covered by OpenAPI; post idempotency behavior backed by handler and tests.`);
 
 
-// The Render/standalone runtime is cmd/fresh-api, whose routes are registered
-// in internal/freshapi/server.go. Keep this audit separate from the legacy
-// cmd/api inventory: identical paths do not imply identical wire contracts.
+// The legacy standalone Fresh API runtime is cmd/fresh-api, whose routes are
+// registered in internal/freshapi/server.go. Keep this audit separate from the
+// canonical Instabox cmd/api runtime: identical paths do not imply identical
+// wire contracts. Render is retired and must not be required for deployment.
 const freshInventoryPath = resolve("contracts/route-inventory/fresh-api-public-routes.json");
 const freshServerPath = resolve("source-repos/backend/internal/freshapi/server.go");
 const freshMainPath = resolve("source-repos/backend/cmd/fresh-api/main.go");
 const freshDockerfilePath = resolve("source-repos/backend/Dockerfile.fresh");
-const freshRenderPath = resolve("source-repos/backend/render.yaml");
+const deploymentGuardPath = resolve("source-repos/backend/scripts/guard-no-render.py");
+const deploymentWorkflowPath = resolve("source-repos/backend/.github/workflows/ci.yml");
+const instaboxDeployPath = resolve("source-repos/backend/.github/workflows/instabox-deploy.yml");
 const freshInventory = JSON.parse(readFileSync(freshInventoryPath, "utf8"));
 if (freshInventory.sourceRef !== sourceLock.repositories.backend.ref) {
   throw new Error("Fresh API route inventory sourceRef does not match contracts/sources.lock.json.");
@@ -108,7 +111,9 @@ if (freshInventory.sourceRef !== sourceLock.repositories.backend.ref) {
 const freshServer = readFileSync(freshServerPath, "utf8");
 const freshMain = readFileSync(freshMainPath, "utf8");
 const freshDockerfile = readFileSync(freshDockerfilePath, "utf8");
-const freshRender = readFileSync(freshRenderPath, "utf8");
+const deploymentGuard = readFileSync(deploymentGuardPath, "utf8");
+const deploymentWorkflow = readFileSync(deploymentWorkflowPath, "utf8");
+const instaboxDeploy = readFileSync(instaboxDeployPath, "utf8");
 const freshRegistered = new Set();
 for (const match of freshServer.matchAll(/mux\.HandleFunc\("([A-Z]+) ([^"]+)"\s*,/g)) {
   freshRegistered.add(key(match[1], match[2]));
@@ -139,6 +144,8 @@ for (const marker of ["IDENTITY_PREAUTH_SECRET", "APPWRITE_SERVER_API_KEY", "FRE
 for (const marker of ["HEALTHCHECK", "healthcheck"]) {
   if (!freshDockerfile.includes(marker)) throw new Error(`Fresh API Docker healthcheck marker missing: ${marker}`);
 }
-if (!freshRender.includes("healthCheckPath: /healthz")) throw new Error("Render Blueprint must use the Fresh API /healthz endpoint.");
+if (!deploymentGuard.includes("Instabox-only deployment guard passed")) throw new Error("Backend must retain the retired-hosting deployment guard.");
+if (!deploymentWorkflow.includes("python3 scripts/guard-no-render.py")) throw new Error("Backend CI must execute the Instabox-only deployment guard.");
+if (!instaboxDeploy.includes("scripts/start-instabox-deployment.sh")) throw new Error("Backend production deployment workflow must invoke the Instabox deployment script.");
 const freshUncontracted = freshInventory.routes.filter((route) => route.contractStatus !== "contracted").length;
 console.log(`Fresh API runtime audit passed: ${freshRegistered.size} routes match the pinned runtime inventory; ${freshUncontracted} remain explicitly blocked from public contract adoption pending wire-level review.`);
