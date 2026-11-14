@@ -42,7 +42,7 @@ Promote a registered-only route only after the owner supplies:
 | Provider | Interface | API-repo evidence | Readiness |
 |---|---|---|---|
 | The Algorithm | Private `POST /v1/feed/rank` | Pinned upstream OpenAPI snapshot; Backend client and candidate validation documented | Provider and consumer interface implemented; staging test required |
-| Data Centre platform | Private `/v1/config/*`, `/v1/events`, `/v1/audit` on port 8095 | Pinned provider OpenAPI snapshot and source conformance report | Provider/spec drift (config/set 200 vs 204; method/schema validation gaps); Backend typed client absent |
+| Data Centre platform | Private `/v1/config/*`, `/v1/events`, `/v1/audit` on port 8095 | Pinned provider OpenAPI snapshot and source conformance report | Provider mainline now matches documented methods, 204 write responses and strict object validation; Backend platform typed client and consumer call sites remain absent; DB-backed 204/outage tests remain open |
 | Data Centre video | `/v1/videos*`, `/v1/channels*`, `/v1/feed` | Service catalogue only | No client SDK or promoted contract until exact handler DTOs are audited |
 | Data Centre notifications | `/v1/devices`, `/v1/notifications`, `/v1/stream` | Service catalogue only | No client SDK or promoted contract until exact handler DTOs are audited |
 | CDN | `/v1/*`, HLS/DASH, media aliases, `/route`, restricted purge | Source-audited route contract | Go mainline disables caller-directed URL signing (HTTP 410) and uses trusted Backend-origin classification for public bytes plus forwarded viewer authorization for private bytes; deployed Backend validation, R2 Worker parity, DNS/TLS and live negative tests remain unverified |
