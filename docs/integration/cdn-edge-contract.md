@@ -2,7 +2,7 @@
 
 **Provider:** `Trendyzima/cdn-`  
 **Implementation source:** `internal/edge/server.go`  
-**Status:** current Go mainline disables caller-directed URL signing and routes viewer-authorized requests through the trusted Backend origin. This closes the unsafe signer behavior described by CDN issue #54 in the inspected source, but deployed configuration, Backend authorization validation, R2 Worker parity, DNS/TLS and production acceptance remain unverified.
+**Status:** current Go mainline disables caller-directed URL signing and routes viewer-authorized requests through the trusted Backend origin. The Cloudflare Worker gateway is now implemented and CI-validated as a thin hostname proxy only; it does not store media or authorize viewers. Its manual release workflow verifies Backend/CDN origin identity, custom-domain ownership, canonical API/media health, metrics privacy and private-media denial. Live DNS/TLS, origin deployment and production acceptance remain unverified until that workflow completes.
 
 ## Responsibility
 
@@ -21,9 +21,9 @@ The Go edge rejects legacy query playback tokens, does not cache authenticated p
 
 | Method/path | Purpose | Exposure |
 |---|---|---|
-| GET /healthz | Liveness | Private monitoring |
-| GET /readyz | Readiness | Private monitoring; requires trusted origin configuration |
-| GET /metrics | Cache/upstream/byte/prefetch metrics | Private monitoring |
+| GET /healthz | Liveness and Go CDN release identity | Public through `media.testagram.site`; gateway preserves `X-Testagram-CDN-Version` |
+| GET /readyz | Origin readiness | Public through the media gateway for release verification; not an authorization signal |
+| GET /metrics | Cache/upstream/byte/prefetch metrics | Hidden on the canonical media hostname by the gateway; direct InstaBox origin URLs remain public and are not an access-control boundary |
 | GET /route?key=... | Deterministic edge selection for stable key | Public routing primitive; not global health-aware DNS |
 | POST/DELETE /api/cache/purge | Purge all or one cache key | Operator-only; requires PURGE_TOKEN |
 | GET /v1/media/url | Disabled legacy URL-issuance helper | Returns HTTP 410; use Backend-authorized media access |
@@ -43,7 +43,7 @@ Asset delivery accepts GET and HEAD; disabled media URL helpers accept GET but r
 - Purge is an administrative operation and must never be exposed in Flutter configuration or generated public SDKs.
 - CDN origin/shield URLs and origin credentials remain server-side.
 - Do not re-enable either URL-issuance helper as a caller-directed signer. Any future issuance API requires a separately reviewed Backend authorization contract; the current helpers return HTTP 410.
-- Public host `media.testagram.site` is an intended deployment value only; DNS, TLS, origin reachability and private-media authorization must be verified before configuring Backend `MEDIA_PUBLIC_BASE_URL`.
+- Public host `media.testagram.site` is configured in the merged Worker custom-domain gateway, but live DNS/TLS and origin reachability must be verified by the manual cutover workflow before declaring production acceptance. Backend `MEDIA_PUBLIC_BASE_URL` must continue to reference the canonical hostname, never an InstaBox origin URL.
 
 ## End-to-end acceptance
 
@@ -56,7 +56,7 @@ Asset delivery accepts GET and HEAD; disabled media URL helpers accept GET but r
 7. Deletion/retention invalidates access and stale edge objects within the documented safety window.
 8. Origin outage, shield outage, cache miss and purge failure are tested.
 9. Backend authenticates `X-Testagram-Origin-Auth`, validates `X-Testagram-Viewer-Authorization` against the canonical user/session and object ACL, and returns `X-Testagram-Visibility` only after authorization.
-10. CDN and any R2 Worker implementation have equivalent public/private authorization, cache, range and denial semantics. Go source tests alone do not satisfy this gate.
+10. The Cloudflare Worker remains a thin gateway: it preserves Go CDN authorization, cache, range and version semantics and never stores or authorizes media. Post-cutover smoke must verify the canonical Go version, readiness, hidden metrics and private-media denial.
 
 ## Not provided by this contract
 
