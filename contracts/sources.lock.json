@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "c732755b2768ed74e289989cc171f598e00af8be",
+      "ref": "d41e56c20835f97234831a1d15c7234e262600f3",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
@@ -120,12 +120,14 @@
         "scripts/test-identity-registration-migration.sh",
         "migrations/20261115_native_identity_status_access.sql",
         "admin-console/security.go",
-        "admin-console/identity_review_integration_test.go"
+        "admin-console/identity_review_integration_test.go",
+        ".github/workflows/identity-evidence-staging-smoke.yml",
+        "docs/identity-evidence-staging-acceptance.md"
       ]
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "12c8d30f75fe6e9843b4748d9067c6f46364ab57",
+      "ref": "1d3e84437a9523b1c41d889e2dad18768ae531c1",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/media-provider-smoke.yml",
@@ -170,7 +172,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "3bfd6a49804d227a910db7c1e18c00a2e00df13e",
+      "ref": "a2454a9e3a67a03162b973c80f5a457d353cd2eb",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "docs/migration-progress.md",
