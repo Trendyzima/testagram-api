@@ -26,10 +26,11 @@
       "contracts": [
         "contracts/openapi/testagram-v1.yaml",
         "contracts/route-inventory/backend-public-routes.json",
-        "contracts/internal/openapi/backend-federation-provider-v1.yaml"
+        "contracts/internal/openapi/backend-federation-provider-v1.yaml",
+        "contracts/internal/openapi/backend-tv-health-monitor-v1.yaml"
       ],
       "status": "implemented-core-contract",
-      "notes": "Backend is the only public product API runtime and canonical authority for local and remote social relationships, public posts and privacy. It transactionally enqueues opted-in public posts for Federation and rechecks public eligibility on object dereference."
+      "notes": "Backend is the only public product API runtime and canonical authority for local and remote social relationships, public posts and privacy. It transactionally enqueues opted-in public posts for Federation and rechecks public eligibility on object dereference. The private GitHub Actions TV health monitor contract is separately specified and never exported to public client SDKs."
     },
     {
       "id": "flutter-client",
