@@ -1,6 +1,6 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "d06e47e448b62597b4f251fe581a50cb0bec637a",
+  "sourceRef": "41ba057f10e932dde5f13c982a032aeade0f4cfd",
   "sourceFile": "cmd/api/main.go",
   "note": "Static public/API route registrations across all production Go files in cmd/api at the pinned Backend integration commit. Dynamic auth actions are asserted separately. registered-only routes are not approved for client adoption until promoted into OpenAPI.",
   "dynamicAuthActions": [
@@ -140,17 +140,17 @@
     {
       "method": "GET",
       "path": "/api/social/polls",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "GET",
       "path": "/api/social/polls/{poll_id}",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "GET",
       "path": "/api/social/posts/{post_id}",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "GET",
@@ -160,7 +160,7 @@
     {
       "method": "GET",
       "path": "/api/social/posts/{post_id}/interactions/{kind}",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "GET",
@@ -185,7 +185,7 @@
     {
       "method": "GET",
       "path": "/api/social/profiles/{user_id}",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "GET",
@@ -195,12 +195,12 @@
     {
       "method": "GET",
       "path": "/api/social/profiles/{user_id}/connections",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "GET",
       "path": "/api/social/profiles/{user_id}/posts",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "GET",
@@ -275,7 +275,7 @@
     {
       "method": "POST",
       "path": "/api/capability",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
@@ -380,12 +380,12 @@
     {
       "method": "POST",
       "path": "/api/social/polls",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
       "path": "/api/social/polls/{poll_id}/vote",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
@@ -425,22 +425,22 @@
     {
       "method": "POST",
       "path": "/api/threads/{thread_id}/bookmarks/toggle",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
       "path": "/api/threads/{thread_id}/likes/toggle",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
       "path": "/api/threads/{thread_id}/media",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
       "path": "/api/threads/{thread_id}/reposts/toggle",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",

@@ -1393,6 +1393,381 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/capability:
+    post:
+      operationId: dispatchCapability
+      tags: [Social]
+      summary: Dispatch an authenticated Backend capability
+      description: Routes a bounded capability request to the same native Backend handlers used by first-class API operations. Supported capabilities are explicitly allow-listed; unknown capabilities are rejected. Prefer first-class routes for new clients.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [capability, input]
+              properties:
+                capability: { type: string, minLength: 1, maxLength: 128 }
+                input:
+                  type: object
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Capability-specific result envelope.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/polls:
+    get:
+      operationId: listSocialPolls
+      tags: [Social]
+      summary: List active and closed polls
+      description: Optional authentication personalizes has_voted. Returns polls ordered newest first. Offset pagination is bounded; limit defaults to 20 and must be 1–50, offset defaults to 0 and must be 0–10000.
+      security: [{}, { appwriteBearer: [] }]
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+        - in: query
+          name: offset
+          schema: { type: integer, minimum: 0, maximum: 10000, default: 0 }
+      responses:
+        '200':
+          description: Poll page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PollListEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { description: Request origin is not allowed. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    post:
+      operationId: createSocialPoll
+      tags: [Social]
+      summary: Create a poll
+      description: Requires an active authenticated account. Question is 5–500 characters, description at most 1000 characters, options count 2–8 with each option 1–200 characters. Rate limited to five creations per minute.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [question, options]
+              properties:
+                question: { type: string, minLength: 5, maxLength: 500 }
+                description: { type: string, maxLength: 1000 }
+                options:
+                  type: array
+                  minItems: 2
+                  maxItems: 8
+                  items: { type: string, minLength: 1, maxLength: 200 }
+                ends_at: { type: [string, 'null'], format: date-time }
+                media_object_key: { type: string, maxLength: 512 }
+      responses:
+        '201':
+          description: Poll created.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PollEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Account is not active or origin is not allowed. }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/polls/{poll_id}:
+    parameters:
+      - in: path
+        name: poll_id
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getSocialPoll
+      tags: [Social]
+      summary: Read a poll
+      description: Optional authentication personalizes has_voted. Invalid or unavailable poll IDs are not disclosed.
+      security: [{}, { appwriteBearer: [] }]
+      responses:
+        '200':
+          description: Poll details.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PollEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/polls/{poll_id}/vote:
+    parameters:
+      - in: path
+        name: poll_id
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: voteSocialPoll
+      tags: [Social]
+      summary: Cast one vote in a poll
+      description: Requires an active authenticated account. A user may vote once per poll. Closed polls and invalid option IDs return conflict.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [option_id]
+              properties:
+                option_id: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Vote recorded.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PollVoteEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409':
+          description: The user has already voted, the poll is closed, or the option does not belong to the poll.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/posts/{post_id}:
+    parameters:
+      - in: path
+        name: post_id
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getSocialPost
+      tags: [Social]
+      summary: Read a privacy-filtered post
+      description: Requires an authenticated active account. Protected-account, follower visibility and block checks are enforced before post/media details are returned. Private media authorization headers are viewer-scoped.
+      responses:
+        '200':
+          description: Post and authorized media metadata.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SocialPostEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/posts/{post_id}/interactions/{kind}:
+    parameters:
+      - in: path
+        name: post_id
+        required: true
+        schema: { type: string, format: uuid }
+      - in: path
+        name: kind
+        required: true
+        schema: { type: string, enum: [likes, reposts, quotes] }
+      - in: query
+        name: limit
+        schema: { type: integer, minimum: 1, maximum: 100, default: 50 }
+    get:
+      operationId: listSocialPostInteractions
+      tags: [Social]
+      summary: List people who liked, reposted or quoted a post
+      description: Requires authentication and a successful privacy check for the target post. Results are newest first, limited to 100. quote-likes is explicitly not implemented.
+      responses:
+        '200':
+          description: Interaction page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PostInteractionsEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/profiles/{user_id}:
+    parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getSocialProfile
+      tags: [Social]
+      summary: Read an active profile
+      description: Requires an authenticated active account. Non-discoverable profiles, blocked relationships and protected-account rules are enforced; unavailable profiles return the same 404 response.
+      responses:
+        '200':
+          description: Canonical profile and viewer relationship state.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProfileEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/profiles/{user_id}/connections:
+    parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema: { type: string, format: uuid }
+      - in: query
+        name: kind
+        required: true
+        schema: { type: string, enum: [followers, following] }
+      - in: query
+        name: limit
+        schema: { type: integer, minimum: 1, maximum: 100, default: 30 }
+      - in: query
+        name: cursor
+        schema: { type: string, maxLength: 512 }
+    get:
+      operationId: listSocialProfileConnections
+      tags: [Social]
+      summary: List privacy-filtered followers or following
+      description: Requires authentication. Cursor is an opaque base64url cursor; only accepted followers are returned. Protected and non-discoverable account visibility is enforced.
+      responses:
+        '200':
+          description: Connection page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProfileConnectionsEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/profiles/{user_id}/posts:
+    parameters:
+      - in: path
+        name: user_id
+        required: true
+        schema: { type: string, format: uuid }
+      - in: query
+        name: limit
+        schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      - in: query
+        name: before
+        description: Opaque cursor returned by the previous page.
+        schema: { type: string, maxLength: 1024 }
+    get:
+      operationId: listSocialProfilePosts
+      tags: [Social]
+      summary: List visible posts for a profile
+      description: Requires authentication. Protected-account, follower visibility and block rules are applied before returning posts and authorized media URLs.
+      responses:
+        '200':
+          description: Profile post page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProfilePostsEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/threads/{thread_id}/likes/toggle:
+    parameters:
+      - in: path
+        name: thread_id
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: toggleThreadLike
+      tags: [Threads]
+      summary: Toggle the authenticated user's like on a thread
+      description: Requires an active authenticated account. Private threads are hidden from non-owners. Rate limited to 60 actions per minute.
+      responses:
+        '200':
+          description: Current like state after the toggle.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ThreadLikeEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/threads/{thread_id}/reposts/toggle:
+    parameters:
+      - in: path
+        name: thread_id
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: toggleThreadRepost
+      tags: [Threads]
+      summary: Toggle the authenticated user's repost on a thread
+      description: Requires an active authenticated account. Private threads are hidden from non-owners. Rate limited to 30 actions per minute.
+      responses:
+        '200':
+          description: Current repost state after the toggle.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ThreadRepostEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/threads/{thread_id}/bookmarks/toggle:
+    parameters:
+      - in: path
+        name: thread_id
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: toggleThreadBookmark
+      tags: [Threads]
+      summary: Toggle the authenticated user's bookmark on a thread
+      description: Requires an active authenticated account. Private threads are hidden from non-owners. Rate limited to 60 actions per minute.
+      responses:
+        '200':
+          description: Current bookmark state after the toggle.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ThreadBookmarkEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/threads/{thread_id}/media:
+    parameters:
+      - in: path
+        name: thread_id
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: attachThreadMedia
+      tags: [Threads]
+      summary: Attach a ready public media asset to a thread
+      description: Requires an active authenticated account and ownership of the thread and media asset. Only ready public media is accepted; duplicate attachments and the 20-file limit return conflict. The client uploads through the Backend media gateway and submits the returned object key.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [key]
+              properties:
+                key: { type: string, minLength: 1, maxLength: 512 }
+      responses:
+        '200':
+          description: Media attached.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ThreadMediaEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: Duplicate attachment or thread media limit reached.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ApiError' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+
 components:
   securitySchemes:
     appwriteBearer:
@@ -1407,6 +1782,315 @@ components:
       required: true
       schema: { type: string, minLength: 1 }
   schemas:
+    PollOption:
+      type: object
+      additionalProperties: false
+      required: [id, label, position, votes]
+      properties:
+        id: { type: string, format: uuid }
+        label: { type: string, minLength: 1, maxLength: 200 }
+        position: { type: integer, minimum: 0 }
+        votes: { type: integer, minimum: 0 }
+    Poll:
+      type: object
+      additionalProperties: false
+      required: [id, question, description, status, ends_at, created_at, total_votes, options, has_voted]
+      properties:
+        id: { type: string, format: uuid }
+        question: { type: string, minLength: 5, maxLength: 500 }
+        description: { type: string, maxLength: 1000 }
+        status: { type: string, enum: [open, closed] }
+        ends_at: { type: [string, 'null'], format: date-time }
+        created_at: { type: string, format: date-time }
+        total_votes: { type: integer, minimum: 0 }
+        options:
+          type: array
+          items: { $ref: '#/components/schemas/PollOption' }
+        has_voted: { type: boolean }
+        media_url: { type: string, format: uri }
+        media_type: { type: string }
+    PollEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data: { $ref: '#/components/schemas/Poll' }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PollListEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [items, next_offset, has_more]
+          properties:
+            items:
+              type: array
+              items: { $ref: '#/components/schemas/Poll' }
+            next_offset: { type: integer, minimum: 0 }
+            has_more: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PollVoteEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [poll_id, option_id, voted]
+          properties:
+            poll_id: { type: string, format: uuid }
+            option_id: { type: string, format: uuid }
+            voted: { const: true }
+        error: { type: 'null' }
+        request_id: { type: string }
+    SocialProfile:
+      type: object
+      additionalProperties: false
+      required: [id, user_id, username, display_name, bio, website, location, social_links, avatar_key, avatar_url, avatar_storage_provider, cover_key, cover_url, protected_account, followers_count, following_count, follow_status, is_following, is_followed_by, can_view_posts, is_self]
+      properties:
+        id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        username: { type: string }
+        display_name: { type: string }
+        bio: { type: string }
+        website: { type: string }
+        location: { type: string }
+        social_links: { type: object, additionalProperties: { type: string } }
+        avatar_key: { type: string }
+        avatar_url: { type: string }
+        avatar_storage_provider: { type: string }
+        cover_key: { type: string }
+        cover_url: { type: string }
+        protected_account: { type: boolean }
+        followers_count: { type: integer, minimum: 0 }
+        following_count: { type: integer, minimum: 0 }
+        follow_status: { type: string, enum: ["", pending, accepted] }
+        is_following: { type: boolean }
+        is_followed_by: { type: boolean }
+        can_view_posts: { type: boolean }
+        is_self: { type: boolean }
+    ProfileEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data: { $ref: '#/components/schemas/SocialProfile' }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ProfileConnection:
+      type: object
+      additionalProperties: false
+      required: [id, username, display_name, avatar_url, bio, follow_status, is_following, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        username: { type: string }
+        display_name: { type: string }
+        avatar_url: { type: string }
+        bio: { type: string }
+        follow_status: { type: string, enum: ["", pending, accepted] }
+        is_following: { type: boolean }
+        created_at: { type: string, format: date-time }
+    ProfileConnectionsEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [items, next_cursor, has_more, kind]
+          properties:
+            items:
+              type: array
+              items: { $ref: '#/components/schemas/ProfileConnection' }
+            next_cursor: { type: string }
+            has_more: { type: boolean }
+            kind: { type: string, enum: [followers, following] }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ProfilePost:
+      type: object
+      additionalProperties: false
+      required: [id, user_id, content, visibility, media_ids, media_urls, media_content_types, is_video, is_following, language, created_at, likes_count, replies_count, reposts_count, author, origin]
+      properties:
+        id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        content: { type: string }
+        visibility: { type: string, enum: [public, followers, private] }
+        media_ids: { type: array, items: { type: string } }
+        media_urls: { type: array, items: { type: string, format: uri } }
+        media_content_types: { type: array, items: { type: string } }
+        media_auth_headers: { type: object, additionalProperties: { type: string } }
+        is_video: { type: boolean }
+        is_following: { type: boolean }
+        language: { type: string }
+        created_at: { type: string, format: date-time }
+        likes_count: { type: integer, minimum: 0 }
+        replies_count: { type: integer, minimum: 0 }
+        reposts_count: { type: integer, minimum: 0 }
+        author: { type: object, additionalProperties: true }
+        origin: { type: string, const: local }
+    ProfilePostsEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [posts, has_more, next_cursor]
+          properties:
+            posts:
+              type: array
+              items: { $ref: '#/components/schemas/ProfilePost' }
+            has_more: { type: boolean }
+            next_cursor: { type: string }
+        error: { type: 'null' }
+        request_id: { type: string }
+    SocialPost:
+      type: object
+      additionalProperties: false
+      required: [id, content, created_at, author_id, user_id, visibility, language, media_ids, media_urls, media_content_types, is_video, video_url, image_url, likes_count, replies_count, reposts_count, profiles, user_profiles]
+      properties:
+        id: { type: string, format: uuid }
+        content: { type: string }
+        created_at: { type: string, format: date-time }
+        author_id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        visibility: { type: string, enum: [public, followers, private] }
+        language: { type: string }
+        media_ids: { type: array, items: { type: string } }
+        media_urls: { type: array, items: { type: string, format: uri } }
+        media_content_types: { type: array, items: { type: string } }
+        media_auth_headers: { type: object, additionalProperties: { type: string } }
+        is_video: { type: boolean }
+        video_url: { type: string }
+        image_url: { type: string }
+        likes_count: { type: integer, minimum: 0 }
+        replies_count: { type: integer, minimum: 0 }
+        reposts_count: { type: integer, minimum: 0 }
+        profiles: { type: object, additionalProperties: true }
+        user_profiles: { type: object, additionalProperties: true }
+    SocialPostEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data: { $ref: '#/components/schemas/SocialPost' }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PostInteraction:
+      type: object
+      additionalProperties: false
+      required: [id, user_id, post_id, created_at, profile, user_profiles]
+      properties:
+        id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        post_id: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+        profile: { type: object, additionalProperties: true }
+        user_profiles: { type: object, additionalProperties: true }
+        quote: { type: string }
+        content: { type: string }
+        quoted_post_id: { type: string, format: uuid }
+    PostInteractionsEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [items, has_more]
+          properties:
+            items:
+              type: array
+              items: { $ref: '#/components/schemas/PostInteraction' }
+            has_more: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadLikeEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, liked]
+          properties:
+            thread_id: { type: string, format: uuid }
+            liked: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadRepostEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, reposted]
+          properties:
+            thread_id: { type: string, format: uuid }
+            reposted: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadBookmarkEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, bookmarked]
+          properties:
+            thread_id: { type: string, format: uuid }
+            bookmarked: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadMediaEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, attached, media]
+          properties:
+            thread_id: { type: string, format: uuid }
+            attached: { const: true }
+            media:
+              type: object
+              additionalProperties: false
+              required: [url, name, type, size]
+              properties:
+                key: { type: string }
+                url: { type: string, format: uri }
+                name: { type: string }
+                type: { type: string }
+                size: { type: integer, minimum: 1 }
     TvChannel:
       type: object
       additionalProperties: false

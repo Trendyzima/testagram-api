@@ -23,17 +23,28 @@ The inventory check clones Backend main during CI and fails if:
 3. a route marked `contracted` is missing from OpenAPI; or
 4. the dynamic authentication route registration changes without an explicit audit update.
 
-## Registered-only surfaces requiring a deeper contract pass
+## Flutter-used operations promoted from registered-only
+
+The current Flutter client calls the following surfaces. They have now been promoted into OpenAPI with handler-derived request bounds, response envelopes, authentication requirements, privacy behavior, and principal status codes:
+
+- Capability dispatch: `POST /api/capability` (generic capability-specific data remains extensible; new clients should prefer first-class routes).
+- Polls: `GET|POST /api/social/polls`, `GET /api/social/polls/{poll_id}`, and `POST /api/social/polls/{poll_id}/vote`.
+- Post detail and interaction listing: `GET /api/social/posts/{post_id}` and `GET /api/social/posts/{post_id}/interactions/{kind}`.
+- Profiles: `GET /api/social/profiles/{user_id}`, `GET /api/social/profiles/{user_id}/connections`, and `GET /api/social/profiles/{user_id}/posts`.
+- Threads: `POST /api/threads/{thread_id}/likes/toggle`, `POST /api/threads/{thread_id}/reposts/toggle`, `POST /api/threads/{thread_id}/bookmarks/toggle`, and `POST /api/threads/{thread_id}/media`.
+
+These DTOs are based on the pinned Backend handlers, not guessed from UI models. The route inventory is method-specific; adding a route with a different HTTP method still requires a separate contract entry.
+
+## Remaining registered-only surfaces
 
 - Authentication: `POST /api/auth/{signup,resend-verification,verify-email,login,forgot-password,reset-password}`.
-- Profiles, profile posts/connections, follow requests and blocks.
-- Post reads, views, reaction state and interaction lists.
-- Polls and browsing history.
-- Thread media attachment, delete, likes, reposts and bookmarks.
+- Follow requests, blocks, browsing history, profile avatar upload, and other social administration routes not called by the current Flutter boundary.
+- Post views, poll-by-post lookup, reaction state, repost state, and other operations not directly adopted by the Flutter client.
+- Thread delete/list/state endpoints not yet adopted by the Flutter boundary.
 - Media upload intent, bounded `PUT /api/media/upload`, completion, attachment, delete, private download URL and list.
-- TV health and the generic capability dispatcher.
-- Federation preference routes and M-Pesa callback are registered but have distinct security/ownership concerns; do not treat them as ordinary client SDK endpoints.
+- TV health (private monitor endpoints remain outside the public contract).
+- Federation preference routes and M-Pesa callback have distinct security/ownership concerns; do not treat them as ordinary client SDK endpoints.
 
 ## Remaining source-level work
 
-The exact success and failure status codes, all response DTOs, media attachment semantics, pagination fields, and authorization tests still need a handler-by-handler contract pass. The OpenAPI document intentionally does not pretend those shapes are fully typed yet.
+This promotion establishes a stronger client contract baseline, but it does not replace handler-level integration tests against a running Backend. In particular, the generic capability response remains extensible, media URLs/headers are viewer-scoped, and the live runtime must still be tested for auth, privacy, pagination, conflict, rate-limit and dependency-failure behavior. The route audit is source-level evidence, not production availability evidence.
