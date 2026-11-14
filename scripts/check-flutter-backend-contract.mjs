@@ -31,8 +31,7 @@ const inventoryByOperation = new Map(inventory.routes.map((route) => [
 // Verify the HTTP method as well as the path for direct BackendApi calls.
 // A GET-only contract must never silently authorize a POST/DELETE client call.
 const clientOperations = new Set();
-for (const match of backendClient.matchAll(/(?:_request|http\\.Request)\\s*\\(\\s*['"]([A-Z]+)['"]\\s*,\\s*baseUri\\.resolve\\(\\s*['"`]([^'"`]+)['"`]/gs)) {
-  const method = match[1].toUpperCase();
+for (const match of backendClient.matchAll(/(?:_request|http\.Request)\s*\(\s*['"]([A-Z]+)['"]\s*,\s*baseUri\.resolve\(\s*['"\x60]([^'"\x60]+)['"\x60]/gs)) {  const method = match[1].toUpperCase();
   const path = normalize(match[2]);
   clientOperations.add(method + " " + path);
 }
