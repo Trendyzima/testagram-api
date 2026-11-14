@@ -255,7 +255,7 @@ paths:
         '400': { $ref: '#/components/responses/BadRequest' }
         '403': { description: Request origin is not allowed. }
         '404': { description: Session or upload reservation not found. }
-        '409': { description: Evidence size, content type, checksum or file signature does not match the reservation. }
+        '409': { description: 'Evidence size, content type, checksum or file signature does not match the reservation.' }
         '413': { $ref: '#/components/responses/RequestTooLarge' }
         '502': { description: Private object storage rejected or failed the upload. }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
