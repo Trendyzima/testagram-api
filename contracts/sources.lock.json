@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "policy": "Immutable source pins identify exact reviewed commits. Integration pins may reference current successor PR heads until acceptance and merge; production release pins must then be retargeted to merged mainline SHAs. Runtime deployment and public-domain routing are separately evidenced; live B2/R2 lifecycle, identity activation, CDN custom-domain cutover and full device acceptance remain gated. The six runtime source pins are refreshed to the latest reviewed mainline commits as of 2026-11-14. Backend Appwrite registration consent endpoint and append-only migration are pinned to the reviewed self-service registration PR head; update the pin to the merged mainline SHA after merge and deployment acceptance.",
+  "policy": "Immutable source pins identify exact reviewed commits. Production source pins target merged mainline SHAs. Runtime deployment and public-domain routing require separate live evidence; live B2/R2 lifecycle, identity activation, CDN custom-domain cutover and full device acceptance remain gated. Backend native identity review is the sole registration authority: private evidence review, two independent approvals and one-time provisioning are required. The legacy Appwrite registration-consent endpoint is compatibility-only and never creates or authorizes a canonical account. Backend and Flutter identity changes are merged to mainline and their CI workflows passed; production rollout and VPS/database acceptance remain separate release gates.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "d94617268b25748e19ded0012d4d69e90c877cb5",
+      "ref": "ff7140fc2660877b4d65227f9b899da45f2a89a3",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
@@ -194,7 +194,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "84e96c7c7b63f6600e369b87695c675b4008c174",
+      "ref": "d6ea0c2f84ffccaf4f5a75630420b0f517224df3",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "docs/migration-progress.md",
