@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "8c4fe1a4c954f8ddfa3bb77b1a32edf33d4dae4d",
+  "sourceRef": "7f818df72a8a15cf31239c81be9d67f94aa15cf8",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across all production Go files in cmd/api at the Backend mainline commit 8c4fe1a4c954f8ddfa3bb77b1a32edf33d4dae4d. Dynamic auth actions are asserted separately. registered-only routes are not approved for client adoption until promoted into OpenAPI.",
+  "note": "Static public/API route registrations across all production Go files in cmd/api at the Backend integration PR head 7f818df72a8a15cf31239c81be9d67f94aa15cf8. Dynamic auth actions are asserted separately. registered-only routes are not approved for client adoption until promoted into OpenAPI.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
@@ -13,44 +13,9 @@
   ],
   "routes": [
     {
-      "method": "DELETE",
-      "path": "/api/hashtags/{tag}/follow",
+      "method": "POST",
+      "path": "/api/admin/identity/applications/{application_id}/approve",
       "status": "contracted"
-    },
-    {
-      "method": "DELETE",
-      "path": "/api/social/blocks/{target_user_id}",
-      "status": "registered-only"
-    },
-    {
-      "method": "DELETE",
-      "path": "/api/social/follows/{target_user_id}",
-      "status": "contracted"
-    },
-    {
-      "method": "DELETE",
-      "path": "/api/social/history",
-      "status": "registered-only"
-    },
-    {
-      "method": "DELETE",
-      "path": "/api/social/posts/{post_id}/bookmarks",
-      "status": "contracted"
-    },
-    {
-      "method": "DELETE",
-      "path": "/api/social/posts/{post_id}/reaction",
-      "status": "contracted"
-    },
-    {
-      "method": "DELETE",
-      "path": "/api/social/posts/{post_id}/reposts",
-      "status": "contracted"
-    },
-    {
-      "method": "DELETE",
-      "path": "/api/threads/{thread_id}",
-      "status": "registered-only"
     },
     {
       "method": "GET",
@@ -58,8 +23,23 @@
       "status": "contracted"
     },
     {
+      "method": "POST",
+      "path": "/api/admin/identity/sessions/{session_id}/decision",
+      "status": "contracted"
+    },
+    {
       "method": "GET",
       "path": "/api/admin/identity/sessions/{session_id}/evidence/{evidence_id}",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/registration-consent",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
+      "path": "/api/capability",
       "status": "contracted"
     },
     {
@@ -78,7 +58,17 @@
       "status": "contracted"
     },
     {
+      "method": "DELETE",
+      "path": "/api/hashtags/{tag}/follow",
+      "status": "contracted"
+    },
+    {
       "method": "GET",
+      "path": "/api/hashtags/{tag}/follow",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
       "path": "/api/hashtags/{tag}/follow",
       "status": "contracted"
     },
@@ -88,203 +78,13 @@
       "status": "contracted"
     },
     {
-      "method": "GET",
-      "path": "/api/identity/applications/{application_id}",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/identity/sessions/{session_id}",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/me/federation",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/me/profile",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/replication/public/{origin}/{entity_type}/{entity_id}",
-      "status": "registered-only"
-    },
-    {
-      "method": "GET",
-      "path": "/api/search",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/social/follow-requests",
-      "status": "registered-only"
-    },
-    {
-      "method": "GET",
-      "path": "/api/social/follows/{target_user_id}",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/social/history",
-      "status": "registered-only"
-    },
-    {
-      "method": "GET",
-      "path": "/api/social/notifications",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/social/polls",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/social/polls/{poll_id}",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/social/posts/{post_id}",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/social/posts/{post_id}/interaction-summary",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/social/posts/{post_id}/interactions/{kind}",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/social/posts/{post_id}/poll",
-      "status": "registered-only"
-    },
-    {
-      "method": "GET",
-      "path": "/api/social/posts/{post_id}/reaction",
-      "status": "registered-only"
-    },
-    {
-      "method": "GET",
-      "path": "/api/social/posts/{post_id}/replies",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/social/posts/{post_id}/reposts",
-      "status": "registered-only"
-    },
-    {
-      "method": "GET",
-      "path": "/api/social/profiles/{user_id}",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/social/profiles/{user_id}/avatar",
-      "status": "registered-only"
-    },
-    {
-      "method": "GET",
-      "path": "/api/social/profiles/{user_id}/connections",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/social/profiles/{user_id}/posts",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/threads",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/threads/{thread_id}",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/api/threads/{thread_id}/likes",
-      "status": "registered-only"
-    },
-    {
-      "method": "GET",
-      "path": "/api/threads/{thread_id}/likes/state",
-      "status": "registered-only"
-    },
-    {
-      "method": "GET",
-      "path": "/api/threads/{thread_id}/reposts",
-      "status": "registered-only"
-    },
-    {
-      "method": "GET",
-      "path": "/api/threads/{thread_id}/reposts/state",
-      "status": "registered-only"
-    },
-    {
-      "method": "GET",
-      "path": "/api/tv/health",
-      "status": "registered-only"
-    },
-    {
-      "method": "GET",
-      "path": "/healthz",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/metrics",
-      "status": "registered-only"
-    },
-    {
-      "method": "GET",
-      "path": "/readyz",
-      "status": "contracted"
-    },
-    {
-      "method": "GET",
-      "path": "/v1/feed/home",
-      "status": "registered-only"
-    },
-    {
-      "method": "GET",
-      "path": "/v1/feed/public",
-      "status": "registered-only"
-    },
-    {
-      "method": "POST",
-      "path": "/api/admin/identity/applications/{application_id}/approve",
-      "status": "contracted"
-    },
-    {
-      "method": "POST",
-      "path": "/api/admin/identity/sessions/{session_id}/decision",
-      "status": "contracted"
-    },
-    {
-      "method": "POST",
-      "path": "/api/capability",
-      "status": "contracted"
-    },
-    {
-      "method": "POST",
-      "path": "/api/hashtags/{tag}/follow",
-      "status": "contracted"
-    },
-    {
       "method": "POST",
       "path": "/api/identity/applications",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/identity/applications/{application_id}",
       "status": "contracted"
     },
     {
@@ -295,6 +95,16 @@
     {
       "method": "POST",
       "path": "/api/identity/applications/{application_id}/redeem",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/identity/sessions/{session_id}",
+      "status": "contracted"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/identity/sessions/{session_id}/evidence/{evidence_id}/upload",
       "status": "contracted"
     },
     {
@@ -311,6 +121,26 @@
       "method": "POST",
       "path": "/api/iptv/social",
       "status": "registered-only"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/federation",
+      "status": "contracted"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/me/federation",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/profile",
+      "status": "contracted"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/me/profile",
+      "status": "contracted"
     },
     {
       "method": "POST",
@@ -343,13 +173,38 @@
       "status": "registered-only"
     },
     {
+      "method": "PUT",
+      "path": "/api/media/upload",
+      "status": "contracted"
+    },
+    {
       "method": "POST",
       "path": "/api/media/upload-intent",
       "status": "contracted"
     },
     {
+      "method": "GET",
+      "path": "/api/replication/public/{origin}/{entity_type}/{entity_id}",
+      "status": "registered-only"
+    },
+    {
+      "method": "GET",
+      "path": "/api/search",
+      "status": "contracted"
+    },
+    {
       "method": "POST",
       "path": "/api/social/blocks",
+      "status": "registered-only"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/social/blocks/{target_user_id}",
+      "status": "registered-only"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/follow-requests",
       "status": "registered-only"
     },
     {
@@ -368,9 +223,34 @@
       "status": "contracted"
     },
     {
+      "method": "DELETE",
+      "path": "/api/social/follows/{target_user_id}",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/follows/{target_user_id}",
+      "status": "contracted"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/social/history",
+      "status": "registered-only"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/history",
+      "status": "registered-only"
+    },
+    {
       "method": "POST",
       "path": "/api/social/history",
       "status": "registered-only"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/notifications",
+      "status": "contracted"
     },
     {
       "method": "POST",
@@ -378,8 +258,18 @@
       "status": "contracted"
     },
     {
+      "method": "GET",
+      "path": "/api/social/polls",
+      "status": "contracted"
+    },
+    {
       "method": "POST",
       "path": "/api/social/polls",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/polls/{poll_id}",
       "status": "contracted"
     },
     {
@@ -393,9 +283,44 @@
       "status": "contracted"
     },
     {
+      "method": "GET",
+      "path": "/api/social/posts/{post_id}",
+      "status": "contracted"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/social/posts/{post_id}/bookmarks",
+      "status": "contracted"
+    },
+    {
       "method": "POST",
       "path": "/api/social/posts/{post_id}/bookmarks",
       "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/posts/{post_id}/interaction-summary",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/posts/{post_id}/interactions/{kind}",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/posts/{post_id}/poll",
+      "status": "registered-only"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/social/posts/{post_id}/reaction",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/posts/{post_id}/reaction",
+      "status": "registered-only"
     },
     {
       "method": "POST",
@@ -403,9 +328,24 @@
       "status": "contracted"
     },
     {
+      "method": "GET",
+      "path": "/api/social/posts/{post_id}/replies",
+      "status": "contracted"
+    },
+    {
       "method": "POST",
       "path": "/api/social/posts/{post_id}/replies",
       "status": "contracted"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/social/posts/{post_id}/reposts",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/posts/{post_id}/reposts",
+      "status": "registered-only"
     },
     {
       "method": "POST",
@@ -418,14 +358,59 @@
       "status": "registered-only"
     },
     {
+      "method": "GET",
+      "path": "/api/social/profiles/{user_id}",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/profiles/{user_id}/avatar",
+      "status": "registered-only"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/profiles/{user_id}/connections",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/profiles/{user_id}/posts",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/threads",
+      "status": "contracted"
+    },
+    {
       "method": "POST",
       "path": "/api/threads",
+      "status": "contracted"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/threads/{thread_id}",
+      "status": "registered-only"
+    },
+    {
+      "method": "GET",
+      "path": "/api/threads/{thread_id}",
       "status": "contracted"
     },
     {
       "method": "POST",
       "path": "/api/threads/{thread_id}/bookmarks/toggle",
       "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/threads/{thread_id}/likes",
+      "status": "registered-only"
+    },
+    {
+      "method": "GET",
+      "path": "/api/threads/{thread_id}/likes/state",
+      "status": "registered-only"
     },
     {
       "method": "POST",
@@ -436,6 +421,16 @@
       "method": "POST",
       "path": "/api/threads/{thread_id}/media",
       "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/threads/{thread_id}/reposts",
+      "status": "registered-only"
+    },
+    {
+      "method": "GET",
+      "path": "/api/threads/{thread_id}/reposts/state",
+      "status": "registered-only"
     },
     {
       "method": "POST",
@@ -458,29 +453,39 @@
       "status": "registered-only"
     },
     {
+      "method": "GET",
+      "path": "/api/tv/health",
+      "status": "registered-only"
+    },
+    {
       "method": "POST",
       "path": "/api/wallet/mpesa/callback",
       "status": "registered-only"
     },
     {
-      "method": "PUT",
-      "path": "/api/identity/sessions/{session_id}/evidence/{evidence_id}/upload",
+      "method": "GET",
+      "path": "/healthz",
       "status": "contracted"
     },
     {
-      "method": "PUT",
-      "path": "/api/me/federation",
+      "method": "GET",
+      "path": "/metrics",
+      "status": "registered-only"
+    },
+    {
+      "method": "GET",
+      "path": "/readyz",
       "status": "contracted"
     },
     {
-      "method": "PUT",
-      "path": "/api/me/profile",
-      "status": "contracted"
+      "method": "GET",
+      "path": "/v1/feed/home",
+      "status": "registered-only"
     },
     {
-      "method": "PUT",
-      "path": "/api/media/upload",
-      "status": "contracted"
+      "method": "GET",
+      "path": "/v1/feed/public",
+      "status": "registered-only"
     }
   ]
 }
