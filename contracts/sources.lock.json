@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "184a765b0cf5a22a82c14606f67f8cd79e3a3983",
+      "ref": "ad9498cad28ac7fe1b311eff44757f6a18a44b58",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
@@ -132,7 +132,9 @@
         "cmd/api/identity_provisioning_integration_test.go",
         "cmd/api/media_replication_gate_test.go",
         "migrations/20261114_media_replication_publication_gate.sql",
-        ".github/workflows/identity-provisioning-staging-smoke.yml"
+        ".github/workflows/identity-provisioning-staging-smoke.yml",
+        "internal/virtualstorage/media_replication_live_test.go",
+        ".github/workflows/instabox-media-staging-smoke.yml"
       ]
     },
     "data-centre": {
