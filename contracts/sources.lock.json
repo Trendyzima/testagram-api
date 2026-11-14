@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "ff7140fc2660877b4d65227f9b899da45f2a89a3",
+      "ref": "d4968a4a38c174455fc095379c6337b4c3ada11d",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
@@ -140,7 +140,8 @@
         "docs/architecture/instabox-only-deployment.md",
         "migrations/20261114_appwrite_registration_consent.sql",
         "scripts/start-instabox-deployment.sh",
-        "cmd/api/appwrite_registration_consent_test.go"
+        "cmd/api/appwrite_registration_consent_test.go",
+        "scripts/validate-canonical-deploy-smoke.py"
       ]
     },
     "data-centre": {
@@ -173,7 +174,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "34846812e8078d9e5a01fa325da891fe2cd2198b",
+      "ref": "b0cd97b26c200762caeef7194f31761f20d97fde",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         "cloudflare/worker.js",
@@ -189,7 +190,8 @@
         "Dockerfile.runtime",
         "cmd/healthcheck/main.go",
         "cmd/healthcheck/main_test.go",
-        "docs/capacity-qualification.md"
+        "docs/capacity-qualification.md",
+        ".github/workflows/restore-canonical-host-routing.yml"
       ]
     },
     "flutter-client": {
