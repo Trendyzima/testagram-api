@@ -8,6 +8,7 @@
 | Home feed | GET /api/feed/home | Backend + Algorithm | Contracted | Appwrite JWT; following_only/before/limit |
 | Search | GET /api/search | Backend | Contracted | Optional auth; q/kind/limit/media_only |
 | Main-feed post creation | POST /api/social/posts | Backend | Contracted | Idempotency-Key required; Flutter widget tests cover request shape; deployed Backend/PostgreSQL and staging read-back remain unverified |
+| Appwrite registration consent | POST /api/auth/registration-consent | Backend + Flutter | Contracted | Authenticated Appwrite JWT; append-only age/Terms/Privacy ledger; first canonical provisioning requires current consent; live Appwrite and VPS migration acceptance pending |
 | Post interaction summary | GET /api/social/posts/{id}/interaction-summary | Backend | Contracted | Viewer-specific state |
 | Reactions/reposts/bookmarks | POST/DELETE /api/social/posts/{id}/reaction, /reposts, /bookmarks | Backend | Contracted | Mutation DTO/status audit continues |
 | Replies | GET/POST /api/social/posts/{id}/replies | Backend | Contracted | Reply DTOs still provisional |
