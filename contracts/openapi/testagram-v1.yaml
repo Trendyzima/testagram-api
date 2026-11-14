@@ -22,6 +22,8 @@ servers:
   - url: https://api.testagram.site
     description: Intended production public API origin; verify DNS/runtime before release.
 tags:
+  - name: Auth
+    description: Appwrite-backed account registration, consent and authentication hand-offs.
   - name: TV
     description: Proposed normalized catalogue and viewer-authorized playback contract.
   - name: Health
@@ -76,6 +78,44 @@ paths:
           content:
             text/plain:
               schema: { type: string }
+  /api/auth/registration-consent:
+    post:
+      operationId: recordAppwriteRegistrationConsent
+      tags: [Auth]
+      summary: Record self-service Appwrite registration consent
+      description: |
+        Verifies the caller's Appwrite session through the configured Appwrite
+        Account endpoint and records an append-only age self-declaration and
+        versioned Terms/Privacy acceptance. Email verification is not required
+        for this consent step; the Backend still requires a verified email and
+        this consent record before first canonical account provisioning.
+        This route does not create an Appwrite account or bypass high-assurance
+        two-person identity review.
+      security:
+        - appwriteBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [adult_confirmed, terms_accepted, privacy_accepted]
+              properties:
+                adult_confirmed: { type: boolean, const: true }
+                terms_accepted: { type: boolean, const: true }
+                privacy_accepted: { type: boolean, const: true }
+      responses:
+        '200':
+          description: Consent was durably recorded for the current policy versions.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { description: Appwrite session is missing or invalid. }
+        '403': { description: Origin is not allowed or declarations were not accepted. }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/identity/applications:
     post:
       operationId: createIdentityApplication
