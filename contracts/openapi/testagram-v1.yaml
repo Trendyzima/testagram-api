@@ -112,7 +112,19 @@ paths:
           description: Consent was durably recorded for the current policy versions.
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+              schema:
+                type: object
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { type: boolean, const: true }
+                  data:
+                    type: object
+                    required: [recorded, email_verified]
+                    properties:
+                      recorded: { type: boolean, const: true }
+                      email_verified: { type: boolean }
+                  error: { type: object, nullable: true }
+                  request_id: { type: string }
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { description: Appwrite session is missing or invalid. }
         '403': { description: Origin is not allowed or declarations were not accepted. }
