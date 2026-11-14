@@ -100,11 +100,13 @@ paths:
             schema:
               type: object
               additionalProperties: false
-              required: [adult_confirmed, terms_accepted, privacy_accepted]
+              required: [age_confirmed, terms_accepted, privacy_accepted, terms_version, privacy_version]
               properties:
-                adult_confirmed: { type: boolean, const: true }
+                age_confirmed: { type: boolean, const: true }
                 terms_accepted: { type: boolean, const: true }
                 privacy_accepted: { type: boolean, const: true }
+                terms_version: { type: string, minLength: 1, maxLength: 64 }
+                privacy_version: { type: string, minLength: 1, maxLength: 64 }
       responses:
         '200':
           description: Consent was durably recorded for the current policy versions.
