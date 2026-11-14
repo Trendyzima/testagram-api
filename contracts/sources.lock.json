@@ -89,7 +89,6 @@
         "migrations/20261112_hashtag_follows.sql",
         "migrations/20261112_media_replication_outbox.sql",
         "migrations/20261112_profile_presentation_fields.sql",
-        "render.yaml",
         ".github/workflows/ci.yml",
         ".github/workflows/cdn-origin-integration.yml",
         ".github/workflows/self-hosted-stack.yml",
