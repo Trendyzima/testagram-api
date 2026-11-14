@@ -1143,11 +1143,13 @@ paths:
             schema:
               type: object
               additionalProperties: false
-              required: [adult_confirmed, terms_accepted, privacy_accepted]
+              required: [age_confirmed, terms_accepted, privacy_accepted, terms_version, privacy_version]
               properties:
-                adult_confirmed: { type: boolean, const: true }
+                age_confirmed: { type: boolean, const: true }
                 terms_accepted: { type: boolean, const: true }
                 privacy_accepted: { type: boolean, const: true }
+                terms_version: { type: string, minLength: 1, maxLength: 64 }
+                privacy_version: { type: string, minLength: 1, maxLength: 64 }
       responses:
         '200':
           description: Consent recorded idempotently for the authenticated Appwrite account.
@@ -1156,13 +1158,18 @@ paths:
               schema:
                 type: object
                 additionalProperties: false
-                required: [ok, consent_recorded, terms_version, privacy_version, email_verified]
+                required: [ok, data, error, request_id]
                 properties:
                   ok: { const: true }
-                  consent_recorded: { type: boolean, const: true }
-                  terms_version: { type: string, minLength: 1, maxLength: 64 }
-                  privacy_version: { type: string, minLength: 1, maxLength: 64 }
-                  email_verified: { type: boolean }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [recorded, email_verified]
+                    properties:
+                      recorded: { type: boolean, const: true }
+                      email_verified: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '405':
