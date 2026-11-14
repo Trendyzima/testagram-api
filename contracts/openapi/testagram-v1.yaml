@@ -500,6 +500,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/ExtensibleObject' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '429': { $ref: '#/components/responses/RateLimited' }
   /api/hashtags/trending:
     get:
@@ -649,6 +650,7 @@ paths:
               schema: { $ref: '#/components/schemas/ExtensibleObject' }
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
         '413': { $ref: '#/components/responses/RequestTooLarge' }
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
@@ -2276,7 +2278,7 @@ components:
         application/json:
           schema: { $ref: '#/components/schemas/ApiError' }
     Forbidden:
-      description: The Appwrite session is valid, but the account is inactive or has not completed Testagram's independent identity review, two-person approval and canonical provisioning workflow.
+      description: The Appwrite session is valid, but the account is inactive or has not completed Testagram's independent identity review, two-person approval and canonical provisioning workflow. Use IDENTITY_APPROVAL_REQUIRED for missing approval, EMAIL_VERIFICATION_REQUIRED for an unverified email, and AUTH_FORBIDDEN for another account-level denial.
       content:
         application/json:
           schema: { $ref: '#/components/schemas/ApiError' }
