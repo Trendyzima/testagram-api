@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "2bd5c6352bf5d753c814b704f53781d3e7ebf734",
+      "ref": "6dd70c6750744b562574aae7ab99b767c3507cd3",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
@@ -124,7 +124,9 @@
         ".github/workflows/identity-evidence-staging-smoke.yml",
         "docs/identity-evidence-staging-acceptance.md",
         "cmd/api/tv_health_test.go",
-        "migrations/20261106_tv_health_postgres.sql"
+        "migrations/20261106_tv_health_postgres.sql",
+        "scripts/instabox_watchdog.py",
+        "tests/test_instabox_watchdog.py"
       ]
     },
     "data-centre": {
@@ -174,7 +176,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "693882a3f16bd9c6ef953c371570088cbb1ba03a",
+      "ref": "c310f83ee89c89642ca5c757db6352ed8c70f23a",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "docs/migration-progress.md",
@@ -209,7 +211,11 @@
         ".github/workflows/flutter-ci.yml",
         ".github/workflows/deploy-cloudflare-pages.yml",
         ".github/workflows/tv-health-monitor.yml",
-        "tool/tv_health_monitor.mjs"
+        "tool/tv_health_monitor.mjs",
+        "docs/tv-channel-cache-policy.md",
+        "docs/xclone-client-extraction.md",
+        "lib/features/tv/tv_channel_cache_policy.dart",
+        "test/features/tv/tv_channel_cache_policy_test.dart"
       ]
     },
     "federation": {
