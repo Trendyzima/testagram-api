@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "41ba057f10e932dde5f13c982a032aeade0f4cfd",
+      "ref": "ad9498cad28ac7fe1b311eff44757f6a18a44b58",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
@@ -116,8 +116,8 @@
         "migrations/20261113_native_identity_verification.sql",
         "migrations/20261114_native_identity_evidence.sql",
         "migrations/20261114_native_identity_integrity.sql",
-      "migrations/20261114_tv_channel_catalog.sql",
-      "docs/tv-catalogue-operations.md",
+        "migrations/20261114_tv_channel_catalog.sql",
+        "docs/tv-catalogue-operations.md",
         "migrations/20261115_identity_evidence_access_audit.sql",
         "scripts/test-identity-registration-migration.sh",
         "migrations/20261115_native_identity_status_access.sql",
@@ -128,7 +128,13 @@
         "cmd/api/tv_health_test.go",
         "migrations/20261106_tv_health_postgres.sql",
         "scripts/instabox_watchdog.py",
-        "tests/test_instabox_watchdog.py"
+        "tests/test_instabox_watchdog.py",
+        "cmd/api/identity_provisioning_integration_test.go",
+        "cmd/api/media_replication_gate_test.go",
+        "migrations/20261114_media_replication_publication_gate.sql",
+        ".github/workflows/identity-provisioning-staging-smoke.yml",
+        "internal/virtualstorage/media_replication_live_test.go",
+        ".github/workflows/instabox-media-staging-smoke.yml"
       ]
     },
     "data-centre": {
@@ -178,7 +184,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "0b49a946d5633ec45c2e8d0124d9d110bcb4489e",
+      "ref": "8f7965571d9adefb6982ac29fef52b76d3141d2a",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "docs/migration-progress.md",

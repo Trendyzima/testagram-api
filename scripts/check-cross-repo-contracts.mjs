@@ -89,7 +89,7 @@ if (!dataCentreMediaServer.includes('r.Header.Get("X-Testagram-API-Version")')) 
  // Backend's VPS-primary identity-evidence replicator requires B2/R2 replica
  // credentials; those are mapped only behind MEDIA_REPLICATION_ENABLED.
  const backendCompose = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/docker-compose.yml"), "utf8");
- const backendDeploy = readFileSync(resolve(lock.repositories.backend.checkoutPath, ".github/workflows/instabox-deploy.yml"), "utf8");
+ const backendDeploy = readFileSync(resolve(lock.repositories.backend.checkoutPath, "scripts/start-instabox-deployment.sh"), "utf8");
  const identityReplication = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/identity_media_replication.go"), "utf8");
  const backendEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
  const dataCentreCompose = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "vps/docker-compose.fresh.yml"), "utf8");
