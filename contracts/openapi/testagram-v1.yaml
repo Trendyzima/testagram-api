@@ -1420,6 +1420,7 @@ paths:
               schema: { $ref: '#/components/schemas/ExtensibleObject' }
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/social/polls:
@@ -1697,7 +1698,7 @@ paths:
       operationId: toggleThreadRepost
       tags: [Threads]
       summary: Toggle the authenticated user's repost on a thread
-      description: Requires an active authenticated account. Private threads are hidden from non-owners. Rate limited to 60 actions per minute.
+      description: Requires an active authenticated account. Private threads are hidden from non-owners. Rate limited to 30 actions per minute.
       responses:
         '200':
           description: Current repost state after the toggle.
