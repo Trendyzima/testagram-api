@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "policy": "Immutable source pins identify exact reviewed commits. Integration pins may reference current successor PR heads until acceptance and merge; production release pins must then be retargeted to merged mainline SHAs. Runtime deployment and public-domain routing are separately evidenced; live B2/R2 lifecycle, identity activation, CDN custom-domain cutover and full device acceptance remain gated. The six runtime source pins are refreshed to the latest reviewed mainline commits as of 2026-11-14. Backend Appwrite registration consent endpoint and append-only migration are pinned to the reviewed self-service registration PR head; update the pin to the merged mainline SHA after merge and deployment acceptance.",
+  "policy": "Immutable source pins identify exact reviewed commits. Integration pins may reference current successor PR heads until acceptance and merge; production release pins must then be retargeted to merged mainline SHAs. Runtime deployment and public-domain routing are separately evidenced; live B2/R2 lifecycle, identity activation, CDN custom-domain cutover and full device acceptance remain gated. The six runtime source pins are refreshed to the latest reviewed mainline commits as of 2026-11-14. Backend native identity review is the sole registration authority. The legacy Appwrite registration-consent endpoint is compatibility-only and never creates or authorizes a canonical account. Backend PR #256 is pinned as the current integration source; after merge and deployment acceptance, retarget the production pin to its merged mainline SHA.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "d94617268b25748e19ded0012d4d69e90c877cb5",
+      "ref": "21becd33783b14fcf4ac2957481699f041a15c44",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
