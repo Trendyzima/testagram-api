@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "6dd70c6750744b562574aae7ab99b767c3507cd3",
+      "ref": "d06e47e448b62597b4f251fe581a50cb0bec637a",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
