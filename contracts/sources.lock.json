@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "policy": "Immutable source pins identify exact reviewed commits. Integration pins may reference current successor PR heads until acceptance and merge; production release pins must then be retargeted to merged mainline SHAs. Runtime deployment and public-domain routing are separately evidenced; live B2/R2 lifecycle, identity activation, CDN custom-domain cutover and full device acceptance remain gated. The six runtime source pins are refreshed to the latest reviewed mainline commits as of 2026-11-14. Backend native identity review is the sole registration authority. The legacy Appwrite registration-consent endpoint is compatibility-only and never creates or authorizes a canonical account. Backend PR #256 and Flutter PR #55 are pinned as the current integration sources; after both merge and deployment acceptance, retarget the production pins to their merged mainline SHAs.",
+  "policy": "Immutable source pins identify exact reviewed commits. Integration pins may reference current successor PR heads until acceptance and merge; production release pins must then be retargeted to merged mainline SHAs. Runtime deployment and public-domain routing are separately evidenced; live B2/R2 lifecycle, identity activation, CDN custom-domain cutover and full device acceptance remain gated. The six runtime source pins are refreshed to the latest reviewed mainline commits as of 2026-11-14. Backend native identity review is the sole registration authority. The legacy Appwrite registration-consent endpoint is compatibility-only and never creates or authorizes a canonical account. Backend PR #258 (including the merged two-person identity gate from PR #256) and Flutter PR #55 are pinned as the current integration sources; after both merge, their CI passes, and deployment acceptance is verified, retarget production pins to merged mainline SHAs.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "21becd33783b14fcf4ac2957481699f041a15c44",
+      "ref": "55224b399fc97c8a53f4027528ca11ec3b66ca29",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
@@ -194,7 +194,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "ef4e0e7520eac8de6a656a4cadc2c5ed326a14d3",
+      "ref": "5f6ca3dcd91398ac7df4947fc2157da1536164ea",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "docs/migration-progress.md",
