@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "policy": "Immutable source pins identify exact reviewed commits. Integration pins may reference current successor PR heads until acceptance and merge; production release pins must then be retargeted to merged mainline SHAs. Runtime deployment and public-domain routing are separately evidenced; live B2/R2 lifecycle, identity activation, CDN custom-domain cutover and full device acceptance remain gated.",
+  "policy": "Immutable source pins identify exact reviewed commits. Integration pins may reference current successor PR heads until acceptance and merge; production release pins must then be retargeted to merged mainline SHAs. Runtime deployment and public-domain routing are separately evidenced; live B2/R2 lifecycle, identity activation, CDN custom-domain cutover and full device acceptance remain gated. The six runtime source pins are refreshed to the latest reviewed mainline commits as of 2026-11-14.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "e05e11529552dec6101cfec8de6ed7e369b60ad2",
+      "ref": "8c4fe1a4c954f8ddfa3bb77b1a32edf33d4dae4d",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
@@ -89,7 +89,6 @@
         "migrations/20261112_hashtag_follows.sql",
         "migrations/20261112_media_replication_outbox.sql",
         "migrations/20261112_profile_presentation_fields.sql",
-        "render.yaml",
         ".github/workflows/ci.yml",
         ".github/workflows/cdn-origin-integration.yml",
         ".github/workflows/self-hosted-stack.yml",
@@ -134,12 +133,16 @@
         "migrations/20261114_media_replication_publication_gate.sql",
         ".github/workflows/identity-provisioning-staging-smoke.yml",
         "internal/virtualstorage/media_replication_live_test.go",
-        ".github/workflows/instabox-media-staging-smoke.yml"
+        ".github/workflows/instabox-media-staging-smoke.yml",
+        "cmd/api/appwrite_auth.go",
+        "cmd/api/appwrite_auth_test.go",
+        "scripts/guard-no-render.py",
+        "docs/architecture/instabox-only-deployment.md"
       ]
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "528f324f6b14b5995bcee77b4cdd974622571f9a",
+      "ref": "acf3911b63477cd9f4eee62e2c4c711c6e8ba4e4",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/media-provider-smoke.yml",
@@ -159,12 +162,15 @@
         "vps/.env.example",
         "vps/FRESH-DEPLOYMENT.md",
         "vps/docker-compose.fresh.yml",
-        "vps/docker-compose.yml"
+        "vps/docker-compose.yml",
+        "vps/backup.sh",
+        "vps/restore-drill.sh",
+        "scripts/test-backup-scope-contract.py"
       ]
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "543093e47bde602512adfc2b4aa30caed8cf0e60",
+      "ref": "34846812e8078d9e5a01fa325da891fe2cd2198b",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         "cloudflare/worker.js",
@@ -179,12 +185,13 @@
         ".github/workflows/ci.yml",
         "Dockerfile.runtime",
         "cmd/healthcheck/main.go",
-        "cmd/healthcheck/main_test.go"
+        "cmd/healthcheck/main_test.go",
+        "docs/capacity-qualification.md"
       ]
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "8f7965571d9adefb6982ac29fef52b76d3141d2a",
+      "ref": "bcb52e845ad09faed2af16024e63e4d7d99b8fe0",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "docs/migration-progress.md",
@@ -223,7 +230,11 @@
         "docs/tv-channel-cache-policy.md",
         "docs/xclone-client-extraction.md",
         "lib/features/tv/tv_channel_cache_policy.dart",
-        "test/features/tv/tv_channel_cache_policy_test.dart"
+        "test/features/tv/tv_channel_cache_policy_test.dart",
+        "lib/features/auth/auth_screen.dart",
+        "lib/app/main_shell.dart",
+        "lib/core/testagram_theme.dart",
+        "docs/authentication-and-media-circuit.md"
       ]
     },
     "federation": {
