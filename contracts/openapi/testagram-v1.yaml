@@ -123,7 +123,10 @@ paths:
                     properties:
                       recorded: { type: boolean, const: true }
                       email_verified: { type: boolean }
-                  error: { type: object, nullable: true }
+                  error:
+                    anyOf:
+                      - type: object
+                      - type: 'null'
                   request_id: { type: string }
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { description: Appwrite session is missing or invalid. }
