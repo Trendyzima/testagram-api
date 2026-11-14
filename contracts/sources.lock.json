@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "policy": "Immutable source pins identify exact reviewed commits. Production source pins target merged mainline SHAs. Runtime deployment and public-domain routing require separate live evidence; live B2/R2 lifecycle, identity activation, CDN custom-domain cutover and full device acceptance remain gated. Backend native identity review is the sole registration authority: private evidence review, two independent approvals and one-time provisioning are required. The legacy Appwrite registration-consent endpoint is compatibility-only and never creates or authorizes a canonical account. Backend and Flutter identity changes are merged to mainline and their CI workflows passed; production rollout and VPS/database acceptance remain separate release gates.",
+  "policy": "Immutable source pins identify exact reviewed commits. Production source pins target merged mainline SHAs. Backend native identity review is the sole registration authority: private evidence review, two independent approvals and one-time provisioning are required. The legacy Appwrite registration-consent endpoint is compatibility-only and never creates or authorizes a canonical account. The legacy cmd/api public liveness contract is GET /healthz with JSON service identity and X-Testagram-Service; readiness and metrics are hidden on the canonical API hostname. The Cloudflare Worker is a thin hostname gateway only: it does not store media, mint authorization, or replace the Go CDN. The Backend remains API authority and the Go CDN remains media-delivery, cache, origin-assertion and private-media authorization authority. The manual gateway workflow verifies both InstaBox origins before binding api.testagram.site and media.testagram.site, then verifies public API liveness, hidden API readiness/metrics, TV-catalogue authentication, Go CDN version/readiness, hidden media metrics and private-media denial. Source pins and green CI are not proof that the manual Backend deployment or Cloudflare cutover has run. The standalone cmd/fresh-api B2/R2 lifecycle still requires the Data Centre adapter and staging acceptance.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "ff7140fc2660877b4d65227f9b899da45f2a89a3",
+      "ref": "d761bae3a536228970ba64cab8a7b3e7a8c70e3a",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
@@ -140,7 +140,11 @@
         "docs/architecture/instabox-only-deployment.md",
         "migrations/20261114_appwrite_registration_consent.sql",
         "scripts/start-instabox-deployment.sh",
-        "cmd/api/appwrite_registration_consent_test.go"
+        "cmd/api/appwrite_registration_consent_test.go",
+        "cmd/api/health_test.go",
+        "cmd/api/main_test.go",
+        "deploy/self-hosted/Caddyfile",
+        "scripts/validate-canonical-deploy-smoke.py"
       ]
     },
     "data-centre": {
@@ -173,7 +177,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "34846812e8078d9e5a01fa325da891fe2cd2198b",
+      "ref": "beeee15595ce4e8a046b144f941daea707c23be9",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         "cloudflare/worker.js",
@@ -189,7 +193,8 @@
         "Dockerfile.runtime",
         "cmd/healthcheck/main.go",
         "cmd/healthcheck/main_test.go",
-        "docs/capacity-qualification.md"
+        "docs/capacity-qualification.md",
+        ".github/workflows/restore-canonical-host-routing.yml"
       ]
     },
     "flutter-client": {
