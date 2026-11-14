@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "d06e47e448b62597b4f251fe581a50cb0bec637a",
+  "sourceRef": "41ba057f10e932dde5f13c982a032aeade0f4cfd",
   "sourceFile": "internal/freshapi/server.go",
   "runtime": "cmd/fresh-api",
   "note": "This inventory audits the standalone cmd/fresh-api runtime, not the legacy cmd/api runtime. Route presence does not imply production enablement: conditional registrations require their named configuration. Routes marked uncontracted or compatibility-review are not approved for Flutter/public-client adoption. Internal routes are service-to-service only. Critical media blocker: cmd/fresh-api still constructs freshstorage.Service from direct B2/R2 environment credentials; it is not yet adapted to the dedicated Data Centre media lifecycle API. Keep media routes uncontracted and FRESH_MEDIA_ENABLED=false until the adapter, contract tests and staging acceptance are complete.",
