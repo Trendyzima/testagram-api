@@ -59,7 +59,7 @@ paths:
                         country: { type: string, maxLength: 128 }
                         group_name: { type: string, maxLength: 256 }
                         priority: { type: integer, minimum: 0, maximum: 100000 }
-        '401': { description: Missing, invalid, expired or unauthorized GitHub Actions OIDC identity. }
+        '401': { description: 'Missing, invalid, expired or unauthorized GitHub Actions OIDC identity.' }
         '405': { description: Only GET is supported. }
         '503': { description: Backend database or catalogue query is unavailable. }
   /internal/tv/health:
@@ -114,7 +114,7 @@ paths:
                   checked: { type: integer, minimum: 1, maximum: 100 }
                   persisted: { type: integer, minimum: 1, maximum: 100 }
                   checked_at: { type: string, format: date-time }
-        '400': { description: Invalid JSON, duplicate or invalid channel record, or batch outside the 1–100 bound. }
+        '400': { description: 'Invalid JSON, duplicate or invalid channel record, or batch outside the 1–100 bound.' }
         '401': { description: Missing, invalid, expired or unauthorized GitHub Actions OIDC identity. }
         '405': { description: Only POST is supported. }
         '413': { description: Request body exceeds the 1 MiB limit. }
