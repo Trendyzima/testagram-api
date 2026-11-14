@@ -27,7 +27,7 @@ tags:
   - name: Health
     description: Process liveness and dependency readiness.
   - name: Authentication
-    description: Appwrite-backed account session and registration consent operations.
+    description: Appwrite-backed account session operations. Canonical account creation requires native identity review, two-person approval and one-time Backend provisioning.
   - name: Feed
     description: Authorized home timeline retrieval.
   - name: Social
