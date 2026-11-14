@@ -178,7 +178,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "c310f83ee89c89642ca5c757db6352ed8c70f23a",
+      "ref": "0b49a946d5633ec45c2e8d0124d9d110bcb4489e",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         "docs/migration-progress.md",
