@@ -7,7 +7,7 @@
 | Liveness/readiness | GET /healthz, GET /readyz | Backend | Contracted | Plain-text responses |
 | Home feed | GET /api/feed/home | Backend + Algorithm | Contracted | Appwrite JWT; following_only/before/limit |
 | Search | GET /api/search | Backend | Contracted | Optional auth; q/kind/limit/media_only |
-| Main-feed post creation | POST /api/social/posts | Backend | Contracted | Idempotency-Key required; Flutter integration tests still needed |
+| Main-feed post creation | POST /api/social/posts | Backend | Contracted | Idempotency-Key required; Flutter widget tests cover request shape; deployed Backend/PostgreSQL and staging read-back remain unverified |
 | Post interaction summary | GET /api/social/posts/{id}/interaction-summary | Backend | Contracted | Viewer-specific state |
 | Reactions/reposts/bookmarks | POST/DELETE /api/social/posts/{id}/reaction, /reposts, /bookmarks | Backend | Contracted | Mutation DTO/status audit continues |
 | Replies | GET/POST /api/social/posts/{id}/replies | Backend | Contracted | Reply DTOs still provisional |
@@ -17,7 +17,7 @@
 | Profiles/connections/follow requests/blocks | /api/social/profiles/*, /api/social/follow-requests/*, /api/social/blocks* | Backend | Registered-only | Do not consume until schemas/auth are promoted |
 | Polls/history | /api/social/polls*, /api/social/history | Backend | Registered-only | Handler-specific DTOs pending |
 | Thread interactions/media | /api/threads/* interaction and media routes | Backend | Registered-only | Route exists; client contract pending |
-| Media lifecycle | /api/media/upload-intent, PUT /api/media/upload, /complete, /delete, /attach, /private-download-url, /list | Backend + Data Centre + CDN | Registered-only | Backend controls upload authorization; CDN only delivers bytes |
+| Media lifecycle | /api/media/upload-intent, PUT /api/media/upload, /complete, /delete, /attach, /private-download-url, /list | Backend + Data Centre + CDN | Registered-only | Flutter main-feed public-image client flow exists; real three-provider replication/read-back, private-media/CDN authorization and staging journeys remain release gates |
 | TV health | GET /api/tv/health | Backend + Data Centre | Registered-only | Not a TV catalogue/player contract |
 | Capability dispatcher | POST /api/capability | Backend | Registered-only | Allow-listed capability calls only; never generic arbitrary RPC |
 | Auth lifecycle | POST /api/auth/{signup,resend-verification,verify-email,login,forgot-password,reset-password} | Backend | Registered-only | Dynamic routes; dedicated auth contract required |
