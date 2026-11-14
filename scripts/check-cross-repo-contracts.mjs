@@ -90,6 +90,7 @@ if (!dataCentreMediaServer.includes('r.Header.Get("X-Testagram-API-Version")')) 
  // credentials; those are mapped only behind MEDIA_REPLICATION_ENABLED.
  const backendCompose = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/docker-compose.yml"), "utf8");
  const backendDeploy = readFileSync(resolve(lock.repositories.backend.checkoutPath, ".github/workflows/instabox-deploy.yml"), "utf8");
+ const identityReplication = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/identity_media_replication.go"), "utf8");
  const backendEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
  const dataCentreCompose = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "vps/docker-compose.fresh.yml"), "utf8");
  const dataCentreEnvExample = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "vps/.env.example"), "utf8");
@@ -106,6 +107,8 @@ if (!dataCentreMediaServer.includes('r.Header.Get("X-Testagram-API-Version")')) 
  if (!backendCompose.includes("B2_S3_ACCESS_KEY_ID:") || !backendCompose.includes("B2_S3_SECRET_ACCESS_KEY:") || !backendCompose.includes("CLOUDFLARE_R2_ACCESS_KEY_ID:") || !backendCompose.includes("CLOUDFLARE_R2_SECRET_ACCESS_KEY:")) fail.push("Backend identity-evidence replica credentials must be mapped into the VPS API container");
  if (!backendCompose.includes("MEDIA_REPLICATION_ENABLED:")) fail.push("Backend Compose must preserve the explicit three-provider replication feature gate");
  if (!backendDeploy.includes('if [[ "$(read_env_value MEDIA_REPLICATION_ENABLED)" == "true" ]]; then') || !backendDeploy.includes("for key in B2_S3_ENDPOINT") || !backendDeploy.includes("CLOUDFLARE_R2_SECRET_ACCESS_KEY")) fail.push("Backend B2/R2 credentials must only be written to the VPS environment after explicit MEDIA_REPLICATION_ENABLED=true");
+ if (!identityReplication.includes("identityBucket == privateBucket") || !identityReplication.includes("identityBucket == publicBucket") || !identityReplication.includes('strings.TrimSpace(os.Getenv("B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET"))') || !identityReplication.includes('strings.TrimSpace(os.Getenv("CLOUDFLARE_R2_IDENTITY_EVIDENCE_PRIVATE_BUCKET"))')) fail.push("Backend identity evidence must use dedicated MinIO/B2/R2 buckets distinct from ordinary media");
+ if (!backendDeploy.includes("B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET") || !backendDeploy.includes("CLOUDFLARE_R2_IDENTITY_EVIDENCE_PRIVATE_BUCKET") || !backendDeploy.includes("VPS identity evidence bucket must be dedicated")) fail.push("Backend deployment must require explicit dedicated identity-evidence buckets before enabling replication");
  if (!backendDeploy.includes('if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" ]]; then')) fail.push("Data Centre media provider credentials must remain behind DATA_CENTRE_MEDIA_ENABLED=true");
 
 // Verify the other service-to-service edges against both pinned producers and consumers.
