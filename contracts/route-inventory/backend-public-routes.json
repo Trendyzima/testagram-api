@@ -275,7 +275,7 @@
     {
       "method": "POST",
       "path": "/api/auth/registration-consent",
-      "status": "contracted"
+      "status": "registered-only"
     },
     {
       "method": "POST",
