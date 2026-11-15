@@ -1,0 +1,226 @@
+openapi: 3.1.0
+info:
+  title: Testagram Quote Posts and Feed Preferences
+  version: 1.0.0
+  description: Native X-style quote posts and user-selectable Bluesky-inspired timeline presets. ActivityPub federation remains a separate protocol service.
+servers:
+  - url: https://api.testagram.site
+security:
+  - bearerAuth: []
+paths:
+  /api/threads/{thread_id}/quote:
+    post:
+      operationId: createThreadQuote
+      summary: Create a quote thread
+      description: Creates a normal Testagram thread with a canonical reference to an active public source thread. The client must supply a stable idempotency key for retries.
+      parameters:
+        - $ref: '#/components/parameters/ThreadId'
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+            minLength: 16
+            maxLength: 128
+            pattern: '^[^\s]+$'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                body:
+                  type: string
+                  maxLength: 500
+                visibility:
+                  type: string
+                  enum: [public, unlisted, private]
+      responses:
+        '201':
+          description: Quote thread created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteThreadResponse'
+        '200':
+          description: Idempotent replay of the original quote request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuoteThreadResponse'
+        '400': { description: Invalid source ID, body, visibility or idempotency key. }
+        '401': { description: Authentication required. }
+        '404': { description: Source thread is not active and public. }
+        '409': { description: Idempotency key reused with different quote content. }
+        '429': { description: Social write rate limit reached. }
+        '503': { description: Quote could not be durably stored. }
+  /api/threads/{thread_id}/quotes:
+    get:
+      operationId: listThreadQuotes
+      summary: List public quote threads for a source thread
+      parameters:
+        - $ref: '#/components/parameters/ThreadId'
+      responses:
+        '200':
+          description: Public quote threads.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean }
+                  data:
+                    type: object
+                    required: [items, count]
+                    properties:
+                      count: { type: integer }
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/QuoteThread'
+        '404': { description: Source thread not found or not public. }
+        '503': { description: Quote list unavailable. }
+  /api/me/feed-preferences:
+    get:
+      operationId: getFeedPreferences
+      summary: Read the signed-in account's default thread feed
+      responses:
+        '200':
+          description: Current default feed and available presets.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean }
+                  data:
+                    type: object
+                    required: [default_feed, available_feeds]
+                    properties:
+                      default_feed:
+                        type: string
+                        enum: [for-you, following, latest, media]
+                      available_feeds:
+                        type: array
+                        items:
+                          type: string
+                          enum: [for-you, following, latest, media]
+                      updated_at:
+                        type: string
+                        format: date-time
+        '401': { description: Authentication required. }
+        '503': { description: Preference store unavailable. }
+    put:
+      operationId: updateFeedPreferences
+      summary: Choose the account's default thread feed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [default_feed]
+              properties:
+                default_feed:
+                  type: string
+                  enum: [for-you, following, latest, media]
+      responses:
+        '200':
+          description: Preference saved.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean }
+                  data:
+                    type: object
+                    required: [default_feed, updated_at]
+                    properties:
+                      default_feed:
+                        type: string
+                        enum: [for-you, following, latest, media]
+                      updated_at: { type: string, format: date-time }
+        '400': { description: Invalid feed preset. }
+        '401': { description: Authentication required. }
+        '503': { description: Preference could not be saved. }
+  /api/threads:
+    get:
+      operationId: listThreadsWithFeedPreset
+      summary: List threads using a selected or account-default feed
+      parameters:
+        - in: query
+          name: tab
+          required: false
+          schema:
+            type: string
+            enum: [for-you, following, saved, latest, media]
+          description: If omitted for an authenticated user, the saved default_feed preference is used.
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 30, default: 6 }
+        - in: query
+          name: cursor
+          schema: { type: string }
+      responses:
+        '200':
+          description: Thread page. Each thread includes quote_of_thread_id when it is a quote.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  data:
+                    type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          allOf:
+                            - $ref: '#/components/schemas/QuoteThread'
+                            - type: object
+                              properties:
+                                quote_of_thread_id: { type: string, format: uuid, nullable: true }
+                      next_cursor: { type: string }
+                      has_more: { type: boolean }
+        '400': { description: Invalid feed tab, limit or cursor. }
+        '401': { description: Authentication required for following or saved feeds. }
+        '503': { description: Thread list unavailable. }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    ThreadId:
+      in: path
+      name: thread_id
+      required: true
+      schema: { type: string, format: uuid }
+  schemas:
+    QuoteThreadResponse:
+      type: object
+      required: [ok, data]
+      properties:
+        ok: { type: boolean }
+        data:
+          $ref: '#/components/schemas/QuoteThread'
+    QuoteThread:
+      type: object
+      required: [id, owner_id, body, visibility, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        owner_id: { type: string, format: uuid }
+        body: { type: string, maxLength: 500 }
+        visibility: { type: string, enum: [public, unlisted, private] }
+        quote_of_thread_id: { type: string, format: uuid, nullable: true }
+        created_at: { type: string, format: date-time }
+        idempotent_replay: { type: boolean }
