@@ -462,7 +462,7 @@ paths:
       operationId: getHomeFeed
       tags: [Feed]
       summary: Retrieve the authorized home timeline
-      description: Supports named, composable feed lanes and opaque cursor pagination. Backend performs authorization, candidate selection and ranking orchestration; the private Algorithm service only orders Backend-authorized candidate IDs. The `feed` lane defaults to `for_you`; `following` restricts to accepted follows; `latest` uses chronological order; `media` filters to posts with media; and `discover` selects public posts from accounts the viewer does not follow. The legacy following_only boolean remains supported. Private media URLs may include a parallel `media_auth_headers` map keyed by exact URL; clients must attach the matching Authorization header and must not cache these short-lived bearer assertions.
+      description: Supports named, composable feed lanes and opaque cursor pagination. Backend performs authorization, candidate selection and ranking orchestration; the private Algorithm service only orders Backend-authorized candidate IDs. The `feed` lane defaults to `for_you`; `following` restricts to accepted follows; `latest` uses chronological order; `media` filters to posts with media; and `discover` selects public posts from accounts the viewer does not follow. The `video_only` filter composes with the authorized timeline and returns only posts containing ready public video assets. The legacy following_only boolean remains supported. Private media URLs may include a parallel `media_auth_headers` map keyed by exact URL; clients must attach the matching Authorization header and must not cache these short-lived bearer assertions.
       parameters:
         - in: query
           name: feed
@@ -474,6 +474,11 @@ paths:
           required: false
           schema: { type: boolean, default: false }
           description: Set true to restrict the feed to followed accounts.
+        - in: query
+          name: video_only
+          required: false
+          schema: { type: boolean, default: false }
+          description: Set true to return only posts with at least one ready, public video attachment. Backend applies post visibility, block, mute, ownership and media-readiness checks before returning a playback URL.
         - in: query
           name: before
           required: false
