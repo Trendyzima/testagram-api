@@ -2256,7 +2256,26 @@ components:
               minLength: 36
               maxLength: 36
               pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
-                PostCreateEnvelope:
+            - type: string
+              const: ""
+        updated_at: { type: string, format: date-time }
+    IdentityVerificationSessionStatus:
+      type: object
+      additionalProperties: false
+      required: [session_id, application_id, purpose, status, created_at, expires_at, submitted_at]
+      properties:
+        session_id: { type: string, format: uuid }
+        application_id: { type: string, format: uuid }
+        purpose: { type: string, const: age_assurance }
+        status: { type: string, maxLength: 32 }
+        created_at: { type: string, format: date-time }
+        expires_at: { type: string, format: date-time }
+        submitted_at: { type: [string, 'null'], format: date-time }
+    ExtensibleObject:
+      type: object
+      additionalProperties: true
+      description: Temporary extensible schema. Replace with an implementation-backed DTO when exact wire shape is verified.
+    PostCreateEnvelope:
       type: object
       required: [ok, data, error, request_id]
       properties:
