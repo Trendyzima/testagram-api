@@ -1,0 +1,134 @@
+openapi: 3.1.0
+info:
+  title: Testagram Internal User-Activity Watchdog
+  version: 1.0.0
+  description: >
+    Private Backend control-plane contract. Never publish this contract to
+    public client SDKs. The public Backend authenticates users and emits an
+    impulse only after successful session validation and authorization.
+servers:
+  - url: http://control-plane:8787
+    description: Private control-plane network only; not publicly routable.
+security:
+  - internalBearer: []
+paths:
+  /v1/watchdog/impulses:
+    post:
+      operationId: enqueueAuthenticatedUserImpulse
+      summary: Persist an authenticated user activity impulse
+      description: Backend-to-control-plane only. Clients must never call this endpoint or supply identity claims to it.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [idempotencyKey, eventType]
+              properties:
+                idempotencyKey: { type: string, minLength: 16, maxLength: 128, pattern: '^[^\s]+$' }
+                eventType:
+                  type: string
+                  enum: [login, feed_open, post_publish, media_upload, media_view, federation_interaction]
+      responses:
+        '202':
+          description: Impulse durably accepted or an idempotent prior event returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, status, services, leaseSeconds]
+                properties:
+                  id: { type: integer, format: int64 }
+                  status: { type: string, enum: [queued, claimed, completed, failed] }
+                  services:
+                    type: array
+                    items: { type: string, enum: [backend, data-centre, cdn, algorithm, federation] }
+                  leaseSeconds: { type: integer, const: 600 }
+        '400': { description: Unsupported event or invalid idempotency key. }
+        '401': { description: Missing or invalid internal service bearer. }
+        '503': { description: Queue or database unavailable; caller may retry with the same idempotency key. }
+  /v1/watchdog/impulses/claim:
+    post:
+      operationId: claimWatchdogImpulses
+      summary: Claim queued impulses for a trusted activation worker
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 50, default: 10 }
+      responses:
+        '200':
+          description: Impulses leased to this worker for 60 seconds.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [impulses, count]
+                properties:
+                  count: { type: integer }
+                  impulses:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, eventType, services, attempts, leaseUntil]
+                      properties:
+                        id: { type: integer, format: int64 }
+                        eventType: { type: string }
+                        services: { type: array, items: { type: string } }
+                        attempts: { type: integer }
+                        leaseUntil: { type: string, format: date-time }
+        '401': { description: Missing or invalid internal service bearer. }
+        '503': { description: Queue unavailable. }
+  /v1/watchdog/impulses/ack:
+    post:
+      operationId: acknowledgeWatchdogImpulse
+      summary: Acknowledge activation worker outcome
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [id, success]
+              properties:
+                id: { type: integer, format: int64, minimum: 1 }
+                success: { type: boolean }
+                error: { type: string, maxLength: 500 }
+      responses:
+        '200': { description: Claimed impulse marked completed or failed. }
+        '400': { description: Invalid result. }
+        '401': { description: Missing or invalid internal service bearer. }
+        '409': { description: Impulse is not currently claimed. }
+  /v1/watchdog/services:
+    get:
+      operationId: listActiveWatchdogServiceLeases
+      summary: List downstream service leases that have not expired
+      responses:
+        '200':
+          description: Active service leases.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [services, count]
+                properties:
+                  count: { type: integer }
+                  services:
+                    type: array
+                    items:
+                      type: object
+                      required: [service, activeUntil, lastImpulseAt]
+                      properties:
+                        service: { type: string, enum: [backend, data-centre, cdn, algorithm, federation] }
+                        activeUntil: { type: string, format: date-time }
+                        lastImpulseAt: { type: string, format: date-time }
+      responses:
+        '401': { description: Missing or invalid internal service bearer. }
+        '503': { description: Lease inventory unavailable. }
+components:
+  securitySchemes:
+    internalBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque-service-token
