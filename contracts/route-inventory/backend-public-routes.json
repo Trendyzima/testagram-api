@@ -244,12 +244,27 @@
     },
     {
       "method": "GET",
+      "path": "/internal/cdn/v1/{key...}",
+      "status": "registered-only"
+    },
+    {
+      "method": "GET",
+      "path": "/internal/tv/catalog",
+      "status": "registered-only"
+    },
+    {
+      "method": "GET",
       "path": "/v1/feed/home",
       "status": "registered-only"
     },
     {
       "method": "GET",
       "path": "/v1/feed/public",
+      "status": "registered-only"
+    },
+    {
+      "method": "HEAD",
+      "path": "/internal/cdn/v1/{key...}",
       "status": "registered-only"
     },
     {
@@ -455,6 +470,31 @@
     {
       "method": "POST",
       "path": "/api/wallet/mpesa/callback",
+      "status": "registered-only"
+    },
+    {
+      "method": "POST",
+      "path": "/internal/media/fresh/cdn-download-url",
+      "status": "registered-only"
+    },
+    {
+      "method": "POST",
+      "path": "/internal/media/fresh/register",
+      "status": "registered-only"
+    },
+    {
+      "method": "POST",
+      "path": "/internal/media/fresh/revoke",
+      "status": "registered-only"
+    },
+    {
+      "method": "POST",
+      "path": "/internal/media/quarantine",
+      "status": "registered-only"
+    },
+    {
+      "method": "POST",
+      "path": "/internal/tv/health",
       "status": "registered-only"
     },
     {
