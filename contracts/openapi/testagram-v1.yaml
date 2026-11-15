@@ -27,7 +27,7 @@ tags:
   - name: Health
     description: Process liveness and dependency readiness.
   - name: Authentication
-    description: Appwrite-backed account session operations. Canonical account creation requires native identity review, two-person approval and one-time Backend provisioning.
+    description: Transitional Appwrite-backed account sessions while native Testagram identity migration is implemented. Existing account IDs and ownership must be preserved; Appwrite is not removed until native session and recovery tests pass.
   - name: Feed
     description: Authorized home timeline retrieval.
   - name: Social
@@ -1825,7 +1825,12 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Appwrite session JWT issued to the signed-in user. Backend validates it with Appwrite; this spec does not authorize a caller.
+      description: Legacy Appwrite session JWT accepted during the controlled migration window only.
+    testagramBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Reserved for native Testagram access tokens. Do not apply to public operations until Backend enforces issuer, audience, expiry, session revocation and account status checks. This scheme is documented ahead of its global activation.
   parameters:
     PostId:
       name: postId
