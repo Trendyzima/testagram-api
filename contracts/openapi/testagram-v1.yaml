@@ -2215,7 +2215,7 @@ components:
       properties:
         ok: { const: true }
         application_id: { type: string, format: uuid }
-        application_token: { type: string, minLength: 32, maxLength: 128, writeOnly: true }
+        application_token: { type: string, minLength: 32, maxLength: 128 }
         verification_session_id: { type: string, format: uuid }
         verification_session_token: { type: string, minLength: 32, maxLength: 128, writeOnly: true }
         status: { type: string, const: verification_pending }
@@ -2249,7 +2249,7 @@ components:
         application_id: { type: string, format: uuid }
         status: { type: string, maxLength: 32 }
         adult_verification_status: { type: string, maxLength: 32 }
-        adult_verification_threshold: { type: integer, minimum: 18, maximum: 120 }
+        adult_verification_threshold: { type: integer, const: 18 }
         verification_session_id:
           oneOf:
             - { type: string, format: uuid }
