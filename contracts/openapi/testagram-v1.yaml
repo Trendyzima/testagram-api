@@ -462,8 +462,13 @@ paths:
       operationId: getHomeFeed
       tags: [Feed]
       summary: Retrieve the authorized home timeline
-      description: Supports the Following filter and opaque cursor pagination. Backend performs authorization and ranking orchestration. Private media URLs may include a parallel `media_auth_headers` map keyed by exact URL; clients must attach the matching Authorization header and must not cache these short-lived bearer assertions.
+      description: Supports named, composable feed lanes and opaque cursor pagination. Backend performs authorization, candidate selection and ranking orchestration; the private Algorithm service only orders Backend-authorized candidate IDs. The `feed` lane defaults to `for_you`; `following` restricts to accepted follows; `latest` uses chronological order; `media` filters to posts with media; and `discover` selects public posts from accounts the viewer does not follow. The legacy following_only boolean remains supported. Private media URLs may include a parallel `media_auth_headers` map keyed by exact URL; clients must attach the matching Authorization header and must not cache these short-lived bearer assertions.
       parameters:
+        - in: query
+          name: feed
+          required: false
+          schema: { type: string, enum: [for_you, following, latest, media, discover], default: for_you }
+          description: Select a server-defined feed generator lane; clients cannot supply ranking weights or candidate IDs.
         - in: query
           name: following_only
           required: false
