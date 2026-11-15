@@ -96,8 +96,11 @@ const expectedPrivateInternalRoutes = new Set([
   "POST /internal/v1/federation/remote-follows/undo",
 ]);
 const missingPrivateInternalRoutes = [...expectedPrivateInternalRoutes].filter((route) => !privateInternalRoutes.has(route)).sort();
-if (missingPrivateInternalRoutes.length) {
-  throw new Error("Private Federation routes missing from the private listener: " + missingPrivateInternalRoutes.join(", "));
+const unexpectedPrivateInternalRoutes = [...privateInternalRoutes].filter((route) => !expectedPrivateInternalRoutes.has(route)).sort();
+if (missingPrivateInternalRoutes.length || unexpectedPrivateInternalRoutes.length) {
+  throw new Error("Private Federation route inventory drifted: " + JSON.stringify({
+    missingPrivateInternalRoutes, unexpectedPrivateInternalRoutes
+  }));
 }
 const expected = new Set(inventory.routes.map(({ method, path }) => key(method, path)));
 const missingFromInventory = [...registered].filter((route) => !expected.has(route)).sort();
