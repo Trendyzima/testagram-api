@@ -2252,7 +2252,26 @@ components:
         adult_verification_threshold: { type: integer, const: 18 }
         verification_session_id:
           oneOf:
-            - { type: string, format: uuid, pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}    PostCreateEnvelope:
+            - type: string
+              format: uuid
+              minLength: 36
+              maxLength: 36
+            - type: string
+              const: ""
+        updated_at: { type: string, format: date-time }
+    IdentityVerificationSessionStatus:
+      type: object
+      additionalProperties: false
+      required: [session_id, application_id, purpose, status, created_at, expires_at, submitted_at]
+      properties:
+        session_id: { type: string, format: uuid }
+        application_id: { type: string, format: uuid }
+        purpose: { type: string, const: age_assurance }
+        status: { type: string, maxLength: 32 }
+        created_at: { type: string, format: date-time }
+        expires_at: { type: string, format: date-time }
+        submitted_at: { type: [string, 'null'], format: date-time }
+    PostCreateEnvelope:
       type: object
       required: [ok, data, error, request_id]
       properties:
