@@ -35,16 +35,17 @@ if (publicRoutesStart < 0 || internalRoutesStart <= publicRoutesStart) {
   throw new Error("Backend public/private listener functions are missing or reordered.");
 }
 const publicRoutesSource = apiMain.slice(publicRoutesStart, internalRoutesStart);
-const nextFunction = apiMain.indexOf("\\nfunc ", internalRoutesStart + 1);
+const nextFunction = apiMain.indexOf("\nfunc ", internalRoutesStart + 1);
 const internalRoutesSource = apiMain.slice(internalRoutesStart, nextFunction < 0 ? apiMain.length : nextFunction);
 for (const route of ["GET /readyz", "GET /metrics"]) {
-  const pattern = new RegExp('mux\\\\.HandleFunc\\\\("' + route.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\const postHandler = readFileSync(postHandlerPath, "utf8");
-const postTests = readFileSync(postTestsPath, "utf8");
-const spec = readFileSync(specPath, "utf8");") + '"\\\\s*,');
-  if (pattern.test(publicRoutesSource)) throw new Error(`Private endpoint registered on public listener: ${route}`);
-  if (!pattern.test(internalRoutesSource)) throw new Error(`Private endpoint missing from internal listener: ${route}`);
+  const registration = 'mux.HandleFunc("' + route + '",';
+  if (publicRoutesSource.includes(registration)) {
+    throw new Error("Private endpoint registered on public listener: " + route);
+  }
+  if (!internalRoutesSource.includes(registration)) {
+    throw new Error("Private endpoint missing from internal listener: " + route);
+  }
 }
-
 const normalize = (value) => value.replace(/\{[^}]+\}/g, "{}");
 const key = (method, path) => `${method.toUpperCase()} ${normalize(path)}`;
 
