@@ -49,18 +49,59 @@ for (const route of ["GET /readyz", "GET /metrics"]) {
 const normalize = (value) => value.replace(/\{[^}]+\}/g, "{}");
 const key = (method, path) => `${method.toUpperCase()} ${normalize(path)}`;
 
+// Classify routes by the listener function that registers them, not by URL
+// prefix: some authenticated /internal/* service routes intentionally use the
+// public listener, while Federation /internal/v1/* routes use the private one.
 const registered = new Set();
-for (const match of source.matchAll(/mux\.HandleFunc\("([A-Z]+) ([^"]+)"\s*,/g)) {
+const publicInternalRoutes = new Set();
+for (const match of publicRoutesSource.matchAll(/mux\.HandleFunc\("([A-Z]+) ([^"]+)"\s*,/g)) {
   const [, method, path] = match;
   if (method === "OPTIONS") continue;
-  if (path.startsWith("/internal/")) continue;
-  // These routes are intentionally private and are registered on internalRoutes.
-  if (path === "/readyz" || path === "/metrics") continue;
-  if (path.startsWith("/api/") || path.startsWith("/v1/") || path === "/healthz") {
-    registered.add(key(method, path));
+  if (path === "/readyz" || path === "/metrics") {
+    throw new Error("Private readiness/metrics endpoint registered on public listener: " + method + " " + path);
   }
+  if (path.startsWith("/internal/")) publicInternalRoutes.add(key(method, path));
+  // Inventory every static route registered on the public listener, regardless
+  // of path family, so a newly introduced prefix cannot silently escape audit.
+  registered.add(key(method, path));
 }
-
+const expectedPublicInternalRoutes = new Set([
+  "POST /internal/media/quarantine",
+  "POST /internal/media/fresh/register",
+  "POST /internal/media/fresh/revoke",
+  "POST /internal/media/fresh/cdn-download-url",
+  "GET /internal/tv/catalog",
+  "POST /internal/tv/health",
+  "GET /internal/cdn/v1/{}",
+  "HEAD /internal/cdn/v1/{}",
+]);
+const unexpectedPublicInternalRoutes = [...publicInternalRoutes].filter((route) => !expectedPublicInternalRoutes.has(route)).sort();
+const missingPublicInternalRoutes = [...expectedPublicInternalRoutes].filter((route) => !publicInternalRoutes.has(route)).sort();
+if (unexpectedPublicInternalRoutes.length || missingPublicInternalRoutes.length) {
+  throw new Error("Public-listener authenticated internal routes drifted: " + JSON.stringify({
+    unexpectedPublicInternalRoutes, missingPublicInternalRoutes
+  }));
+}
+const privateInternalRoutes = new Set(
+  [...internalRoutesSource.matchAll(/mux\.HandleFunc\("([A-Z]+) ([^"]+)"\s*,/g)]
+    .map((match) => key(match[1], match[2]))
+    .filter((route) => route.includes(" /internal/v1/federation/"))
+);
+const expectedPrivateInternalRoutes = new Set([
+  "GET /internal/v1/federation/readyz",
+  "GET /internal/v1/federation/actors/{}",
+  "GET /internal/v1/federation/actors/by-id/{}",
+  "GET /internal/v1/federation/objects/{}",
+  "POST /internal/v1/federation/remote-follows",
+  "POST /internal/v1/federation/remote-follows/undo",
+]);
+const missingPrivateInternalRoutes = [...expectedPrivateInternalRoutes].filter((route) => !privateInternalRoutes.has(route)).sort();
+const unexpectedPrivateInternalRoutes = [...privateInternalRoutes].filter((route) => !expectedPrivateInternalRoutes.has(route)).sort();
+if (missingPrivateInternalRoutes.length || unexpectedPrivateInternalRoutes.length) {
+  throw new Error("Private Federation route inventory drifted: " + JSON.stringify({
+    missingPrivateInternalRoutes, unexpectedPrivateInternalRoutes
+  }));
+}
 const expected = new Set(inventory.routes.map(({ method, path }) => key(method, path)));
 const missingFromInventory = [...registered].filter((route) => !expected.has(route)).sort();
 const staleInventory = [...expected].filter((route) => !registered.has(route)).sort();
