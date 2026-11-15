@@ -174,7 +174,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "b0cd97b26c200762caeef7194f31761f20d97fde",
+      "ref": "17c3b872f6025b532383aab5a78db5c68cfa93dc",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         "cloudflare/worker.js",
