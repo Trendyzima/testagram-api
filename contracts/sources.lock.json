@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "de78071a67998df5dd32cc7e8e1122f3e2dd0398",
+      "ref": "decc78012a2556a5b207d915a03fa6dff5b680c1",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
@@ -174,7 +174,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "54c38f3ec3266d5c9d9b1737220987d8cc02c7e0",
+      "ref": "c124f5e6fc38186471512cadbcf907a259b39e58",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         "cloudflare/worker.js",
@@ -247,7 +247,7 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "872fc20022aac43f9d4c92ecac9e77a24442d4bb",
+      "ref": "f1511ec5b3d3ea2a4413757e9a5fddf1b059a3cb",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
         "api/events/post-published.v1.schema.json",
@@ -270,7 +270,7 @@
     },
     "algorithm": {
       "fullName": "Trendyzima/the-algorithm",
-      "ref": "6ae0532c171383b84731063d590d775524f9da1e",
+      "ref": "2194c6919a808294b9d7430ef964c60406d823d6",
       "checkoutPath": "source-repos/algorithm",
       "sourcePaths": [
         "testagram-feed/api/openapi.yaml",
