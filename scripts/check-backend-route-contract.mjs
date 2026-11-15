@@ -26,6 +26,26 @@ const postHandler = readFileSync(postHandlerPath, "utf8");
 const postTests = readFileSync(postTestsPath, "utf8");
 const spec = readFileSync(specPath, "utf8");
 
+// Enforce the public/private listener boundary. Readiness and metrics must
+// exist only on the Docker-private listener and never enter public OpenAPI.
+const apiMain = readFileSync(resolve("source-repos/backend/cmd/api/main.go"), "utf8");
+const publicRoutesStart = apiMain.indexOf("func (s *service) routes() http.Handler {");
+const internalRoutesStart = apiMain.indexOf("func (s *service) internalRoutes() http.Handler {");
+if (publicRoutesStart < 0 || internalRoutesStart <= publicRoutesStart) {
+  throw new Error("Backend public/private listener functions are missing or reordered.");
+}
+const publicRoutesSource = apiMain.slice(publicRoutesStart, internalRoutesStart);
+const nextFunction = apiMain.indexOf("\nfunc ", internalRoutesStart + 1);
+const internalRoutesSource = apiMain.slice(internalRoutesStart, nextFunction < 0 ? apiMain.length : nextFunction);
+for (const route of ["GET /readyz", "GET /metrics"]) {
+  const registration = 'mux.HandleFunc("' + route + '",';
+  if (publicRoutesSource.includes(registration)) {
+    throw new Error("Private endpoint registered on public listener: " + route);
+  }
+  if (!internalRoutesSource.includes(registration)) {
+    throw new Error("Private endpoint missing from internal listener: " + route);
+  }
+}
 const normalize = (value) => value.replace(/\{[^}]+\}/g, "{}");
 const key = (method, path) => `${method.toUpperCase()} ${normalize(path)}`;
 
@@ -34,7 +54,9 @@ for (const match of source.matchAll(/mux\.HandleFunc\("([A-Z]+) ([^"]+)"\s*,/g))
   const [, method, path] = match;
   if (method === "OPTIONS") continue;
   if (path.startsWith("/internal/")) continue;
-  if (path.startsWith("/api/") || path.startsWith("/v1/") || path === "/healthz" || path === "/readyz" || path === "/metrics") {
+  // These routes are intentionally private and are registered on internalRoutes.
+  if (path === "/readyz" || path === "/metrics") continue;
+  if (path.startsWith("/api/") || path.startsWith("/v1/") || path === "/healthz") {
     registered.add(key(method, path));
   }
 }
@@ -50,6 +72,10 @@ for (let i = 0; i < pathMatches.length; i++) {
   const end = i + 1 < pathMatches.length ? pathMatches[i + 1].index : spec.length;
   pathBlocks.set(normalize(pathMatches[i][1]), spec.slice(start, end));
 }
+if (pathBlocks.has("/readyz") || pathBlocks.has("/metrics")) {
+  throw new Error("Private readiness/metrics endpoints must not appear in public OpenAPI.");
+}
+if (!pathBlocks.has("/healthz")) throw new Error("Public /healthz liveness route is missing from OpenAPI.");
 const missingFromOpenApi = [];
 for (const route of inventory.routes.filter((item) => item.status === "contracted")) {
   const block = pathBlocks.get(normalize(route.path));
