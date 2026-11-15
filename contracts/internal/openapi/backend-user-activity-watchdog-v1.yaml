@@ -123,7 +123,6 @@ paths:
                         service: { type: string, enum: [backend, data-centre, cdn, algorithm, federation] }
                         activeUntil: { type: string, format: date-time }
                         lastImpulseAt: { type: string, format: date-time }
-      responses:
         '401': { description: Missing or invalid internal service bearer. }
         '503': { description: Lease inventory unavailable. }
 components:
