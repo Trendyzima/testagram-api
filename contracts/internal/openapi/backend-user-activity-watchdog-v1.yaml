@@ -3,12 +3,13 @@ info:
   title: Testagram Internal User-Activity Watchdog
   version: 1.0.0
   description: >
-    Private Backend control-plane contract. Never publish this contract to
-    public client SDKs. The public Backend authenticates users and emits an
-    impulse only after successful session validation and authorization.
+    Private Data Centre VPS control-plane contract. Never publish this contract
+    to public client SDKs. The public Backend authenticates users and emits an
+    impulse only after successful session validation and authorization. The
+    node agent uses its enrolled node token for claim and acknowledgement.
 servers:
   - url: http://control-plane:8787
-    description: Private control-plane network only; not publicly routable.
+    description: Private Data Centre control-plane network only; not publicly routable.
 security:
   - internalBearer: []
 paths:
@@ -100,6 +101,65 @@ paths:
         '400': { description: Invalid result. }
         '401': { description: Missing or invalid internal service bearer. }
         '409': { description: Impulse is not currently claimed. }
+  /v1/nodes/watchdog/claim:
+    post:
+      operationId: claimUserActivityImpulsesAsNode
+      summary: Claim impulses using an enrolled watchdog-capable VPS node token
+      security:
+        - nodeBearer: []
+      parameters:
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 50, default: 10 }
+      responses:
+        '200':
+          description: Activity impulses leased to this recently heartbeating node.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [impulses, count]
+                properties:
+                  count: { type: integer }
+                  impulses:
+                    type: array
+                    items:
+                      type: object
+                      required: [id, eventType, services, attempts, leaseUntil]
+                      properties:
+                        id: { type: integer, format: int64 }
+                        eventType: { type: string, enum: [login, feed_open, post_publish, media_upload, media_view, federation_interaction] }
+                        services:
+                          type: array
+                          items: { type: string, enum: [backend, data-centre, cdn, algorithm, federation] }
+                        attempts: { type: integer }
+                        leaseUntil: { type: string, format: date-time }
+        '401': { description: Node token is invalid, stale or lacks watchdogActivation capability. }
+        '503': { description: Queue unavailable. }
+  /v1/nodes/watchdog/ack:
+    post:
+      operationId: acknowledgeUserActivityImpulseAsNode
+      summary: Acknowledge a claimed impulse using the same enrolled node token
+      security:
+        - nodeBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [id, success]
+              properties:
+                id: { type: integer, format: int64, minimum: 1 }
+                success: { type: boolean }
+                error: { type: string, maxLength: 500 }
+      responses:
+        '200': { description: Impulse completed or scheduled for bounded retry. }
+        '400': { description: Invalid result. }
+        '401': { description: Node token is invalid, stale or lacks watchdogActivation capability. }
+        '409': { description: Impulse is not currently claimed by this node. }
+        '503': { description: Queue unavailable. }
   /v1/watchdog/services:
     get:
       operationId: listActiveWatchdogServiceLeases
@@ -131,3 +191,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: opaque-service-token
+    nodeBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: enrolled-vps-node-token
