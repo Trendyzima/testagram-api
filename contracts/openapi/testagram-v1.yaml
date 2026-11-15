@@ -60,24 +60,6 @@ paths:
           content:
             text/plain:
               schema: { type: string, example: "ok\n" }
-  /readyz:
-    get:
-      operationId: getReadiness
-      tags: [Health]
-      summary: Check Backend readiness
-      description: Readiness endpoint documented by the Backend repository.
-      security: []
-      responses:
-        '200':
-          description: Backend process and PostgreSQL are ready.
-          content:
-            text/plain:
-              schema: { type: string, example: "ready\n" }
-        '503':
-          description: Backend database is unavailable.
-          content:
-            text/plain:
-              schema: { type: string }
   /api/identity/applications:
     post:
       operationId: createIdentityApplication
