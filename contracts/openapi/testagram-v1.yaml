@@ -2255,7 +2255,10 @@ components:
             - type: string
               minLength: 36
               maxLength: 36
-              pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}        updated_at: { type: string, format: date-time }
+              pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+            - type: string
+              const: ""
+        updated_at: { type: string, format: date-time }
     IdentityVerificationSessionStatus:
       type: object
       additionalProperties: false
