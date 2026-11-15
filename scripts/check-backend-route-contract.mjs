@@ -61,9 +61,9 @@ for (const match of publicRoutesSource.matchAll(/mux\.HandleFunc\("([A-Z]+) ([^"
     throw new Error("Private readiness/metrics endpoint registered on public listener: " + method + " " + path);
   }
   if (path.startsWith("/internal/")) publicInternalRoutes.add(key(method, path));
-  if (path.startsWith("/api/") || path.startsWith("/v1/") || path.startsWith("/internal/") || path === "/healthz") {
-    registered.add(key(method, path));
-  }
+  // Inventory every static route registered on the public listener, regardless
+  // of path family, so a newly introduced prefix cannot silently escape audit.
+  registered.add(key(method, path));
 }
 const expectedPublicInternalRoutes = new Set([
   "POST /internal/media/quarantine",
