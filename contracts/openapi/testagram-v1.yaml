@@ -1621,6 +1621,31 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/posts/{post_id}/view:
+    parameters:
+      - in: path
+        name: post_id
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      operationId: recordSocialPostView
+      tags: [Social]
+      summary: Record a privacy-filtered post view
+      description: Authentication is optional. Anonymous viewers may record views only for public posts; authenticated viewers may also view posts visible to their account. Backend enforces visibility and follower access, applies a per-viewer rate limit, increments the view count and records signed-in browsing history. Clients should de-duplicate view events within a playback session.
+      security:
+        - testagramBearer: []
+        - {}
+      responses:
+        '200':
+          description: View recorded.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/social/posts/{post_id}/interactions/{kind}:
     parameters:
       - in: path
