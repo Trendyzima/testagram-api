@@ -112,7 +112,6 @@ paths:
       tags: [Identity]
       summary: Retrieve applicant-scoped application status
       security: []
-      security: []
       parameters:
         - in: path
           name: application_id
