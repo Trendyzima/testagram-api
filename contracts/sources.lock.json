@@ -233,7 +233,6 @@
         ".github/workflows/tv-health-monitor.yml",
         "tool/tv_health_monitor.mjs",
         "docs/tv-channel-cache-policy.md",
-        "docs/xclone-client-extraction.md",
         "lib/features/tv/tv_channel_cache_policy.dart",
         "test/features/tv/tv_channel_cache_policy_test.dart",
         "lib/features/auth/auth_screen.dart",
