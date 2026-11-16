@@ -2121,7 +2121,1468 @@ components:
       properties:
         protocol: { type: string, enum: [activitypub, atproto] }
         actor_uri: { type: [string, 'null'], format: uri, maxLength: 2048 }
-        did: { type: [string, 'null'], pattern: '^did:[a-z0-9]+:[A-Za-z0-9._:%-]+      additionalProperties: false
+        did: { type: [string, 'null'], pattern: '^did:[a-z0-9]+:[A-Za-z0-9._:%-]+      required: [id, content, created_at, author_id, user_id, visibility, language, media_ids, media_urls, media_content_types, is_video, video_url, image_url, likes_count, replies_count, reposts_count, profiles, user_profiles]
+      properties:
+        id: { type: string, format: uuid }
+        content: { type: string }
+        created_at: { type: string, format: date-time }
+        author_id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        visibility: { type: string, enum: [public, followers, private] }
+        language: { type: string }
+        media_ids: { type: array, items: { type: string } }
+        media_urls: { type: array, items: { type: string, format: uri } }
+        media_content_types: { type: array, items: { type: string } }
+        media_auth_headers: { type: object, additionalProperties: { type: string } }
+        is_video: { type: boolean }
+        video_url: { type: string }
+        image_url: { type: string }
+        likes_count: { type: integer, minimum: 0 }
+        replies_count: { type: integer, minimum: 0 }
+        reposts_count: { type: integer, minimum: 0 }
+        profiles: { type: object, additionalProperties: true }
+        user_profiles: { type: object, additionalProperties: true }
+    SocialPostEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data: { $ref: '#/components/schemas/SocialPost' }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PostInteraction:
+      type: object
+      additionalProperties: false
+      required: [id, user_id, post_id, created_at, profile, user_profiles]
+      properties:
+        id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        post_id: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+        profile: { type: object, additionalProperties: true }
+        user_profiles: { type: object, additionalProperties: true }
+        quote: { type: string }
+        content: { type: string }
+        quoted_post_id: { type: string, format: uuid }
+    PostInteractionsEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [items, has_more]
+          properties:
+            items:
+              type: array
+              items: { $ref: '#/components/schemas/PostInteraction' }
+            has_more: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadLikeEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, liked]
+          properties:
+            thread_id: { type: string, format: uuid }
+            liked: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadRepostEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, reposted]
+          properties:
+            thread_id: { type: string, format: uuid }
+            reposted: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadBookmarkEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, bookmarked]
+          properties:
+            thread_id: { type: string, format: uuid }
+            bookmarked: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadMediaEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, attached, media]
+          properties:
+            thread_id: { type: string, format: uuid }
+            attached: { const: true }
+            media:
+              type: object
+              additionalProperties: false
+              required: [url, name, type, size]
+              properties:
+                key: { type: string }
+                url: { type: string, format: uri }
+                name: { type: string }
+                type: { type: string }
+                size: { type: integer, minimum: 1 }
+    TvChannel:
+      type: object
+      additionalProperties: false
+      required: [id, name, playback_type, availability, updated_at]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 256 }
+        name: { type: string, minLength: 1, maxLength: 160 }
+        description: { type: string, maxLength: 2000 }
+        logo_url: { type: string, format: uri }
+        country_code: { type: string, pattern: "^[A-Z]{2}$" }
+        language: { type: string, maxLength: 16 }
+        categories:
+          type: array
+          maxItems: 20
+          items: { type: string, maxLength: 64 }
+        website_url: { type: string, format: uri }
+        playback_type: { type: string, enum: [hls, dash, mp4, external] }
+        availability: { type: string, enum: [available, degraded, offline, scheduled, unknown] }
+        health_checked_at: { type: [string, 'null'], format: date-time }
+        updated_at: { type: string, format: date-time }
+    TvChannelPage:
+      type: object
+      additionalProperties: false
+      required: [items, next_cursor]
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/TvChannel' }
+        next_cursor: { type: [string, 'null'], maxLength: 2048 }
+    TvPlaybackGrant:
+      type: object
+      additionalProperties: false
+      required: [channel_id, playback_url, expires_at, playback_type]
+      properties:
+        channel_id: { type: string, minLength: 1, maxLength: 256 }
+        playback_url: { type: string, format: uri }
+        expires_at: { type: string, format: date-time }
+        playback_type: { type: string, enum: [hls, dash, mp4, external] }
+        required_headers:
+          type: object
+          maxProperties: 8
+          additionalProperties: { type: string, maxLength: 512 }
+    IdentityApplicationCreateResponse:
+      oneOf:
+        - $ref: '#/components/schemas/IdentityApplicationCreated'
+        - $ref: '#/components/schemas/IdentityApplicationResumed'
+        - $ref: '#/components/schemas/IdentityApplicationAccepted'
+    IdentityApplicationCreated:
+      type: object
+      additionalProperties: false
+      required: [ok, application_id, application_token, verification_session_id, verification_session_token, status, adult_verification_status, verification_method, expires_in_seconds]
+      properties:
+        ok: { const: true }
+        application_id: { type: string, format: uuid }
+        application_token: { type: string, minLength: 32, maxLength: 128 }
+        verification_session_id: { type: string, format: uuid }
+        verification_session_token: { type: string, minLength: 32, maxLength: 128 }
+        status: { type: string, const: verification_pending }
+        adult_verification_status: { type: string, const: pending }
+        verification_method: { type: string, const: manual_review }
+        expires_in_seconds: { type: integer, minimum: 1, maximum: 86400 }
+    IdentityApplicationResumed:
+      type: object
+      additionalProperties: false
+      required: [ok, application_id, application_token, verification_session_id, verification_session_token, status, verification_method]
+      properties:
+        ok: { const: true }
+        application_id: { type: string, format: uuid }
+        application_token: { type: string, minLength: 32, maxLength: 128 }
+        verification_session_id: { type: string, const: "" }
+        verification_session_token: { type: string, const: "" }
+        status: { type: string, maxLength: 32 }
+        verification_method: { type: string, const: existing_application }
+    IdentityApplicationAccepted:
+      type: object
+      additionalProperties: false
+      required: [ok, message]
+      properties:
+        ok: { const: true }
+        message: { type: string, minLength: 1, maxLength: 256 }
+    IdentityApplicationStatus:
+      type: object
+      additionalProperties: false
+      required: [application_id, status, adult_verification_status, adult_verification_threshold, verification_session_id, updated_at]
+      properties:
+        application_id: { type: string, format: uuid }
+        status: { type: string, maxLength: 32 }
+        adult_verification_status: { type: string, maxLength: 32 }
+        adult_verification_threshold: { type: integer, const: 18 }
+        verification_session_id:
+          oneOf:
+            - type: string
+              minLength: 36
+              maxLength: 36
+              pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+            - type: string
+              const: ""
+        updated_at: { type: string, format: date-time }
+    IdentityVerificationSessionStatus:
+      type: object
+      additionalProperties: false
+      required: [session_id, application_id, purpose, status, created_at, expires_at, submitted_at]
+      properties:
+        session_id: { type: string, format: uuid }
+        application_id: { type: string, format: uuid }
+        purpose: { type: string, const: age_assurance }
+        status: { type: string, maxLength: 32 }
+        created_at: { type: string, format: date-time }
+        expires_at: { type: string, format: date-time }
+        submitted_at: { type: [string, 'null'], format: date-time }
+    ExtensibleObject:
+      type: object
+      additionalProperties: true
+      description: Temporary extensible schema. Replace with an implementation-backed DTO when exact wire shape is verified.
+    PostCreateEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [id, author_id, content, visibility, created_at, idempotent_replay]
+          properties:
+            id: { type: string }
+            author_id: { type: string, format: uuid }
+            content: { type: string, minLength: 1, maxLength: 5000 }
+            visibility: { type: string, enum: [public, followers, private] }
+            created_at: { type: string, format: date-time }
+            idempotent_replay: { const: false }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PostCreateReplayEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [id, idempotent_replay]
+          properties:
+            id: { type: string }
+            idempotent_replay: { const: true }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ModerationReviewEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: false }
+        data:
+          type: object
+          additionalProperties: true
+          description: Moderation result returned for review; exact provider DTO remains owned by the Backend.
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { const: CONTENT_REQUIRES_REVIEW }
+            message: { type: string }
+          additionalProperties: false
+        request_id: { type: string }
+    ApiError:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: false }
+        data: { type: 'null' }
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }
+          additionalProperties: false
+        request_id: { type: string }
+      additionalProperties: true
+  responses:
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    Unauthorized:
+      description: Missing, expired or invalid Appwrite session JWT.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    Forbidden:
+      description: The Appwrite session is valid, but the account is inactive or has not completed Testagram's independent identity review, two-person approval and canonical provisioning workflow. Use IDENTITY_APPROVAL_REQUIRED for missing approval, EMAIL_VERIFICATION_REQUIRED for an unverified email, and AUTH_FORBIDDEN for another account-level denial.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    NotFound:
+      description: Resource not found or not visible to the caller.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    RequestTooLarge:
+      description: Request body or uploaded media exceeds the configured byte limit.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    RateLimited:
+      description: Request rate limit exceeded.
+      headers:
+        Retry-After:
+          schema: { type: integer }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    ServiceUnavailable:
+      description: Backend or required dependency is not ready.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+, maxLength: 512 }
+        handle: { type: [string, 'null'], maxLength: 253 }
+        instance: { type: [string, 'null'], maxLength: 253 }
+    FeedMedia:
+      type: object
+      additionalProperties: false
+      required: [id, media_type, alt_text, url, width, height]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 256 }
+        media_type: { type: string, enum: [image, video, audio, unknown] }
+        alt_text: { type: [string, 'null'], maxLength: 2000 }
+        url: { type: string, format: uri, maxLength: 2048, description: Backend/CDN-authorized delivery URL; never an arbitrary upstream URL. }
+        width: { type: [integer, 'null'], minimum: 1, maximum: 20000 }
+        height: { type: [integer, 'null'], minimum: 1, maximum: 20000 }
+    FeedMetrics:
+      type: object
+      additionalProperties: false
+      required: [likes, replies, reposts]
+      properties:
+        likes: { type: integer, minimum: 0 }
+        replies: { type: integer, minimum: 0 }
+        reposts: { type: integer, minimum: 0 }
+    FeedInteractionCapabilities:
+      type: object
+      additionalProperties: false
+      required: [like, reply, repost, quote, follow_author]
+      properties:
+        like: { type: boolean }
+        reply: { type: boolean }
+        repost: { type: boolean }
+        quote: { type: boolean }
+        follow_author: { type: boolean }
+    SocialPost:
+      type: object
+      additionalProperties: false
+      required: [id, content, created_at, author_id, user_id, visibility, language, media_ids, media_urls, media_content_types, is_video, video_url, image_url, likes_count, replies_count, reposts_count, profiles, user_profiles]
+      properties:
+        id: { type: string, format: uuid }
+        content: { type: string }
+        created_at: { type: string, format: date-time }
+        author_id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        visibility: { type: string, enum: [public, followers, private] }
+        language: { type: string }
+        media_ids: { type: array, items: { type: string } }
+        media_urls: { type: array, items: { type: string, format: uri } }
+        media_content_types: { type: array, items: { type: string } }
+        media_auth_headers: { type: object, additionalProperties: { type: string } }
+        is_video: { type: boolean }
+        video_url: { type: string }
+        image_url: { type: string }
+        likes_count: { type: integer, minimum: 0 }
+        replies_count: { type: integer, minimum: 0 }
+        reposts_count: { type: integer, minimum: 0 }
+        profiles: { type: object, additionalProperties: true }
+        user_profiles: { type: object, additionalProperties: true }
+    SocialPostEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data: { $ref: '#/components/schemas/SocialPost' }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PostInteraction:
+      type: object
+      additionalProperties: false
+      required: [id, user_id, post_id, created_at, profile, user_profiles]
+      properties:
+        id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        post_id: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+        profile: { type: object, additionalProperties: true }
+        user_profiles: { type: object, additionalProperties: true }
+        quote: { type: string }
+        content: { type: string }
+        quoted_post_id: { type: string, format: uuid }
+    PostInteractionsEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [items, has_more]
+          properties:
+            items:
+              type: array
+              items: { $ref: '#/components/schemas/PostInteraction' }
+            has_more: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadLikeEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, liked]
+          properties:
+            thread_id: { type: string, format: uuid }
+            liked: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadRepostEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, reposted]
+          properties:
+            thread_id: { type: string, format: uuid }
+            reposted: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadBookmarkEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, bookmarked]
+          properties:
+            thread_id: { type: string, format: uuid }
+            bookmarked: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadMediaEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, attached, media]
+          properties:
+            thread_id: { type: string, format: uuid }
+            attached: { const: true }
+            media:
+              type: object
+              additionalProperties: false
+              required: [url, name, type, size]
+              properties:
+                key: { type: string }
+                url: { type: string, format: uri }
+                name: { type: string }
+                type: { type: string }
+                size: { type: integer, minimum: 1 }
+    TvChannel:
+      type: object
+      additionalProperties: false
+      required: [id, name, playback_type, availability, updated_at]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 256 }
+        name: { type: string, minLength: 1, maxLength: 160 }
+        description: { type: string, maxLength: 2000 }
+        logo_url: { type: string, format: uri }
+        country_code: { type: string, pattern: "^[A-Z]{2}$" }
+        language: { type: string, maxLength: 16 }
+        categories:
+          type: array
+          maxItems: 20
+          items: { type: string, maxLength: 64 }
+        website_url: { type: string, format: uri }
+        playback_type: { type: string, enum: [hls, dash, mp4, external] }
+        availability: { type: string, enum: [available, degraded, offline, scheduled, unknown] }
+        health_checked_at: { type: [string, 'null'], format: date-time }
+        updated_at: { type: string, format: date-time }
+    TvChannelPage:
+      type: object
+      additionalProperties: false
+      required: [items, next_cursor]
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/TvChannel' }
+        next_cursor: { type: [string, 'null'], maxLength: 2048 }
+    TvPlaybackGrant:
+      type: object
+      additionalProperties: false
+      required: [channel_id, playback_url, expires_at, playback_type]
+      properties:
+        channel_id: { type: string, minLength: 1, maxLength: 256 }
+        playback_url: { type: string, format: uri }
+        expires_at: { type: string, format: date-time }
+        playback_type: { type: string, enum: [hls, dash, mp4, external] }
+        required_headers:
+          type: object
+          maxProperties: 8
+          additionalProperties: { type: string, maxLength: 512 }
+    IdentityApplicationCreateResponse:
+      oneOf:
+        - $ref: '#/components/schemas/IdentityApplicationCreated'
+        - $ref: '#/components/schemas/IdentityApplicationResumed'
+        - $ref: '#/components/schemas/IdentityApplicationAccepted'
+    IdentityApplicationCreated:
+      type: object
+      additionalProperties: false
+      required: [ok, application_id, application_token, verification_session_id, verification_session_token, status, adult_verification_status, verification_method, expires_in_seconds]
+      properties:
+        ok: { const: true }
+        application_id: { type: string, format: uuid }
+        application_token: { type: string, minLength: 32, maxLength: 128 }
+        verification_session_id: { type: string, format: uuid }
+        verification_session_token: { type: string, minLength: 32, maxLength: 128 }
+        status: { type: string, const: verification_pending }
+        adult_verification_status: { type: string, const: pending }
+        verification_method: { type: string, const: manual_review }
+        expires_in_seconds: { type: integer, minimum: 1, maximum: 86400 }
+    IdentityApplicationResumed:
+      type: object
+      additionalProperties: false
+      required: [ok, application_id, application_token, verification_session_id, verification_session_token, status, verification_method]
+      properties:
+        ok: { const: true }
+        application_id: { type: string, format: uuid }
+        application_token: { type: string, minLength: 32, maxLength: 128 }
+        verification_session_id: { type: string, const: "" }
+        verification_session_token: { type: string, const: "" }
+        status: { type: string, maxLength: 32 }
+        verification_method: { type: string, const: existing_application }
+    IdentityApplicationAccepted:
+      type: object
+      additionalProperties: false
+      required: [ok, message]
+      properties:
+        ok: { const: true }
+        message: { type: string, minLength: 1, maxLength: 256 }
+    IdentityApplicationStatus:
+      type: object
+      additionalProperties: false
+      required: [application_id, status, adult_verification_status, adult_verification_threshold, verification_session_id, updated_at]
+      properties:
+        application_id: { type: string, format: uuid }
+        status: { type: string, maxLength: 32 }
+        adult_verification_status: { type: string, maxLength: 32 }
+        adult_verification_threshold: { type: integer, const: 18 }
+        verification_session_id:
+          oneOf:
+            - type: string
+              minLength: 36
+              maxLength: 36
+              pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+            - type: string
+              const: ""
+        updated_at: { type: string, format: date-time }
+    IdentityVerificationSessionStatus:
+      type: object
+      additionalProperties: false
+      required: [session_id, application_id, purpose, status, created_at, expires_at, submitted_at]
+      properties:
+        session_id: { type: string, format: uuid }
+        application_id: { type: string, format: uuid }
+        purpose: { type: string, const: age_assurance }
+        status: { type: string, maxLength: 32 }
+        created_at: { type: string, format: date-time }
+        expires_at: { type: string, format: date-time }
+        submitted_at: { type: [string, 'null'], format: date-time }
+    ExtensibleObject:
+      type: object
+      additionalProperties: true
+      description: Temporary extensible schema. Replace with an implementation-backed DTO when exact wire shape is verified.
+    PostCreateEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [id, author_id, content, visibility, created_at, idempotent_replay]
+          properties:
+            id: { type: string }
+            author_id: { type: string, format: uuid }
+            content: { type: string, minLength: 1, maxLength: 5000 }
+            visibility: { type: string, enum: [public, followers, private] }
+            created_at: { type: string, format: date-time }
+            idempotent_replay: { const: false }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PostCreateReplayEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [id, idempotent_replay]
+          properties:
+            id: { type: string }
+            idempotent_replay: { const: true }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ModerationReviewEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: false }
+        data:
+          type: object
+          additionalProperties: true
+          description: Moderation result returned for review; exact provider DTO remains owned by the Backend.
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { const: CONTENT_REQUIRES_REVIEW }
+            message: { type: string }
+          additionalProperties: false
+        request_id: { type: string }
+    ApiError:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: false }
+        data: { type: 'null' }
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }
+          additionalProperties: false
+        request_id: { type: string }
+      additionalProperties: true
+  responses:
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    Unauthorized:
+      description: Missing, expired or invalid Appwrite session JWT.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    Forbidden:
+      description: The Appwrite session is valid, but the account is inactive or has not completed Testagram's independent identity review, two-person approval and canonical provisioning workflow. Use IDENTITY_APPROVAL_REQUIRED for missing approval, EMAIL_VERIFICATION_REQUIRED for an unverified email, and AUTH_FORBIDDEN for another account-level denial.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    NotFound:
+      description: Resource not found or not visible to the caller.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    RequestTooLarge:
+      description: Request body or uploaded media exceeds the configured byte limit.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    RateLimited:
+      description: Request rate limit exceeded.
+      headers:
+        Retry-After:
+          schema: { type: integer }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    ServiceUnavailable:
+      description: Backend or required dependency is not ready.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+, maxLength: 512 }
+        handle: { type: [string, 'null'], maxLength: 253 }
+        instance: { type: [string, 'null'], maxLength: 253 }
+    SocialPost:
+      type: object
+      additionalProperties: false
+      required: [id, content, created_at, author_id, user_id, visibility, language, media_ids, media_urls, media_content_types, is_video, video_url, image_url, likes_count, replies_count, reposts_count, profiles, user_profiles]
+      properties:
+        id: { type: string, format: uuid }
+        content: { type: string }
+        created_at: { type: string, format: date-time }
+        author_id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        visibility: { type: string, enum: [public, followers, private] }
+        language: { type: string }
+        media_ids: { type: array, items: { type: string } }
+        media_urls: { type: array, items: { type: string, format: uri } }
+        media_content_types: { type: array, items: { type: string } }
+        media_auth_headers: { type: object, additionalProperties: { type: string } }
+        is_video: { type: boolean }
+        video_url: { type: string }
+        image_url: { type: string }
+        likes_count: { type: integer, minimum: 0 }
+        replies_count: { type: integer, minimum: 0 }
+        reposts_count: { type: integer, minimum: 0 }
+        profiles: { type: object, additionalProperties: true }
+        user_profiles: { type: object, additionalProperties: true }
+    SocialPostEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data: { $ref: '#/components/schemas/SocialPost' }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PostInteraction:
+      type: object
+      additionalProperties: false
+      required: [id, user_id, post_id, created_at, profile, user_profiles]
+      properties:
+        id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        post_id: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+        profile: { type: object, additionalProperties: true }
+        user_profiles: { type: object, additionalProperties: true }
+        quote: { type: string }
+        content: { type: string }
+        quoted_post_id: { type: string, format: uuid }
+    PostInteractionsEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [items, has_more]
+          properties:
+            items:
+              type: array
+              items: { $ref: '#/components/schemas/PostInteraction' }
+            has_more: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadLikeEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, liked]
+          properties:
+            thread_id: { type: string, format: uuid }
+            liked: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadRepostEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, reposted]
+          properties:
+            thread_id: { type: string, format: uuid }
+            reposted: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadBookmarkEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, bookmarked]
+          properties:
+            thread_id: { type: string, format: uuid }
+            bookmarked: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadMediaEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, attached, media]
+          properties:
+            thread_id: { type: string, format: uuid }
+            attached: { const: true }
+            media:
+              type: object
+              additionalProperties: false
+              required: [url, name, type, size]
+              properties:
+                key: { type: string }
+                url: { type: string, format: uri }
+                name: { type: string }
+                type: { type: string }
+                size: { type: integer, minimum: 1 }
+    TvChannel:
+      type: object
+      additionalProperties: false
+      required: [id, name, playback_type, availability, updated_at]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 256 }
+        name: { type: string, minLength: 1, maxLength: 160 }
+        description: { type: string, maxLength: 2000 }
+        logo_url: { type: string, format: uri }
+        country_code: { type: string, pattern: "^[A-Z]{2}$" }
+        language: { type: string, maxLength: 16 }
+        categories:
+          type: array
+          maxItems: 20
+          items: { type: string, maxLength: 64 }
+        website_url: { type: string, format: uri }
+        playback_type: { type: string, enum: [hls, dash, mp4, external] }
+        availability: { type: string, enum: [available, degraded, offline, scheduled, unknown] }
+        health_checked_at: { type: [string, 'null'], format: date-time }
+        updated_at: { type: string, format: date-time }
+    TvChannelPage:
+      type: object
+      additionalProperties: false
+      required: [items, next_cursor]
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/TvChannel' }
+        next_cursor: { type: [string, 'null'], maxLength: 2048 }
+    TvPlaybackGrant:
+      type: object
+      additionalProperties: false
+      required: [channel_id, playback_url, expires_at, playback_type]
+      properties:
+        channel_id: { type: string, minLength: 1, maxLength: 256 }
+        playback_url: { type: string, format: uri }
+        expires_at: { type: string, format: date-time }
+        playback_type: { type: string, enum: [hls, dash, mp4, external] }
+        required_headers:
+          type: object
+          maxProperties: 8
+          additionalProperties: { type: string, maxLength: 512 }
+    IdentityApplicationCreateResponse:
+      oneOf:
+        - $ref: '#/components/schemas/IdentityApplicationCreated'
+        - $ref: '#/components/schemas/IdentityApplicationResumed'
+        - $ref: '#/components/schemas/IdentityApplicationAccepted'
+    IdentityApplicationCreated:
+      type: object
+      additionalProperties: false
+      required: [ok, application_id, application_token, verification_session_id, verification_session_token, status, adult_verification_status, verification_method, expires_in_seconds]
+      properties:
+        ok: { const: true }
+        application_id: { type: string, format: uuid }
+        application_token: { type: string, minLength: 32, maxLength: 128 }
+        verification_session_id: { type: string, format: uuid }
+        verification_session_token: { type: string, minLength: 32, maxLength: 128 }
+        status: { type: string, const: verification_pending }
+        adult_verification_status: { type: string, const: pending }
+        verification_method: { type: string, const: manual_review }
+        expires_in_seconds: { type: integer, minimum: 1, maximum: 86400 }
+    IdentityApplicationResumed:
+      type: object
+      additionalProperties: false
+      required: [ok, application_id, application_token, verification_session_id, verification_session_token, status, verification_method]
+      properties:
+        ok: { const: true }
+        application_id: { type: string, format: uuid }
+        application_token: { type: string, minLength: 32, maxLength: 128 }
+        verification_session_id: { type: string, const: "" }
+        verification_session_token: { type: string, const: "" }
+        status: { type: string, maxLength: 32 }
+        verification_method: { type: string, const: existing_application }
+    IdentityApplicationAccepted:
+      type: object
+      additionalProperties: false
+      required: [ok, message]
+      properties:
+        ok: { const: true }
+        message: { type: string, minLength: 1, maxLength: 256 }
+    IdentityApplicationStatus:
+      type: object
+      additionalProperties: false
+      required: [application_id, status, adult_verification_status, adult_verification_threshold, verification_session_id, updated_at]
+      properties:
+        application_id: { type: string, format: uuid }
+        status: { type: string, maxLength: 32 }
+        adult_verification_status: { type: string, maxLength: 32 }
+        adult_verification_threshold: { type: integer, const: 18 }
+        verification_session_id:
+          oneOf:
+            - type: string
+              minLength: 36
+              maxLength: 36
+              pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+            - type: string
+              const: ""
+        updated_at: { type: string, format: date-time }
+    IdentityVerificationSessionStatus:
+      type: object
+      additionalProperties: false
+      required: [session_id, application_id, purpose, status, created_at, expires_at, submitted_at]
+      properties:
+        session_id: { type: string, format: uuid }
+        application_id: { type: string, format: uuid }
+        purpose: { type: string, const: age_assurance }
+        status: { type: string, maxLength: 32 }
+        created_at: { type: string, format: date-time }
+        expires_at: { type: string, format: date-time }
+        submitted_at: { type: [string, 'null'], format: date-time }
+    ExtensibleObject:
+      type: object
+      additionalProperties: true
+      description: Temporary extensible schema. Replace with an implementation-backed DTO when exact wire shape is verified.
+    PostCreateEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [id, author_id, content, visibility, created_at, idempotent_replay]
+          properties:
+            id: { type: string }
+            author_id: { type: string, format: uuid }
+            content: { type: string, minLength: 1, maxLength: 5000 }
+            visibility: { type: string, enum: [public, followers, private] }
+            created_at: { type: string, format: date-time }
+            idempotent_replay: { const: false }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PostCreateReplayEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [id, idempotent_replay]
+          properties:
+            id: { type: string }
+            idempotent_replay: { const: true }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ModerationReviewEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: false }
+        data:
+          type: object
+          additionalProperties: true
+          description: Moderation result returned for review; exact provider DTO remains owned by the Backend.
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { const: CONTENT_REQUIRES_REVIEW }
+            message: { type: string }
+          additionalProperties: false
+        request_id: { type: string }
+    ApiError:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: false }
+        data: { type: 'null' }
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }
+          additionalProperties: false
+        request_id: { type: string }
+      additionalProperties: true
+  responses:
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    Unauthorized:
+      description: Missing, expired or invalid Appwrite session JWT.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    Forbidden:
+      description: The Appwrite session is valid, but the account is inactive or has not completed Testagram's independent identity review, two-person approval and canonical provisioning workflow. Use IDENTITY_APPROVAL_REQUIRED for missing approval, EMAIL_VERIFICATION_REQUIRED for an unverified email, and AUTH_FORBIDDEN for another account-level denial.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    NotFound:
+      description: Resource not found or not visible to the caller.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    RequestTooLarge:
+      description: Request body or uploaded media exceeds the configured byte limit.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    RateLimited:
+      description: Request rate limit exceeded.
+      headers:
+        Retry-After:
+          schema: { type: integer }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    ServiceUnavailable:
+      description: Backend or required dependency is not ready.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+, maxLength: 512 }
+        handle: { type: [string, 'null'], maxLength: 253 }
+        instance: { type: [string, 'null'], maxLength: 253 }
+    FeedMedia:
+      type: object
+      additionalProperties: false
+      required: [id, media_type, alt_text, url, width, height]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 256 }
+        media_type: { type: string, enum: [image, video, audio, unknown] }
+        alt_text: { type: [string, 'null'], maxLength: 2000 }
+        url: { type: string, format: uri, maxLength: 2048, description: Backend/CDN-authorized delivery URL; never an arbitrary upstream URL. }
+        width: { type: [integer, 'null'], minimum: 1, maximum: 20000 }
+        height: { type: [integer, 'null'], minimum: 1, maximum: 20000 }
+    FeedMetrics:
+      type: object
+      additionalProperties: false
+      required: [likes, replies, reposts]
+      properties:
+        likes: { type: integer, minimum: 0 }
+        replies: { type: integer, minimum: 0 }
+        reposts: { type: integer, minimum: 0 }
+    FeedInteractionCapabilities:
+      type: object
+      additionalProperties: false
+      required: [like, reply, repost, quote, follow_author]
+      properties:
+        like: { type: boolean }
+        reply: { type: boolean }
+        repost: { type: boolean }
+        quote: { type: boolean }
+        follow_author: { type: boolean }
+    SocialPost:
+      type: object
+      additionalProperties: false
+      required: [id, content, created_at, author_id, user_id, visibility, language, media_ids, media_urls, media_content_types, is_video, video_url, image_url, likes_count, replies_count, reposts_count, profiles, user_profiles]
+      properties:
+        id: { type: string, format: uuid }
+        content: { type: string }
+        created_at: { type: string, format: date-time }
+        author_id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        visibility: { type: string, enum: [public, followers, private] }
+        language: { type: string }
+        media_ids: { type: array, items: { type: string } }
+        media_urls: { type: array, items: { type: string, format: uri } }
+        media_content_types: { type: array, items: { type: string } }
+        media_auth_headers: { type: object, additionalProperties: { type: string } }
+        is_video: { type: boolean }
+        video_url: { type: string }
+        image_url: { type: string }
+        likes_count: { type: integer, minimum: 0 }
+        replies_count: { type: integer, minimum: 0 }
+        reposts_count: { type: integer, minimum: 0 }
+        profiles: { type: object, additionalProperties: true }
+        user_profiles: { type: object, additionalProperties: true }
+    SocialPostEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data: { $ref: '#/components/schemas/SocialPost' }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PostInteraction:
+      type: object
+      additionalProperties: false
+      required: [id, user_id, post_id, created_at, profile, user_profiles]
+      properties:
+        id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        post_id: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+        profile: { type: object, additionalProperties: true }
+        user_profiles: { type: object, additionalProperties: true }
+        quote: { type: string }
+        content: { type: string }
+        quoted_post_id: { type: string, format: uuid }
+    PostInteractionsEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [items, has_more]
+          properties:
+            items:
+              type: array
+              items: { $ref: '#/components/schemas/PostInteraction' }
+            has_more: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadLikeEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, liked]
+          properties:
+            thread_id: { type: string, format: uuid }
+            liked: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadRepostEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, reposted]
+          properties:
+            thread_id: { type: string, format: uuid }
+            reposted: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadBookmarkEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, bookmarked]
+          properties:
+            thread_id: { type: string, format: uuid }
+            bookmarked: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadMediaEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_id, attached, media]
+          properties:
+            thread_id: { type: string, format: uuid }
+            attached: { const: true }
+            media:
+              type: object
+              additionalProperties: false
+              required: [url, name, type, size]
+              properties:
+                key: { type: string }
+                url: { type: string, format: uri }
+                name: { type: string }
+                type: { type: string }
+                size: { type: integer, minimum: 1 }
+    TvChannel:
+      type: object
+      additionalProperties: false
+      required: [id, name, playback_type, availability, updated_at]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 256 }
+        name: { type: string, minLength: 1, maxLength: 160 }
+        description: { type: string, maxLength: 2000 }
+        logo_url: { type: string, format: uri }
+        country_code: { type: string, pattern: "^[A-Z]{2}$" }
+        language: { type: string, maxLength: 16 }
+        categories:
+          type: array
+          maxItems: 20
+          items: { type: string, maxLength: 64 }
+        website_url: { type: string, format: uri }
+        playback_type: { type: string, enum: [hls, dash, mp4, external] }
+        availability: { type: string, enum: [available, degraded, offline, scheduled, unknown] }
+        health_checked_at: { type: [string, 'null'], format: date-time }
+        updated_at: { type: string, format: date-time }
+    TvChannelPage:
+      type: object
+      additionalProperties: false
+      required: [items, next_cursor]
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/TvChannel' }
+        next_cursor: { type: [string, 'null'], maxLength: 2048 }
+    TvPlaybackGrant:
+      type: object
+      additionalProperties: false
+      required: [channel_id, playback_url, expires_at, playback_type]
+      properties:
+        channel_id: { type: string, minLength: 1, maxLength: 256 }
+        playback_url: { type: string, format: uri }
+        expires_at: { type: string, format: date-time }
+        playback_type: { type: string, enum: [hls, dash, mp4, external] }
+        required_headers:
+          type: object
+          maxProperties: 8
+          additionalProperties: { type: string, maxLength: 512 }
+    IdentityApplicationCreateResponse:
+      oneOf:
+        - $ref: '#/components/schemas/IdentityApplicationCreated'
+        - $ref: '#/components/schemas/IdentityApplicationResumed'
+        - $ref: '#/components/schemas/IdentityApplicationAccepted'
+    IdentityApplicationCreated:
+      type: object
+      additionalProperties: false
+      required: [ok, application_id, application_token, verification_session_id, verification_session_token, status, adult_verification_status, verification_method, expires_in_seconds]
+      properties:
+        ok: { const: true }
+        application_id: { type: string, format: uuid }
+        application_token: { type: string, minLength: 32, maxLength: 128 }
+        verification_session_id: { type: string, format: uuid }
+        verification_session_token: { type: string, minLength: 32, maxLength: 128 }
+        status: { type: string, const: verification_pending }
+        adult_verification_status: { type: string, const: pending }
+        verification_method: { type: string, const: manual_review }
+        expires_in_seconds: { type: integer, minimum: 1, maximum: 86400 }
+    IdentityApplicationResumed:
+      type: object
+      additionalProperties: false
+      required: [ok, application_id, application_token, verification_session_id, verification_session_token, status, verification_method]
+      properties:
+        ok: { const: true }
+        application_id: { type: string, format: uuid }
+        application_token: { type: string, minLength: 32, maxLength: 128 }
+        verification_session_id: { type: string, const: "" }
+        verification_session_token: { type: string, const: "" }
+        status: { type: string, maxLength: 32 }
+        verification_method: { type: string, const: existing_application }
+    IdentityApplicationAccepted:
+      type: object
+      additionalProperties: false
+      required: [ok, message]
+      properties:
+        ok: { const: true }
+        message: { type: string, minLength: 1, maxLength: 256 }
+    IdentityApplicationStatus:
+      type: object
+      additionalProperties: false
+      required: [application_id, status, adult_verification_status, adult_verification_threshold, verification_session_id, updated_at]
+      properties:
+        application_id: { type: string, format: uuid }
+        status: { type: string, maxLength: 32 }
+        adult_verification_status: { type: string, maxLength: 32 }
+        adult_verification_threshold: { type: integer, const: 18 }
+        verification_session_id:
+          oneOf:
+            - type: string
+              minLength: 36
+              maxLength: 36
+              pattern: '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$'
+            - type: string
+              const: ""
+        updated_at: { type: string, format: date-time }
+    IdentityVerificationSessionStatus:
+      type: object
+      additionalProperties: false
+      required: [session_id, application_id, purpose, status, created_at, expires_at, submitted_at]
+      properties:
+        session_id: { type: string, format: uuid }
+        application_id: { type: string, format: uuid }
+        purpose: { type: string, const: age_assurance }
+        status: { type: string, maxLength: 32 }
+        created_at: { type: string, format: date-time }
+        expires_at: { type: string, format: date-time }
+        submitted_at: { type: [string, 'null'], format: date-time }
+    ExtensibleObject:
+      type: object
+      additionalProperties: true
+      description: Temporary extensible schema. Replace with an implementation-backed DTO when exact wire shape is verified.
+    PostCreateEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [id, author_id, content, visibility, created_at, idempotent_replay]
+          properties:
+            id: { type: string }
+            author_id: { type: string, format: uuid }
+            content: { type: string, minLength: 1, maxLength: 5000 }
+            visibility: { type: string, enum: [public, followers, private] }
+            created_at: { type: string, format: date-time }
+            idempotent_replay: { const: false }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PostCreateReplayEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          required: [id, idempotent_replay]
+          properties:
+            id: { type: string }
+            idempotent_replay: { const: true }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ModerationReviewEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: false }
+        data:
+          type: object
+          additionalProperties: true
+          description: Moderation result returned for review; exact provider DTO remains owned by the Backend.
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { const: CONTENT_REQUIRES_REVIEW }
+            message: { type: string }
+          additionalProperties: false
+        request_id: { type: string }
+    ApiError:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: false }
+        data: { type: 'null' }
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }
+          additionalProperties: false
+        request_id: { type: string }
+      additionalProperties: true
+  responses:
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    Unauthorized:
+      description: Missing, expired or invalid Appwrite session JWT.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    Forbidden:
+      description: The Appwrite session is valid, but the account is inactive or has not completed Testagram's independent identity review, two-person approval and canonical provisioning workflow. Use IDENTITY_APPROVAL_REQUIRED for missing approval, EMAIL_VERIFICATION_REQUIRED for an unverified email, and AUTH_FORBIDDEN for another account-level denial.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    NotFound:
+      description: Resource not found or not visible to the caller.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    RequestTooLarge:
+      description: Request body or uploaded media exceeds the configured byte limit.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    RateLimited:
+      description: Request rate limit exceeded.
+      headers:
+        Retry-After:
+          schema: { type: integer }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+    ServiceUnavailable:
+      description: Backend or required dependency is not ready.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ApiError' }
+, maxLength: 512 }
+        handle: { type: [string, 'null'], maxLength: 253 }
+        instance: { type: [string, 'null'], maxLength: 253 }
+    SocialPost:
+      type: object
+      additionalProperties: false
       required: [id, content, created_at, author_id, user_id, visibility, language, media_ids, media_urls, media_content_types, is_video, video_url, image_url, likes_count, replies_count, reposts_count, profiles, user_profiles]
       properties:
         id: { type: string, format: uuid }
