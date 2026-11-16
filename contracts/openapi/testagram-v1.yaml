@@ -464,12 +464,18 @@ paths:
       operationId: getHomeFeed
       tags: [Feed]
       summary: Retrieve the authorized home timeline
-      description: Supports named, composable feed lanes and opaque cursor pagination. Backend performs authorization, candidate selection and ranking orchestration; the private Algorithm service only orders Backend-authorized candidate IDs. The `feed` lane defaults to `for_you`; `following` restricts to accepted follows; `latest` uses chronological order; `media` filters to posts with media; and `discover` selects public posts from accounts the viewer does not follow. The `video_only` filter composes with the authorized timeline and returns only posts containing ready public video assets. The legacy following_only boolean remains supported. Private media URLs may include a parallel `media_auth_headers` map keyed by exact URL; clients must attach the matching Authorization header and must not cache these short-lived bearer assertions.
+      description: >-
+        Returns a normalized timeline of Testagram-native and eligible public remote posts. Backend is the
+        sole authorization boundary and applies visibility, block, mute, moderation, deletion and source-policy
+        checks before candidates reach the private Algorithm service. Algorithm may only reorder supplied IDs.
+        Remote ActivityPub and AT Protocol items are read-only unless an explicit interaction capability is true.
+        Cursors are opaque and bound to the viewer and selected lane. Media URLs must be Testagram CDN URLs;
+        clients must never fetch arbitrary upstream media URLs.
       parameters:
         - in: query
           name: feed
           required: false
-          schema: { type: string, enum: [for_you, following, latest, media, discover], default: for_you }
+          schema: { type: string, enum: [for_you, following, latest, media, discover, federated], default: for_you }
           description: Select a server-defined feed generator lane; clients cannot supply ranking weights or candidate IDs.
         - in: query
           name: following_only
@@ -482,6 +488,16 @@ paths:
           schema: { type: boolean, default: false }
           description: Set true to return only posts with at least one ready, public video attachment. Backend applies post visibility, block, mute, ownership and media-readiness checks before returning a playback URL.
         - in: query
+          name: sources
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: array
+            uniqueItems: true
+            items: { type: string, enum: [native, activitypub, atproto] }
+          description: Optional source allowlist; Backend still enforces visibility and source policy.
+        - in: query
           name: before
           required: false
           schema: { type: string }
@@ -492,10 +508,10 @@ paths:
           schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
       responses:
         '200':
-          description: Authorized feed page. Exact payload schema is pending wire-level verification.
+          description: Authorized, normalized mixed-source feed page.
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+              schema: { $ref: '#/components/schemas/UnifiedFeedEnvelope' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
         '429': { $ref: '#/components/responses/RateLimited' }
@@ -2052,6 +2068,77 @@ components:
             next_cursor: { type: string }
         error: { type: 'null' }
         request_id: { type: string }
+    UnifiedFeedEnvelope:
+      type: object
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data: { $ref: '#/components/schemas/UnifiedFeedPage' }
+        error: { type: 'null' }
+        request_id: { type: string }
+    UnifiedFeedPage:
+      type: object
+      required: [posts, next_cursor, has_more, ranking_mode, feed_mode]
+      properties:
+        posts:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/UnifiedFeedItem' }
+        next_cursor: { type: [string, 'null'], maxLength: 2048 }
+        has_more: { type: boolean }
+        ranking_mode: { type: string, enum: [algorithm, chronological] }
+        feed_mode: { type: string, enum: [for_you, following, latest, media, discover, federated] }
+        video_only: { type: boolean }
+    UnifiedFeedItem:
+      type: object
+      additionalProperties: true
+      required: [id, content, created_at, origin, author]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 256, description: Opaque stable feed ID; not necessarily a UUID. }
+        user_id: { type: [string, 'null'], format: uuid }
+        content: { type: string, maxLength: 100000 }
+        visibility: { type: string, enum: [public, unlisted, followers, private, direct] }
+        created_at: { type: string, format: date-time }
+        origin: { type: string, enum: [local, activitypub, atproto] }
+        source_post_id: { type: [string, 'null'], maxLength: 2048 }
+        canonical_uri: { type: [string, 'null'], format: uri, maxLength: 2048 }
+        atproto_cid: { type: [string, 'null'], maxLength: 256 }
+        author:
+          type: object
+          required: [id, protected_account]
+          properties:
+            id: { type: string, maxLength: 2048, description: Local UUID or protocol-native remote identity; never an account-linking assertion. }
+            username: { type: [string, 'null'], maxLength: 253 }
+            display_name: { type: [string, 'null'], maxLength: 256 }
+            avatar_url: { type: [string, 'null'], format: uri }
+            profile_url: { type: [string, 'null'], format: uri }
+            protected_account: { type: boolean }
+            kind: { type: string, enum: [local, remote] }
+            source_identity:
+              type: object
+              properties:
+                protocol: { type: string, enum: [activitypub, atproto] }
+                actor_uri: { type: [string, 'null'], format: uri, maxLength: 2048 }
+                did: { type: [string, 'null'], maxLength: 512 }
+                handle: { type: [string, 'null'], maxLength: 253 }
+                instance: { type: [string, 'null'], maxLength: 253 }
+        media_urls: { type: array, maxItems: 20, items: { type: string, format: uri, maxLength: 2048 } }
+        media_auth_headers: { type: object, additionalProperties: { type: string } }
+        media_content_types: { type: array, items: { type: string, maxLength: 128 } }
+        likes_count: { type: integer, minimum: 0 }
+        replies_count: { type: integer, minimum: 0 }
+        reposts_count: { type: integer, minimum: 0 }
+        capabilities:
+          type: object
+          required: [like, reply, repost, quote, follow_author]
+          properties:
+            like: { type: boolean }
+            reply: { type: boolean }
+            repost: { type: boolean }
+            quote: { type: boolean }
+            follow_author: { type: boolean }
+        ranking_score: { type: number, minimum: 0, maximum: 1 }
+        ranking_reasons: { type: array, maxItems: 8, items: { type: string, maxLength: 128 } }
     SocialPost:
       type: object
       additionalProperties: false
