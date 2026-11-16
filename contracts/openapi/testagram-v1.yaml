@@ -2067,7 +2067,7 @@ components:
     UnifiedFeedItem:
       type: object
       additionalProperties: true
-      required: [id, content, created_at, origin, author, capabilities]
+      required: [id, content, created_at, origin, author]
       properties:
         id: { type: string, minLength: 1, maxLength: 256, description: Opaque stable feed ID; not necessarily a UUID. }
         user_id: { type: [string, 'null'], format: uuid }
