@@ -1,0 +1,202 @@
+openapi: 3.1.0
+info:
+  title: Testagram Private Federation Feed API
+  version: 1.0.0
+  summary: Backend-to-Federation internal contract for authorized remote feed source retrieval.
+  description: |
+    This contract is private service-to-service traffic. The Backend is the
+    only viewer-authorization authority. It supplies the exact actor URI or DID
+    allowlist after applying viewer-specific follows, blocks, mutes, moderation
+    and visibility policy. Federation retrieves public source material and
+    returns protocol-native identities; it never provisions Testagram accounts.
+servers:
+  - url: http://federation:8081
+    description: Private Docker/service network only; never expose to mobile clients.
+security:
+  - backendServiceBearer: []
+paths:
+  /internal/v1/remote-objects:
+    post:
+      operationId: getAuthorizedActivityPubFeedCandidates
+      summary: Retrieve public ActivityPub projections for Backend-authorized actors
+      description: |
+        Returns only non-deleted public and unlisted remote objects for the
+        exact actor URI allowlist. Followers-only and direct objects are
+        excluded. Backend must re-check all viewer permissions before ranking
+        and before returning any candidate to a client.
+      parameters:
+        - in: header
+          name: X-Testagram-API-Version
+          required: true
+          schema: { type: string, const: '1' }
+        - in: header
+          name: X-Request-ID
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 128 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [actor_uris]
+              properties:
+                actor_uris:
+                  type: array
+                  minItems: 1
+                  maxItems: 100
+                  uniqueItems: true
+                  items: { type: string, format: uri, maxLength: 2048 }
+                limit: { type: integer, minimum: 1, maximum: 100, default: 50 }
+                cursor: { type: string, maxLength: 2048 }
+      responses:
+        '200':
+          description: Public/unlisted ActivityPub projection page.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+                  data:
+                    type: object
+                    required: [source, items, next_cursor, has_more]
+                    properties:
+                      source: { const: activitypub }
+                      items:
+                        type: array
+                        maxItems: 100
+                        items: { $ref: '#/components/schemas/RemoteObjectCandidate' }
+                      next_cursor: { type: string, maxLength: 2048 }
+                      has_more: { type: boolean }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /internal/v1/atproto/feed:
+    post:
+      operationId: getAuthorizedATProtoAuthorFeeds
+      summary: Aggregate public Bluesky author feeds for Backend-authorized DIDs
+      description: |
+        Accepts a bounded list of protocol DIDs selected by Backend. Federation
+        resolves each DID and verifies that the returned profile DID is exactly
+        the requested DID before returning posts. Each post URI must be an
+        AT URI owned by that same DID. This is public read-only retrieval, not
+        an authenticated Bluesky user session or a Testagram account link.
+      parameters:
+        - in: header
+          name: X-Testagram-API-Version
+          required: true
+          schema: { type: string, const: '1' }
+        - in: header
+          name: X-Request-ID
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 128 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [actor_dids]
+              properties:
+                actor_dids:
+                  type: array
+                  minItems: 1
+                  maxItems: 20
+                  uniqueItems: true
+                  items: { type: string, pattern: '^did:(plc|web):', maxLength: 512 }
+                limit_per_actor: { type: integer, minimum: 1, maximum: 25, default: 10 }
+      responses:
+        '200':
+          description: Public author feeds keyed by verified DID.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+                  data:
+                    type: object
+                    required: [source, actors]
+                    properties:
+                      source: { const: bluesky-atproto }
+                      actors:
+                        type: array
+                        maxItems: 20
+                        items: { $ref: '#/components/schemas/ATProtoActorFeed' }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '502': { $ref: '#/components/responses/UpstreamUnavailable' }
+        '504': { $ref: '#/components/responses/UpstreamTimeout' }
+components:
+  securitySchemes:
+    backendServiceBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque service credential
+  schemas:
+    RemoteObjectCandidate:
+      type: object
+      additionalProperties: false
+      required: [object_uri, actor_uri, object_type, content, visibility, created_at]
+      properties:
+        object_uri: { type: string, format: uri, maxLength: 2048 }
+        actor_uri: { type: string, format: uri, maxLength: 2048 }
+        object_type: { type: string, enum: [Note, Article] }
+        content: { type: string, minLength: 1, maxLength: 20000 }
+        published_at: { type: string, format: date-time }
+        visibility: { type: string, enum: [public, unlisted] }
+        created_at: { type: string, format: date-time }
+    ATProtoActorFeed:
+      type: object
+      additionalProperties: false
+      required: [did, handle, posts]
+      properties:
+        did: { type: string, pattern: '^did:(plc|web):', maxLength: 512 }
+        handle: { type: string, maxLength: 253 }
+        cursor: { type: string, maxLength: 512 }
+        posts:
+          type: array
+          maxItems: 25
+          items: { $ref: '#/components/schemas/ATProtoPost' }
+    ATProtoPost:
+      type: object
+      additionalProperties: false
+      required: [uri, cid, text, author]
+      properties:
+        uri: { type: string, pattern: '^at://did:(plc|web):.+/app.bsky.feed.post/', maxLength: 2048 }
+        cid: { type: string, maxLength: 256 }
+        text: { type: string, maxLength: 20000 }
+        createdAt: { type: string, format: date-time }
+        indexedAt: { type: string, format: date-time }
+        author:
+          type: object
+          required: [did, handle]
+          properties:
+            did: { type: string, pattern: '^did:(plc|web):', maxLength: 512 }
+            handle: { type: string, maxLength: 253 }
+            displayName: { type: string, maxLength: 256 }
+        replyCount: { type: integer, minimum: 0 }
+        repostCount: { type: integer, minimum: 0 }
+        likeCount: { type: integer, minimum: 0 }
+        quoteCount: { type: integer, minimum: 0 }
+        labels: { type: array, maxItems: 50, items: { type: string, maxLength: 80 } }
+  responses:
+    InvalidRequest:
+      description: Request body, allowlist, or cursor is invalid.
+    Unauthorized:
+      description: Backend service bearer is missing or invalid.
+    Unavailable:
+      description: Durable Federation storage is unavailable.
+    UpstreamUnavailable:
+      description: One or more requested public author feeds could not be retrieved.
+    UpstreamTimeout:
+      description: The public author-feed request exceeded its time budget.
