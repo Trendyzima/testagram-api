@@ -2049,47 +2049,58 @@ components:
     FeedPage:
       type: object
       additionalProperties: false
-      required: [items, next_cursor, has_more, lane]
+      required: [posts, next_cursor, has_more, ranking_mode, feed_mode, video_only]
       properties:
-        items:
+        posts:
           type: array
           maxItems: 50
           items: { $ref: '#/components/schemas/FeedItem' }
-        next_cursor: { type: [string, 'null'], maxLength: 2048 }
+        next_cursor: { type: string, maxLength: 2048 }
         has_more: { type: boolean }
-        lane: { type: string, enum: [for_you, following, latest, media, discover, federated] }
+        ranking_mode: { type: string, enum: [algorithm, chronological] }
+        feed_mode: { type: string, enum: [for_you, following, latest, media, discover, federated] }
+        video_only: { type: boolean }
     FeedItem:
       type: object
       additionalProperties: false
-      required: [id, source, source_post_id, canonical_uri, atproto_cid, content, created_at, language, visibility, author, media, metrics, capabilities]
+      required: [id, user_id, content, visibility, media_ids, media_urls, media_content_types, is_video, is_following, language, created_at, likes_count, replies_count, reposts_count, author, origin]
       properties:
-        id: { type: string, minLength: 1, maxLength: 256, description: Stable opaque Testagram feed-item identifier; not necessarily a local post UUID. }
-        source: { type: string, enum: [native, activitypub, atproto] }
-        source_post_id: { type: string, minLength: 1, maxLength: 2048, description: Stable source-native object identifier. }
-        canonical_uri: { type: [string, 'null'], format: uri, maxLength: 2048 }
-        atproto_cid: { type: [string, 'null'], maxLength: 256, description: AT Protocol record CID; null for other sources. }
+        id: { type: string, minLength: 1, maxLength: 256, description: Stable opaque feed identifier; local items retain their UUID string. }
+        user_id: { type: [string, 'null'], format: uuid, description: Null for remote authors; never fabricate a Testagram user UUID for a remote actor. }
         content: { type: string, maxLength: 100000 }
-        created_at: { type: string, format: date-time }
-        language: { type: [string, 'null'], maxLength: 64 }
         visibility: { type: string, enum: [public, unlisted, followers, private, direct] }
+        media_ids: { type: array, items: { type: string, maxLength: 2048 } }
+        media_urls: { type: array, items: { type: string, format: uri, maxLength: 2048 } }
+        media_content_types: { type: array, items: { type: string, maxLength: 128 } }
+        media_auth_headers: { type: object, additionalProperties: { type: string } }
+        is_video: { type: boolean }
+        is_following: { type: boolean }
+        language: { type: [string, 'null'], maxLength: 64 }
+        created_at: { type: string, format: date-time }
+        likes_count: { type: integer, minimum: 0 }
+        replies_count: { type: integer, minimum: 0 }
+        reposts_count: { type: integer, minimum: 0 }
         author: { $ref: '#/components/schemas/FeedAuthor' }
-        media:
-          type: array
-          maxItems: 20
-          items: { $ref: '#/components/schemas/FeedMedia' }
-        metrics: { $ref: '#/components/schemas/FeedMetrics' }
+        origin: { type: string, enum: [local, activitypub, atproto] }
+        source_post_id: { type: [string, 'null'], maxLength: 2048 }
+        canonical_uri: { type: [string, 'null'], format: uri, maxLength: 2048 }
+        atproto_cid: { type: [string, 'null'], maxLength: 256 }
+        ranking_score: { type: number, minimum: 0, maximum: 1 }
+        ranking_reasons: { type: array, maxItems: 8, items: { type: string, maxLength: 128 } }
         capabilities: { $ref: '#/components/schemas/FeedInteractionCapabilities' }
     FeedAuthor:
       type: object
       additionalProperties: false
-      required: [kind, local_user_id, username, display_name, avatar_url, profile_url, source_identity]
+      required: [id, username, display_name, avatar_url, protected_account]
       properties:
-        kind: { type: string, enum: [local, remote] }
-        local_user_id: { type: [string, 'null'], format: uuid }
-        username: { type: [string, 'null'], maxLength: 128 }
+        id: { type: string, minLength: 1, maxLength: 2048, description: Local UUID string or protocol-native remote identity; not an account-linking key. }
+        username: { type: [string, 'null'], maxLength: 253 }
         display_name: { type: [string, 'null'], maxLength: 256 }
-        avatar_url: { type: [string, 'null'], format: uri }
-        profile_url: { type: [string, 'null'], format: uri }
+        avatar_key: { type: [string, 'null'], maxLength: 2048 }
+        avatar_url: { type: [string, 'null'], format: uri, maxLength: 2048 }
+        protected_account: { type: boolean }
+        kind: { type: string, enum: [local, remote] }
+        profile_url: { type: [string, 'null'], format: uri, maxLength: 2048 }
         source_identity:
           oneOf:
             - { type: 'null' }
