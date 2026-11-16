@@ -32,7 +32,7 @@ The API contract, compatibility, client SDK and integration-governance repositor
 3. Flutter must not call PostgreSQL, object storage, private Data Centre endpoints, Federation, or Algorithm directly.
 4. CDN media URLs are for byte delivery; media ownership, upload authorization and attachment to posts remain Backend-controlled.
 5. Private service tokens must never enter mobile/web bundles, public OpenAPI schemas, generated SDKs or client examples.
-6. Do not add Supabase, Redis/Valkey or Upstash runtime dependencies. Existing platform architecture explicitly excludes them.
+6. Do not introduce external cache, queue or product-data services without an approved Testagram architecture decision.
 7. Do not invent success responses or silently fall back to another service when an operation is not implemented.
 
 ## Verified contract status
