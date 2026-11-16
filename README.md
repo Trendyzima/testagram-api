@@ -1,6 +1,6 @@
 # Testagram API Platform
 
-The API contract, compatibility, client SDK and integration-governance repository coordinating Testagram's six runtime repositories.
+The API contract, compatibility, client SDK and integration-governance repository coordinating Testagram's six runtime repositories and this contract control plane.
 
 > **Boundary:** this repository does not replace the Go Backend, own product data, or expose private infrastructure services. The Backend remains the public product API runtime and authority. This repository defines and validates the contract consumed by Flutter and other clients, and coordinates compatibility across services.
 
@@ -18,7 +18,7 @@ The API contract, compatibility, client SDK and integration-governance repositor
 | Repository | Authority |
 |---|---|
 | [testagram-api](https://github.com/Trendyzima/testagram-api) | API contracts, client SDKs, compatibility rules and integration governance |
-| [Testagram Backend](https://github.com/Trendyzima/Testagram-backend-) | Public product API runtime, Appwrite JWT validation, canonical identity, authorization, PostgreSQL product data and social operations |
+| [Testagram Backend](https://github.com/Trendyzima/Testagram-backend-) | Public product API runtime, provider-gated Testagram-native bearer authentication, canonical identity, authorization, PostgreSQL product data and social operations; Appwrite remains a transitional reviewer/compatibility dependency |
 | [Flutter Client](https://github.com/Trendyzima/testagram-flutter-client-) | Native UI, local UX state and client transport; product data only through Backend |
 | [Data Centre](https://github.com/Trendyzima/Testagram-data-centre-) | Storage, video processing, notifications, infrastructure and operations; private service APIs remain private |
 | [CDN](https://github.com/Trendyzima/cdn-) | Media delivery/cache data plane; not a product API or identity authority |
@@ -27,8 +27,8 @@ The API contract, compatibility, client SDK and integration-governance repositor
 
 ## Critical integration rules
 
-1. End-user clients authenticate with Appwrite and send the resulting Appwrite session JWT to the public Backend API.
-2. The Backend validates identity and owns authorization. Never treat this repository, a generated SDK, or a client-side claim as an authorization boundary.
+1. Flutter uses the Testagram-owned `NativeAuthClient` and sends short-lived Testagram access tokens when the Backend deployment has `TESTAGRAM_AUTH_PROVIDER=native` enabled. The Backend still defaults to the legacy Appwrite provider until an explicit, staged cutover.
+2. Appwrite remains a separate staff-reviewer identity dependency for the identity-review console and a compatibility provider during migration; it is not the Flutter end-user SDK. Never treat this repository, a generated SDK, or a client-side claim as an authorization boundary.
 3. Flutter must not call PostgreSQL, object storage, private Data Centre endpoints, Federation, or Algorithm directly.
 4. CDN media URLs are for byte delivery; media ownership, upload authorization and attachment to posts remain Backend-controlled.
 5. Private service tokens must never enter mobile/web bundles, public OpenAPI schemas, generated SDKs or client examples.
