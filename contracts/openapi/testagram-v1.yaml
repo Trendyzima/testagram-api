@@ -487,6 +487,7 @@ paths:
           required: false
           schema: { type: boolean, default: false }
           description: Set true to return only posts with at least one ready, public video attachment. Backend applies post visibility, block, mute, ownership and media-readiness checks before returning a playback URL.
+        - in: query
           name: sources
           required: false
           style: form
