@@ -136,6 +136,67 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '502': { $ref: '#/components/responses/UpstreamUnavailable' }
         '504': { $ref: '#/components/responses/UpstreamTimeout' }
+  /internal/v1/remote-subscriptions/verify:
+    post:
+      operationId: verifyRemoteAuthorSubscription
+      summary: Resolve a remote ActivityPub actor or Bluesky DID for a pending Backend subscription
+      description: |
+        Backend supplies the exact local Testagram user UUID, protocol and
+        canonical remote identity after creating a pending subscription.
+        Federation resolves the remote identity using protocol-native rules
+        and calls Backend's private verification callback. This endpoint never
+        creates a Testagram account and never chooses a viewer's follow graph.
+        Transient upstream failures leave the Backend subscription pending.
+      parameters:
+        - in: header
+          name: X-Testagram-API-Version
+          required: true
+          schema: { type: string, const: '1' }
+        - in: header
+          name: X-Request-ID
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 128 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [local_user_id, protocol, identity]
+              properties:
+                local_user_id: { type: string, format: uuid }
+                protocol: { type: string, enum: [activitypub, bluesky] }
+                identity:
+                  type: string
+                  minLength: 12
+                  maxLength: 2048
+                  description: Canonical HTTPS ActivityPub actor URI or canonical AT Protocol DID.
+      responses:
+        '200':
+          description: Identity was resolved and Backend confirmed the matching subscription.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+                  data:
+                    type: object
+                    required: [protocol, identity, handle, verification_status]
+                    properties:
+                      protocol: { type: string, enum: [activitypub, bluesky] }
+                      identity: { type: string }
+                      handle: { type: string, maxLength: 256 }
+                      verification_status: { const: verified }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422':
+          description: The supplied identity did not resolve to a valid protocol actor.
+        '502': { $ref: '#/components/responses/UpstreamUnavailable' }
 components:
   securitySchemes:
     backendServiceBearer:
