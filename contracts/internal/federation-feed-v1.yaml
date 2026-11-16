@@ -84,7 +84,9 @@ paths:
         Accepts a bounded list of protocol DIDs selected by Backend. Federation
         resolves each DID and verifies that the returned profile DID is exactly
         the requested DID before returning posts. Each post URI must be an
-        AT URI owned by that same DID. This is public read-only retrieval, not
+        AT URI owned by that same DID. Optional opaque cursors are keyed by DID,
+        so each author's page advances independently without cross-author cursor
+        confusion. This is public read-only retrieval, not
         an authenticated Bluesky user session or a Testagram account link.
       parameters:
         - in: header
@@ -111,6 +113,166 @@ paths:
                   uniqueItems: true
                   items: { type: string, pattern: '^did:(plc|web):', maxLength: 512 }
                 limit_per_actor: { type: integer, minimum: 1, maximum: 25, default: 10 }
+                cursors:
+                  type: object
+                  maxProperties: 20
+                  propertyNames:
+                    pattern: '^did:(plc|web):[A-Za-z0-9.:%_-]{1,512}
+      responses:
+        '200':
+          description: Public author feeds keyed by verified DID.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+                  data:
+                    type: object
+                    required: [source, actors]
+                    properties:
+                      source: { const: bluesky-atproto }
+                      actors:
+                        type: array
+                        maxItems: 20
+                        items: { $ref: '#/components/schemas/ATProtoActorFeed' }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '502': { $ref: '#/components/responses/UpstreamUnavailable' }
+        '504': { $ref: '#/components/responses/UpstreamTimeout' }
+  /internal/v1/remote-subscriptions/verify:
+    post:
+      operationId: verifyRemoteAuthorSubscription
+      summary: Resolve a remote ActivityPub actor or Bluesky DID for a pending Backend subscription
+      description: |
+        Backend supplies the exact local Testagram user UUID, protocol and
+        canonical remote identity after creating a pending subscription.
+        Federation resolves the remote identity using protocol-native rules
+        and calls Backend's private verification callback. This endpoint never
+        creates a Testagram account and never chooses a viewer's follow graph.
+        Transient upstream failures leave the Backend subscription pending.
+      parameters:
+        - in: header
+          name: X-Testagram-API-Version
+          required: true
+          schema: { type: string, const: '1' }
+        - in: header
+          name: X-Request-ID
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 128 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [local_user_id, protocol, identity]
+              properties:
+                local_user_id: { type: string, format: uuid }
+                protocol: { type: string, enum: [activitypub, bluesky] }
+                identity:
+                  type: string
+                  minLength: 12
+                  maxLength: 2048
+                  description: Canonical HTTPS ActivityPub actor URI or canonical AT Protocol DID.
+      responses:
+        '200':
+          description: Identity was resolved and Backend confirmed the matching subscription.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+                  data:
+                    type: object
+                    required: [protocol, identity, handle, verification_status]
+                    properties:
+                      protocol: { type: string, enum: [activitypub, bluesky] }
+                      identity: { type: string }
+                      handle: { type: string, maxLength: 256 }
+                      verification_status: { const: verified }
+        '400': { $ref: '#/components/responses/InvalidRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422':
+          description: The supplied identity did not resolve to a valid protocol actor.
+        '502': { $ref: '#/components/responses/UpstreamUnavailable' }
+components:
+  securitySchemes:
+    backendServiceBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque service credential
+  schemas:
+    RemoteObjectCandidate:
+      type: object
+      additionalProperties: false
+      required: [object_uri, actor_uri, object_type, content, visibility, created_at]
+      properties:
+        object_uri: { type: string, format: uri, maxLength: 2048 }
+        actor_uri: { type: string, format: uri, maxLength: 2048 }
+        object_type: { type: string, enum: [Note, Article] }
+        content: { type: string, minLength: 1, maxLength: 20000 }
+        published_at: { type: string, format: date-time }
+        visibility: { type: string, enum: [public, unlisted] }
+        created_at: { type: string, format: date-time }
+    ATProtoActorFeed:
+      type: object
+      additionalProperties: false
+      required: [did, handle, posts]
+      properties:
+        did: { type: string, pattern: '^did:(plc|web):', maxLength: 512 }
+        handle: { type: string, maxLength: 253 }
+        cursor: { type: string, maxLength: 512 }
+        posts:
+          type: array
+          maxItems: 25
+          items: { $ref: '#/components/schemas/ATProtoPost' }
+    ATProtoPost:
+      type: object
+      additionalProperties: false
+      required: [uri, cid, text, author]
+      properties:
+        uri: { type: string, pattern: '^at://did:(plc|web):.+/app.bsky.feed.post/', maxLength: 2048 }
+        cid: { type: string, maxLength: 256 }
+        text: { type: string, maxLength: 20000 }
+        createdAt: { type: string, format: date-time }
+        indexedAt: { type: string, format: date-time }
+        author:
+          type: object
+          required: [did, handle]
+          properties:
+            did: { type: string, pattern: '^did:(plc|web):', maxLength: 512 }
+            handle: { type: string, maxLength: 253 }
+            displayName: { type: string, maxLength: 256 }
+        replyCount: { type: integer, minimum: 0 }
+        repostCount: { type: integer, minimum: 0 }
+        likeCount: { type: integer, minimum: 0 }
+        quoteCount: { type: integer, minimum: 0 }
+        labels: { type: array, maxItems: 50, items: { type: string, maxLength: 80 } }
+  responses:
+    InvalidRequest:
+      description: Request body, allowlist, or cursor is invalid.
+    Unauthorized:
+      description: Backend service bearer is missing or invalid.
+    Unavailable:
+      description: Durable Federation storage is unavailable.
+    UpstreamUnavailable:
+      description: One or more requested public author feeds could not be retrieved.
+    UpstreamTimeout:
+      description: The public author-feed request exceeded its time budget.
+
+                  additionalProperties:
+                    type: string
+                    maxLength: 512
+                    description: Opaque AT Protocol author-feed cursor scoped to the DID used as this property name.
       responses:
         '200':
           description: Public author feeds keyed by verified DID.
