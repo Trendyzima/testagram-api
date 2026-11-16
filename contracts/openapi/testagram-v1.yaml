@@ -2121,7 +2121,12 @@ components:
       properties:
         protocol: { type: string, enum: [activitypub, atproto] }
         actor_uri: { type: [string, 'null'], format: uri, maxLength: 2048 }
-        did: { type: [string, 'null'], pattern: '^did:[a-z0-9]+:[A-Za-z0-9._:%-]+      required: [id, content, created_at, author_id, user_id, visibility, language, media_ids, media_urls, media_content_types, is_video, video_url, image_url, likes_count, replies_count, reposts_count, profiles, user_profiles]
+        did: { type: [string, 'null'], pattern: '^did:[a-z0-9]+:[A-Za-z0-9._:%-]+$', maxLength: 512 }
+        handle: { type: [string, 'null'], maxLength: 253 }
+        instance: { type: [string, 'null'], maxLength: 253 }
+    SocialPost:
+      type: object
+      additionalProperties: false
       properties:
         id: { type: string, format: uuid }
         content: { type: string }
