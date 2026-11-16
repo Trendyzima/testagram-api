@@ -27,7 +27,7 @@ tags:
   - name: Health
     description: Process liveness and dependency readiness.
   - name: Authentication
-    description: Transitional Appwrite-backed account sessions while native Testagram identity migration is implemented. Existing account IDs and ownership must be preserved; Appwrite is not removed until native session and recovery tests pass.
+    description: Testagram-native bearer sessions when the Backend is configured for the native provider; the legacy Appwrite bearer remains a deployment-selected compatibility mode. Staff identity-review operations explicitly retain Appwrite staff authentication during the migration.
   - name: Feed
     description: Authorized home timeline retrieval.
   - name: Social
@@ -45,6 +45,8 @@ tags:
   - name: Identity
     description: Applicant-facing native age-assurance application and private evidence submission. No account is provisioned until manual verification and independent two-person approval complete.
 security:
+  # The deployment enables one end-user provider at a time; this OR list documents both supported migration modes.
+  - testagramBearer: []
   - appwriteBearer: []
 paths:
   /healthz:
@@ -109,6 +111,7 @@ paths:
       operationId: getIdentityApplicationStatus
       tags: [Identity]
       summary: Retrieve applicant-scoped application status
+      security: []
       security: []
       parameters:
         - in: path
@@ -427,8 +430,8 @@ paths:
     post:
       operationId: redeemIdentityProvisioningAuthorization
       tags: [Identity]
-      summary: Redeem approved provisioning authorization against an Appwrite session
-      description: Backend verifies the Appwrite session email matches the approved application, consumes the approval token and JTI once, and provisions the canonical account transactionally.
+      summary: Redeem approved provisioning authorization to provision a native Testagram account
+      description: Backend revalidates the application capability, both independent identity-review decisions and the two-person sensitive-action approval ledger inside one PostgreSQL transaction. It consumes the approval token and JTI once, creates the native credential and canonical profile atomically, and starts a separate single-use email-verification step. No Appwrite end-user session is required.
       parameters:
         - in: path
           name: application_id
@@ -448,12 +451,12 @@ paths:
           schema: { type: string, minLength: 32, maxLength: 128 }
       responses:
         '200':
-          description: Canonical account provisioned or an idempotent replay for the same Appwrite account.
+          description: Native Testagram account and canonical profile provisioned, or an idempotent replay for the same approved application and native user. Email verification remains required before sign-in.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ExtensibleObject' }
         '401': { $ref: '#/components/responses/Unauthorized' }
-        '403': { description: Appwrite email mismatch or invalid approval authorization. }
+        '403': { description: Invalid application capability or provisioning approval authorization. }
         '404': { description: Application or authorization not found. }
         '409': { description: "Approval authorization expired, consumed or replayed." }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
@@ -1840,7 +1843,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Reserved for native Testagram access tokens. Do not apply to public operations until Backend enforces issuer, audience, expiry, session revocation and account status checks. This scheme is documented ahead of its global activation.
+      description: Testagram-native short-lived access JWT. Backend validates signature, issuer, audience, expiry, session state, token version and account status when TESTAGRAM_AUTH_PROVIDER=native is enabled. Provider activation remains a separate deployment gate.
   parameters:
     PostId:
       name: postId
