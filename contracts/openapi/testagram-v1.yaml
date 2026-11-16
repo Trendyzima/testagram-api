@@ -464,7 +464,16 @@ paths:
       operationId: getHomeFeed
       tags: [Feed]
       summary: Retrieve the authorized home timeline
-      description: Returns one normalized timeline containing Testagram-native posts and eligible public remote posts. Backend is the sole authorization boundary: it resolves source identity, applies local visibility, block, mute, moderation, deletion and source-policy checks, and only then supplies eligible candidate IDs to the private Algorithm service. The Algorithm may reorder only those IDs and cannot authorize or introduce content. The `for_you`, `following`, `latest`, `media`, `discover` and `federated` lanes are server-defined. Remote ActivityPub and AT Protocol posts are read-only unless an explicit interaction capability is returned. Cursors are opaque, versioned and bound to the viewer, lane and source filters. Private media URLs may include a parallel `media_auth_headers` map keyed by exact URL; clients must attach the matching Authorization header and must not cache these short-lived bearer assertions.
+      description: >-
+        Returns one normalized timeline containing Testagram-native posts and eligible public remote posts.
+        Backend is the sole authorization boundary: it resolves source identity, applies local visibility, block,
+        mute, moderation, deletion and source-policy checks, and only then supplies eligible candidate IDs to
+        the private Algorithm service. The Algorithm may reorder only those IDs and cannot authorize or introduce
+        content. The for_you, following, latest, media, discover and federated lanes are server-defined.
+        Remote ActivityPub and AT Protocol posts are read-only unless an explicit interaction capability is
+        returned. Cursors are opaque, versioned and bound to the viewer, lane and source filters. Private media
+        URLs may include a parallel media_auth_headers map keyed by exact URL; clients must attach the matching
+        Authorization header and must not cache these short-lived bearer assertions.
       parameters:
         - in: query
           name: feed
