@@ -60,6 +60,7 @@ paths:
           content:
             text/plain:
               schema: { type: string, example: "ok\n" }
+        '405': { description: Method not allowed; GET is required. }
   /api/auth/login:
     post:
       operationId: loginWithTestagramCredentials
@@ -87,7 +88,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/NativeAuthResponse' }
         '401': { description: Credentials are invalid. }
-        '403': { description: Email verification, account approval or password reset is required. }
+        '403': { description: "Email verification, account approval or password reset is required." }
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/auth/refresh:
@@ -113,7 +114,7 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/NativeAuthResponse' }
-        '401': { description: Refresh token is invalid, expired, revoked or reused. }
+        '401': { description: "Refresh token is invalid, expired, revoked or reused." }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/auth/forgot-password:
     post:
@@ -138,6 +139,9 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/GenericAuthMessage' }
+        '400': { description: Malformed request or invalid email address. }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/auth/reset-password:
     post:
       operationId: resetTestagramPassword
@@ -162,7 +166,7 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/GenericAuthMessage' }
-        '400': { description: Recovery token is invalid or expired, or password policy is not satisfied. }
+        '400': { description: "Recovery token is invalid or expired, or password policy is not satisfied." }
         '403': { description: Account is not eligible for password reset. }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/auth/logout:
@@ -2424,6 +2428,8 @@ components:
                 name: { type: string }
                 type: { type: string }
                 size: { type: integer, minimum: 1 }
+        error: { type: 'null' }
+        request_id: { type: string }
     TvChannel:
       type: object
       additionalProperties: false
