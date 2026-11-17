@@ -1997,6 +1997,23 @@ paths:
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
 
 components:
+  securitySchemes:
+    appwriteBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Legacy Appwrite session JWT accepted during the controlled migration window only.
+    testagramBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Testagram-native short-lived access JWT. Backend validates signature, issuer, audience, expiry, session state, token version and account status. No external-provider fallback is accepted for end-user routes.
+  parameters:
+    PostId:
+      name: postId
+      in: path
+      required: true
+      schema: { type: string, minLength: 1 }
   schemas:
     NativeAuthResponse:
       type: object
@@ -2027,24 +2044,6 @@ components:
       properties:
         ok: { type: boolean, const: true }
         message: { type: string }
-  securitySchemes:
-    appwriteBearer:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      description: Legacy Appwrite session JWT accepted during the controlled migration window only.
-    testagramBearer:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      description: Testagram-native short-lived access JWT. Backend validates signature, issuer, audience, expiry, session state, token version and account status when TESTAGRAM_AUTH_PROVIDER=native is enabled. Provider activation remains a separate deployment gate.
-  parameters:
-    PostId:
-      name: postId
-      in: path
-      required: true
-      schema: { type: string, minLength: 1 }
-  schemas:
     PollOption:
       type: object
       additionalProperties: false
