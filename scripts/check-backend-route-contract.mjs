@@ -172,15 +172,17 @@ console.log(`Backend route audit passed: ${registered.size} static routes invent
 // canonical Instabox cmd/api runtime: identical paths do not imply identical
 // wire contracts. Render is retired and must not be required for deployment.
 const freshInventoryPath = resolve("contracts/route-inventory/fresh-api-public-routes.json");
-const freshServerPath = resolve("source-repos/backend/internal/freshapi/server.go");
-const freshMainPath = resolve("source-repos/backend/cmd/fresh-api/main.go");
-const freshDockerfilePath = resolve("source-repos/backend/Dockerfile.fresh");
-const deploymentGuardPath = resolve("source-repos/backend/scripts/guard-no-render.py");
-const deploymentWorkflowPath = resolve("source-repos/backend/.github/workflows/ci.yml");
-const instaboxDeployPath = resolve("source-repos/backend/.github/workflows/instabox-deploy.yml");
+const freshLegacyPin = sourceLock.repositories["backend-fresh-legacy"];
+if (!freshLegacyPin) throw new Error("The retired Fresh API must have its own immutable legacy source pin.");
+const freshServerPath = resolve("source-repos/backend-fresh-legacy/internal/freshapi/server.go");
+const freshMainPath = resolve("source-repos/backend-fresh-legacy/cmd/fresh-api/main.go");
+const freshDockerfilePath = resolve("source-repos/backend-fresh-legacy/Dockerfile.fresh");
+const deploymentGuardPath = resolve("source-repos/backend-fresh-legacy/scripts/guard-no-render.py");
+const deploymentWorkflowPath = resolve("source-repos/backend-fresh-legacy/.github/workflows/ci.yml");
+const instaboxDeployPath = resolve("source-repos/backend-fresh-legacy/.github/workflows/instabox-deploy.yml");
 const freshInventory = JSON.parse(readFileSync(freshInventoryPath, "utf8"));
-if (freshInventory.sourceRef !== sourceLock.repositories.backend.ref) {
-  throw new Error("Fresh API route inventory sourceRef does not match contracts/sources.lock.json.");
+if (freshInventory.sourceRef !== freshLegacyPin.ref) {
+  throw new Error("Fresh API route inventory sourceRef does not match the separate legacy source pin.");
 }
 const freshServer = readFileSync(freshServerPath, "utf8");
 const freshMain = readFileSync(freshMainPath, "utf8");
