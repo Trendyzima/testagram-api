@@ -27,7 +27,7 @@ tags:
   - name: Health
     description: Process liveness and dependency readiness.
   - name: Authentication
-    description: Testagram-native bearer sessions when the Backend is configured for the native provider; the legacy Appwrite bearer remains a deployment-selected compatibility mode. Staff identity-review operations explicitly retain Appwrite staff authentication during the migration.
+    description: End-user operations accept only Testagram-native short-lived access JWTs. Backend checks the live PostgreSQL session and account state; no Appwrite bearer fallback is accepted. Staff review operations use the separate encrypted testagram-staff cookie issued by the Admin Console after native staff authentication and MFA enrollment.
   - name: Feed
     description: Authorized home timeline retrieval.
   - name: Social
@@ -417,9 +417,9 @@ paths:
       operationId: getIdentityReviewQueue
       tags: [Identity]
       summary: List applications awaiting manual identity review
-      description: Requires a verified Appwrite staff account with the identity.review permission. Queue metadata contains opaque evidence references only; raw evidence is served by the separate no-store reviewer endpoint and every retrieval attempt is audited.
+      description: Requires a native Testagram staff session. The Admin Console verifies the Backend-issued native session, enabled staff principal, enrolled MFA and identity.review permission from PostgreSQL. Queue metadata contains opaque evidence references only; raw evidence is served by the separate no-store reviewer endpoint and every retrieval attempt is audited.
       security:
-        - appwriteBearer: []
+        - testagramStaffSession: []
       responses:
         '200':
           description: Authorized manual-review queue.
@@ -437,7 +437,7 @@ paths:
       operationId: getIdentityReviewEvidence
       tags: [Identity]
       summary: Stream private identity evidence to an authorized reviewer
-      description: Requires verified Appwrite staff identity.review permission. Backend audits the access attempt before streaming, verifies byte length and SHA-256 before returning evidence, restores a missing or drifted VPS primary from a checksum-verified B2/R2 replica when possible, and otherwise serves only a checksum-verified private replica through the Backend proxy. No storage URL is returned; responses are private, no-store and nosniff.
+      description: Requires a native Testagram staff session with an enabled staff principal, enrolled MFA and identity.review permission. Backend audits the access attempt before streaming. Backend audits the access attempt before streaming, verifies byte length and SHA-256 before returning evidence, restores a missing or drifted VPS primary from a checksum-verified B2/R2 replica when possible, and otherwise serves only a checksum-verified private replica through the Backend proxy. No storage URL is returned; responses are private, no-store and nosniff.
       security:
         - appwriteBearer: []
       parameters:
@@ -2002,11 +2002,11 @@ paths:
 
 components:
   securitySchemes:
-    appwriteBearer:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      description: Legacy Appwrite session JWT accepted during the controlled migration window only.
+    testagramStaffSession:
+      type: apiKey
+      in: cookie
+      name: testagram-staff
+      description: Encrypted HttpOnly, Secure, SameSite=Strict Admin Console session cookie. The cookie contains a Backend-native access/refresh session and is accepted only by staff review operations after PostgreSQL staff-role and MFA checks.
     testagramBearer:
       type: http
       scheme: bearer
