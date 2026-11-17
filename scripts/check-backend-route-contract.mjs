@@ -132,7 +132,7 @@ for (const action of dynamicActions) {
     throw new Error(`Dynamic auth action missing from Backend registration: ${action}`);
   }
 }
-const authRouteLoop = source.match(/for _, action := range \\[\\]string\\{([^}]+)\\}\\s*\\{\\s*action := action\\s*mux\\.HandleFunc\\("OPTIONS \\/api\\/auth\\/"\\+action/);
+const authRouteLoop = source.match(/for _, action := range \[\]string\{([^}]+)\}\s*\{\s*action := action\s*mux\.HandleFunc\("OPTIONS \/api\/auth\/"\+action/);
 if (!authRouteLoop) {
   throw new Error("Backend native auth route loop is missing.");
 }
