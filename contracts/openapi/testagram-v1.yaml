@@ -45,9 +45,7 @@ tags:
   - name: Identity
     description: Applicant-facing native age-assurance application and private evidence submission. No account is provisioned until manual verification and independent two-person approval complete.
 security:
-  # The deployment enables one end-user provider at a time; this OR list documents both supported migration modes.
   - testagramBearer: []
-  - appwriteBearer: []
 paths:
   /healthz:
     get:
@@ -62,6 +60,136 @@ paths:
           content:
             text/plain:
               schema: { type: string, example: "ok\n" }
+        '405': { description: Method not allowed; GET is required. }
+  /api/auth/login:
+    post:
+      operationId: loginWithTestagramCredentials
+      tags: [Authentication]
+      summary: Create a native Testagram session
+      description: Verifies the canonical Testagram password, email-verification state, account status and identity-provisioning state. Returns a 15-minute access token and an opaque rotating refresh token. The refresh token must be stored only in platform secure storage.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [email, password]
+              properties:
+                email: { type: string, format: email, maxLength: 254 }
+                password: { type: string, minLength: 1, maxLength: 128, writeOnly: true }
+      responses:
+        '200':
+          description: Native session created.
+          headers:
+            Cache-Control: { schema: { type: string, const: no-store } }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NativeAuthResponse' }
+        '401': { description: Credentials are invalid. }
+        '403': { description: "Email verification, account approval or password reset is required." }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/auth/refresh:
+    post:
+      operationId: rotateTestagramRefreshToken
+      tags: [Authentication]
+      summary: Rotate a native refresh token
+      description: Atomically consumes the presented refresh token and issues a new refresh token and short-lived access token. Reuse of a revoked token revokes its entire token family.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [refresh_token]
+              properties:
+                refresh_token: { type: string, minLength: 40, maxLength: 128, writeOnly: true }
+      responses:
+        '200':
+          description: Rotated native session.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NativeAuthResponse' }
+        '401': { description: "Refresh token is invalid, expired, revoked or reused." }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/auth/forgot-password:
+    post:
+      operationId: requestTestagramPasswordRecovery
+      tags: [Authentication]
+      summary: Request password recovery
+      description: Always returns a generic anti-enumeration response. If an eligible verified account exists, Backend stores only a hash of a single-use 30-minute recovery token and sends the link using configured Testagram email delivery.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [email]
+              properties:
+                email: { type: string, format: email, maxLength: 254 }
+      responses:
+        '202':
+          description: Generic recovery acknowledgement; does not disclose whether an account exists.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GenericAuthMessage' }
+        '400': { description: Malformed request or invalid email address. }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/auth/reset-password:
+    post:
+      operationId: resetTestagramPassword
+      tags: [Authentication]
+      summary: Complete password recovery
+      description: Consumes a single-use, unexpired recovery token, updates the password, increments the account token version and revokes all existing sessions.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [token, password]
+              properties:
+                token: { type: string, minLength: 32, maxLength: 128, writeOnly: true }
+                password: { type: string, minLength: 12, maxLength: 128, writeOnly: true }
+      responses:
+        '200':
+          description: Password reset and existing sessions revoked.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GenericAuthMessage' }
+        '400': { description: "Recovery token is invalid or expired, or password policy is not satisfied." }
+        '403': { description: Account is not eligible for password reset. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/auth/logout:
+    post:
+      operationId: revokeTestagramSession
+      tags: [Authentication]
+      summary: Revoke the current native session
+      security:
+        - testagramBearer: []
+      responses:
+        '200': { description: Current session revoked. }
+        '401': { description: Native access token is invalid or expired. }
+  /api/auth/logout-all:
+    post:
+      operationId: revokeAllTestagramSessions
+      tags: [Authentication]
+      summary: Revoke every active session for the current account
+      description: Increments the account token version and revokes all active sessions.
+      security:
+        - testagramBearer: []
+      responses:
+        '200': { description: All active sessions revoked. }
+        '401': { description: Native access token is invalid or expired. }
   /api/identity/applications:
     post:
       operationId: createIdentityApplication
@@ -522,7 +650,7 @@ paths:
       summary: Retrieve trending public hashtags
       description: Returns distinct public hashtags from the previous seven days. When authenticated, followed hashtags receive viewer-specific ranking affinity; the Backend retains public visibility filtering.
       security:
-        - appwriteBearer: []
+        - testagramBearer: []
         - {}
       parameters:
         - in: query
@@ -544,7 +672,7 @@ paths:
       summary: Retrieve posts for a hashtag
       description: Returns a cursor-paginated timeline and the current viewer's private follow state. Backend applies account visibility, accepted-follow, block, mute and media authorization rules before returning records.
       security:
-        - appwriteBearer: []
+        - testagramBearer: []
         - {}
       parameters:
         - in: path
@@ -575,7 +703,7 @@ paths:
       summary: Get the current viewer's hashtag follow state
       description: Authentication is optional. Anonymous viewers always receive is_following=false.
       security:
-        - appwriteBearer: []
+        - testagramBearer: []
         - {}
       parameters:
         - in: path
@@ -596,7 +724,7 @@ paths:
       summary: Follow a hashtag
       description: Creates a private interest signal used to personalize Explore. The follow is not public and is not federated.
       security:
-        - appwriteBearer: []
+        - testagramBearer: []
       parameters:
         - in: path
           name: tag
@@ -618,7 +746,7 @@ paths:
       summary: Unfollow a hashtag
       description: Removes the current viewer's private Explore interest signal.
       security:
-        - appwriteBearer: []
+        - testagramBearer: []
       parameters:
         - in: path
           name: tag
@@ -641,7 +769,7 @@ paths:
       summary: Reserve a bounded public-media upload
       description: Backend authenticates the owner, enforces content type, visibility and byte limits, and returns a short-lived upload URL and opaque object key.
       security:
-        - appwriteBearer: []
+        - testagramBearer: []
       requestBody:
         required: true
         content:
@@ -674,7 +802,7 @@ paths:
       summary: Stream bytes into a reserved upload intent
       description: The client must use the URL returned by the upload-intent response, preserve its key query parameter, send the matching Content-Type, and stay within the reserved byte limit.
       security:
-        - appwriteBearer: []
+        - testagramBearer: []
       parameters:
         - in: query
           name: key
@@ -704,7 +832,7 @@ paths:
       summary: Issue viewer-bound authorization for one private media object
       description: Backend authenticates the viewer, verifies ownership and ready/private state in the canonical media ledger, and issues a short-lived exact-object CDN assertion. The returned URL is not a bearer credential; send the returned Authorization value to the CDN. HLS multi-object playback is not covered by this exact-object grant.
       security:
-        - appwriteBearer: []
+        - testagramBearer: []
       requestBody:
         required: true
         content:
@@ -732,7 +860,7 @@ paths:
       tags: [Media]
       summary: Verify uploaded media and persist its metadata
       security:
-        - appwriteBearer: []
+        - testagramBearer: []
       requestBody:
         required: true
         content:
@@ -763,7 +891,7 @@ paths:
       summary: Attach a verified public media asset to an owned post
       description: Only ready, owner-matched public assets can be attached. The Backend checks post ownership and visibility transactionally; attachment is idempotent.
       security:
-        - appwriteBearer: []
+        - testagramBearer: []
       requestBody:
         required: true
         content:
@@ -793,7 +921,7 @@ paths:
       summary: Delete an unattached media asset
       description: Starts durable deletion for an asset owned by the authenticated account. Used to clean up un-attached uploads after a failed publish.
       security:
-        - appwriteBearer: []
+        - testagramBearer: []
       requestBody:
         required: true
         content:
@@ -821,7 +949,7 @@ paths:
       summary: Search people and posts
       description: Privacy-filtered product search. Authentication is optional for public results; Backend applies visibility and authorization rules.
       security:
-        - appwriteBearer: []
+        - testagramBearer: []
         - {}
       parameters:
         - in: query
@@ -1508,7 +1636,7 @@ paths:
       tags: [Social]
       summary: List active and closed polls
       description: Optional authentication personalizes has_voted. Returns polls ordered newest first. Offset pagination is bounded; limit defaults to 20 and must be 1–50, offset defaults to 0 and must be 0–10000.
-      security: [{}, { appwriteBearer: [] }]
+      security: [{}, { testagramBearer: [] }]
       parameters:
         - in: query
           name: limit
@@ -1570,7 +1698,7 @@ paths:
       tags: [Social]
       summary: Read a poll
       description: Optional authentication personalizes has_voted. Invalid or unavailable poll IDs are not disclosed.
-      security: [{}, { appwriteBearer: [] }]
+      security: [{}, { testagramBearer: [] }]
       responses:
         '200':
           description: Poll details.
@@ -1883,7 +2011,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Testagram-native short-lived access JWT. Backend validates signature, issuer, audience, expiry, session state, token version and account status when TESTAGRAM_AUTH_PROVIDER=native is enabled. Provider activation remains a separate deployment gate.
+      description: Testagram-native short-lived access JWT. Backend validates signature, issuer, audience, expiry, session state, token version and account status. No external-provider fallback is accepted for end-user routes.
   parameters:
     PostId:
       name: postId
@@ -1891,6 +2019,35 @@ components:
       required: true
       schema: { type: string, minLength: 1 }
   schemas:
+    NativeAuthResponse:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { type: boolean, const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [access_token, refresh_token, token_type, expires_in, user]
+          properties:
+            access_token: { type: string, minLength: 32 }
+            refresh_token: { type: string, minLength: 40 }
+            token_type: { type: string, const: Bearer }
+            expires_in: { type: integer, const: 900 }
+            user:
+              type: object
+              required: [id, email]
+              properties:
+                id: { type: string, format: uuid }
+                email: { type: string, format: email }
+        error: { type: 'null' }
+        request_id: { type: string }
+    GenericAuthMessage:
+      type: object
+      required: [ok, message]
+      properties:
+        ok: { type: boolean, const: true }
+        message: { type: string }
     PollOption:
       type: object
       additionalProperties: false
@@ -2271,6 +2428,8 @@ components:
                 name: { type: string }
                 type: { type: string }
                 size: { type: integer, minimum: 1 }
+        error: { type: 'null' }
+        request_id: { type: string }
     TvChannel:
       type: object
       additionalProperties: false
