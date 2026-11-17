@@ -8,6 +8,9 @@
     "resend-verification",
     "verify-email",
     "login",
+    "refresh",
+    "logout",
+    "logout-all",
     "forgot-password",
     "reset-password"
   ],
