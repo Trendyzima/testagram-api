@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "policy": "Immutable source pins identify exact reviewed commits. Production source pins target merged mainline SHAs. Runtime deployment and public-domain routing require separate live evidence; live B2/R2 lifecycle, identity activation, CDN custom-domain cutover and full device acceptance remain gated. Backend native identity review is the sole registration authority: private evidence review, two independent approvals and one-time provisioning are required. The legacy Appwrite registration-consent endpoint is compatibility-only and never creates or authorizes a canonical account. Backend and Flutter identity changes are merged to mainline and their CI workflows passed; production rollout and VPS/database acceptance remain separate release gates.",
+  "policy": "Immutable source pins identify exact reviewed commits. Production source pins target merged mainline SHAs. Draft cross-repository validation may temporarily pin an immutable reviewed feature-PR SHA; refresh the pin to mainline after that PR merges. Runtime deployment and public-domain routing require separate live evidence; live B2/R2 lifecycle, identity activation, CDN custom-domain cutover and full device acceptance remain gated. Backend native identity review is the sole registration authority: private evidence review, two independent approvals and one-time provisioning are required. The legacy Appwrite registration-consent endpoint is compatibility-only and never creates or authorizes a canonical account. Backend and Flutter identity changes are merged to mainline and their CI workflows passed; production rollout and VPS/database acceptance remain separate release gates.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "decc78012a2556a5b207d915a03fa6dff5b680c1",
+      "ref": "a6c2454f41ffb4f0f1beef00e623d7f038428cbb",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
@@ -269,7 +269,7 @@
     },
     "algorithm": {
       "fullName": "Trendyzima/the-algorithm",
-      "ref": "2194c6919a808294b9d7430ef964c60406d823d6",
+      "ref": "da8e90e79150636a6efe8e03c2cbc8fb9357764d",
       "checkoutPath": "source-repos/algorithm",
       "sourcePaths": [
         "testagram-feed/api/openapi.yaml",
