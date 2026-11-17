@@ -14,6 +14,7 @@
 | CDN viewer assertion | Backend-authorized media clients | CDN private-media assertion relay and trusted origin | General API authentication or service-to-service identity |
 | CDN origin and purge tokens | Backend/CDN runtime and authorized operators | Trusted CDN origin and purge routes respectively | Public SDK or client bundle |
 | S3/object-store credentials | Backend/Data Centre runtime | Object storage | Flutter, CDN public responses or API docs |
+| Legacy Appwrite session/API key | Legacy Fresh Backend image only | Its retained `/auth/v1/*` compatibility runtime | Native Backend `cmd/api`, Flutter, Data Centre platform APIs and all new clients |
 
 ## Mandatory controls
 
