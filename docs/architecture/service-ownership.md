@@ -28,6 +28,38 @@ The API repository publishes the public/private contracts, generated SDKs, sourc
 | `the-algorithm` | Private candidate ranking and recommendations; ordered IDs and explainable reasons | Candidate authorization, source records, social graph authority, visibility or pagination |
 | `testagram-api` | OpenAPI 3.1, private schemas, events, SDKs, immutable source pins, compatibility policy and cross-repository CI | Runtime traffic, product data, authentication decisions or service authorization |
 
+## Public hostname and edge ownership
+
+The intended production hostname map is part of the shared seven-repository architecture.
+The Cloudflare Worker `testagram-cdn` in the CDN repository is a hostname gateway,
+not a product API, media authorization service or object store.
+
+| Public hostname | Edge path | Canonical owner |
+| --- | --- | --- |
+| `www.testagram.site` | Cloudflare Worker → Caddy edge → private Flutter web container | Flutter Client owns the web application; Backend deployment owns its private serving runtime |
+| `testagram.site` | Cloudflare Worker → Caddy edge | Federation owns WebFinger/ActivityPub; Caddy redirects ordinary web paths to www |
+| `api.testagram.site` | Cloudflare Worker → Backend public listener | Testagram Backend |
+| `media.testagram.site` | Cloudflare Worker → Go CDN listener | Testagram CDN |
+
+Data Centre, Federation and Algorithm remain private service boundaries except
+for Federation protocol paths deliberately exposed through the apex. The Flutter
+client calls only the public Backend API and approved media URLs; it must never
+connect directly to private service APIs, PostgreSQL or object-store credentials.
+The API repository remains the contract control plane and does not receive
+runtime user traffic.
+
+Cloudflare Pages project `testagram-flutter-web` is retained for preview builds
+only after the guarded migration completes. The production apex and www custom
+domains must not be reattached to Pages by any future preview workflow.
+
+This hostname map describes the target after the verified cutover; it does not
+authorize premature DNS changes or Pages detachment. Before cutover, the
+self-hosted Flutter image must be published and anonymously pullable (or the
+host must have a read-only registry credential), the Backend/Caddy origin must
+pass health and application-shell probes, Worker/DNS/Pages ownership must be
+enumerated, and the guarded rollback path must be available. Preserve the
+existing production routes until those conditions pass.
+
 ## Authentication and identity migration state (2026-11-16)
 
 - Flutter mainline contains the Testagram-owned `NativeAuthClient`; it stores the rotating refresh credential in secure storage and keeps short-lived access tokens in memory.
