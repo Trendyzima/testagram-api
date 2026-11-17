@@ -1,6 +1,6 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "decc78012a2556a5b207d915a03fa6dff5b680c1",
+  "sourceRef": "2bbf251e1c67af292c9fee76bf68a570dd743423",
   "sourceFile": "cmd/api/main.go",
   "note": "Static public/API route registrations across all production Go files in cmd/api at the Backend mainline commit de78071a67998df5dd32cc7e8e1122f3e2dd0398 after health-listener isolation, identity retry hardening and read-only production schema preflight. /readyz and /metrics are served only on the private :8082 listener and are intentionally excluded from this public route inventory. Dynamic auth actions are asserted separately; registered-only routes are not approved for client adoption until promoted into OpenAPI.",
   "dynamicAuthActions": [
