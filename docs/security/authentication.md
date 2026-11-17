@@ -37,3 +37,4 @@ The Admin Console uses the same Testagram-native Backend identity authority. It 
 - Private Data Centre, Federation and Algorithm endpoints are service-to-service only.
 - Do not store bearer tokens, recovery tokens, evidence bytes or signed object URLs in logs, analytics, crash reports or test fixtures.
 - Use TLS for all non-local traffic.
+A separate legacy Fresh Backend image is still referenced by Data Centre `vps/docker-compose.yml` and requires Appwrite endpoint/project/database/server-key configuration. It is separately pinned and audited as a legacy runtime, not part of the native Backend auth contract. Do not route Flutter or new services to its `/auth/v1/*` endpoints, and do not remove it until deployed traffic, existing-account reconciliation, rollback and production cutover are verified and separately approved.
