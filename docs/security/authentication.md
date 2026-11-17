@@ -27,7 +27,7 @@ The registration feature flag remains fail-closed until the storage, email, poli
 
 ## Staff identity review
 
-The Admin Console uses the same Testagram-native Backend identity authority. It exchanges credentials at the native login endpoint, verifies the current session and PostgreSQL staff principal/role, and stores the session only inside an encrypted `testagram-staff` cookie (`HttpOnly`, `Secure`, `SameSite=Strict`). Staff access requires an enabled principal, enrolled MFA and an explicit PostgreSQL role grant. Staff invitation and role-grant activation remain fail-closed until the dual-control onboarding path is implemented. Historical Appwrite account IDs are reconciliation inputs only; Appwrite bearer tokens are not accepted by the native end-user or staff API paths.
+The Admin Console uses the same Testagram-native Backend identity authority. It exchanges credentials at the native login endpoint, verifies the current session and PostgreSQL staff principal/role, and stores the session only inside an encrypted `testagram-staff` cookie (`HttpOnly`, `Secure`, `SameSite=Strict`). The current console checks an enabled principal, a recorded `mfa_enrolled_at` marker and an explicit PostgreSQL role grant. Its step-up currently rechecks the password only; it does not yet verify a TOTP/passkey challenge, so the marker must not be represented as completed second-factor authentication. Staff invitation and role-grant activation remain fail-closed. Historical Appwrite account IDs are reconciliation inputs only; Appwrite bearer tokens are not accepted by the native end-user or staff API paths.
 
 ## Security rules
 
