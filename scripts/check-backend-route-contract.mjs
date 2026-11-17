@@ -94,6 +94,7 @@ const expectedPrivateInternalRoutes = new Set([
   "GET /internal/v1/federation/objects/{}",
   "POST /internal/v1/federation/remote-follows",
   "POST /internal/v1/federation/remote-follows/undo",
+  "POST /internal/v1/federation/subscriptions/verify",
 ]);
 const missingPrivateInternalRoutes = [...expectedPrivateInternalRoutes].filter((route) => !privateInternalRoutes.has(route)).sort();
 const unexpectedPrivateInternalRoutes = [...privateInternalRoutes].filter((route) => !expectedPrivateInternalRoutes.has(route)).sort();
