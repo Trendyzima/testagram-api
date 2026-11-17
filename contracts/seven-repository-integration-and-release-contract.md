@@ -1,7 +1,7 @@
 # Testagram seven-repository integration and release contract
 
 Status: reviewed integration baseline; **not** production cutover authorization.
-Reviewed: 2026-11-13.
+Reviewed: 2026-11-18.
 
 This repository is the contract control plane. It owns public/private OpenAPI, event schemas, SDKs, route inventories, immutable source pins and cross-repository compatibility CI. It is not a runtime service, identity provider, product database or authorization gateway.
 
@@ -9,14 +9,14 @@ The six runtime repositories are Flutter, Backend, Data Centre, CDN, Federation 
 
 ## Immutable source revisions
 
-The exact revisions used by contract CI are in `contracts/sources.lock.json`. All six runtime source pins identify immutable commits on their repositories' main branches: Backend `a5e4ce7d502a9b68f8f321d038fca4d9eb990261`, Data Centre `18930b7707b97fec44c6ffc42eae4220c32a848f`, CDN `543093e47bde602512adfc2b4aa30caed8cf0e60`, Flutter `32c7a033469f5bd796dc0b4b650367c1ebc3f50c`, Federation `edf4f59f843514596d35273c888ff1c16ec0f73e`, and Algorithm `6ae0532c171383b84731063d590d775524f9da1e`. Contract CI checks exact immutable checkouts and snapshots. A source pin is not evidence that a service is deployed.
+The exact revisions used by contract CI are in `contracts/sources.lock.json`. The reviewed source pins are Backend `19645d484433ad081b4e9568b8d675a29294ff2c`, Data Centre `fda92448fb6df8c1c313f1e7751540866ffa97b8`, CDN `28c58a41d69320034132f3e13fac2ce9d8406b1f`, Flutter `a90ae7cf77034308ff205d66614d1061821f27d4`, Federation `b0e75e8d005d3a014badd762bec4e81fe09559fe`, and Algorithm `da8e90e79150636a6efe8e03c2cbc8fb9357764d`. Contract CI checks exact immutable checkouts and snapshots. A source pin is not evidence that a service is deployed.
 
 ## Ownership and allowed calls
 
 | Repository | Owns | Allowed runtime path |
 |---|---|---|
-| Flutter | UI, local presentation and Appwrite session acquisition | Public authenticated Backend API; canonical media URLs only |
-| Backend | Product identity, authorization, social API, PostgreSQL state, media policy, outboxes and orchestration | Appwrite Auth; private Algorithm, Federation and Data Centre clients; trusted CDN origin |
+| Flutter | UI, local presentation, Testagram-native login/session/recovery client | Public Backend API using short-lived native access JWTs; canonical media URLs only |
+| Backend | Canonical identity, native credential/session authority, product authorization, social API, PostgreSQL state, media policy and orchestration | Private Algorithm, Federation and Data Centre clients; trusted CDN origin |
 | Data Centre | Private media lifecycle, B2/R2 operations, replication/reconciliation, node/platform operations and backups | Private Backend network; object stores and node agents |
 | CDN | Go media delivery, public cache, private assertion relay, range/HEAD, shields and origin routing | Public media traffic; authenticated Backend origin |
 | Federation | ActivityPub actors, signatures, inbox/outbox, remote delivery and federation state | Private Backend contracts; remote ActivityPub peers |
@@ -27,17 +27,26 @@ The exact revisions used by contract CI are in `contracts/sources.lock.json`. Al
 
 ### Flutter -> Backend
 
-- Flutter obtains an Appwrite session JWT and sends it to Backend as a bearer token.
-- Backend validates it and derives canonical identity server-side.
+- Flutter submits email/password to Backend `POST /api/auth/login` and receives a 15-minute Testagram-native access JWT plus an opaque rotating refresh token.
+- Flutter keeps access tokens in memory and stores only the refresh token in platform secure storage. Refresh is sent only to `POST /api/auth/refresh`; it is never a bearer credential.
+- Backend verifies signature, issuer, audience, expiry, canonical UUID, token version and session ID, then rechecks the live PostgreSQL session, account state, verified email and provisioning status.
+- Logout and logout-all revoke server-side sessions; password reset consumes a one-time hashed recovery token and revokes prior sessions.
 - Flutter must not receive service tokens, storage-provider keys, database credentials or private service URLs.
 - The client API base is configured through `TESTAGRAM_API_URL`.
-- Private media requests use only short-lived Backend-issued viewer assertions; no assertion is reused for a different URL or asset.
+- Private media requests use only short-lived Backend-issued viewer assertions; no assertion is reused for a different URL or asset and the raw user JWT is not forwarded to the CDN origin.
+
+### Native authentication and staff sessions
+
+- The Backend is the only end-user credential issuer. Current mainline uses Testagram-native sessions; the native API path does not accept Appwrite JWTs as a compatibility fallback.
+- The Admin Console signs in through the same Backend-native login endpoint. It stores its session inside the encrypted `testagram-staff` cookie (`HttpOnly`, `Secure`, `SameSite=Strict`) and checks the enabled PostgreSQL staff principal, enrolled MFA and role grant on staff requests.
+- Staff invitation and role-grant activation remain fail-closed until the dual-control onboarding path is available. Historical Appwrite account IDs are retained only for explicit reconciliation; email equality is never an account-linking rule.
+- The Backend and user-aware Data Centre services must share the same `TESTAGRAM_AUTH_JWT_SECRET`. Data Centre video/notification handlers validate the JWT and then recheck the live PostgreSQL session/account state; a signature alone never grants access.
+- Data Centre platform routes use `PLATFORM_INTERNAL_TOKEN`, not a user access JWT. Federation ingress/read credentials, Algorithm internal token, CDN viewer assertion, CDN origin token and purge token are separate identities with separate audiences.
 
 ### Backend -> Algorithm
 
 - `POST /v1/feed/rank`; readiness `GET /readyz`.
 - The current `cmd/api` runtime uses `ALGORITHM_URL=http://algorithm:8092` and `ALGORITHM_INTERNAL_TOKEN`, matching Algorithm's `INTERNAL_TOKEN`.
-- The separate `cmd/fresh-api` runtime uses `ALGORITHM_ENDPOINT`; these names are not interchangeable.
 - Backend submits at most 200 authorized candidates and accepts at most 50 results. It rejects duplicate or unknown IDs and reapplies visibility, blocks, follows and moderation after ranking.
 
 ### Backend <-> Federation
@@ -60,7 +69,7 @@ The exact revisions used by contract CI are in `contracts/sources.lock.json`. Al
 
 ### Backend -> CDN -> trusted origin -> storage
 
-- Backend issues the authorization assertion; CDN validates/relays it and does not decide user visibility.
+- Backend issues the authorization assertion; CDN validates/relays it and does not decide user visibility. The viewer assertion is distinct from the Flutter user access JWT and from the CDN origin/purge credentials.
 - Private origin requests require both CDN service authentication and a valid Backend viewer assertion. Private responses bypass shared cache and return no-store.
 - Public cache misses require canonical Backend metadata to prove the object is ready and public before CDN can cache it.
 - Backend PR #206 implements the canonical public-origin branch: a viewer assertion may be omitted only for an asset whose Backend metadata row is both `ready` and `public`; private media still requires a key-bound viewer assertion and a separate CDN origin credential. The provider is resolved from canonical metadata and GET/HEAD are signed with the correct method. Backend PR #223 adds and passes a PostgreSQL-backed handler acceptance matrix for public/private/deleted/quarantined denial, wrong service credentials, owner/key mismatch, method-correct GET/HEAD, Range forwarding and private no-store/public cache classification. The API contract CI statically checks Backend origin registration/authorization and CDN consumer enforcement. Deployed CDN smoke, cache-purge revocation under live traffic and custom-domain routing remain separate gates. Treat source wiring and CI handler acceptance as implemented, not fully deployed.
@@ -69,7 +78,7 @@ The exact revisions used by contract CI are in `contracts/sources.lock.json`. Al
 
 ### Fresh API runtime boundary
 
-The Data Centre Compose `api` container runs Backend `cmd/fresh-api`, which is distinct from the self-hosted Backend `cmd/api` runtime. The pinned Backend mainline contains the typed Data Centre media client described above, and the API contract audit checks all five client/provider/OpenAPI routes plus private Compose-network and service-token wiring. The `cmd/fresh-api` runtime still uses its own `freshstorage.FromEnv()` provider path and does not yet consume `DATA_CENTRE_MEDIA_API_URL` / `FRESH_DATA_CENTRE_INTERNAL_TOKEN`. Do not pass B2/R2 credentials into the Fresh API container or enable its media flag until a Data Centre-backed adapter and canonical metadata-ledger reconciliation are implemented and tested. Keep `FRESH_MEDIA_ENABLED=false` in that profile. The separate `cmd/api` runtime's typed Data Centre media integration does not automatically wire the Fresh API runtime.
+The legacy Fresh API runtime is not part of the current Backend `main` source pin. Do not treat old `cmd/fresh-api` references or its environment names as a supported authentication path. The supported native user-authenticated public API is Backend `cmd/api`; private Data Centre media/platform APIs remain service-token protected. Any retained Fresh API image or profile must be separately reconciled against a current source revision before it is enabled.
 
 ### TV / HLS
 
@@ -81,7 +90,7 @@ The Data Centre Compose `api` container runs Backend `cmd/fresh-api`, which is d
 
 ## Contract and CI boundaries
 
-- The Backend route inventory currently audits 82 static routes; 37 contracted operations are represented in the Backend OpenAPI. The separate Fresh API inventory contains 22 routes explicitly marked uncontracted pending wire-level review. CI passing means the inventory is accurately marked; it does not approve those 22 routes for public clients.
+- The Backend route inventory is pinned to the exact Backend `main` source SHA in `contracts/route-inventory/backend-public-routes.json`; the current inventory audits static routes and explicitly marks registered-only operations. Contract CI must verify parity after each source-pin refresh. The separate Fresh API inventory contains 22 routes explicitly marked uncontracted pending wire-level review. CI passing means the inventory is accurately marked; it does not approve those 22 routes for public clients.
 - API cross-repository CI checks immutable source checkout, OpenAPI lint, SDK build, tests, Backend route inventory and cross-repository snapshots.
 - Every source path in the current six runtime pins must exist at the pinned commit. Every snapshot must match its upstream source byte-for-byte.
 - A contract change requires producer, consumer, schema, fixtures, route inventory and pin updates in the same reviewed integration cycle.
