@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "policy": "Immutable source pins identify exact reviewed commits. Production source pins target merged mainline SHAs. Runtime deployment and public-domain routing require separate live evidence; live B2/R2 lifecycle, identity activation, CDN custom-domain cutover and full device acceptance remain gated. Backend native identity review is the sole registration authority: private evidence review, two independent approvals and one-time provisioning are required. The legacy Appwrite registration-consent endpoint is compatibility-only and never creates or authorizes a canonical account. Backend and Flutter identity changes are merged to mainline and their CI workflows passed; production rollout and VPS/database acceptance remain separate release gates.",
+  "policy": "Immutable source pins identify exact reviewed commits. Production source pins target merged mainline SHAs. Draft cross-repository validation may temporarily pin an immutable reviewed feature-PR SHA; refresh the pin to mainline after that PR merges. Runtime deployment and public-domain routing require separate live evidence; live B2/R2 lifecycle, identity activation, CDN custom-domain cutover and full device acceptance remain gated. Backend native identity review is the sole registration authority: private evidence review, two independent approvals and one-time provisioning are required. The legacy Appwrite registration-consent endpoint is compatibility-only and never creates or authorizes a canonical account. Backend and Flutter identity changes are merged to mainline and their CI workflows passed; production rollout and VPS/database acceptance remain separate release gates.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "decc78012a2556a5b207d915a03fa6dff5b680c1",
+      "ref": "2bbf251e1c67af292c9fee76bf68a570dd743423",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/instabox-deploy.yml",
