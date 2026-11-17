@@ -2133,7 +2133,7 @@ components:
       type: apiKey
       in: cookie
       name: testagram-staff
-      description: Encrypted HttpOnly, Secure, SameSite=Strict Admin Console session cookie. The cookie contains a Backend-native access/refresh session and is accepted only by staff review operations after PostgreSQL staff-role and MFA checks.
+      description: Encrypted HttpOnly, Secure, SameSite=Strict Admin Console session cookie containing a Backend-native access/refresh session. Staff routes check PostgreSQL role grants and the recorded mfa_enrolled_at marker. The current console step-up is password re-authentication only; it does not yet verify a TOTP/passkey challenge, and staff onboarding remains fail-closed.
     testagramBearer:
       type: http
       scheme: bearer
