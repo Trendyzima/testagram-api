@@ -70,3 +70,5 @@ Provider ETags are opaque transport metadata, not a portable checksum.
 - Staff console: native login, encrypted session cookie, session validation and PostgreSQL role/MFA checks are implemented. Complete the fail-closed invitation and two-person staff-role onboarding workflow before opening staff enrollment.
 
 No repository PR is merged merely because its local tests pass. Require exact-head CI, review, staging evidence and cross-repository compatibility. Any production provider/auth/DNS change requires a separate explicit release approval.
+
+A separate legacy Fresh Backend image is still referenced by Data Centre `vps/docker-compose.yml` and requires Appwrite endpoint/project/database/server-key configuration. It is pinned and audited separately from current Backend `main`; it is not part of the native auth contract. Do not remove it until deployed traffic, account reconciliation, rollback and production cutover are verified and separately approved.
