@@ -8,7 +8,7 @@
       "repository": "Trendyzima/Testagram-backend-",
       "role": "public-api-provider",
       "authority": [
-        "Appwrite JWT validation",
+        "Testagram-native access-token issuance and live-session validation",
         "canonical user identity",
         "product authorization",
         "canonical product records",
@@ -19,7 +19,7 @@
       ],
       "baseUrl": "https://api.testagram.site",
       "exposure": "public",
-      "auth": "Appwrite session JWT; Backend validates and derives identity",
+      "auth": "Testagram-native short-lived access JWT; PostgreSQL session/account checks on every protected request; opaque rotating refresh token accepted only by /api/auth/refresh; no Appwrite bearer fallback on end-user routes",
       "consumers": [
         "flutter-client"
       ],
@@ -31,7 +31,7 @@
         "contracts/internal/openapi/backend-user-activity-watchdog-v1.yaml"
       ],
       "status": "implemented-core-contract",
-      "notes": "Backend is the only public product API runtime and canonical authority for local and remote social relationships, public posts and privacy. It transactionally enqueues opted-in public posts for Federation and rechecks public eligibility on object dereference. The private GitHub Actions TV health monitor contract is separately specified and never exported to public client SDKs. The internal-only authenticated-user activity watchdog contract is defined in contracts/internal/openapi/backend-user-activity-watchdog-v1.yaml; Backend emits impulses only after validating existing sessions and authorization. It is never exposed to public clients. A trusted activation worker is still required to consume claims and operate the runtime."
+      "notes": "Backend is the sole public product API and canonical identity authority. Mainline issues native Testagram sessions and checks PostgreSQL session/account state; legacy Appwrite IDs remain only as explicit reconciliation inputs and are not accepted as user bearer credentials. Admin Console staff sessions use the native Backend identity plus the encrypted testagram-staff cookie and PostgreSQL staff-role/MFA records. Registration remains fail-closed until private evidence, email, independent review and provisioning gates are enabled and accepted."
     },
     {
       "id": "flutter-client",
@@ -42,11 +42,11 @@
         "navigation",
         "device permissions",
         "local presentation state",
-        "Appwrite session acquisition"
+        "Testagram-native login, refresh, recovery and session restoration"
       ],
       "baseUrl": null,
       "exposure": "client",
-      "auth": "Obtains Appwrite JWT and sends it only to Backend public API",
+      "auth": "Uses Backend-native login and rotating refresh credentials; stores only the refresh token in platform secure storage; access token stays in memory",
       "consumers": [
         "backend-public"
       ],
@@ -56,7 +56,7 @@
         "packages/dart/lib/testagram_api.dart"
       ],
       "status": "consumer-with-native-identity-and-public-api-contract",
-      "notes": "Flutter obtains Appwrite session JWTs and calls only the Backend public API. The shared OpenAPI contract is the source of truth for contracted public operations, including the applicant-scoped native identity application/evidence/status/provisioning routes. Applicant and verification-session tokens are limited to their own identity operations; the Appwrite JWT is used for final approved provisioning redemption. Flutter must never receive service tokens, storage-provider keys, database credentials or private service URLs."
+      "notes": "Flutter uses the Testagram-native Backend auth client for login, password recovery/reset, session restore, refresh and logout. It calls only the Backend public API with the short-lived native access token. Applicant and verification-session tokens are limited to their own identity operations; the native password is set only after approved provisioning. No Appwrite JWT is sent by the public client. Flutter must never receive service tokens, storage-provider keys, database credentials or private service URLs."
     },
     {
       "id": "data-centre-platform",
@@ -72,7 +72,7 @@
       ],
       "baseUrl": "http://platform:8095",
       "exposure": "private-network",
-      "auth": "PLATFORM_INTERNAL_TOKEN for protected writes; public config read is restricted to enabled public keys",
+      "auth": "PLATFORM_INTERNAL_TOKEN for protected platform writes; video and notification user routes validate Backend-native access JWTs against live PostgreSQL session/account state; user tokens are never platform service credentials",
       "consumers": [
         "backend-public"
       ],
@@ -81,7 +81,7 @@
         "docs/integration/data-centre-platform-contract.md"
       ],
       "status": "private-media-profile-merged-compose-optional-and-ci-verified-runtime-deployment-and-live-b2-r2-acceptance-pending",
-      "notes": "Data Centre PR #66 added the opt-in `media` profile with a separate media database, private `testagram-platform` network, five authenticated lifecycle routes, durable verify/replicate/delete outbox and reconciliation worker. Data Centre PR #67 fixed Compose shell-variable escaping so the disabled profile no longer blocks core production deployment; CI now validates both disabled and enabled profile models and runs the dedicated media service smoke. Backend's typed client and API contract checks cover the five routes. Backend deployment has not yet enabled this profile; `DATA_CENTRE_MEDIA_ENABLED` must remain false until dedicated B2/R2 staging write/read/hash/replication/delete/restore acceptance passes. Keep `FRESH_MEDIA_ENABLED=false` because the separate Fresh API runtime still lacks the canonical Data Centre adapter/metadata-ledger integration."
+      "notes": "Data Centre PR #66 added the opt-in `media` profile with a separate media database, private `testagram-platform` network, five authenticated lifecycle routes, durable verify/replicate/delete outbox and reconciliation worker. Data Centre PR #67 fixed Compose shell-variable escaping so the disabled profile no longer blocks core production deployment; CI now validates both disabled and enabled profile models and runs the dedicated media service smoke. Backend's typed client and API contract checks cover the five routes. Backend deployment has not yet enabled this profile; `DATA_CENTRE_MEDIA_ENABLED` must remain false until dedicated B2/R2 staging write/read/hash/replication/delete/restore acceptance passes. Keep `FRESH_MEDIA_ENABLED=false` because the separate Fresh API runtime still lacks the canonical Data Centre adapter/metadata-ledger integration. User-aware video and notification routes share the Backend-native JWT format and independently recheck live session, token version, account status, email verification and native-registration state in PostgreSQL. Their TESTAGRAM_AUTH_JWT_SECRET must match the Backend issuer; PLATFORM_INTERNAL_TOKEN and notification/media service credentials remain separate."
     },
     {
       "id": "cdn-edge",
@@ -97,7 +97,7 @@
       ],
       "baseUrl": "https://media.testagram.site",
       "exposure": "public-media-and-restricted-operations",
-      "auth": "Public objects by policy; private media requires expiring key-bound playback authorization; purge uses PURGE_TOKEN",
+      "auth": "Backend-issued short-lived viewer assertion for private media; separate origin and purge credentials; raw user access JWT is not forwarded as a CDN origin credential",
       "consumers": [
         "backend-public",
         "flutter-client"
@@ -106,7 +106,7 @@
         "docs/integration/cdn-edge-contract.md"
       ],
       "status": "go-cdn-instabox-deployment-wired-live-rollout-and-domain-cutover-pending",
-      "notes": "Backend PR #223 is merged. It replaces the legacy Nginx cache with the immutable Go CDN image (`sha256:e4c014a043b761d6f84b05d3973a3a6831522b863eef08685b7ca6db17f55ce9`), gives it a persistent bounded cache, private Backend origin, distinct origin/viewer-assertion/purge credentials, cache purge-before-delete, Instabox container verification and external health/readiness/unauthenticated-denial smoke. The PostgreSQL-backed Backend origin matrix, Go security checks, Backend race/static tests and self-hosted Compose validation passed pre-merge. The first production deployment attempt reached the VPS but stopped at Data Centre Compose interpolation; Data Centre PR #67 fixed that defect and the failed deployment job is being rerun. Do not claim live CDN service until that rerun and external HTTPS smoke pass. CDN issues #61/#65 still report `media.testagram.site` serving the older R2 Worker; custom-domain/DNS cutover and rollback are not yet evidenced. Cloudflare deployment/DNS credentials are not available through the current repository integration."
+      "notes": "Backend PR #223 is merged. It replaces the legacy Nginx cache with the immutable Go CDN image (`sha256:e4c014a043b761d6f84b05d3973a3a6831522b863eef08685b7ca6db17f55ce9`), gives it a persistent bounded cache, private Backend origin, distinct origin/viewer-assertion/purge credentials, cache purge-before-delete, Instabox container verification and external health/readiness/unauthenticated-denial smoke. The PostgreSQL-backed Backend origin matrix, Go security checks, Backend race/static tests and self-hosted Compose validation passed pre-merge. The first production deployment attempt reached the VPS but stopped at Data Centre Compose interpolation; Data Centre PR #67 fixed that defect and the failed deployment job is being rerun. Do not claim live CDN service until that rerun and external HTTPS smoke pass. CDN issues #61/#65 still report `media.testagram.site` serving the older R2 Worker; custom-domain/DNS cutover and rollback are not yet evidenced. Cloudflare deployment/DNS credentials are not available through the current repository integration. CDN viewer assertions are distinct from user access JWTs and from the origin/purge service credentials. CDN never becomes the identity or visibility authority."
     },
     {
       "id": "federation",
