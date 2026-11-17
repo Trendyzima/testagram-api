@@ -18,7 +18,7 @@
     {
       "method": "DELETE",
       "path": "/api/federation/subscriptions/{subscription_id}",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "DELETE",
@@ -73,7 +73,7 @@
     {
       "method": "GET",
       "path": "/api/federation/subscriptions",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "GET",
@@ -303,7 +303,7 @@
     {
       "method": "POST",
       "path": "/api/federation/subscriptions",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
@@ -328,12 +328,12 @@
     {
       "method": "POST",
       "path": "/api/identity/applications/{application_id}/resend-verification",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
       "path": "/api/identity/applications/{application_id}/verify-email",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
@@ -453,7 +453,7 @@
     {
       "method": "POST",
       "path": "/api/social/posts/{post_id}/view",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
