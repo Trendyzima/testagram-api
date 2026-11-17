@@ -132,8 +132,14 @@ for (const action of dynamicActions) {
     throw new Error(`Dynamic auth action missing from Backend registration: ${action}`);
   }
 }
-if (!source.includes('for _, action := range []string{"signup", "resend-verification", "verify-email", "login", "forgot-password", "reset-password"}')) {
-  throw new Error("Backend auth route loop changed; update route inventory audit.");
+const authRouteLoop = source.match(/for _, action := range \\[\\]string\\{([^}]+)\\}\\s*\\{\\s*action := action\\s*mux\\.HandleFunc\\("OPTIONS \\/api\\/auth\\/"\\+action/);
+if (!authRouteLoop) {
+  throw new Error("Backend native auth route loop is missing.");
+}
+const registeredAuthActions = [...authRouteLoop[1].matchAll(/"([^"]+)"/g)].map((match) => match[1]).sort();
+const expectedAuthActions = [...dynamicActions].sort();
+if (JSON.stringify(registeredAuthActions) !== JSON.stringify(expectedAuthActions)) {
+  throw new Error("Backend dynamic auth actions do not match the API route inventory.");
 }
 
 const postEvidence = [
