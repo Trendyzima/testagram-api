@@ -39,6 +39,7 @@
         "cmd/api/identity_media_replication.go",
         "cmd/api/identity_media_replication_test.go",
         "cmd/api/identity_native.go",
+        "cmd/api/identity_native_provisioning.go",
         "cmd/api/identity_native_provisioning_integration_test.go",
         "cmd/api/identity_native_test.go",
         "cmd/api/identity_provisioning_integration_test.go",
