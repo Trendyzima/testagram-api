@@ -5,6 +5,7 @@ const root = process.cwd();
 const read = (path) => readFileSync(resolve(root, path), "utf8");
 const inventory = JSON.parse(read("contracts/route-inventory/backend-public-routes.json"));
 const backendClient = read("source-repos/flutter-client/lib/core/backend_api.dart");
+const nativeAuthClient = read("source-repos/flutter-client/lib/core/auth/native_auth_client.dart");
 const identityClient = read("source-repos/flutter-client/lib/features/auth/identity_verification_client.dart");
 const publicSpec = read("contracts/openapi/testagram-v1.yaml");
 const fail = [];
@@ -51,9 +52,11 @@ for (const path of [...routes].sort()) {
     warnings.push(path + " (" + entry.status + ")");
   }
 }
-if (!backendClient.includes("'Authorization': 'Bearer $jwt'") &&
-    !backendClient.includes('"Authorization": "Bearer $jwt"')) {
-  fail.push("Flutter BackendApi must attach the Appwrite session JWT as a Bearer token");
+if (!backendClient.includes("getAccessToken") ||
+    !backendClient.includes("'Authorization': 'Bearer $token'") ||
+    !nativeAuthClient.includes("/api/auth/") ||
+    !nativeAuthClient.includes("_refreshKey")) {
+  fail.push("Flutter BackendApi must attach the Testagram-native access JWT from NativeAuthClient; only the refresh token may be persisted");
 }
 if (!identityClient.includes("X-Verification-Session-Token") ||
     !identityClient.includes("X-Application-Token")) {
@@ -93,4 +96,4 @@ if (fail.length) {
   console.error(fail.map((item) => "- " + item).join("\n"));
   process.exit(1);
 }
-console.log("Flutter-to-Backend boundary audit passed: " + routes.size + " client paths and " + clientOperations.size + " method/path operations are inventoried and contracted; JWT/token boundaries are present, and no direct private-service/provider calls were found.");
+console.log("Flutter-to-Backend boundary audit passed: " + routes.size + " client paths and " + clientOperations.size + " method/path operations are inventoried and contracted; Testagram-native access/refresh-token boundaries are present, and no direct private-service/provider calls were found.");
