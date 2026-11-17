@@ -27,7 +27,7 @@ The registration feature flag remains fail-closed until the storage, email, poli
 
 ## Staff identity review
 
-The staff review console and reviewer routes still have a separate legacy Appwrite-based authentication dependency in the current codebase. This is not an end-user authentication provider and must not be used by Flutter's public login, session, or password-recovery flow. Migrate the staff console and staff-role ledger to native Testagram sessions before claiming the entire platform has zero Appwrite runtime dependencies.
+The Admin Console uses the same Testagram-native Backend identity authority. It exchanges credentials at the native login endpoint, verifies the current session and PostgreSQL staff principal/role, and stores the session only inside an encrypted `testagram-staff` cookie (`HttpOnly`, `Secure`, `SameSite=Strict`). Staff access requires an enabled principal, enrolled MFA and an explicit PostgreSQL role grant. Staff invitation and role-grant activation remain fail-closed until the dual-control onboarding path is implemented. Historical Appwrite account IDs are reconciliation inputs only; Appwrite bearer tokens are not accepted by the native end-user or staff API paths.
 
 ## Security rules
 
