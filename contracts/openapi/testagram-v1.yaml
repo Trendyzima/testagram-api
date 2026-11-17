@@ -439,7 +439,7 @@ paths:
       summary: Stream private identity evidence to an authorized reviewer
       description: Requires a native Testagram staff session with an enabled staff principal, enrolled MFA and identity.review permission. Backend audits the access attempt before streaming. Backend audits the access attempt before streaming, verifies byte length and SHA-256 before returning evidence, restores a missing or drifted VPS primary from a checksum-verified B2/R2 replica when possible, and otherwise serves only a checksum-verified private replica through the Backend proxy. No storage URL is returned; responses are private, no-store and nosniff.
       security:
-        - appwriteBearer: []
+        - testagramStaffSession: []
       parameters:
         - in: path
           name: session_id
@@ -471,9 +471,9 @@ paths:
       operationId: recordIdentityReviewDecision
       tags: [Identity]
       summary: Record one independent reviewer decision
-      description: Requires verified Appwrite staff identity.review permission. A reviewer can decide once per session. Two distinct matching verified or failed decisions are required; a verified review creates a separate two-person account-approval request and does not itself provision an account.
+      description: Requires a native Testagram staff session with an enabled PostgreSQL staff principal, enrolled MFA and identity.review permission. A reviewer can decide once per session. Two distinct matching verified or failed decisions are required; a verified review creates a separate two-person account-approval request and does not itself provision an account.
       security:
-        - appwriteBearer: []
+        - testagramStaffSession: []
       parameters:
         - in: path
           name: session_id
@@ -505,7 +505,7 @@ paths:
       summary: Record one of the two independent account-activation approvals
       description: Requires a currently authorized, non-revoked Appwrite staff identity with identity.review permission. Only the two reviewers who independently verified the evidence may approve. The linked sensitive-action request must still be pending, target this application, require exactly two approvals and be unexpired; the application and approval request are finalized atomically before provisioning authorization can be issued.
       security:
-        - appwriteBearer: []
+        - testagramStaffSession: []
       parameters:
         - in: path
           name: application_id
