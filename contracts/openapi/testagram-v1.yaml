@@ -587,6 +587,65 @@ paths:
         '404': { description: Application or authorization not found. }
         '409': { description: "Approval authorization expired, consumed or replayed." }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/identity/applications/{application_id}/resend-verification:
+    post:
+      operationId: resendNativeIdentityVerification
+      tags: [Identity]
+      summary: Request another native account verification email
+      description: Uses the applicant-scoped X-Application-Token and returns the same generic response whether the application is awaiting verification or the capability is invalid. Resend is rate-limited and does not create or activate an account.
+      parameters:
+        - in: path
+          name: application_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: header
+          name: X-Application-Token
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+      responses:
+        '202':
+          description: Generic anti-enumeration acknowledgement. Delivery may be pending.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/identity/applications/{application_id}/verify-email:
+    post:
+      operationId: verifyNativeIdentityEmail
+      tags: [Identity]
+      summary: Verify the email address for a provisioned native account
+      description: Consumes the single-use email token after approved provisioning. On success the native provisioning state becomes active; the account can then sign in. Invalid or expired tokens do not activate an account.
+      parameters:
+        - in: path
+          name: application_id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [token]
+              properties:
+                token: { type: string, minLength: 32, maxLength: 128 }
+      responses:
+        '200':
+          description: Email verified and native account activated.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [status, email_verified, canonical_user_id]
+                properties:
+                  status: { type: string, const: active }
+                  email_verified: { type: boolean, const: true }
+                  canonical_user_id: { type: string, format: uuid }
+        '400': { description: Verification token is invalid or expired. }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/feed/home:
     get:
       operationId: getHomeFeed
@@ -1455,7 +1514,7 @@ paths:
       operationId: updateMyFederationPreference
       tags: [Federation]
       summary: Update the authenticated user's federation preference
-      description: Backend validates the Appwrite session, account status and username discoverability. This endpoint changes preference only; it does not create a separate Mastodon account or bypass federation rollout gates.
+      description: Backend validates the Testagram-native access session, live account status and username discoverability. This endpoint changes preference only; it does not create a separate Mastodon account or bypass federation rollout gates.
       requestBody:
         required: true
         content:
@@ -1495,6 +1554,74 @@ paths:
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
 
+  /api/federation/subscriptions:
+    get:
+      operationId: listRemoteAuthorSubscriptions
+      tags: [Federation]
+      summary: List this user's remote author subscriptions
+      description: Returns only subscriptions owned by the authenticated canonical Testagram user. Remote actors remain distinct from local accounts.
+      security:
+        - testagramBearer: []
+      responses:
+        '200':
+          description: Active remote author subscriptions.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    post:
+      operationId: createRemoteAuthorSubscription
+      tags: [Federation]
+      summary: Subscribe to a remote ActivityPub or Bluesky author
+      description: Requires a native Testagram access session. Backend validates canonical HTTPS ActivityPub actor URIs or Bluesky DIDs, scopes the subscription to the authenticated user and asks the private Federation service to resolve the remote identity. A subscription is not a local account or a follow grant.
+      security:
+        - testagramBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [protocol, identity]
+              properties:
+                protocol: { type: string, enum: [activitypub, bluesky] }
+                identity: { type: string, minLength: 1, maxLength: 2048 }
+                handle: { type: string, maxLength: 256 }
+      responses:
+        '202':
+          description: Subscription accepted for remote identity resolution.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/federation/subscriptions/{subscription_id}:
+    delete:
+      operationId: removeRemoteAuthorSubscription
+      tags: [Federation]
+      summary: Remove one of the authenticated user's remote author subscriptions
+      description: Soft-removes only the subscription owned by the current canonical Testagram user. It does not delete the remote actor or affect other users.
+      security:
+        - testagramBearer: []
+      parameters:
+        - in: path
+          name: subscription_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Subscription removal result.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/tv/channels:
     get:
       operationId: listTvChannels
