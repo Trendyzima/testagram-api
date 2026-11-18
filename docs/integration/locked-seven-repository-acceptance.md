@@ -32,7 +32,7 @@ The baseline below is the reviewed `main` head observed on 2026-11-18. The six r
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `96fb0ad5b4d4b0870ceea7784cc620becb6afe19` |
-| Backend | `a4470886fb648288a1f988b257dc71fb93a02e1b` |
+| Backend | `e4c8cdd5037b70932c02d8e85fcb818bb003cb61` |
 | Data Centre | `3fef8311f0ec07bdb37c8b88ff9b2cc82bb973f3` |
 | Testagram API control plane | `f877b954529080278d850554f0217e68b1101c30` |
 | Algorithm | `98bc457b52ecd0c1bf3a9af0d772575b2c825e7b` |
