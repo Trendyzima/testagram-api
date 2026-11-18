@@ -187,6 +187,19 @@ No test may report PASS if it ran against an unpinned or unknown build.
 - Federation public inbound projection/fan-out/interoperability and HLS acceptance remain gated.
 - At the initial lock, the source registry had Data Centre pinned 35 commits behind its then-current main. That earlier drift was addressed in the preceding source-refresh work; the subsequent native-auth merges required the additional six-repository baseline refresh recorded in Section 7.
 
+
+## 8. Required CI execution for this refreshed baseline
+
+The API contract validation workflow must execute the same full sequence on this PR head:
+
+1. `npm run sources:checkout` — sparse-checkout each immutable runtime pin and the separately pinned retired-source inventory.
+2. `npm run lint:openapi` and `npm run lint:internal-openapi`.
+3. `npm run typecheck`, `npm run build:sdk`, and `npm test`.
+4. `npm run audit:backend-routes`, `npm run audit:cross-repo`, `npm run audit:locked-acceptance`, `npm run audit:tv-health-contract`, and `npm run audit:flutter-backend`.
+5. Flutter validation: `dart format .`, `dart analyze`, and `dart test`.
+
+The cross-repository audit must prove that every listed source path exists at its pinned commit, all checkouts resolve to the exact lock SHA, all provider snapshots match their pinned source files, and the Backend/Data Centre media and service-auth contracts remain aligned. A successful workflow on an earlier source-pin set does not satisfy this PR.
+
 ## 7. Post-merge verification — 2026-11-18
 
 The following native-identity integration changes are now merged:
