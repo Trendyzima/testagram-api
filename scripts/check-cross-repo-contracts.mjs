@@ -90,7 +90,10 @@ const mediaRoutes = [
 ];
 for (const route of mediaRoutes) {
   const clientSuffix = route.path.slice("/internal/v1/media".length);
-  if (!backendMediaClient.includes(`c.prefix+"${clientSuffix}"`)) fail.push(`Backend Data Centre client missing route suffix: ${clientSuffix}`);
+  const clientRouteMarker = route.path.endsWith("/status")
+    ? `c.prefix+"${clientSuffix}?"`
+    : `c.prefix+"${clientSuffix}"`;
+  if (!backendMediaClient.includes(clientRouteMarker)) fail.push(`Backend Data Centre client missing route suffix: ${clientSuffix}`);
   if (!dataCentreMediaServer.includes(route.provider)) fail.push(`Data Centre media server missing handler: ${route.path}`);
   if (!dataCentreMediaOpenAPI.includes(route.path)) fail.push(`Data Centre media OpenAPI missing route: ${route.path}`);
   if (!dataCentreMediaOpenAPI.includes(`  ${route.path}:\n    ${route.method.toLowerCase()}:`)) fail.push(`Data Centre media OpenAPI method mismatch: ${route.method} ${route.path}`);
