@@ -27,7 +27,7 @@ tags:
   - name: Health
     description: Process liveness and dependency readiness.
   - name: Authentication
-    description: End-user operations accept only Testagram-native short-lived access JWTs. Backend checks the live PostgreSQL session and account state; no Appwrite bearer fallback is accepted. Staff review operations use the separate encrypted testagram-staff cookie issued by the Admin Console after native staff authentication and MFA enrollment.
+    description: End-user and identity-review operations accept only Testagram-native short-lived access JWTs. Backend checks the live PostgreSQL session, account state, enabled staff principal, enrolled-MFA marker and explicit role grants. No external identity-provider bearer token is accepted.
   - name: Feed
     description: Authorized home timeline retrieval.
   - name: Social
@@ -419,7 +419,7 @@ paths:
       summary: List applications awaiting manual identity review
       description: Requires a native Testagram staff session. The Admin Console verifies the Backend-issued native session, enabled staff principal, enrolled MFA and identity.review permission from PostgreSQL. Queue metadata contains opaque evidence references only; raw evidence is served by the separate no-store reviewer endpoint and every retrieval attempt is audited.
       security:
-        - testagramStaffSession: []
+        - testagramBearer: []
       responses:
         '200':
           description: Authorized manual-review queue.
@@ -439,7 +439,7 @@ paths:
       summary: Stream private identity evidence to an authorized reviewer
       description: Requires a native Testagram staff session with an enabled staff principal, enrolled MFA and identity.review permission. Backend audits the access attempt before streaming. Backend audits the access attempt before streaming, verifies byte length and SHA-256 before returning evidence, restores a missing or drifted VPS primary from a checksum-verified B2/R2 replica when possible, and otherwise serves only a checksum-verified private replica through the Backend proxy. No storage URL is returned; responses are private, no-store and nosniff.
       security:
-        - testagramStaffSession: []
+        - testagramBearer: []
       parameters:
         - in: path
           name: session_id
@@ -473,7 +473,7 @@ paths:
       summary: Record one independent reviewer decision
       description: Requires a native Testagram staff session with an enabled PostgreSQL staff principal, enrolled MFA and identity.review permission. A reviewer can decide once per session. Two distinct matching verified or failed decisions are required; a verified review creates a separate two-person account-approval request and does not itself provision an account.
       security:
-        - testagramStaffSession: []
+        - testagramBearer: []
       parameters:
         - in: path
           name: session_id
@@ -503,9 +503,9 @@ paths:
       operationId: approveIdentityAccountProvisioning
       tags: [Identity]
       summary: Record one of the two independent account-activation approvals
-      description: Requires a currently authorized, non-revoked Appwrite staff identity with identity.review permission. Only the two reviewers who independently verified the evidence may approve. The linked sensitive-action request must still be pending, target this application, require exactly two approvals and be unexpired; the application and approval request are finalized atomically before provisioning authorization can be issued.
+      description: Requires a valid Testagram-native staff access JWT, an enabled staff principal, an enrolled-MFA marker and an active identity-review role grant. Only the two reviewers who independently verified the evidence may approve. The linked sensitive-action request must still be pending, target this application, require exactly two approvals and be unexpired; the application and approval request are finalized atomically before provisioning authorization can be issued.
       security:
-        - testagramStaffSession: []
+        - testagramBearer: []
       parameters:
         - in: path
           name: application_id
@@ -558,7 +558,7 @@ paths:
       operationId: redeemIdentityProvisioningAuthorization
       tags: [Identity]
       summary: Redeem approved provisioning authorization to provision a native Testagram account
-      description: Backend revalidates the application capability, both independent identity-review decisions and the two-person sensitive-action approval ledger inside one PostgreSQL transaction. It consumes the approval token and JTI once, creates the native credential and canonical profile atomically, and starts a separate single-use email-verification step. No Appwrite end-user session is required.
+      description: Backend revalidates the application capability, both independent identity-review decisions and the two-person sensitive-action approval ledger inside one PostgreSQL transaction. It consumes the approval token and JTI once, creates the Testagram-native credential and canonical profile atomically, and starts a separate single-use email-verification step. No external identity-provider session is required.
       parameters:
         - in: path
           name: application_id
@@ -1326,72 +1326,12 @@ paths:
               schema: { $ref: '#/components/schemas/ExtensibleObject' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
-  /api/auth/registration-consent:
-    post:
-      operationId: recordAppwriteRegistrationConsent
-      tags: [Authentication]
-      summary: Record age, Terms and Privacy declarations for an Appwrite account
-      description: >
-        Requires an authenticated Appwrite session, but intentionally permits
-        an unverified email so consent can be durably recorded immediately
-        after account creation. The Backend resolves the account ID and email
-        from Appwrite, assigns acceptance timestamps and policy versions, and
-        records an append-only consent ledger. This endpoint does not provision
-        a canonical Testagram account; product access remains blocked until
-        Appwrite email verification and Backend identity provisioning succeed.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties: false
-              required: [age_confirmed, terms_accepted, privacy_accepted, terms_version, privacy_version]
-              properties:
-                age_confirmed: { type: boolean, const: true }
-                terms_accepted: { type: boolean, const: true }
-                privacy_accepted: { type: boolean, const: true }
-                terms_version: { type: string, minLength: 1, maxLength: 64 }
-                privacy_version: { type: string, minLength: 1, maxLength: 64 }
-      responses:
-        '200':
-          description: Consent recorded idempotently for the authenticated Appwrite account.
-          content:
-            application/json:
-              schema:
-                type: object
-                additionalProperties: false
-                required: [ok, data, error, request_id]
-                properties:
-                  ok: { const: true }
-                  data:
-                    type: object
-                    additionalProperties: false
-                    required: [recorded, email_verified]
-                    properties:
-                      recorded: { type: boolean, const: true }
-                      email_verified: { type: boolean }
-                  error: { type: 'null' }
-                  request_id: { type: string }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '401': { $ref: '#/components/responses/Unauthorized' }
-        '405':
-          description: Only POST is accepted.
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/ApiError' }
-        '429':
-          description: Registration consent rate limit exceeded.
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/ApiError' }
-        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/me/profile:
     get:
       operationId: getMyProfile
       tags: [Social]
       summary: Read the authenticated user's canonical Testagram profile
-      description: Resolves the canonical Testagram UUID only from an Appwrite identity linked by the completed two-person approval and provisioning workflow; clients must not substitute the Appwrite user ID.
+      description: Requires a Testagram-native access JWT. Backend resolves the canonical Testagram UUID from the verified live PostgreSQL session and account record; clients must not supply or substitute a user ID.
       responses:
         '200':
           description: Current canonical profile and viewer relationship flags.
@@ -1447,7 +1387,7 @@ paths:
       operationId: updateMyProfile
       tags: [Social]
       summary: Update the authenticated user's canonical profile
-      description: Backend validates the Appwrite session, active account, profile fields and ownership/readiness of uploaded public image assets. Clients upload media through the Backend media gateway first; raw object keys are never accepted unless owned and ready.
+      description: Backend validates the Testagram-native access JWT, live session, active account, profile fields and ownership/readiness of uploaded public image assets. Clients upload media through the Backend media gateway first; raw object keys are never accepted unless owned and ready.
       requestBody:
         required: true
         content:
@@ -2129,11 +2069,6 @@ paths:
 
 components:
   securitySchemes:
-    testagramStaffSession:
-      type: apiKey
-      in: cookie
-      name: testagram-staff
-      description: Encrypted HttpOnly, Secure, SameSite=Strict Admin Console session cookie containing a Backend-native access/refresh session. Staff routes check PostgreSQL role grants and the recorded mfa_enrolled_at marker. The current console step-up is password re-authentication only; it does not yet verify a TOTP/passkey challenge, and staff onboarding remains fail-closed.
     testagramBearer:
       type: http
       scheme: bearer
@@ -2741,12 +2676,12 @@ components:
         application/json:
           schema: { $ref: '#/components/schemas/ApiError' }
     Unauthorized:
-      description: Missing, expired or invalid Appwrite session JWT.
+      description: Missing, expired or invalid Testagram-native access JWT or live session.
       content:
         application/json:
           schema: { $ref: '#/components/schemas/ApiError' }
     Forbidden:
-      description: The Appwrite session is valid, but the account is inactive or has not completed Testagram's independent identity review, two-person approval and canonical provisioning workflow. Use IDENTITY_APPROVAL_REQUIRED for missing approval, EMAIL_VERIFICATION_REQUIRED for an unverified email, and AUTH_FORBIDDEN for another account-level denial.
+      description: The Testagram-native session is valid, but the account is inactive or has not completed Testagram's independent identity review, two-person approval, email verification and canonical provisioning workflow. Use IDENTITY_APPROVAL_REQUIRED for missing approval, EMAIL_VERIFICATION_REQUIRED for an unverified email, and AUTH_FORBIDDEN for another account-level denial.
       content:
         application/json:
           schema: { $ref: '#/components/schemas/ApiError' }
