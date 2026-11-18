@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "e4c8cdd5037b70932c02d8e85fcb818bb003cb61",
+      "ref": "2a65ac075329f9f9fb092c4802f2a8ae3296e66c",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -166,7 +166,8 @@
         "scripts/instabox-production-backup.sh",
         "scripts/self-hosted-backup.sh",
         "scripts/self-hosted-restore-drill.sh",
-        "tests/test_self_hosted_backup_guards.py"
+        "tests/test_self_hosted_backup_guards.py",
+        "tests/test_instabox_federation_runtime_contract.py"
       ]
     },
     "data-centre": {
