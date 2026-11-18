@@ -300,7 +300,7 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "1a8cb7895caa7e27f9bdb3f1a2bb68ef755634b4",
+      "ref": "808ae80919dee198e6dcb66778814aeb8a2d3c5a",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
         ".env.example",
@@ -321,7 +321,8 @@
         "internal/worker/inbox.go",
         "internal/worker/inbox_test.go",
         "internal/worker/outbox.go",
-        "internal/worker/outbox_test.go"
+        "internal/worker/outbox_test.go",
+        "internal/httpapi/worker_status.go"
       ]
     },
     "algorithm": {
