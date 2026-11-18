@@ -18,7 +18,7 @@ The API contract, compatibility, client SDK and integration-governance repositor
 | Repository | Authority |
 |---|---|
 | [testagram-api](https://github.com/Trendyzima/testagram-api) | API contracts, client SDKs, compatibility rules and integration governance |
-| [Testagram Backend](https://github.com/Trendyzima/Testagram-backend-) | Public product API runtime, provider-gated Testagram-native bearer authentication, canonical identity, authorization, PostgreSQL product data and social operations; Appwrite remains a transitional reviewer/compatibility dependency |
+| [Testagram Backend](https://github.com/Trendyzima/Testagram-backend-) | Public product API runtime, Testagram-native bearer authentication, canonical identity, authorization, PostgreSQL product data and social operations; historical external account IDs are reconciliation inputs only |
 | [Flutter Client](https://github.com/Trendyzima/testagram-flutter-client-) | Native UI, local UX state and client transport; product data only through Backend |
 | [Data Centre](https://github.com/Trendyzima/Testagram-data-centre-) | Storage, video processing, notifications, infrastructure and operations; private service APIs remain private |
 | [CDN](https://github.com/Trendyzima/cdn-) | Media delivery/cache data plane; not a product API or identity authority |
