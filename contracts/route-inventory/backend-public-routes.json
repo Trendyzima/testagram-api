@@ -252,6 +252,11 @@
     },
     {
       "method": "GET",
+      "path": "/health",
+      "status": "registered-only"
+    },
+    {
+      "method": "GET",
       "path": "/healthz",
       "status": "contracted"
     },
