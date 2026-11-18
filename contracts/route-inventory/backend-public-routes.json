@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "19645d484433ad081b4e9568b8d675a29294ff2c",
+  "sourceRef": "e440e341a98004b4e982035f068f80aaf6f64dee",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across all production Go files in cmd/api at the Backend mainline commit a6c2454f41ffb4f0f1beef00e623d7f038428cbb after health-listener isolation, identity retry hardening and read-only production schema preflight. /readyz and /metrics are served only on the private :8082 listener and are intentionally excluded from this public route inventory. Dynamic auth actions are asserted separately; registered-only routes are not approved for client adoption until promoted into OpenAPI.",
+  "note": "Static public/API route registrations across all production Go files in cmd/api at the merged Backend mainline commit e440e341a98004b4e982035f068f80aaf6f64dee after native identity cutover and strict read-only InstaBox inspection hardening. /readyz and /metrics are served only on the private :8082 listener and are intentionally excluded from this public route inventory. Dynamic auth actions are asserted separately; registered-only routes are not approved for client adoption until promoted into OpenAPI.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
@@ -248,6 +248,11 @@
     {
       "method": "GET",
       "path": "/api/tv/health",
+      "status": "registered-only"
+    },
+    {
+      "method": "GET",
+      "path": "/health",
       "status": "registered-only"
     },
     {

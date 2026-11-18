@@ -4,14 +4,13 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "19645d484433ad081b4e9568b8d675a29294ff2c",
+      "ref": "e440e341a98004b4e982035f068f80aaf6f64dee",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
         ".github/workflows/ci.yml",
         ".github/workflows/identity-evidence-staging-smoke.yml",
         ".github/workflows/instabox-deploy.yml",
-        ".github/workflows/instabox-media-staging-smoke.yml",
         ".github/workflows/media-provider-smoke.yml",
         ".github/workflows/self-hosted-stack.yml",
         "admin-console/identity_review_integration_test.go",
