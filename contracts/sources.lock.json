@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "b7a2448006447f801bfbd367f25a3d7ef0f8598e",
+      "ref": "2a65ac075329f9f9fb092c4802f2a8ae3296e66c",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -160,7 +160,14 @@
         "scripts/start-instabox-deployment.sh",
         "scripts/test-identity-registration-migration.sh",
         "scripts/validate-canonical-deploy-smoke.py",
-        "tests/test_instabox_watchdog.py"
+        "tests/test_instabox_watchdog.py",
+        ".github/workflows/instabox-production-backup.yml",
+        "deploy/self-hosted/BACKUP-RESTORE.md",
+        "scripts/instabox-production-backup.sh",
+        "scripts/self-hosted-backup.sh",
+        "scripts/self-hosted-restore-drill.sh",
+        "tests/test_self_hosted_backup_guards.py",
+        "tests/test_instabox_federation_runtime_contract.py"
       ]
     },
     "data-centre": {
@@ -211,7 +218,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "ccb9ca8053e2309fe01ed4829b19ba2dd7e844a7",
+      "ref": "3a877515966ea113c5ea0021ca6df748ba767ac4",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         ".github/workflows/ci.yml",
@@ -294,7 +301,7 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "1a8cb7895caa7e27f9bdb3f1a2bb68ef755634b4",
+      "ref": "808ae80919dee198e6dcb66778814aeb8a2d3c5a",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
         ".env.example",
@@ -315,12 +322,13 @@
         "internal/worker/inbox.go",
         "internal/worker/inbox_test.go",
         "internal/worker/outbox.go",
-        "internal/worker/outbox_test.go"
+        "internal/worker/outbox_test.go",
+        "internal/httpapi/worker_status.go"
       ]
     },
     "algorithm": {
       "fullName": "Trendyzima/the-algorithm",
-      "ref": "da8e90e79150636a6efe8e03c2cbc8fb9357764d",
+      "ref": "98bc457b52ecd0c1bf3a9af0d772575b2c825e7b",
       "checkoutPath": "source-repos/algorithm",
       "sourcePaths": [
         "testagram-feed/API-CONTRACT.md",
@@ -331,7 +339,9 @@
         "testagram-feed/cmd/feed-api/topics.go",
         "testagram-feed/cmd/feed-api/topics_test.go",
         "testagram-feed/internal/ranking/topics.go",
-        "testagram-feed/internal/ranking/topics_test.go"
+        "testagram-feed/internal/ranking/topics_test.go",
+        "testagram-feed/internal/ranking/rank.go",
+        "testagram-feed/internal/ranking/rank_test.go"
       ]
     },
     "backend-fresh-legacy": {
