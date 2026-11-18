@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "b7a2448006447f801bfbd367f25a3d7ef0f8598e",
+      "ref": "a4470886fb648288a1f988b257dc71fb93a02e1b",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -160,7 +160,13 @@
         "scripts/start-instabox-deployment.sh",
         "scripts/test-identity-registration-migration.sh",
         "scripts/validate-canonical-deploy-smoke.py",
-        "tests/test_instabox_watchdog.py"
+        "tests/test_instabox_watchdog.py",
+        ".github/workflows/instabox-production-backup.yml",
+        "deploy/self-hosted/BACKUP-RESTORE.md",
+        "scripts/instabox-production-backup.sh",
+        "scripts/self-hosted-backup.sh",
+        "scripts/self-hosted-restore-drill.sh",
+        "tests/test_self_hosted_backup_guards.py"
       ]
     },
     "data-centre": {
@@ -211,7 +217,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "ccb9ca8053e2309fe01ed4829b19ba2dd7e844a7",
+      "ref": "3a877515966ea113c5ea0021ca6df748ba767ac4",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         ".github/workflows/ci.yml",
@@ -320,7 +326,7 @@
     },
     "algorithm": {
       "fullName": "Trendyzima/the-algorithm",
-      "ref": "da8e90e79150636a6efe8e03c2cbc8fb9357764d",
+      "ref": "98bc457b52ecd0c1bf3a9af0d772575b2c825e7b",
       "checkoutPath": "source-repos/algorithm",
       "sourcePaths": [
         "testagram-feed/API-CONTRACT.md",
@@ -331,7 +337,9 @@
         "testagram-feed/cmd/feed-api/topics.go",
         "testagram-feed/cmd/feed-api/topics_test.go",
         "testagram-feed/internal/ranking/topics.go",
-        "testagram-feed/internal/ranking/topics_test.go"
+        "testagram-feed/internal/ranking/topics_test.go",
+        "testagram-feed/internal/ranking/rank.go",
+        "testagram-feed/internal/ranking/rank_test.go"
       ]
     },
     "backend-fresh-legacy": {
