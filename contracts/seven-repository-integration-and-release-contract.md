@@ -9,7 +9,7 @@ The six runtime repositories are Flutter, Backend, Data Centre, CDN, Federation 
 
 ## Immutable source revisions
 
-The exact revisions used by contract CI are in `contracts/sources.lock.json`. The six current runtime source pins are Backend `19645d484433ad081b4e9568b8d675a29294ff2c`, Data Centre `fda92448fb6df8c1c313f1e7751540866ffa97b8`, CDN `28c58a41d69320034132f3e13fac2ce9d8406b1f`, Flutter `a90ae7cf77034308ff205d66614d1061821f27d4`, Federation `b0e75e8d005d3a014badd762bec4e81fe09559fe`, and Algorithm `da8e90e79150636a6efe8e03c2cbc8fb9357764d`. The retired Appwrite-based Fresh API is separately pinned at `backend-fresh-legacy` commit `a6c2454f41ffb4f0f1beef00e623d7f038428cbb` solely for legacy route/deployment audit. Contract CI checks exact immutable checkouts and snapshots. A source pin is not evidence that a service is deployed.
+The exact revisions used by contract CI are in `contracts/sources.lock.json`. The six current runtime source pins are Backend `e440e341a98004b4e982035f068f80aaf6f64dee`, Data Centre `bbf08499bcd80adcdafd8fff38b7bd34e8edd741`, CDN `eb30f4f2b7ecfaaf121411657a281f4195d8d314`, Flutter `a90ae7cf77034308ff205d66614d1061821f27d4`, Federation `b0e75e8d005d3a014badd762bec4e81fe09559fe`, and Algorithm `da8e90e79150636a6efe8e03c2cbc8fb9357764d`. The retired Appwrite-based Fresh API is separately pinned at `backend-fresh-legacy` commit `a6c2454f41ffb4f0f1beef00e623d7f038428cbb` solely for legacy route/deployment audit. Contract CI checks exact immutable checkouts and snapshots. A source pin is not evidence that a service is deployed.
 
 ## Ownership and allowed calls
 
