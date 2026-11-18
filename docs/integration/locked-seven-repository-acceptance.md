@@ -175,7 +175,7 @@ Each result must contain:
 
 No test may report PASS if it ran against an unpinned or unknown build.
 
-## 6. Current verified position (2026-11-18)
+## 6. Initial verified position at lock time (2026-11-18)
 
 - Backend, Data Centre and Testagram API CI runs were observed green on their reviewed commits; Algorithm tests and image publication and Federation CI/image publication were observed green. These are repository-level results, not live inter-service acceptance.
 - Backend's InstaBox deployment workflow validated inputs but its actual deployment job was skipped pending explicit dispatch confirmation.
@@ -185,7 +185,7 @@ No test may report PASS if it ran against an unpinned or unknown build.
 - Data Centre's separate media profile is a B2-primary/R2-replica byte lifecycle with MinIO/R2 metadata sidecars only. It has a separate media database and outbox; it is not the third copy in Backend's MinIO/R2/B2 pipeline. Its guarded B2/R2 smoke has not been run against staging buckets.
 - Algorithm service authentication and Federation private ingress have source-level contract coverage; deployed service-to-service staging acceptance remains unproven.
 - Federation public inbound projection/fan-out/interoperability and HLS acceptance remain gated.
-- Current source pin registry had Data Centre pinned 35 commits behind its current main. This PR refreshes that pin and its reviewed source path set; the two Data Centre OpenAPI snapshots were checked against current main and are byte-identical. CDN's pin is also refreshed to current main. CI must validate these refreshed pins before merge.
+- At the initial lock, the source registry had Data Centre pinned 35 commits behind its then-current main. That earlier drift was addressed in the preceding source-refresh work; the subsequent native-auth merges required the additional six-repository baseline refresh recorded in Section 7.
 
 ## 7. Post-merge verification — 2026-11-18
 
