@@ -106,17 +106,19 @@ if (!dataCentreMediaServer.includes('r.Header.Get("X-Testagram-API-Version")')) 
  const backendDeploy = readFileSync(resolve(lock.repositories.backend.checkoutPath, "scripts/start-instabox-deployment.sh"), "utf8");
  const identityReplication = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/identity_media_replication.go"), "utf8");
  const backendEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
- const dataCentreCompose = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "vps/docker-compose.fresh.yml"), "utf8");
- const dataCentreEnvExample = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "vps/.env.example"), "utf8");
+ const dataCentreCompose = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/docker-compose.yml"), "utf8");
  for (const variable of ["FRESH_MEDIA_ENABLED", "DATA_CENTRE_MEDIA_API_URL", "FRESH_DATA_CENTRE_INTERNAL_TOKEN"]) {
    if (!backendCompose.includes(variable)) fail.push(`Backend Compose missing Data Centre media variable: ${variable}`);
    if (!backendEnvExample.includes(variable)) fail.push(`Backend env example missing Data Centre media variable: ${variable}`);
  }
  if (!backendEnvExample.includes("DATA_CENTRE_MEDIA_API_URL=http://media:8096")) fail.push("Backend env example must use the private media service DNS endpoint");
  if (!dataCentreCompose.includes("MEDIA_INTERNAL_TOKEN: ${FRESH_DATA_CENTRE_INTERNAL_TOKEN:-}")) fail.push("Data Centre media service token must use FRESH_DATA_CENTRE_INTERNAL_TOKEN");
- if (!dataCentreEnvExample.includes("FRESH_DATA_CENTRE_INTERNAL_TOKEN=")) fail.push("Data Centre env example must document the shared internal token");
- if (!dataCentreCompose.includes("name: testagram-platform") || !dataCentreCompose.includes("external: true")) fail.push("Data Centre media service must join the externally-created Backend platform network");
- if (!dataCentreCompose.includes("networks: [services, platform]")) fail.push("Data Centre media service must join both its private services and Backend platform networks");
+ if (!backendDeploy.includes('write_dc_env_value FRESH_DATA_CENTRE_INTERNAL_TOKEN "$FRESH_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must provision the same private media token into the Data Centre runtime env");
+ if (!backendDeploy.includes('write_dc_env_value MEDIA_DATABASE_URL "postgresql://testagram:$POSTGRES_PASSWORD@postgres:5432/testagram_media?sslmode=disable"')) fail.push("Backend deployment must provision the dedicated media database URL in the Data Centre runtime env");
+ if (!backendDeploy.includes('if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" && "${FRESH_MEDIA_ENABLED:-false}" == "true" ]]; then')) fail.push("Data Centre media provider credentials must require both independent media gates");
+ if (!backendDeploy.includes('FRESH_MEDIA_ENABLED and DATA_CENTRE_MEDIA_ENABLED must both be true or both be false')) fail.push("Backend deployment must reject inconsistent Data Centre media feature gates");
+ if (!dataCentreCompose.includes("name: ${TESTAGRAM_NETWORK:-testagram-platform}") || !dataCentreCompose.includes("external: true")) fail.push("Data Centre media service must join the externally-created Backend platform network");
+ if (!dataCentreCompose.includes("networks: [platform]")) fail.push("Data Centre media service must join the Backend-owned private platform network");
  if (!dataCentreCompose.includes('expose: ["8096"]')) fail.push("Data Centre media API must expose only the private container port, not publish it publicly");
  if (!backendCompose.includes("B2_S3_ACCESS_KEY_ID:") || !backendCompose.includes("B2_S3_SECRET_ACCESS_KEY:") || !backendCompose.includes("CLOUDFLARE_R2_ACCESS_KEY_ID:") || !backendCompose.includes("CLOUDFLARE_R2_SECRET_ACCESS_KEY:")) fail.push("Backend identity-evidence replica credentials must be mapped into the VPS API container");
  if (!backendCompose.includes("MEDIA_REPLICATION_ENABLED:")) fail.push("Backend Compose must preserve the explicit three-provider replication feature gate");
