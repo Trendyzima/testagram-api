@@ -89,7 +89,8 @@ const mediaRoutes = [
   { path: "/internal/v1/media/delete", method: "POST", client: "post(ctx,", provider: 'mux.HandleFunc("/internal/v1/media/delete"' },
 ];
 for (const route of mediaRoutes) {
-  if (!backendMediaClient.includes(route.path)) fail.push(`Backend Data Centre client missing route: ${route.path}`);
+  const clientSuffix = route.path.slice("/internal/v1/media".length);
+  if (!backendMediaClient.includes(`c.prefix+"${clientSuffix}"`)) fail.push(`Backend Data Centre client missing route suffix: ${clientSuffix}`);
   if (!dataCentreMediaServer.includes(route.provider)) fail.push(`Data Centre media server missing handler: ${route.path}`);
   if (!dataCentreMediaOpenAPI.includes(route.path)) fail.push(`Data Centre media OpenAPI missing route: ${route.path}`);
   if (!dataCentreMediaOpenAPI.includes(`  ${route.path}:\n    ${route.method.toLowerCase()}:`)) fail.push(`Data Centre media OpenAPI method mismatch: ${route.method} ${route.path}`);
@@ -235,12 +236,12 @@ for (const [label, source, marker] of [
 // The active Backend overlay must carry the optional private Data Centre media
 // profile, with a separate database and no public host port.
 const dataCentreOverlay = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/docker-compose.yml"), "utf8");
+const dataCentreMediaProvisioner = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "scripts/provision-media-database.sh"), "utf8");
 for (const marker of [
   "media-migrate:",
   "media:",
   "MEDIA_DATABASE_URL",
   "MEDIA_DATABASE_NAME",
-  "CREATE DATABASE",
   "MEDIA_INTERNAL_TOKEN: ${FRESH_DATA_CENTRE_INTERNAL_TOKEN:-}",
   "B2_S3_BUCKET",
   "CLOUDFLARE_R2_BUCKET",
@@ -252,6 +253,13 @@ for (const marker of [
 }
 if (/^\\s+ports:\\s*\\n\\s+- ["']?8096:/m.test(dataCentreOverlay)) {
   fail.push("Data Centre media service must not publish port 8096 to the host");
+}
+
+if (!dataCentreOverlay.includes("../scripts/provision-media-database.sh:/scripts/provision-media-database.sh:ro") || !dataCentreOverlay.includes("entrypoint: [\"/bin/sh\", \"/scripts/provision-media-database.sh\"]")) {
+  fail.push("Data Centre media profile must run its dedicated database provisioner");
+}
+if (!dataCentreMediaProvisioner.includes("CREATE DATABASE") || !dataCentreMediaProvisioner.includes("MEDIA_DATABASE_URL") || !dataCentreMediaProvisioner.includes("NOSUPERUSER NOCREATEDB NOCREATEROLE")) {
+  fail.push("Data Centre media database provisioner must create a separate database and restricted runtime role");
 }
 
 const publicSpec = readFileSync("contracts/openapi/testagram-v1.yaml", "utf8");
