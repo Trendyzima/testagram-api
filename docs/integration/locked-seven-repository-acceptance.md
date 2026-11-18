@@ -31,13 +31,13 @@ The baseline below is the reviewed `main` head observed on 2026-11-18. The six r
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `a90ae7cf77034308ff205d66614d1061821f27d4` |
-| Backend | `e440e341a98004b4e982035f068f80aaf6f64dee` |
-| Data Centre | `bbf08499bcd80adcdafd8fff38b7bd34e8edd741` |
-| Testagram API control plane | `d75595a2c4eb28d50e630d4b29d1bffc666b3a88` |
+| Flutter | `96fb0ad5b4d4b0870ceea7784cc620becb6afe19` |
+| Backend | `b7a2448006447f801bfbd367f25a3d7ef0f8598e` |
+| Data Centre | `3fef8311f0ec07bdb37c8b88ff9b2cc82bb973f3` |
+| Testagram API control plane | `19b71043c034456f92dd10ef38c104f67ae762f0` |
 | Algorithm | `da8e90e79150636a6efe8e03c2cbc8fb9357764d` |
-| Federation | `b0e75e8d005d3a014badd762bec4e81fe09559fe` |
-| CDN | `eb30f4f2b7ecfaaf121411657a281f4195d8d314` |
+| Federation | `1a8cb7895caa7e27f9bdb3f1a2bb68ef755634b4` |
+| CDN | `ccb9ca8053e2309fe01ed4829b19ba2dd7e844a7` |
 
 A source pin is not a deployment record. Every accepted staging and production run must separately record the actual running image digest and source revision. Mutable tags such as `main` and `latest` are not acceptable release identities.
 
@@ -187,4 +187,24 @@ No test may report PASS if it ran against an unpinned or unknown build.
 - Federation public inbound projection/fan-out/interoperability and HLS acceptance remain gated.
 - Current source pin registry had Data Centre pinned 35 commits behind its current main. This PR refreshes that pin and its reviewed source path set; the two Data Centre OpenAPI snapshots were checked against current main and are byte-identical. CDN's pin is also refreshed to current main. CI must validate these refreshed pins before merge.
 
-**Decision: NOT ACCEPTED for end-to-end staging or production until all required gates have passing evidence.** This is a locked acceptance standard, not a claim that all seven repositories are already integrated or deployed.
+## 7. Post-merge verification — 2026-11-18
+
+The following native-identity integration changes are now merged:
+- Backend PR #360 — dedicated Data Centre identity-evidence bridge and staging auth acceptance workflow.
+- Data Centre PR #93 — private identity-evidence namespace, separate service credential and B2/R2 lifecycle smoke.
+- Testagram API PR #99 — native bearer authentication contract alignment.
+- The current source baseline above is refreshed to the six runtime repositories' observed `main` heads. The five provider OpenAPI/event snapshots were compared with their current provider source files and are byte-identical.
+
+Observed CI evidence on the merged integration commits:
+- Backend CI run `44376987763`, self-hosted stack validation `44376987767`, Go security checks `44376987832`, and container publication `44376987881` completed successfully.
+- Backend deployment workflow run `44376987784` completed its input-validation job, but the actual `Deploy backend and private services` job was **skipped**. This is not deployment evidence.
+- Data Centre PR #93 CI and API PR #99 contract CI passed on their reviewed PR heads; these results do not substitute for the refreshed source-pin audit on this control-plane PR.
+
+Still unexecuted or blocked:
+- The Backend native-auth staging smoke has not been dispatched. It requires the dedicated GitHub `staging` environment origin and test-account secrets, plus explicit staging-only confirmation.
+- The Data Centre live provider smoke has not been dispatched. It writes and deletes temporary objects and requires explicitly designated staging B2/R2 buckets and the manual confirmation input.
+- The Backend three-provider MinIO/B2/R2 lifecycle and the Data Centre B2/R2 lifecycle remain separate acceptance paths; neither has live end-to-end evidence recorded here.
+- Staff review still lacks a real TOTP/passkey challenge. A non-null MFA-enrolment timestamp and password reauthentication do not prove a second factor; staff-review production activation remains gated.
+- Public registration, media replication, Federation delivery, CDN domain cutover and production feature activation remain subject to their individual gates and explicit approval.
+
+**Decision: NOT ACCEPTED for end-to-end staging or production until all required gates have passing evidence.** Merged branches and green repository CI do not waive the live integration, restore, security or deployment gates.
