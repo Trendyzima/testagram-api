@@ -17,6 +17,11 @@
   "routes": [
     {
       "method": "DELETE",
+      "path": "/api/federation/subscriptions/{subscription_id}",
+      "status": "registered-only"
+    },
+    {
+      "method": "DELETE",
       "path": "/api/hashtags/{tag}/follow",
       "status": "contracted"
     },
@@ -64,6 +69,11 @@
       "method": "GET",
       "path": "/api/admin/identity/sessions/{session_id}/evidence/{evidence_id}",
       "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/federation/subscriptions",
+      "status": "registered-only"
     },
     {
       "method": "GET",
@@ -289,6 +299,11 @@
       "method": "POST",
       "path": "/api/capability",
       "status": "contracted"
+    },
+    {
+      "method": "POST",
+      "path": "/api/federation/subscriptions",
+      "status": "registered-only"
     },
     {
       "method": "POST",
