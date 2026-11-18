@@ -1,6 +1,6 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "a6c2454f41ffb4f0f1beef00e623d7f038428cbb",
+  "sourceRef": "19645d484433ad081b4e9568b8d675a29294ff2c",
   "sourceFile": "cmd/api/main.go",
   "note": "Static public/API route registrations across all production Go files in cmd/api at the Backend mainline commit a6c2454f41ffb4f0f1beef00e623d7f038428cbb after health-listener isolation, identity retry hardening and read-only production schema preflight. /readyz and /metrics are served only on the private :8082 listener and are intentionally excluded from this public route inventory. Dynamic auth actions are asserted separately; registered-only routes are not approved for client adoption until promoted into OpenAPI.",
   "dynamicAuthActions": [
@@ -18,7 +18,7 @@
     {
       "method": "DELETE",
       "path": "/api/federation/subscriptions/{subscription_id}",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "DELETE",
@@ -73,7 +73,7 @@
     {
       "method": "GET",
       "path": "/api/federation/subscriptions",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "GET",
@@ -292,18 +292,13 @@
     },
     {
       "method": "POST",
-      "path": "/api/auth/registration-consent",
-      "status": "contracted"
-    },
-    {
-      "method": "POST",
       "path": "/api/capability",
       "status": "contracted"
     },
     {
       "method": "POST",
       "path": "/api/federation/subscriptions",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
@@ -328,12 +323,12 @@
     {
       "method": "POST",
       "path": "/api/identity/applications/{application_id}/resend-verification",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
       "path": "/api/identity/applications/{application_id}/verify-email",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
@@ -453,7 +448,7 @@
     {
       "method": "POST",
       "path": "/api/social/posts/{post_id}/view",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",

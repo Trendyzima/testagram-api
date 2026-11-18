@@ -6,7 +6,7 @@ This is a cross-repository contract for Backend, Data Centre, CDN and Flutter. I
 
 - PostgreSQL on the Testagram Backend owns canonical Testagram account UUIDs, credentials, session state, product records, media metadata, visibility, moderation, quotas, deletion tombstones and the canonical replica ledger.
 - Testagram Backend is the sole end-user identity issuer and authorization authority. Public Flutter clients use Testagram-native sessions; no external identity-provider session is accepted on the end-user API path.
-- The staff identity-review console still has a separate legacy Appwrite dependency in the current implementation. It must be migrated to native Testagram staff sessions and canonical staff UUIDs before the project can claim zero Appwrite runtime dependencies. This legacy staff dependency must never be exposed to or used by the public Flutter client.
+- The Admin Console now authenticates through the Testagram-native Backend session and stores it in an encrypted `testagram-staff` cookie (`HttpOnly`, `Secure`, `SameSite=Strict`). Staff authorization is checked against enabled PostgreSQL staff principals, a recorded MFA-enrollment marker and role grants. The current step-up verifies the password only; TOTP/passkey challenge verification is not implemented, so staff invitation and role-grant activation remain fail-closed. Historical Appwrite IDs are retained only for explicit account reconciliation; Appwrite bearer tokens are not accepted by the native end-user or staff API paths.
 - Data Centre owns VPS MinIO, R2/B2 replication workers and operational job/receipt state.
 - Cloudflare R2 and Backblaze B2 are private object stores. Cloudflare DNS remains authoritative; Testagram Go CDN is the public media byte-delivery plane.
 - CDN cache is disposable and never a durable replica.
@@ -67,6 +67,8 @@ Provider ETags are opaque transport metadata, not a portable checksum.
 - CDN: private cache bypass, public classification, origin auth and checksum-safe failover, HEAD/Range/HLS.
 - Flutter: native login/restart/refresh/logout/recovery tests, registration application UX, upload checksum, retry, playback and deletion tests.
 - API: schema compatibility, generated client drift, exact source commit pins and route inventory parity.
-- Staff console: migrate Appwrite login, invitations, step-up authentication and role records to native Testagram identity before declaring Appwrite fully removed.
+- Staff console: native login, encrypted session cookie, session validation and PostgreSQL role/MFA checks are implemented. Complete the fail-closed invitation and two-person staff-role onboarding workflow before opening staff enrollment.
 
 No repository PR is merged merely because its local tests pass. Require exact-head CI, review, staging evidence and cross-repository compatibility. Any production provider/auth/DNS change requires a separate explicit release approval.
+
+A separate legacy Fresh Backend image is still referenced by Data Centre `vps/docker-compose.yml` and requires Appwrite endpoint/project/database/server-key configuration. It is pinned and audited separately from current Backend `main`; it is not part of the native auth contract. Do not remove it until deployed traffic, account reconciliation, rollback and production cutover are verified and separately approved.

@@ -27,7 +27,7 @@ The registration feature flag remains fail-closed until the storage, email, poli
 
 ## Staff identity review
 
-The staff review console and reviewer routes still have a separate legacy Appwrite-based authentication dependency in the current codebase. This is not an end-user authentication provider and must not be used by Flutter's public login, session, or password-recovery flow. Migrate the staff console and staff-role ledger to native Testagram sessions before claiming the entire platform has zero Appwrite runtime dependencies.
+The Admin Console uses the same Testagram-native Backend identity authority. It exchanges credentials at the native login endpoint, verifies the current session and PostgreSQL staff principal/role, and stores the session only inside an encrypted `testagram-staff` cookie (`HttpOnly`, `Secure`, `SameSite=Strict`). The current console checks an enabled principal, a recorded `mfa_enrolled_at` marker and an explicit PostgreSQL role grant. Its step-up currently rechecks the password only; it does not yet verify a TOTP/passkey challenge, so the marker must not be represented as completed second-factor authentication. Staff invitation and role-grant activation remain fail-closed. Historical Appwrite account IDs are reconciliation inputs only; Appwrite bearer tokens are not accepted by the native end-user or staff API paths.
 
 ## Security rules
 
@@ -37,3 +37,4 @@ The staff review console and reviewer routes still have a separate legacy Appwri
 - Private Data Centre, Federation and Algorithm endpoints are service-to-service only.
 - Do not store bearer tokens, recovery tokens, evidence bytes or signed object URLs in logs, analytics, crash reports or test fixtures.
 - Use TLS for all non-local traffic.
+A separate legacy Fresh Backend image is still referenced by Data Centre `vps/docker-compose.yml` and requires Appwrite endpoint/project/database/server-key configuration. It is separately pinned and audited as a legacy runtime, not part of the native Backend auth contract. Do not route Flutter or new services to its `/auth/v1/*` endpoints, and do not remove it until deployed traffic, existing-account reconciliation, rollback and production cutover are verified and separately approved.

@@ -27,7 +27,7 @@ tags:
   - name: Health
     description: Process liveness and dependency readiness.
   - name: Authentication
-    description: Testagram-native bearer sessions when the Backend is configured for the native provider; the legacy Appwrite bearer remains a deployment-selected compatibility mode. Staff identity-review operations explicitly retain Appwrite staff authentication during the migration.
+    description: End-user operations accept only Testagram-native short-lived access JWTs. Backend checks the live PostgreSQL session and account state; no Appwrite bearer fallback is accepted. Staff review operations use the separate encrypted testagram-staff cookie issued by the Admin Console after native staff authentication and MFA enrollment.
   - name: Feed
     description: Authorized home timeline retrieval.
   - name: Social
@@ -417,9 +417,9 @@ paths:
       operationId: getIdentityReviewQueue
       tags: [Identity]
       summary: List applications awaiting manual identity review
-      description: Requires a verified Appwrite staff account with the identity.review permission. Queue metadata contains opaque evidence references only; raw evidence is served by the separate no-store reviewer endpoint and every retrieval attempt is audited.
+      description: Requires a native Testagram staff session. The Admin Console verifies the Backend-issued native session, enabled staff principal, enrolled MFA and identity.review permission from PostgreSQL. Queue metadata contains opaque evidence references only; raw evidence is served by the separate no-store reviewer endpoint and every retrieval attempt is audited.
       security:
-        - appwriteBearer: []
+        - testagramStaffSession: []
       responses:
         '200':
           description: Authorized manual-review queue.
@@ -437,9 +437,9 @@ paths:
       operationId: getIdentityReviewEvidence
       tags: [Identity]
       summary: Stream private identity evidence to an authorized reviewer
-      description: Requires verified Appwrite staff identity.review permission. Backend audits the access attempt before streaming, verifies byte length and SHA-256 before returning evidence, restores a missing or drifted VPS primary from a checksum-verified B2/R2 replica when possible, and otherwise serves only a checksum-verified private replica through the Backend proxy. No storage URL is returned; responses are private, no-store and nosniff.
+      description: Requires a native Testagram staff session with an enabled staff principal, enrolled MFA and identity.review permission. Backend audits the access attempt before streaming. Backend audits the access attempt before streaming, verifies byte length and SHA-256 before returning evidence, restores a missing or drifted VPS primary from a checksum-verified B2/R2 replica when possible, and otherwise serves only a checksum-verified private replica through the Backend proxy. No storage URL is returned; responses are private, no-store and nosniff.
       security:
-        - appwriteBearer: []
+        - testagramStaffSession: []
       parameters:
         - in: path
           name: session_id
@@ -471,9 +471,9 @@ paths:
       operationId: recordIdentityReviewDecision
       tags: [Identity]
       summary: Record one independent reviewer decision
-      description: Requires verified Appwrite staff identity.review permission. A reviewer can decide once per session. Two distinct matching verified or failed decisions are required; a verified review creates a separate two-person account-approval request and does not itself provision an account.
+      description: Requires a native Testagram staff session with an enabled PostgreSQL staff principal, enrolled MFA and identity.review permission. A reviewer can decide once per session. Two distinct matching verified or failed decisions are required; a verified review creates a separate two-person account-approval request and does not itself provision an account.
       security:
-        - appwriteBearer: []
+        - testagramStaffSession: []
       parameters:
         - in: path
           name: session_id
@@ -505,7 +505,7 @@ paths:
       summary: Record one of the two independent account-activation approvals
       description: Requires a currently authorized, non-revoked Appwrite staff identity with identity.review permission. Only the two reviewers who independently verified the evidence may approve. The linked sensitive-action request must still be pending, target this application, require exactly two approvals and be unexpired; the application and approval request are finalized atomically before provisioning authorization can be issued.
       security:
-        - appwriteBearer: []
+        - testagramStaffSession: []
       parameters:
         - in: path
           name: application_id
@@ -586,6 +586,65 @@ paths:
         '403': { description: Invalid application capability or provisioning approval authorization. }
         '404': { description: Application or authorization not found. }
         '409': { description: "Approval authorization expired, consumed or replayed." }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/identity/applications/{application_id}/resend-verification:
+    post:
+      operationId: resendNativeIdentityVerification
+      tags: [Identity]
+      summary: Request another native account verification email
+      description: Uses the applicant-scoped X-Application-Token and returns the same generic response whether the application is awaiting verification or the capability is invalid. Resend is rate-limited and does not create or activate an account.
+      parameters:
+        - in: path
+          name: application_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: header
+          name: X-Application-Token
+          required: true
+          schema: { type: string, minLength: 32, maxLength: 128 }
+      responses:
+        '202':
+          description: Generic anti-enumeration acknowledgement. Delivery may be pending.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/identity/applications/{application_id}/verify-email:
+    post:
+      operationId: verifyNativeIdentityEmail
+      tags: [Identity]
+      summary: Verify the email address for a provisioned native account
+      description: Consumes the single-use email token after approved provisioning. On success the native provisioning state becomes active; the account can then sign in. Invalid or expired tokens do not activate an account.
+      parameters:
+        - in: path
+          name: application_id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [token]
+              properties:
+                token: { type: string, minLength: 32, maxLength: 128 }
+      responses:
+        '200':
+          description: Email verified and native account activated.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [status, email_verified, canonical_user_id]
+                properties:
+                  status: { type: string, const: active }
+                  email_verified: { type: boolean, const: true }
+                  canonical_user_id: { type: string, format: uuid }
+        '400': { description: Verification token is invalid or expired. }
+        '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/feed/home:
     get:
@@ -1455,7 +1514,7 @@ paths:
       operationId: updateMyFederationPreference
       tags: [Federation]
       summary: Update the authenticated user's federation preference
-      description: Backend validates the Appwrite session, account status and username discoverability. This endpoint changes preference only; it does not create a separate Mastodon account or bypass federation rollout gates.
+      description: Backend validates the Testagram-native access session, live account status and username discoverability. This endpoint changes preference only; it does not create a separate Mastodon account or bypass federation rollout gates.
       requestBody:
         required: true
         content:
@@ -1495,6 +1554,74 @@ paths:
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
 
+  /api/federation/subscriptions:
+    get:
+      operationId: listRemoteAuthorSubscriptions
+      tags: [Federation]
+      summary: List this user's remote author subscriptions
+      description: Returns only subscriptions owned by the authenticated canonical Testagram user. Remote actors remain distinct from local accounts.
+      security:
+        - testagramBearer: []
+      responses:
+        '200':
+          description: Active remote author subscriptions.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    post:
+      operationId: createRemoteAuthorSubscription
+      tags: [Federation]
+      summary: Subscribe to a remote ActivityPub or Bluesky author
+      description: Requires a native Testagram access session. Backend validates canonical HTTPS ActivityPub actor URIs or Bluesky DIDs, scopes the subscription to the authenticated user and asks the private Federation service to resolve the remote identity. A subscription is not a local account or a follow grant.
+      security:
+        - testagramBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [protocol, identity]
+              properties:
+                protocol: { type: string, enum: [activitypub, bluesky] }
+                identity: { type: string, minLength: 1, maxLength: 2048 }
+                handle: { type: string, maxLength: 256 }
+      responses:
+        '202':
+          description: Subscription accepted for remote identity resolution.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/federation/subscriptions/{subscription_id}:
+    delete:
+      operationId: removeRemoteAuthorSubscription
+      tags: [Federation]
+      summary: Remove one of the authenticated user's remote author subscriptions
+      description: Soft-removes only the subscription owned by the current canonical Testagram user. It does not delete the remote actor or affect other users.
+      security:
+        - testagramBearer: []
+      parameters:
+        - in: path
+          name: subscription_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Subscription removal result.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/tv/channels:
     get:
       operationId: listTvChannels
@@ -2002,11 +2129,11 @@ paths:
 
 components:
   securitySchemes:
-    appwriteBearer:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      description: Legacy Appwrite session JWT accepted during the controlled migration window only.
+    testagramStaffSession:
+      type: apiKey
+      in: cookie
+      name: testagram-staff
+      description: Encrypted HttpOnly, Secure, SameSite=Strict Admin Console session cookie containing a Backend-native access/refresh session. Staff routes check PostgreSQL role grants and the recorded mfa_enrolled_at marker. The current console step-up is password re-authentication only; it does not yet verify a TOTP/passkey challenge, and staff onboarding remains fail-closed.
     testagramBearer:
       type: http
       scheme: bearer
