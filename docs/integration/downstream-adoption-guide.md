@@ -13,7 +13,7 @@ This guide describes how each runtime repository consumes this API repository. I
 
 1. Pin the Dart package from the API repository using a release tag and the packages/dart path.
 2. Set TESTAGRAM_API_URL to the public Backend origin at build time.
-3. Supply the current Appwrite session JWT through the SDK token provider.
+3. Authenticate through the Testagram Backend native login flow. Supply only the short-lived Backend access JWT as the SDK bearer token; refresh through the native rotating-refresh endpoint and keep the opaque refresh credential in platform secure storage.
 4. Use only public Backend OpenAPI operations. Do not import internal OpenAPI contracts into the app.
 5. Never ship service tokens, object-store credentials, private hostnames, CDN purge credentials or internal API URLs.
 6. Keep unsupported capabilities in an explicit unavailable state rather than fabricating data or falling back to another provider.
@@ -56,7 +56,7 @@ This guide describes how each runtime repository consumes this API repository. I
 1. Maintain testagram-feed/api/openapi.yaml as the ranking provider contract.
 2. Backend is the only caller and sends a bounded candidate set (1-200) with a requested result limit (1-50).
 3. Return only unique IDs from the submitted candidate set and finite scores in [0,1].
-4. Never read canonical user/post data, Appwrite, PostgreSQL or object storage from the ranker.
+4. Never read canonical user/post data, identity-provider credentials, PostgreSQL or object storage from the ranker.
 5. Backend validates ranker output and reapplies visibility and authorization before returning content.
 
 ## How to propose a cross-repository change
