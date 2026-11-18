@@ -96,9 +96,15 @@ Treat the platform API and media lifecycle API as separate interfaces; do not cl
 - Prove Backend's typed platform client (or explicitly mark the platform edge unsupported); match every consumed platform route to provider handler, auth, schema, status code and tests.
 - For media, exercise the five private routes: `upload-url`, `verify`, `status`, `download-url`, and `delete` under `/internal/v1/media/*`.
 - Confirm the media service is attached to the Backend-owned private network, has no public host port, uses its separate media database, and accepts only its dedicated service token plus API version.
-- Use explicitly designated staging buckets only. Verify signed upload expiry/content type/size limits, actual PUT, independent GET and SHA-256/byte-count verification, durable replication receipt, destination read-back, reconciliation, retry after process/worker interruption, delete tombstone and restore from the surviving verified copy.
-- Prove no object is published as ready until required copies have independently passed read-back verification.
-- Exercise provider outage, partial replication, duplicate completion, expired upload grant, delete retry, stale metadata and worker restart.
+- Treat the Backend native virtual-storage path and the Data Centre dedicated media service as two distinct lifecycle implementations; never combine their receipts or call one a substitute for the other.
+
+  **Backend three-provider media path:** Backend's canonical media metadata/replica ledger and `internal/virtualstorage.Replicator` use Instabox VPS MinIO as the primary media-byte store and Cloudflare R2 + Backblaze B2 as two independent media-byte replicas. Run the guarded `TestLiveMediaReplicationLifecycle` against dedicated staging buckets for private, public and identity-evidence namespaces. Verify actual PUT, independent GET/size/SHA-256 at all three stores, MinIO-primary restoration from a verified surviving replica, missing-R2 repair, same-size B2 corruption repair, tombstone deletion from all three stores, and no ready/public state before all required receipts match.
+
+  **Data Centre dedicated media path:** the optional `media` Compose profile uses a separate `MEDIA_DATABASE_URL` and durable outbox, with B2 as media-byte primary and R2 as media-byte replica. Its MinIO + R2 sidecars are metadata mirrors only, not a third media-byte copy. Run the guarded Data Centre `TestLiveMediaReplicationRestoreDelete` workflow to verify actual B2/R2 PUT, GET, HEAD, size/content-type/SHA-256, primary restore, replica repair, retry and deletion. Then exercise Backend's five private routes: `upload-url`, `verify`, `status`, `download-url`, and `delete` through the typed client.
+
+- For both paths, use only explicitly designated staging buckets. Verify signed upload expiry/content type/size limits, durable receipt, destination read-back, reconciliation, retry after process/worker interruption and deletion tombstones. Never treat a successful PUT, ETag, metadata sidecar, or CDN cache entry as a verified media-byte copy.
+- Keep Backend `MEDIA_REPLICATION_ENABLED` and `FRESH_MEDIA_ENABLED` disabled until their respective staging paths pass; the Data Centre media profile must not be started against production providers as a substitute for staging acceptance.
+- Exercise provider outage, partial replication, duplicate completion, expired upload grant, delete retry, stale metadata and worker restart for each implementation separately.
 
 **Fail if:** a successful PUT is treated as replication, ETag is treated as SHA-256, a one-copy object becomes ready, a provider credential reaches Flutter/CDN, or Data Centre becomes the product authorization authority.
 
@@ -117,7 +123,7 @@ Treat the platform API and media lifecycle API as separate interfaces; do not cl
 
 ### G6 — Coordinated off-host backup and restore
 
-- Produce a consistent backup set covering canonical Backend PostgreSQL, required Data Centre media metadata/replica ledger, actual B2/R2 object data, Federation protocol/outbox/inbox/cursor state, and required deployment/configuration material.
+- Produce a consistent backup set covering canonical Backend PostgreSQL and its three-provider replica ledger, the separate Data Centre `MEDIA_DATABASE_URL` ledger/outbox when that profile is enabled, actual MinIO/R2/B2 media bytes for the Backend path, actual B2/R2 media bytes for the Data Centre path, Federation protocol/outbox/inbox/cursor state, and required deployment/configuration material.
 - Secrets/private keys must be backed up through the approved encrypted recovery process; never place raw secrets in artifacts or logs.
 - Restore to isolated infrastructure, not over production.
 - Verify database integrity and migration state, account/session revocation semantics, representative object bytes/checksums, public/private authorization, deletion tombstones, Federation cursor/delivery idempotency and all service readiness.
@@ -175,7 +181,8 @@ No test may report PASS if it ran against an unpinned or unknown build.
 - Backend's InstaBox deployment workflow validated inputs but its actual deployment job was skipped pending explicit dispatch confirmation.
 - Flutter's scheduled domain smoke failed because apex returned HTTP 200 where the workflow requires HTTP 308 to www; www shell probes succeeded in that run.
 - CDN's canonical-host routing workflow failed during preflight; no Cloudflare cutover was reached.
-- Data Centre media profile is present in source and CI, but live B2/R2 lifecycle and coordinated restore remain unproven.
+- Backend native virtual storage has a three-provider MinIO/R2/B2 media replicator and live lifecycle test; the existing provider workflow did not yet invoke that media test. A guarded invocation is proposed in Backend PR #359 and has not yet produced live staging evidence.
+- Data Centre's separate media profile is a B2-primary/R2-replica byte lifecycle with MinIO/R2 metadata sidecars only. It has a separate media database and outbox; it is not the third copy in Backend's MinIO/R2/B2 pipeline. Its guarded B2/R2 smoke has not been run against staging buckets.
 - Algorithm service authentication and Federation private ingress have source-level contract coverage; deployed service-to-service staging acceptance remains unproven.
 - Federation public inbound projection/fan-out/interoperability and HLS acceptance remain gated.
 - Current source pin registry had Data Centre pinned 35 commits behind its current main. This PR refreshes that pin and its reviewed source path set; the two Data Centre OpenAPI snapshots were checked against current main and are byte-identical. CDN's pin is also refreshed to current main. CI must validate these refreshed pins before merge.
