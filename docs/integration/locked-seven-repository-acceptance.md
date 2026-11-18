@@ -34,7 +34,7 @@ The baseline below is the reviewed `main` head observed on 2026-11-18. The six r
 | Flutter | `96fb0ad5b4d4b0870ceea7784cc620becb6afe19` |
 | Backend | `a4470886fb648288a1f988b257dc71fb93a02e1b` |
 | Data Centre | `3fef8311f0ec07bdb37c8b88ff9b2cc82bb973f3` |
-| Testagram API control plane | `19b71043c034456f92dd10ef38c104f67ae762f0` |
+| Testagram API control plane | `f877b954529080278d850554f0217e68b1101c30` |
 | Algorithm | `98bc457b52ecd0c1bf3a9af0d772575b2c825e7b` |
 | Federation | `1a8cb7895caa7e27f9bdb3f1a2bb68ef755634b4` |
 | CDN | `3a877515966ea113c5ea0021ca6df748ba767ac4` |
