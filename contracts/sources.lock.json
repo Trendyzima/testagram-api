@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "e440e341a98004b4e982035f068f80aaf6f64dee",
+      "ref": "b7a2448006447f801bfbd367f25a3d7ef0f8598e",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -12,6 +12,7 @@
         ".github/workflows/identity-evidence-staging-smoke.yml",
         ".github/workflows/instabox-deploy.yml",
         ".github/workflows/media-provider-smoke.yml",
+        ".github/workflows/native-auth-staging-smoke.yml",
         ".github/workflows/self-hosted-stack.yml",
         "admin-console/identity_review_integration_test.go",
         "admin-console/main.go",
@@ -35,6 +36,8 @@
         "cmd/api/fresh_media_bridge_test.go",
         "cmd/api/identity_evidence_http_integration_test.go",
         "cmd/api/identity_evidence_retention.go",
+        "cmd/api/identity_evidence_storage.go",
+        "cmd/api/identity_evidence_storage_test.go",
         "cmd/api/identity_media_replication.go",
         "cmd/api/identity_media_replication_test.go",
         "cmd/api/identity_native.go",
@@ -94,6 +97,7 @@
         "docs/platform/auth-storage-production-hardening.md",
         "docs/platform/identity-registration-provisioning.md",
         "docs/platform/independent-auth.md",
+        "docs/platform/native-auth-acceptance.md",
         "docs/six-repository-runtime-integration-contract.md",
         "docs/tv-catalogue-operations.md",
         "internal/algorithmclient/client.go",
@@ -152,6 +156,7 @@
         "scripts/guard-no-render.py",
         "scripts/instabox_watchdog.py",
         "scripts/migrate-appwrite-identities.sql",
+        "scripts/native-auth-staging-smoke.py",
         "scripts/start-instabox-deployment.sh",
         "scripts/test-identity-registration-migration.sh",
         "scripts/validate-canonical-deploy-smoke.py",
@@ -160,7 +165,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "bbf08499bcd80adcdafd8fff38b7bd34e8edd741",
+      "ref": "3fef8311f0ec07bdb37c8b88ff9b2cc82bb973f3",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/media-provider-smoke.yml",
@@ -174,6 +179,7 @@
         "backend/services/media/main_test.go",
         "backend/services/media/migrations/001_media_lifecycle.sql",
         "backend/services/media/migrations/002_primary_origin_restore.sql",
+        "backend/services/media/migrations/003_identity_evidence_namespace.sql",
         "backend/services/media/migrations/test_media_lifecycle.sql",
         "backend/services/media/provider_smoke_test.go",
         "backend/services/media/reconcile.go",
@@ -191,8 +197,11 @@
         "docs/platform/openapi/media-lifecycle-v1.yaml",
         "docs/platform/service-catalog.md",
         "docs/platform/three-copy-media-operations.md",
+        "scripts/provision-federation-database.sh",
+        "scripts/provision-media-database.sh",
         "scripts/test-backup-scope-contract.py",
         "scripts/validate-testagram-platform-contracts.sh",
+        "scripts/validate-testagram-runtime-integration.py",
         "vps/.env.example",
         "vps/DEPLOYMENT.md",
         "vps/backup.sh",
@@ -202,7 +211,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "eb30f4f2b7ecfaaf121411657a281f4195d8d314",
+      "ref": "ccb9ca8053e2309fe01ed4829b19ba2dd7e844a7",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         ".github/workflows/ci.yml",
@@ -226,15 +235,17 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "a90ae7cf77034308ff205d66614d1061821f27d4",
+      "ref": "96fb0ad5b4d4b0870ceea7784cc620becb6afe19",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",
         ".github/workflows/deploy-cloudflare-pages.yml",
         ".github/workflows/flutter-ci.yml",
         ".github/workflows/tv-health-monitor.yml",
+        "README.md",
         "docs/auth-media-client-acceptance.md",
         "docs/authentication-and-media-circuit.md",
+        "docs/legacy-route-migration-matrix.md",
         "docs/migration-progress.md",
         "docs/native-auth-rollout-boundary.md",
         "docs/six-repository-runtime-integration-contract.md",
@@ -283,9 +294,11 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "b0e75e8d005d3a014badd762bec4e81fe09559fe",
+      "ref": "1a8cb7895caa7e27f9bdb3f1a2bb68ef755634b4",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
+        ".env.example",
+        "README.md",
         "api/events/post-published.v1.schema.json",
         "api/openapi.yaml",
         "docs/backend-integration-contract.md",

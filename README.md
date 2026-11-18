@@ -18,7 +18,7 @@ The API contract, compatibility, client SDK and integration-governance repositor
 | Repository | Authority |
 |---|---|
 | [testagram-api](https://github.com/Trendyzima/testagram-api) | API contracts, client SDKs, compatibility rules and integration governance |
-| [Testagram Backend](https://github.com/Trendyzima/Testagram-backend-) | Public product API runtime, provider-gated Testagram-native bearer authentication, canonical identity, authorization, PostgreSQL product data and social operations; Appwrite remains a transitional reviewer/compatibility dependency |
+| [Testagram Backend](https://github.com/Trendyzima/Testagram-backend-) | Public product API runtime, Testagram-native bearer authentication, canonical identity, authorization, PostgreSQL product data and social operations; historical external account IDs are reconciliation inputs only |
 | [Flutter Client](https://github.com/Trendyzima/testagram-flutter-client-) | Native UI, local UX state and client transport; product data only through Backend |
 | [Data Centre](https://github.com/Trendyzima/Testagram-data-centre-) | Storage, video processing, notifications, infrastructure and operations; private service APIs remain private |
 | [CDN](https://github.com/Trendyzima/cdn-) | Media delivery/cache data plane; not a product API or identity authority |
@@ -27,8 +27,8 @@ The API contract, compatibility, client SDK and integration-governance repositor
 
 ## Critical integration rules
 
-1. Flutter uses the Testagram-owned `NativeAuthClient` and sends short-lived Testagram access tokens when the Backend deployment has `TESTAGRAM_AUTH_PROVIDER=native` enabled. The Backend still defaults to the legacy Appwrite provider until an explicit, staged cutover.
-2. Appwrite remains a separate staff-reviewer identity dependency for the identity-review console and a compatibility provider during migration; it is not the Flutter end-user SDK. Never treat this repository, a generated SDK, or a client-side claim as an authorization boundary.
+1. Flutter uses the Testagram-owned `NativeAuthClient` and sends short-lived Testagram access tokens to the Backend. Protected end-user routes use native Backend sessions and live PostgreSQL session/account checks; no Appwrite bearer fallback is accepted. Runtime deployment and existing-account reconciliation still require their own staged evidence.
+2. Staff review uses native Backend sessions, the encrypted Testagram staff cookie and PostgreSQL staff-role/MFA records. Historical account identifiers are reconciliation inputs only; they are not accepted as user or staff bearer credentials. Never treat this repository, a generated SDK, or a client-side claim as an authorization boundary.
 3. Flutter must not call PostgreSQL, object storage, private Data Centre endpoints, Federation, or Algorithm directly.
 4. CDN media URLs are for byte delivery; media ownership, upload authorization and attachment to posts remain Backend-controlled.
 5. Private service tokens must never enter mobile/web bundles, public OpenAPI schemas, generated SDKs or client examples.
@@ -65,8 +65,8 @@ npx --yes @redocly/cli lint contracts/openapi/testagram-v1.yaml
 - `contracts/registry/` and `contracts/sources.lock.json` — six-service registry and pinned upstream provenance.
 - `contracts/schemas/` — reusable JSON schemas.
 - `packages/typescript/` — typed fetch client foundation, nested Backend error handling and idempotent post helper.
-- `packages/dart/` — reusable Dart HTTP client package with Appwrite JWT transport and tests.
-- `docs/` — six-repository topology, ownership, integration flows, downstream adoption, security, provider conformance audits, capability status and release gates.
+- `packages/dart/` — reusable Dart HTTP client package with Testagram-native bearer transport and tests.
+- `docs/` — seven-repository topology, ownership, integration flows, downstream adoption, security, provider conformance audits, capability status and release gates.
 - `examples/` — safe request/response examples.
 - `.github/workflows/` — OpenAPI, TypeScript, Dart, Backend route inventory and six-repository snapshot validation.
 
