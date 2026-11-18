@@ -5,8 +5,8 @@
 | Capability | Backend route | Owner | Contract status | Integration note |
 |---|---|---|---|---|
 | Liveness/readiness | GET /healthz, GET /readyz | Backend | Contracted | Plain-text responses |
-| Home feed | GET /api/feed/home | Backend + Algorithm | Contracted | Appwrite JWT; following_only/before/limit |
-| Legacy Appwrite consent ledger | POST /api/auth/registration-consent | Backend (compatibility only) | Registered-only | Consent recording does not create or authorize a canonical account. Native identity application, private evidence review, two-person approval and one-time provisioning are authoritative; retire this route after legacy-client migration |
+| Home feed | GET /api/feed/home | Backend + Algorithm | Contracted | Testagram-native bearer JWT; following_only/before/limit |
+| Legacy registration-consent ledger | POST /api/auth/registration-consent | Backend (historical compatibility only) | Registered-only | Consent recording does not create or authorize a canonical account and is not part of native sign-in. Native identity application, private evidence review, two-person approval and one-time provisioning are authoritative; retire this route after historical-client migration |
 | Search | GET /api/search | Backend | Contracted | Optional auth; q/kind/limit/media_only |
 | Main-feed post creation | POST /api/social/posts | Backend | Contracted | Idempotency-Key required; Flutter widget tests cover request shape; deployed Backend/PostgreSQL and staging read-back remain unverified |
 | Post interaction summary | GET /api/social/posts/{id}/interaction-summary | Backend | Contracted | Viewer-specific state |
