@@ -36,7 +36,7 @@ The baseline below is the reviewed `main` head observed on 2026-11-18. The six r
 | Data Centre | `3fef8311f0ec07bdb37c8b88ff9b2cc82bb973f3` |
 | Testagram API control plane | `f877b954529080278d850554f0217e68b1101c30` |
 | Algorithm | `98bc457b52ecd0c1bf3a9af0d772575b2c825e7b` |
-| Federation | `1a8cb7895caa7e27f9bdb3f1a2bb68ef755634b4` |
+| Federation | `808ae80919dee198e6dcb66778814aeb8a2d3c5a` |
 | CDN | `3a877515966ea113c5ea0021ca6df748ba767ac4` |
 
 A source pin is not a deployment record. Every accepted staging and production run must separately record the actual running image digest and source revision. Mutable tags such as `main` and `latest` are not acceptable release identities.
