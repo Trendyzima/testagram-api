@@ -11,7 +11,6 @@
         ".github/workflows/ci.yml",
         ".github/workflows/identity-evidence-staging-smoke.yml",
         ".github/workflows/instabox-deploy.yml",
-        ".github/workflows/instabox-media-staging-smoke.yml",
         ".github/workflows/media-provider-smoke.yml",
         ".github/workflows/self-hosted-stack.yml",
         "admin-console/identity_review_integration_test.go",
