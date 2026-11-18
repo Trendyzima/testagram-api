@@ -503,7 +503,7 @@ paths:
       operationId: approveIdentityAccountProvisioning
       tags: [Identity]
       summary: Record one of the two independent account-activation approvals
-      description: Requires a valid Testagram-native staff access JWT, an enabled staff principal, an enrolled-MFA marker and an active identity-review role grant. Only the two reviewers who independently verified the evidence may approve. The linked sensitive-action request must still be pending, target this application, require exactly two approvals and be unexpired; the application and approval request are finalized atomically before provisioning authorization can be issued.
+      description: Requires a valid Testagram-native staff access JWT, an enabled staff principal, an enrolled-MFA marker and an active identity-review role grant. The current Admin Console step-up reauthenticates the password but does not yet verify a TOTP/passkey challenge; the marker is not a substitute for live second-factor verification, so production staff-review activation remains gated. Only the two reviewers who independently verified the evidence may approve. The linked sensitive-action request must still be pending, target this application, require exactly two approvals and be unexpired; the application and approval request are finalized atomically before provisioning authorization can be issued.
       security:
         - testagramBearer: []
       parameters:
