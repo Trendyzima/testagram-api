@@ -32,7 +32,7 @@ The runtime source baseline below was refreshed from the reviewed `main` heads o
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `544c9d122bcfa138789b9153b7a406441e4cf29b` |
-| Backend | `2290d6c8f1ec4f30d7821049ea38876e2284c1a2` |
+| Backend | `abf0368bbf494cecdb74689e92a17e9e9a2e2693` |
 | Data Centre | `1d751692828631f2344311582588d4c4c0c53ad1` |
 | Testagram API control plane | `6f2da34f8cd6751b360d38b4bd4a4c1030df610c` |
 | Algorithm | `3734ff75d52019cb6d2cd0cd5273539fe6ab62e9` |
