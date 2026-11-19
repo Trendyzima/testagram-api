@@ -4,13 +4,14 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "abf0368bbf494cecdb74689e92a17e9e9a2e2693",
+      "ref": "90b3b856fb9ff4ebe6f78afcc93fad539c4c5607",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
         ".github/workflows/ci.yml",
         ".github/workflows/identity-evidence-staging-smoke.yml",
         ".github/workflows/instabox-deploy.yml",
+        ".github/workflows/instabox-production-backup.yml",
         ".github/workflows/media-provider-smoke.yml",
         ".github/workflows/native-auth-staging-smoke.yml",
         ".github/workflows/self-hosted-stack.yml",
@@ -84,6 +85,7 @@
         "cmd/api/wallet_mpesa.go",
         "cmd/api/wallet_spaces_capability.go",
         "deploy/self-hosted/.env.example",
+        "deploy/self-hosted/BACKUP-RESTORE.md",
         "deploy/self-hosted/README.md",
         "deploy/self-hosted/apply-federation-outbox-migration.sh",
         "deploy/self-hosted/apply-media-replication-migrations.sh",
@@ -154,20 +156,19 @@
         "migrations/20261118_native_admin_console.sql",
         "migrations/20261119_native_identity_approval_ledger.sql",
         "scripts/guard-no-render.py",
+        "scripts/instabox-production-backup.sh",
         "scripts/instabox_watchdog.py",
         "scripts/migrate-appwrite-identities.sql",
         "scripts/native-auth-staging-smoke.py",
+        "scripts/self-hosted-backup.sh",
+        "scripts/self-hosted-restore-drill.sh",
         "scripts/start-instabox-deployment.sh",
         "scripts/test-identity-registration-migration.sh",
         "scripts/validate-canonical-deploy-smoke.py",
+        "tests/test_instabox_federation_runtime_contract.py",
+        "tests/test_instabox_image_digest_verification.py",
         "tests/test_instabox_watchdog.py",
-        ".github/workflows/instabox-production-backup.yml",
-        "deploy/self-hosted/BACKUP-RESTORE.md",
-        "scripts/instabox-production-backup.sh",
-        "scripts/self-hosted-backup.sh",
-        "scripts/self-hosted-restore-drill.sh",
-        "tests/test_self_hosted_backup_guards.py",
-        "tests/test_instabox_federation_runtime_contract.py"
+        "tests/test_self_hosted_backup_guards.py"
       ]
     },
     "data-centre": {
@@ -217,7 +218,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "62b8f4388bbd88a9a9ccdeea1a1036960f5b5a71",
+      "ref": "445263c9e0286f830bbf872d523552c04f43da3e",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         ".github/workflows/ci.yml",
