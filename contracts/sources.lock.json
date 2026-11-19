@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "2a65ac075329f9f9fb092c4802f2a8ae3296e66c",
+      "ref": "e08b1c6568fa11cdc0b5a177e48e13ffb1bc7cbe",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -172,10 +172,9 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "3fef8311f0ec07bdb37c8b88ff9b2cc82bb973f3",
+      "ref": "c176b90c97df94651379151420075427379a8bca",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
-        ".github/workflows/media-provider-smoke.yml",
         ".github/workflows/native-auth-session-integration.yml",
         ".github/workflows/vps-ci.yml",
         "backend/docker-compose.yml",
@@ -218,7 +217,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "3a877515966ea113c5ea0021ca6df748ba767ac4",
+      "ref": "4b84d8a5e21aa2f815af535eeec62f729ab4a724",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         ".github/workflows/ci.yml",
@@ -242,7 +241,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "96fb0ad5b4d4b0870ceea7784cc620becb6afe19",
+      "ref": "544c9d122bcfa138789b9153b7a406441e4cf29b",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",

@@ -131,7 +131,20 @@ if (!dataCentreMediaServer.includes('r.Header.Get("X-Testagram-API-Version")')) 
  if (!dataCentreCompose.includes('expose: ["8096"]')) fail.push("Data Centre media API must expose only the private container port, not publish it publicly");
  if (!backendCompose.includes("B2_S3_ACCESS_KEY_ID:") || !backendCompose.includes("B2_S3_SECRET_ACCESS_KEY:") || !backendCompose.includes("CLOUDFLARE_R2_ACCESS_KEY_ID:") || !backendCompose.includes("CLOUDFLARE_R2_SECRET_ACCESS_KEY:")) fail.push("Backend identity-evidence replica credentials must be mapped into the VPS API container");
  if (!backendCompose.includes("MEDIA_REPLICATION_ENABLED:")) fail.push("Backend Compose must preserve the explicit three-provider replication feature gate");
- if (!backendDeploy.includes('if [[ "$(read_env_value MEDIA_REPLICATION_ENABLED)" == "true" ]]; then') || !backendDeploy.includes('if [[ "${MEDIA_REPLICATION_ENABLED:-false}" == "true" ]]; then') || backendDeploy.includes('if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" || "${MEDIA_REPLICATION_ENABLED:-false}" == "true" ]]; then') || !backendDeploy.includes("for key in B2_S3_ENDPOINT") || !backendDeploy.includes("CLOUDFLARE_R2_SECRET_ACCESS_KEY")) fail.push("Backend B2/R2 credentials must only reach the VPS after explicit MEDIA_REPLICATION_ENABLED=true, never merely because Data Centre media is enabled");
+ const backendReplicaGate = backendDeploy.indexOf('if [[ "$(read_env_value MEDIA_REPLICATION_ENABLED)" == "true" ]]; then');
+const backendReplicaElse = backendDeploy.indexOf('else\n  # Do not leave old provider credentials mounted in the Backend', backendReplicaGate);
+if (backendReplicaGate < 0 || backendReplicaElse < 0 ||
+    !backendDeploy.slice(backendReplicaGate, backendReplicaElse).includes('write_env_value "$key" "$value"') ||
+    !backendDeploy.slice(backendReplicaElse).includes('write_env_value "$key" ""')) {
+  fail.push("Backend API B2/R2 replica credentials must be installed only behind MEDIA_REPLICATION_ENABLED and cleared when it is false");
+}
+const dataCentreMediaGate = 'if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" && "${FRESH_MEDIA_ENABLED:-false}" == "true" ]]; then';
+if (!backendDeploy.includes(dataCentreMediaGate) ||
+    !backendDeploy.includes('write_dc_env_value "$key" "$value"') ||
+    !dataCentreCompose.includes("B2_S3_ACCESS_KEY_ID: ${B2_S3_ACCESS_KEY_ID:-}") ||
+    !dataCentreCompose.includes("CLOUDFLARE_R2_ACCESS_KEY_ID: ${CLOUDFLARE_R2_ACCESS_KEY_ID:-}")) {
+  fail.push("B2/R2 provider credentials must be isolated to the private Data Centre media service behind both Data Centre media gates");
+}
  if (!identityReplication.includes("identityBucket == privateBucket") || !identityReplication.includes("identityBucket == publicBucket") || !identityReplication.includes('strings.TrimSpace(os.Getenv("B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET"))') || !identityReplication.includes('strings.TrimSpace(os.Getenv("CLOUDFLARE_R2_IDENTITY_EVIDENCE_PRIVATE_BUCKET"))')) fail.push("Backend identity evidence must use dedicated MinIO/B2/R2 buckets distinct from ordinary media");
  if (!backendDeploy.includes("B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET") || !backendDeploy.includes("CLOUDFLARE_R2_IDENTITY_EVIDENCE_PRIVATE_BUCKET") || !backendDeploy.includes("VPS identity evidence bucket must be dedicated")) fail.push("Backend deployment must require explicit dedicated identity-evidence buckets before enabling replication");
  if (!backendDeploy.includes('if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" && "${FRESH_MEDIA_ENABLED:-false}" == "true" ]]; then')) fail.push("Data Centre media provider credentials must remain behind both independent media gates");
