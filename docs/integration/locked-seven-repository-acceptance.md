@@ -32,11 +32,11 @@ The runtime source baseline below was refreshed from the reviewed `main` heads o
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `544c9d122bcfa138789b9153b7a406441e4cf29b` |
-| Backend | `e08b1c6568fa11cdc0b5a177e48e13ffb1bc7cbe` |
+| Backend | `1ee38bd8bb6d3971ab60def637d86833386ec986` |
 | Data Centre | `c176b90c97df94651379151420075427379a8bca` |
-| Testagram API control plane | `d9e21b4b0819f39946e0a66c78c26e6a3934f095` |
+| Testagram API control plane | `aa1f9a67fd7c84ea745472f93d43345aa6a2f78d` |
 | Algorithm | `98bc457b52ecd0c1bf3a9af0d772575b2c825e7b` |
-| Federation | `808ae80919dee198e6dcb66778814aeb8a2d3c5a` |
+| Federation | `78e83a411afc8b9f46c687875b3cfd6db6d071b6` |
 | CDN | `4b84d8a5e21aa2f815af535eeec62f729ab4a724` |
 
 A source pin is not a deployment record. Every accepted staging and production run must separately record the actual running image digest and source revision. Mutable tags such as `main` and `latest` are not acceptable release identities.
