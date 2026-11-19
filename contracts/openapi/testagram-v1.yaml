@@ -417,7 +417,7 @@ paths:
       operationId: getIdentityReviewQueue
       tags: [Identity]
       summary: List applications awaiting manual identity review
-      description: Requires a native Testagram staff session. The Admin Console verifies the Backend-issued native session, enabled staff principal, enrolled MFA and identity.review permission from PostgreSQL. Queue metadata contains opaque evidence references only; raw evidence is served by the separate no-store reviewer endpoint and every retrieval attempt is audited.
+      description: Requires a Testagram-native staff access token with a signed `mfa=true` claim, an enabled staff principal, enrolled MFA and identity.review permission. The `mfa_enrolled_at` timestamp alone is not live second-factor proof. Current Backend tokens do not issue `mfa=true` because the WebAuthn/passkey challenge is not implemented; the route therefore returns HTTP 503 until a verified phishing-resistant challenge exists. Queue metadata contains opaque evidence references only; raw evidence is served by the separate no-store reviewer endpoint and every retrieval attempt is audited.
       security:
         - testagramBearer: []
       responses:
@@ -437,7 +437,7 @@ paths:
       operationId: getIdentityReviewEvidence
       tags: [Identity]
       summary: Stream private identity evidence to an authorized reviewer
-      description: Requires a native Testagram staff session with an enabled staff principal, enrolled MFA and identity.review permission. Backend audits the access attempt before streaming. Backend audits the access attempt before streaming, verifies byte length and SHA-256 before returning evidence, restores a missing or drifted VPS primary from a checksum-verified B2/R2 replica when possible, and otherwise serves only a checksum-verified private replica through the Backend proxy. No storage URL is returned; responses are private, no-store and nosniff.
+      description: Requires a Testagram-native staff access token with a signed `mfa=true` claim, an enabled staff principal, enrolled MFA and identity.review permission. An enrollment timestamp or password-only step-up is insufficient; current tokens do not carry live MFA proof, so this route returns HTTP 503 until WebAuthn/passkey verification is implemented. Backend audits the access attempt before streaming, verifies byte length and SHA-256 before returning evidence, restores a missing or drifted VPS primary from a checksum-verified B2/R2 replica when possible, and otherwise serves only a checksum-verified private replica through the Backend proxy. No storage URL is returned; responses are private, no-store and nosniff.
       security:
         - testagramBearer: []
       parameters:
@@ -471,7 +471,7 @@ paths:
       operationId: recordIdentityReviewDecision
       tags: [Identity]
       summary: Record one independent reviewer decision
-      description: Requires a native Testagram staff session with an enabled PostgreSQL staff principal, enrolled MFA and identity.review permission. A reviewer can decide once per session. Two distinct matching verified or failed decisions are required; a verified review creates a separate two-person account-approval request and does not itself provision an account.
+      description: Requires a Testagram-native staff access token with a signed `mfa=true` claim, an enabled PostgreSQL staff principal, enrolled MFA and identity.review permission. The current runtime does not issue the live-MFA claim, so this route returns HTTP 503 until the WebAuthn/passkey challenge and recovery lifecycle are implemented. A reviewer can decide once per session. Two distinct matching verified or failed decisions are required; a verified review creates a separate two-person account-approval request and does not itself provision an account.
       security:
         - testagramBearer: []
       parameters:
@@ -503,7 +503,7 @@ paths:
       operationId: approveIdentityAccountProvisioning
       tags: [Identity]
       summary: Record one of the two independent account-activation approvals
-      description: Requires a valid Testagram-native staff access JWT, an enabled staff principal and an active identity-review role grant. The Admin Console currently fails closed for all identity-review proxy operations until a live phishing-resistant WebAuthn/passkey challenge is implemented; an enrolled-MFA timestamp or password-only reauthentication is not sufficient authorization. Its password-only POST /api/admin/step-up endpoint returns HTTP 503 and does not issue a step-up proof. Production staff-review activation therefore remains gated. Only two distinct authorized reviewers who independently verified the evidence may approve. The linked sensitive-action request must still be pending, target this application, require exactly two approvals and be unexpired; the application and approval request are finalized atomically before provisioning authorization can be issued.
+      description: Requires a valid Testagram-native staff access JWT with a signed `mfa=true` claim, an enabled staff principal and an active identity-review role grant. The Backend route and Admin Console proxy both fail closed until a live phishing-resistant WebAuthn/passkey challenge is implemented. An enrolled-MFA timestamp or password-only reauthentication is not sufficient authorization; current tokens omit the `mfa` claim and the route returns HTTP 503. The password-only POST /api/admin/step-up endpoint also returns HTTP 503 and does not issue a step-up proof. Production staff-review activation therefore remains gated. Only two distinct authorized reviewers who independently verified the evidence may approve. The linked sensitive-action request must still be pending, target this application, require exactly two approvals and be unexpired; the application and approval request are finalized atomically before provisioning authorization can be issued.
       security:
         - testagramBearer: []
       parameters:
