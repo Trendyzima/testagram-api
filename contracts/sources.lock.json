@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "0079a6cad56727b066580a96fee11382b3d64da6",
+      "ref": "a4939055d9fd810fb1a524afa0246c70042df8f6",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -172,7 +172,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "c176b90c97df94651379151420075427379a8bca",
+      "ref": "e6761f3bbbf5fcda7d4db0925e0fca9166ad7518",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/native-auth-session-integration.yml",
@@ -217,7 +217,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "4b84d8a5e21aa2f815af535eeec62f729ab4a724",
+      "ref": "bef18c5b3bfb015a00299c33ecf053f83b9ae1f1",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         ".github/workflows/ci.yml",
@@ -327,7 +327,7 @@
     },
     "algorithm": {
       "fullName": "Trendyzima/the-algorithm",
-      "ref": "98bc457b52ecd0c1bf3a9af0d772575b2c825e7b",
+      "ref": "3734ff75d52019cb6d2cd0cd5273539fe6ab62e9",
       "checkoutPath": "source-repos/algorithm",
       "sourcePaths": [
         "testagram-feed/API-CONTRACT.md",
