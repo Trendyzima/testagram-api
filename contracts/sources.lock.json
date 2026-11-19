@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "e08b1c6568fa11cdc0b5a177e48e13ffb1bc7cbe",
+      "ref": "1ee38bd8bb6d3971ab60def637d86833386ec986",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -300,7 +300,7 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "808ae80919dee198e6dcb66778814aeb8a2d3c5a",
+      "ref": "78e83a411afc8b9f46c687875b3cfd6db6d071b6",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
         ".env.example",
