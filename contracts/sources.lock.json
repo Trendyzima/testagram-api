@@ -175,7 +175,6 @@
       "ref": "c176b90c97df94651379151420075427379a8bca",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
-        ".github/workflows/media-provider-smoke.yml",
         ".github/workflows/native-auth-session-integration.yml",
         ".github/workflows/vps-ci.yml",
         "backend/docker-compose.yml",
