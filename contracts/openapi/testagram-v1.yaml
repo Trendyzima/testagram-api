@@ -417,7 +417,7 @@ paths:
       operationId: getIdentityReviewQueue
       tags: [Identity]
       summary: List applications awaiting manual identity review
-      description: Requires a Testagram-native staff access token with a signed `mfa_at` timestamp claim, an enabled staff principal, enrolled MFA and identity.review permission. The `mfa_enrolled_at` timestamp alone is not live second-factor proof. Current Backend tokens do not issue `mfa=true` because the WebAuthn/passkey challenge is not implemented; the route therefore returns HTTP 503 until a verified phishing-resistant challenge exists. Queue metadata contains opaque evidence references only; raw evidence is served by the separate no-store reviewer endpoint and every retrieval attempt is audited.
+      description: Requires a Testagram-native staff access token with a signed `mfa_at` timestamp claim, an enabled staff principal, enrolled MFA and identity.review permission. The `mfa_enrolled_at` timestamp alone is not live second-factor proof. Current Backend tokens omit `mfa_at` because the WebAuthn/passkey challenge is not implemented; the route therefore returns HTTP 503 until a verified phishing-resistant challenge exists. Queue metadata contains opaque evidence references only; raw evidence is served by the separate no-store reviewer endpoint and every retrieval attempt is audited.
       security:
         - testagramBearer: []
       responses:
