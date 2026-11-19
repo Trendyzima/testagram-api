@@ -132,7 +132,7 @@ if (!dataCentreMediaServer.includes('r.Header.Get("X-Testagram-API-Version")')) 
  if (!backendCompose.includes("B2_S3_ACCESS_KEY_ID:") || !backendCompose.includes("B2_S3_SECRET_ACCESS_KEY:") || !backendCompose.includes("CLOUDFLARE_R2_ACCESS_KEY_ID:") || !backendCompose.includes("CLOUDFLARE_R2_SECRET_ACCESS_KEY:")) fail.push("Backend identity-evidence replica credentials must be mapped into the VPS API container");
  if (!backendCompose.includes("MEDIA_REPLICATION_ENABLED:")) fail.push("Backend Compose must preserve the explicit three-provider replication feature gate");
  const backendReplicaGate = backendDeploy.indexOf('if [[ "$(read_env_value MEDIA_REPLICATION_ENABLED)" == "true" ]]; then');
-const backendReplicaElse = backendDeploy.indexOf('else\\n  # Do not leave old provider credentials mounted in the Backend', backendReplicaGate);
+const backendReplicaElse = backendDeploy.indexOf('else\n  # Do not leave old provider credentials mounted in the Backend', backendReplicaGate);
 if (backendReplicaGate < 0 || backendReplicaElse < 0 ||
     !backendDeploy.slice(backendReplicaGate, backendReplicaElse).includes('write_env_value "$key" "$value"') ||
     !backendDeploy.slice(backendReplicaElse).includes('write_env_value "$key" ""')) {
