@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "201fd3335c737e7fe36ed34dfa1ec07b03c31047"
   },
-  "status": "source-merged-runtime-acceptance-pending",
+  "status": "candidate-backend-pin-runtime-acceptance-pending",
   "repositories": [
     {
       "id": "flutter-client",
@@ -25,7 +25,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "60ba614e414b62e12c8a2692faf9dde870141c2b",
+      "mainCommit": "36560396c54294f9fe9bd4883eb983b8dc489e89",
       "mergedPullRequests": [
         419,
         418,
