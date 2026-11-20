@@ -40,11 +40,8 @@ paths:
             schema:
               type: object
               additionalProperties: false
-              required: [feedMode, limit, candidates]
+              required: [limit, candidates]
               properties:
-                feedMode:
-                  type: string
-                  enum: [for_you, following, media, discover]
                 now: {type: string, format: date-time}
                 limit: {type: integer, minimum: 1, maximum: 50}
                 candidates:
@@ -132,9 +129,8 @@ paths:
                       createdAt: {type: string, format: date-time}
                       features:
                         type: object
-                        additionalProperties: true
+                        additionalProperties: false
                         properties:
-                          additionalProperties: false
                           following: {type: boolean}
                           mutualAffinity: {type: number, minimum: 0, maximum: 1}
                           interestAffinity: {type: number, minimum: 0, maximum: 1}
