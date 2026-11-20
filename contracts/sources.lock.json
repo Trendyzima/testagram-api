@@ -249,7 +249,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "f760d65c02d3aacb839accf4d9566e59e3a30a98",
+      "ref": "5d8bbc09d46d6a7b7f0a852fd4e2251b5109cfbd",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",
@@ -304,7 +304,8 @@
         "test/features/tv/tv_playback_policy_test.dart",
         "test/features/wallet/wallet_screen_test.dart",
         "tool/tv_health_monitor.mjs",
-        "test/backend_api_contract_test.dart"
+        "test/backend_api_contract_test.dart",
+        ".github/workflows/domain-smoke.yml"
       ]
     },
     "federation": {
