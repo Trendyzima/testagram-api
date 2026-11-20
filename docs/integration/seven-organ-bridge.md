@@ -76,7 +76,44 @@ This bridge records the reviewed merge set, not an instruction to merge every br
 
 Flutter production-domain smoke PR #100 remains draft with a failed smoke run. It is deliberately excluded from this merge set and must be repaired and rerun before reconsideration.
 
-## 6. Bridge validation
+## 6. Complete branch census and forensic dispositions
+
+The GitHub branch search was paginated to completion for all seven repositories. The inventory contained **938 branch refs** at the time of this pass:
+
+| Organ | Branch refs |
+|---|---:|
+| Flutter | 118 |
+| Backend | 399 |
+| API control plane | 112 |
+| Data Centre | 112 |
+| CDN | 120 |
+| Algorithm | 29 |
+| Federation | 48 |
+| **Total** | **938** |
+
+A branch census is not permission to merge every ref. Many refs are backups, migration experiments, legacy-provider cutovers, old release candidates or stale snapshots. Only reviewed PRs with current diffs and passing required checks were merged. Branches without PRs were not merged directly into `main`.
+
+Representative branch-level decisions:
+
+- Flutter `fix/webfinger-smoke-probe-handle-20261120` and CDN `fix/webfinger-negative-control-handle-20261120`: the changed workflow/test file blobs are already identical to current `main`; no duplicate cherry-pick is required.
+- Federation `fix/nodeinfo-discovery-runtime`: the inspected server, tests and configuration files are already identical to current `main`; the old branch is not a new fix to merge.
+- Data Centre `fix/live-media-smoke-staging-isolation`: not merged. Its workflow runs on pushes to `main` without requiring the explicit manual confirmation input, and its environment has fallback paths to general provider credentials. That is not an acceptable trigger for live provider writes.
+- Data Centre `feat/independent-media-backup-drill`: not merged. It is roughly 400 commits behind current main, requires an Appwrite export, and does not back up/restore the dedicated media PostgreSQL ledger. Its offline object-byte verification is not a complete native Testagram disaster-recovery path.
+- Backend `fix/close-native-intake-until-staff-mfa-20261120`: not merged. The inspected change adds a readiness boolean and startup log but does not itself enforce a request-time registration/review gate; it is also substantially behind current main.
+- Backend `fix/backend-identity-review-live-mfa-claim`: not merged. It is 143 commits behind current main and needs a current-base rebase plus complete review before any code is considered.
+- CDN `fix/cloudflare-apex-federation-route-20261116`: not merged. It is 31 commits ahead and 18 behind with a broad routing/worker/workflow diff; it needs a focused rebase and live-route-specific checks, not a blind merge.
+
+### Production smoke evidence that remains a blocker
+
+The existing Flutter production-domain smoke run `44480693441` failed on 2026-11-19. Its read-only probes recorded:
+
+- `https://testagram.site/`: HTTP 200, no redirect Location; expected HTTP 308 to `https://www.testagram.site/`.
+- `https://testagram.site/.well-known/nodeinfo`: HTTP 200 but `text/html`, not NodeInfo JSON.
+- WebFinger for the real account `acct:crissbeat@testagram.site`: HTTP 503, `application/json`.
+
+The www frontend and Pages.dev shell returned HTTP 200. This failure is not a Flutter build failure and is not repaired by changing the smoke-test negative-control handle. It points to live apex/federation route ownership or deployed origin readiness. Keep PR #100 draft and do not claim public federation acceptance until the live routes are corrected and the same probes pass.
+
+## 7. Bridge validation
 
 Run from this repository:
 
@@ -88,7 +125,7 @@ npm run check
 
 The offline bridge audit checks all seven repository identities, six immutable runtime source pins, the governance-only API boundary, declared graph edges and trust invariants. The existing cross-repository audit checks the pinned source files and contract snapshots. A green bridge audit is not a live deployment acceptance result.
 
-## 7. Remaining acceptance gates
+## 8. Remaining acceptance gates
 
 - Exact deployed image digests and source revisions for all six runtime organs.
 - Same-staging registration, email verification, native login, refresh rotation, logout and restart journey.
