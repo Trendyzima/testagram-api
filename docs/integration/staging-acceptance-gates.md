@@ -7,7 +7,7 @@ This document defines evidence required before enabling public registration or p
 - Use an isolated staging deployment, PostgreSQL database, and explicitly designated non-production object buckets for every provider under test. Never run destructive tests against production data.
 - Do not print credentials, signed URLs, identity evidence, access JWTs, refresh tokens or recovery secrets in CI logs or artifacts.
 - Testagram Backend is the sole credential, session, canonical identity, authorization and product-data authority. End-user access uses Backend-issued short-lived Testagram access JWTs and opaque rotating refresh tokens.
-- Appwrite JWTs are not accepted as native end-user or staff bearer credentials. Historical Appwrite identifiers may be used only as explicit reconciliation inputs; never auto-link accounts by matching email.
+- Bearer tokens from retired external providers are not accepted as native end-user or staff credentials. Historical external identifiers may be used only as explicit reconciliation inputs; never auto-link accounts by matching email.
 - Keep `TESTAGRAM_IDENTITY_REGISTRATION_ENABLED=false`, `FRESH_MEDIA_ENABLED=false` and `MEDIA_REPLICATION_ENABLED=false` until each owning service's gates pass.
 - Tests that create users, objects or posts must use deterministic test identities and clean up only their own staged resources.
 
