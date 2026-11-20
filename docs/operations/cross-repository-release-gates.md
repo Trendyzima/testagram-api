@@ -22,7 +22,7 @@ This checklist is required before downstream repositories pin a new API contract
 
 ## Staging and production
 - [ ] Private DNS, network routes, ports, TLS/mTLS and secret rotation verified.
-- [ ] Appwrite JWT expiry/revocation and account-linking negative tests pass.
+- [ ] Native access-token expiry/revocation, refresh-token replay and explicit historical-account reconciliation negative tests pass.
 - [ ] Cross-service request IDs and redaction are verified in logs.
 - [ ] Backup restore, media checksum verification and deletion/tombstone propagation are proven.
 - [ ] CDN hostname, DNS, TLS, origin and private media end-to-end are verified.
