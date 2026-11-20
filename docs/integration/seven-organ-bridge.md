@@ -18,7 +18,7 @@ This bridge is a release-governance layer, not a monorepo and not a new runtime 
 | Federation | [federated-content](https://github.com/Trendyzima/federated-content) | `e6946a4c903219d729b778cd4ed91b909a66826a` |
 | Contract control plane | [testagram-api](https://github.com/Trendyzima/testagram-api) | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` (bridge base) |
 
-The six runtime pins are also stored in `contracts/sources.lock.json`. The bridge audit verifies that the manifest and lockfile agree. All 309 declared provider source paths (169 Backend, 38 Data Centre, 17 CDN, 54 Flutter, 20 Federation, 11 Algorithm) were checked against the exact Git trees and all were present.
+The six runtime pins are also stored in `contracts/sources.lock.json`. The bridge audit verifies that the manifest and lockfile agree. All 294 declared provider source paths (154 Backend, 38 Data Centre, 17 CDN, 54 Flutter, 20 Federation, 11 Algorithm) were checked against the exact Git trees and all were present.
 
 ## 2. Merge set assembled
 
@@ -98,7 +98,7 @@ Representative branch-level decisions:
 - Flutter `fix/webfinger-smoke-probe-handle-20261120` and CDN `fix/webfinger-negative-control-handle-20261120`: the changed workflow/test file blobs are already identical to current `main`; no duplicate cherry-pick is required.
 - Federation `fix/nodeinfo-discovery-runtime`: the inspected server, tests and configuration files are already identical to current `main`; the old branch is not a new fix to merge.
 - Data Centre `fix/live-media-smoke-staging-isolation`: not merged. Its workflow runs on pushes to `main` without requiring the explicit manual confirmation input, and its environment has fallback paths to general provider credentials. That is not an acceptable trigger for live provider writes.
-- Data Centre `feat/independent-media-backup-drill`: not merged. It is roughly 400 commits behind current main, requires an Appwrite export, and does not back up/restore the dedicated media PostgreSQL ledger. Its offline object-byte verification is not a complete native Testagram disaster-recovery path.
+- Data Centre `feat/independent-media-backup-drill`: not merged. It is roughly 400 commits behind current main, requires a retired external-provider export, and does not back up/restore the dedicated media PostgreSQL ledger. Its offline object-byte verification is not a complete native Testagram disaster-recovery path.
 - Backend `fix/close-native-intake-until-staff-mfa-20261120`: not merged. The inspected change adds a readiness boolean and startup log but does not itself enforce a request-time registration/review gate; it is also substantially behind current main.
 - Backend `fix/backend-identity-review-live-mfa-claim`: not merged. It is 143 commits behind current main and needs a current-base rebase plus complete review before any code is considered.
 - CDN `fix/cloudflare-apex-federation-route-20261116`: not merged. It is 31 commits ahead and 18 behind with a broad routing/worker/workflow diff; it needs a focused rebase and live-route-specific checks, not a blind merge.
