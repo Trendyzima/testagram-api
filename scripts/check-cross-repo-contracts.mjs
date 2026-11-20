@@ -5,12 +5,11 @@ import { execFileSync } from "node:child_process";
 const lock = JSON.parse(readFileSync("contracts/sources.lock.json", "utf8"));
 const registry = JSON.parse(readFileSync("contracts/registry/services.json", "utf8"));
 const required = ["backend", "data-centre", "cdn", "flutter-client", "federation", "algorithm"];
-const optionalLegacy = ["backend-fresh-legacy"];
 const fail = [];
 const keys = Object.keys(lock.repositories).sort();
-const allowedKeys = [...required, ...optionalLegacy].sort();
+const allowedKeys = [...required].sort();
 if (required.some((key) => !keys.includes(key)) || keys.some((key) => !allowedKeys.includes(key))) {
-  fail.push(`Expected six runtime repositories plus the optional retired Fresh API pin; found: ${keys.join(", ")}`);
+  fail.push(`Expected exactly six native runtime repositories; found: ${keys.join(", ")}`);
 }
 const registryRepos = new Set(registry.services.map((s) => s.repository.toLowerCase()));
 const serviceIds = new Set();
@@ -24,18 +23,6 @@ for (const service of registry.services) {
   }
 }
 if (registry.services.length !== 6) fail.push(`Expected six runtime services; found ${registry.services.length}`);
-const legacyFresh = lock.repositories["backend-fresh-legacy"];
-if (!legacyFresh || legacyFresh.fullName !== lock.repositories.backend.fullName ||
-    !/^[a-f0-9]{40}$/.test(legacyFresh.ref) ||
-    legacyFresh.ref !== JSON.parse(readFileSync("contracts/route-inventory/fresh-api-public-routes.json", "utf8")).sourceRef) {
-  fail.push("Retired Fresh API must use a separate immutable Backend source pin matching its legacy route inventory.");
-} else {
-  const legacyRoot = resolve(legacyFresh.checkoutPath);
-  if (!existsSync(legacyRoot)) fail.push("Retired Fresh API source checkout is missing.");
-  for (const sourcePath of legacyFresh.sourcePaths) {
-    if (!existsSync(resolve(legacyRoot, sourcePath))) fail.push(`backend-fresh-legacy: pinned source path missing: ${sourcePath}`);
-  }
-}
 for (const key of required) {
   const entry = lock.repositories[key];
   if (!entry) continue;
