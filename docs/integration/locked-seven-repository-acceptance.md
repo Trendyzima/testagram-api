@@ -27,17 +27,17 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The runtime source baseline below was refreshed from the reviewed `main` heads observed on 2026-11-20. The acceptance gates remain locked; the source revisions are updated independently. The six runtime source pins are recorded in `contracts/sources.lock.json`; this governance repository is identified separately.
+The runtime source baseline below records the merged `main` heads after the seven-organ integration merge sweep on 2026-11-20. Each six-runtime-repository source pin was checked against its Git tree; all declared source paths exist. The acceptance gates remain locked; this source baseline is not a deployment attestation. The six runtime source pins are recorded in `contracts/sources.lock.json`; this governance repository is identified separately.
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `5d8bbc09d46d6a7b7f0a852fd4e2251b5109cfbd` |
-| Backend | `b55a30bbeaeb0c7caafe55882a6b9db9cf446268` |
-| Data Centre | `6a767f7ae2fe30395d24cded9265dc7e53e759c1` |
-| Testagram API control plane | `03558a2bf68a25b6718cd15851a9e82b89af0d19` |
-| Algorithm | `3734ff75d52019cb6d2cd0cd5273539fe6ab62e9` |
-| Federation | `78e83a411afc8b9f46c687875b3cfd6db6d071b6` |
-| CDN | `4e40463cfd11746c4ab89ccbc3d02a97f7cbee53` |
+| Flutter | `855758a1df5cf6616f4196124ca929787327da82` |
+| Backend | `301cd904ddd786a2625df5910f3955b31370a5db` |
+| Data Centre | `182107393c219ac24078785271731ae7cf0837bf` |
+| Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
+| Algorithm | `8dc66f06201fa0bfe62702a4c5a6dec61a4282e4` |
+| Federation | `e6946a4c903219d729b778cd4ed91b909a66826a` |
+| CDN | `506f22f0ae42d359f01a1f940d48aa578469e0a0` |
 
 A source pin is not a deployment record. Every accepted staging and production run must separately record the actual running image digest and source revision. Mutable tags such as `main` and `latest` are not acceptable release identities.
 
