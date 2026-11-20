@@ -9,7 +9,7 @@ The six runtime repositories are Flutter, Backend, Data Centre, CDN, Federation 
 
 ## Immutable source revisions
 
-The exact revisions used by contract CI are in `contracts/sources.lock.json`. The six current immutable source pins are Backend `287d8669df9dbfcf2ae34f6f532925ca551de4bd`, Data Centre `6a767f7ae2fe30395d24cded9265dc7e53e759c1`, CDN `4e40463cfd11746c4ab89ccbc3d02a97f7cbee53`, Flutter `5d8bbc09d46d6a7b7f0a852fd4e2251b5109cfbd`, Federation `78e83a411afc8b9f46c687875b3cfd6db6d071b6`, and Algorithm `3734ff75d52019cb6d2cd0cd5273539fe6ab62e9`. The Backend pin remains on the pre-retirement mainline until the native-auth retirement PR passes and is merged; contract CI deliberately detects the remaining legacy runtime at that pin. No separate legacy Fresh API source is part of the supported deployment graph. A source pin is not evidence that a service is deployed.
+The exact revisions used by contract CI are in `contracts/sources.lock.json`. Backend is pinned to reviewed native-auth retirement candidate `5a7be197675c90da2c7b713034cc294481a58921` while PR #424 is open; Data Centre `6a767f7ae2fe30395d24cded9265dc7e53e759c1`, CDN `4e40463cfd11746c4ab89ccbc3d02a97f7cbee53`, Flutter `5d8bbc09d46d6a7b7f0a852fd4e2251b5109cfbd`, Federation `78e83a411afc8b9f46c687875b3cfd6db6d071b6`, and Algorithm `3734ff75d52019cb6d2cd0cd5273539fe6ab62e9` remain pinned to reviewed immutable commits. After PR #424 merges, refresh Backend and route-inventory pins to the exact merge commit. No separate legacy Fresh API source is part of the supported deployment graph. A source pin is not evidence that a service is deployed.
 
 ## Ownership and allowed calls
 
@@ -78,7 +78,7 @@ The exact revisions used by contract CI are in `contracts/sources.lock.json`. Th
 
 ### Fresh API runtime boundary
 
-The legacy Fresh API entrypoint and its provider adapters are removed from the native-auth Backend branch. Data Centre `vps/docker-compose.yml` selects the canonical Backend image built from `cmd/api`; it no longer references a separate Fresh Backend image or external identity-provider configuration. The Backend source pin in this contract remains pre-retirement until PR #424 passes all required checks and is merged. Production traffic cutover, account reconciliation, rollback and activation still require independent evidence and approval.
+The legacy Fresh API entrypoint and provider adapters are removed from the native-auth Backend candidate. Data Centre `vps/docker-compose.yml` selects the canonical Backend image built from `cmd/api`; it no longer references a separate Fresh Backend image or external identity-provider configuration. PR #424 must pass all required checks and independent review before merge. Production traffic cutover, account reconciliation, rollback and activation still require separate evidence and approval.
 
 ### TV / HLS
 
@@ -90,7 +90,7 @@ The legacy Fresh API entrypoint and its provider adapters are removed from the n
 
 ## Contract and CI boundaries
 
-- The Backend route inventory is pinned to the exact Backend `main` source SHA in `contracts/route-inventory/backend-public-routes.json`; the current inventory audits static routes and explicitly marks registered-only operations. Contract CI must verify parity after each source-pin refresh. The separate Fresh API inventory contains 22 routes explicitly marked uncontracted pending wire-level review. CI passing means the inventory is accurately marked; it does not approve those 22 routes for public clients.
+- The Backend route inventory is pinned to the exact Backend retirement candidate SHA in `contracts/route-inventory/backend-public-routes.json`; the inventory audits static routes and explicitly marks registered-only operations. Contract CI verifies parity against the immutable source pin. The legacy Fresh API inventory is historical evidence only: its runtime and entrypoint are deleted from the native-auth Backend candidate, and none of its routes is part of the supported public API or SDK. CI passing does not promote historical routes into public client support.
 - API cross-repository CI checks immutable source checkout, OpenAPI lint, SDK build, tests, Backend route inventory and cross-repository snapshots.
 - Every source path in the current six runtime pins must exist at the pinned commit. Every snapshot must match its upstream source byte-for-byte.
 - A contract change requires producer, consumer, schema, fixtures, route inventory and pin updates in the same reviewed integration cycle.
