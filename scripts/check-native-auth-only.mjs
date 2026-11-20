@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 
 const sdkPaths = [
@@ -63,8 +63,8 @@ function walk(path) {
   if (!extensions.has(path.slice(path.lastIndexOf(".")))) return;
   scanned.push(path);
 }
-for (const root of roots) walk(resolve(root));
-for (const path of explicitFiles) scanned.push(resolve(path));
+for (const root of roots) if (existsSync(resolve(root))) walk(resolve(root));
+for (const path of explicitFiles) if (existsSync(resolve(path))) scanned.push(resolve(path));
 for (const path of new Set(scanned)) {
   const source = readFileSync(path, "utf8");
   assert.doesNotMatch(source, /appwrite/i, `${path}: Appwrite runtime, SDK, endpoint, token or fallback is forbidden`);
