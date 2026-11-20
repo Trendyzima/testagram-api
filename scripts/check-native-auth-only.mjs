@@ -68,8 +68,14 @@ function walk(path) {
 }
 for (const root of roots) if (existsSync(resolve(root))) walk(resolve(root));
 for (const path of explicitFiles) if (existsSync(resolve(path))) scanned.push(resolve(path));
+const providerViolations = [];
 for (const path of new Set(scanned)) {
   const source = readFileSync(path, "utf8");
-  assert.doesNotMatch(source, /appwrite/i, `${path}: Appwrite runtime, SDK, endpoint, token or fallback is forbidden`);
+  if (/appwrite/i.test(source)) providerViolations.push(path);
 }
+assert.equal(
+  providerViolations.length,
+  0,
+  `Appwrite runtime, SDK, endpoint, token or fallback remains in provider source/config files:\n${providerViolations.map((path) => `- ${path}`).join("\n")}`,
+);
 console.log(`Native-only authentication boundary: PASS (SDK/OpenAPI plus ${new Set(scanned).size} provider source/config files contain no Appwrite integration)`);
