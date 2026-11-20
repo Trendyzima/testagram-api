@@ -39,14 +39,14 @@ Application tokens, verification-session tokens, reviewer capabilities, access t
 - Access tokens are short-lived. Refresh credentials are stored using platform secure storage, rotated on refresh and revocable server-side.
 - Backend validates signature, issuer, audience, expiry, session state, revocation and canonical account status before authorizing a request.
 - Native mode must fail closed. A native-token validation failure must never fall back to Appwrite validation.
-- The Backend currently retains Appwrite compatibility code behind the native-auth mode boundary. The legacy `/api/auth/registration-consent` route is compatibility-only; it is not the native registration or account-provisioning authority.
-- The exact production setting for native mode, the remaining Appwrite compatibility surface and reviewer/admin authentication are separate release gates. Do not infer production activation from merged source code.
+- The Backend retirement change removes the legacy identity and media adapter packages from the native runtime. Historical migration records are retained only to migrate and preserve prior attribution; they are not authentication providers or fallback paths. The legacy `/api/auth/registration-consent` route is not the native registration or account-provisioning authority.
+- Production activation, controlled staff enrollment, reviewer/admin WebAuthn and the live Admin Console-to-Backend readiness contract remain separate release gates. Do not infer production activation from merged source code.
 
 ### Contract drift that must be resolved
 
-The current `contracts/openapi/testagram-v1.yaml` still declares `appwriteBearer` as the global security scheme and uses it on several operations, while `testagramBearer` is described as reserved. This is inconsistent with the native-auth client direction and the Backend's native-auth mode. Do not regenerate SDKs from that security declaration until every operation has been classified as public, native-user, reviewer/admin or service-to-service and the schemes are corrected with matching Backend enforcement and tests.
+`contracts/openapi/testagram-v1.yaml` now declares `testagramBearer` for authenticated user and staff operations. Public login, refresh, recovery and applicant-scoped identity operations explicitly declare `security: []`. Staff review operations require a native Backend token with the Backend-issued recent `mfa_at` elevation. Keep each operation classified as public, native-user, reviewer/admin or service-to-service, and require matching Backend enforcement and tests before publishing SDKs.
 
-Do not blindly replace every `appwriteBearer` occurrence: public identity enrollment, reviewer/admin routes and compatibility-only endpoints have different security requirements.
+Do not apply one global security requirement to every operation: public identity enrollment, applicant-scoped capabilities, reviewer/admin routes and service-to-service endpoints have different security requirements.
 
 ## Canonical request paths
 
@@ -88,7 +88,7 @@ Data Centre manages storage and processing; CDN delivers bytes. CDN cache is not
 
 ## Current integration gates
 
-1. **Auth/OpenAPI alignment:** classify every secured operation and replace the global Appwrite default only after matching native/reviewer/public enforcement and tests exist.
+1. **Auth/OpenAPI alignment:** classify every operation and verify native user, staff elevation, public and service-to-service enforcement against matching handlers and tests.
 2. **Client contract:** verify Flutter login, registration, verification, recovery, refresh rotation, logout, revoked sessions and expired-session UX against Backend.
 3. **Reviewer boundary:** verify staff authentication, MFA, least privilege, two-person approval, evidence access audit and reviewer token separation from user sessions.
 4. **Data Centre:** verify the actual platform route inventory against Backend typed clients; prove provider operations and replica read-back.
