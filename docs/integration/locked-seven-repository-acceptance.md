@@ -27,14 +27,14 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The runtime source baseline below was refreshed from the reviewed `main` heads observed on 2026-11-19. The acceptance gates remain locked; the source revisions are updated independently. The six runtime source pins are recorded in `contracts/sources.lock.json`; this governance repository is identified separately.
+The runtime source baseline below was refreshed from the reviewed `main` heads observed on 2026-11-20. The acceptance gates remain locked; the source revisions are updated independently. The six runtime source pins are recorded in `contracts/sources.lock.json`; this governance repository is identified separately.
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `544c9d122bcfa138789b9153b7a406441e4cf29b` |
-| Backend | `02c6c3ee10e232a00246ef59663ca261bf58c32d` |
-| Data Centre | `1d751692828631f2344311582588d4c4c0c53ad1` |
-| Testagram API control plane | `35cd97c130e91dab1772529eec3e087bed9ef6b2` |
+| Flutter | `f760d65c02d3aacb839accf4d9566e59e3a30a98` |
+| Backend | `eeef300060d007c72b942b3f8952875844904ac3` |
+| Data Centre | `6a767f7ae2fe30395d24cded9265dc7e53e759c1` |
+| Testagram API control plane | `03558a2bf68a25b6718cd15851a9e82b89af0d19` |
 | Algorithm | `3734ff75d52019cb6d2cd0cd5273539fe6ab62e9` |
 | Federation | `78e83a411afc8b9f46c687875b3cfd6db6d071b6` |
 | CDN | `445263c9e0286f830bbf872d523552c04f43da3e` |
