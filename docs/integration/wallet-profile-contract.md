@@ -6,7 +6,7 @@
 - PostgreSQL is the canonical store for wallet balances, ledger entries, transaction state and local profile fields.
 - Flutter is presentation and authenticated transport only. It must never calculate or mutate a balance locally.
 - Media bytes and upload lifecycle remain behind the Backend media gateway and the existing storage/CDN services.
-- XClone is the visual and interaction reference. Testagram may reuse familiar interaction patterns, but must preserve its own branding, typography, spacing, icons and component language.
+- Use Testagram's own approved design system, branding, typography, spacing, icons and component language.
 
 ## Wallet launch scope
 
