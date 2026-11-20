@@ -58,14 +58,14 @@ A gate passes only with a reproducible test against the exact deployed build and
 
 ### G1 — Flutter → Backend native identity and user journey
 
-- Flutter uses the Testagram-native Backend login/refresh/recovery/session path; no Appwrite JWT fallback is accepted on end-user routes.
+- Flutter uses only the Testagram-native Backend login/refresh/recovery/session path. No external identity-provider endpoint, SDK, JWT, database, server key, session, or fallback is permitted in the supported runtime.
 - Access JWTs remain short-lived and in memory; only opaque rotating refresh tokens are stored in platform secure storage.
 - Backend validates signature, issuer, audience, expiry, token version, session ID, canonical user ID, live PostgreSQL session, account state and verification/provisioning state.
 - Exercise registration only through the approved staging provisioning process, email verification, login, refresh rotation, logout, logout-all, password recovery and session restoration.
 - Exercise authenticated profile read/update, post create/read, feed retrieval, media grant retrieval and denial for expired/revoked/foreign credentials.
 - Verify web and Android builds on real browsers/devices; prove no service token, storage key, private host, or database credential is bundled into the client.
 
-**Fail if:** identity is inferred from email equality, a revoked/expired/wrong-audience token is accepted, a refresh token is replayable, the client calls a private service directly, or user data is lost across refresh/logout/restore.
+**Fail if:** any request, build, runtime container, environment contract or client SDK depends on an external identity provider; any provider token is accepted; or native session checks can be bypassed.\n\n**Fail if:** identity is inferred from email equality, a revoked/expired/wrong-audience token is accepted, a refresh token is replayable, the client calls a private service directly, or user data is lost across refresh/logout/restore.
 
 ### G2 — Backend → Algorithm ranking
 
