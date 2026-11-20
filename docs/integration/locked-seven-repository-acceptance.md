@@ -37,7 +37,7 @@ The runtime source baseline below was refreshed from the reviewed `main` heads o
 | Testagram API control plane | `03558a2bf68a25b6718cd15851a9e82b89af0d19` |
 | Algorithm | `3734ff75d52019cb6d2cd0cd5273539fe6ab62e9` |
 | Federation | `78e83a411afc8b9f46c687875b3cfd6db6d071b6` |
-| CDN | `445263c9e0286f830bbf872d523552c04f43da3e` |
+| CDN | `4e40463cfd11746c4ab89ccbc3d02a97f7cbee53` |
 
 A source pin is not a deployment record. Every accepted staging and production run must separately record the actual running image digest and source revision. Mutable tags such as `main` and `latest` are not acceptable release identities.
 
