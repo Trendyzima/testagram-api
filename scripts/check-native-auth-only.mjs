@@ -34,7 +34,7 @@ assert.match(sdk, /Testagram-native access token is required/);
 const contract = readFileSync(sdkPaths[2], "utf8");
 assert.match(contract, /testagramBearer/);
 assert.match(contract, /loginWithTestagramCredentials/);
-assert.match(contract, /refresh/);
+assert.match(contract, /\/api\/auth\/refresh/);
 
 // Inspect actual checked-out provider source, not just API prose. Historical
 // SQL migration records are intentionally excluded: they remain immutable
