@@ -14,6 +14,9 @@ function collectGoFiles(directory) {
 }
 collectGoFiles(backendDir);
 const source = backendFiles.map((path) => readFileSync(path, "utf8")).join("\n");
+if (/appwrite/i.test(source)) {
+  throw new Error("The canonical cmd/api runtime must contain no Appwrite integration, endpoint, token, SDK, or fallback.");
+}
 const postHandlerPath = resolve("source-repos/backend/cmd/api/social_post_create.go");
 const postTestsPath = resolve("source-repos/backend/cmd/api/social_post_create_test.go");
 
