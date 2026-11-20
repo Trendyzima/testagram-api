@@ -29,6 +29,7 @@ jobs:
       - run: npm run audit:backend-routes
       - run: npm run audit:cross-repo
       - run: npm run audit:locked-acceptance
+      - run: npm run audit:navigation
 
   validate-dart:
     runs-on: ubuntu-latest
