@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "60ba614e414b62e12c8a2692faf9dde870141c2b",
+      "ref": "287d8669df9dbfcf2ae34f6f532925ca551de4bd",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -160,7 +160,9 @@
         "admin-console/webauthn.go",
         "migrations/20261121_native_staff_webauthn.sql",
         "tests/test-native-staff-webauthn-migration.sh",
-        "docs/native-staff-webauthn.md"
+        "docs/native-staff-webauthn.md",
+        "migrations/20261120_social_platform_product_foundation.sql",
+        "tests/test-social-platform-product-foundation.sh"
       ]
     },
     "data-centre": {
