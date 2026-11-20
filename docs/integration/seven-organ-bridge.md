@@ -11,7 +11,7 @@ This bridge is a release-governance layer, not a monorepo and not a new runtime 
 | Organ | Repository | Accepted mainline revision |
 |---|---|---|
 | Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `855758a1df5cf6616f4196124ca929787327da82` |
-| Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `301cd904ddd786a2625df5910f3955b31370a5db` |
+| Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `60ba614e414b62e12c8a2692faf9dde870141c2b` |
 | Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `182107393c219ac24078785271731ae7cf0837bf` |
 | CDN | [cdn-](https://github.com/Trendyzima/cdn-) | `506f22f0ae42d359f01a1f940d48aa578469e0a0` |
 | Algorithm | [the-algorithm](https://github.com/Trendyzima/the-algorithm) | `8dc66f06201fa0bfe62702a4c5a6dec61a4282e4` |
@@ -27,6 +27,7 @@ The following reviewed PRs were merged into their owning organ's `main` branch a
 - Flutter #109 — seven-repository navigation links.
 - Backend #419 — Algorithm feed-mode contract correction.
 - Backend #418 — seven-repository navigation links.
+- Backend #421 — remove legacy external-provider references from the canonical profile runtime.
 - API #115 — machine-checked seven-repository navigation graph.
 - Data Centre #111 — architecture corrections and acceptance evidence boundaries.
 - CDN #122 — seven-repository navigation links.
