@@ -33,7 +33,7 @@ Purpose: one product-level release gate for Testagram. Repository CI is necessar
 2. Register using the supported email flow and verify the email.
 3. Complete native identity review and two-person approval where policy requires it.
 4. Redeem provisioning exactly once and create the canonical Backend account.
-5. Log in; verify Appwrite JWT acceptance and Backend user mapping.
+5. Log in; verify the Testagram-native access JWT, PostgreSQL session state and canonical Backend user mapping.
 6. Create a profile, publish an idempotent text post, refresh the feed and confirm exactly one canonical post.
 7. Exercise replies, reactions, follows, logout and login persistence.
 
