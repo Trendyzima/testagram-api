@@ -66,7 +66,8 @@ npx --yes @redocly/cli lint contracts/openapi/testagram-v1.yaml
 - `contracts/schemas/` — reusable JSON schemas.
 - `packages/typescript/` — typed fetch client foundation, nested Backend error handling and idempotent post helper.
 - `packages/dart/` — reusable Dart HTTP client package with Testagram-native bearer transport and tests.
-- `docs/` — seven-repository topology, ownership, integration flows, downstream adoption, security, provider conformance audits, capability status and release gates.
+- `docs/seven-repository-navigation.md` — canonical seven-repository directory, runtime dependency graph, host ownership and trust boundaries.
+- `docs/` — service ownership, integration flows, downstream adoption, security, provider conformance audits, capability status and release gates.
 - `examples/` — safe request/response examples.
 - `.github/workflows/` — OpenAPI, TypeScript, Dart, Backend route inventory and six-repository snapshot validation.
 
