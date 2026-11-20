@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "policy": "Immutable source pins identify the six reviewed runtime organs at exact merged mainline commits. Every declared provider source path is checked against its corresponding Git tree. The Testagram-native Backend is the only end-user and staff identity/session authority. No external identity-provider endpoint, SDK, bearer token, database, server key, runtime service, or authentication fallback is part of the supported product architecture. Historical account identifiers and migration artifacts are inert records only and are never queried by the live authentication path. Runtime deployment, public routing, identity activation and device acceptance require separate live evidence.",
+  "policy": "Immutable source pins identify the exact six runtime organs under integration validation. The Backend pin may target the reviewed native-auth retirement commit while its PR is open; it must be refreshed to the merged mainline commit after merge. Every declared provider source path is checked against its corresponding Git tree. The Testagram-native Backend is the only end-user and staff identity/session authority. No external identity-provider endpoint, SDK, bearer token, database, server key, runtime service, or authentication fallback is part of the supported product architecture. Historical account identifiers and migration artifacts are inert records only and are never queried by the live authentication path. Runtime deployment, public routing, identity activation and device acceptance require separate live evidence.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "287d8669df9dbfcf2ae34f6f532925ca551de4bd",
+      "ref": "5a7be197675c90da2c7b713034cc294481a58921",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
