@@ -27,12 +27,12 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The runtime source baseline below records the merged `main` heads after the seven-organ integration merge sweep on 2026-11-20. Each six-runtime-repository source pin was checked against its Git tree; all declared source paths exist. The acceptance gates remain locked; this source baseline is not a deployment attestation. The six runtime source pins are recorded in `contracts/sources.lock.json`; this governance repository is identified separately.
+The runtime source baseline below records the merged `main` heads after the seven-organ integration merge sweep on 2026-11-20. Each six-runtime-repository source pin was checked against its Git tree; all declared source paths exist. The acceptance gates remain locked; this source baseline is not a deployment attestation. The six runtime source pins are recorded in `contracts/sources.lock.json`; this governance repository is identified separately. Backend PR #423 (social-platform schema foundation) is included in the Backend pin; its migration is source-mainline evidence, not proof that production has applied it.
 
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `855758a1df5cf6616f4196124ca929787327da82` |
-| Backend | `60ba614e414b62e12c8a2692faf9dde870141c2b` |
+| Backend | `287d8669df9dbfcf2ae34f6f532925ca551de4bd` |
 | Data Centre | `182107393c219ac24078785271731ae7cf0837bf` |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `8dc66f06201fa0bfe62702a4c5a6dec61a4282e4` |
