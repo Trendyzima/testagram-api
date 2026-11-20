@@ -30,6 +30,7 @@ jobs:
       - run: npm run audit:cross-repo
       - run: npm run audit:locked-acceptance
       - run: npm run audit:navigation
+      - run: npm run audit:seven-organ-bridge
 
   validate-dart:
     runs-on: ubuntu-latest
