@@ -32,7 +32,7 @@ The runtime source baseline below records the merged `main` heads after the seve
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `855758a1df5cf6616f4196124ca929787327da82` |
-| Backend | `301cd904ddd786a2625df5910f3955b31370a5db` |
+| Backend | `60ba614e414b62e12c8a2692faf9dde870141c2b` |
 | Data Centre | `182107393c219ac24078785271731ae7cf0837bf` |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `8dc66f06201fa0bfe62702a4c5a6dec61a4282e4` |
