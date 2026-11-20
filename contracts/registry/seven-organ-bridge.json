@@ -159,7 +159,7 @@
     "Federation owns protocol state and signed delivery, not local identity or canonical product records.",
     "Flutter never receives private service tokens, provider credentials, database credentials or private service URLs.",
     "The API control plane is build-time governance only and is never a runtime gateway.",
-    "Legacy Appwrite-compatible identity is migration-only; no Appwrite JWT is a native Testagram bearer credential."
+    "No external identity provider is part of the supported runtime; native Testagram Backend authentication is the only user and staff authentication path."
   ],
   "excludedFromAcceptance": [
     "A branch without a reviewed pull request is not automatically merged.",
