@@ -24,7 +24,7 @@ import { TestagramApiClient, endpoints } from "@trendyzima/testagram-api-client"
 
 const api = new TestagramApiClient({
   baseUrl: "https://api.testagram.site",
-  getAccessToken: async () => appwriteJwt,
+  getAccessToken: async () => testagramAccessToken,
 });
 
 const feed = await api.get(endpoints.homeFeed);
@@ -35,7 +35,7 @@ const created = await api.createPost({
 });
 ```
 
-The caller supplies the Appwrite session JWT. The SDK does not store credentials, authorize resources, retry mutations or bypass Backend ownership. Use a published version pinned by the consuming repository's lockfile.
+The caller supplies the current short-lived Testagram-native Backend access token. The SDK does not store credentials, authorize resources, retry mutations or bypass Backend ownership. Use a published version pinned by the consuming repository's lockfile.
 
 ## Build and release
 
