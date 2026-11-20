@@ -21,7 +21,7 @@ Required positive path:
 4. Confirm one reviewer cannot approve alone; two distinct authorized reviewers must complete the decision.
 5. Obtain a short-lived provisioning authorization only after approval.
 6. Redeem the approved, short-lived provisioning authorization through the Backend's native registration/provisioning path; create exactly one canonical Testagram account.
-7. Verify the Backend persists the canonical account, native credential verifier and identity/application linkage transactionally, without requiring an Appwrite user or JWT.
+7. Verify the Backend persists the canonical account, native credential verifier and identity/application linkage transactionally, without requiring an external identity-provider user or token.
 8. Redeem the same authorization again; assert idempotency and no duplicate account, username or credential records.
 9. Complete email verification using the Backend-issued, single-use, expiring verification flow and the configured staging callback origin.
 10. Sign in through `POST /api/auth/login`, obtain a short-lived Backend-issued access JWT and opaque refresh token, then resolve `GET /api/me/profile` to the same canonical account UUID.
@@ -29,7 +29,7 @@ Required positive path:
 Required negative paths:
 
 - Unverified email, missing/expired/replayed provisioning or verification token, rejected application, one-person approval, duplicate email/username, invalid evidence checksum, expired session and unavailable PostgreSQL/evidence storage must fail closed.
-- Appwrite JWTs, foreign issuers/audiences, expired/revoked access tokens, unknown sessions and refresh-token replay must never authenticate a native user.
+- Foreign issuers/audiences, expired or revoked access tokens, unknown sessions and refresh-token replay must never authenticate a native user.
 - Refresh rotation must invalidate the prior refresh token; replay must revoke the affected session family. Logout and logout-all must revoke active access sessions.
 - Recovery must complete only for the intended staging account; invalid, expired and replayed recovery secrets must fail.
 
