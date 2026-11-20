@@ -2,7 +2,7 @@
 
 **Bridge branch:** `integration/seven-organ-bridge-20261120`  
 **Control plane:** `Trendyzima/testagram-api`  
-**Status:** source merge set assembled; runtime acceptance remains pending.
+**Status:** candidate Backend retirement pin under CI review; runtime acceptance remains pending.
 
 This bridge is a release-governance layer, not a monorepo and not a new runtime gateway. The six runtime organs remain independently owned repositories. The API repository coordinates their contracts, immutable source pins, compatibility checks and acceptance evidence.
 
@@ -11,7 +11,7 @@ This bridge is a release-governance layer, not a monorepo and not a new runtime 
 | Organ | Repository | Accepted mainline revision |
 |---|---|---|
 | Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `855758a1df5cf6616f4196124ca929787327da82` |
-| Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `60ba614e414b62e12c8a2692faf9dde870141c2b` |
+| Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `36560396c54294f9fe9bd4883eb983b8dc489e89` (PR #422 candidate; not yet merged to main) |
 | Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `182107393c219ac24078785271731ae7cf0837bf` |
 | CDN | [cdn-](https://github.com/Trendyzima/cdn-) | `506f22f0ae42d359f01a1f940d48aa578469e0a0` |
 | Algorithm | [the-algorithm](https://github.com/Trendyzima/the-algorithm) | `8dc66f06201fa0bfe62702a4c5a6dec61a4282e4` |
