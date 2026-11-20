@@ -287,11 +287,6 @@
     },
     {
       "method": "POST",
-      "path": "/api/admin/identity/applications/{application_id}/approve",
-      "status": "contracted"
-    },
-    {
-      "method": "POST",
       "path": "/api/admin/identity/sessions/{session_id}/decision",
       "status": "contracted"
     },
