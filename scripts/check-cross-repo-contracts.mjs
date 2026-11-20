@@ -172,10 +172,10 @@ const rankingContract = rankingPath >= 0 ? algorithmOpenAPI.slice(rankingPath, r
 if (!rankingContract.includes("required: [limit, feedMode, candidates]")) {
   fail.push("Algorithm OpenAPI must require feedMode for POST /v1/feed/rank");
 }
-if (!rankingContract.includes("enum: [for_you, following, latest, media, discover, federated]")) {
+if (!rankingContract.includes("enum: [for_you, following, media, discover]")) {
   fail.push("Algorithm OpenAPI feedMode enum must match the Backend-supported modes");
 }
-if (!algorithmClient.includes('case "for_you", "following", "latest", "media", "discover", "federated":')) {
+if (!algorithmClient.includes('case "for_you", "following", "media", "discover":')) {
   fail.push("Backend Algorithm client must validate exactly the feedMode enum published by the Algorithm contract");
 }
 
