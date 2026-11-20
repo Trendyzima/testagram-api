@@ -11,7 +11,7 @@ void main() {
       baseUri: Uri.parse('https://api.testagram.site'),
       tokenProvider: () async => 'testagram-native-access-token',
       httpClient: MockClient((request) async {
-        expect(request.headers['authorization'], 'Bearer appwrite-jwt');
+        expect(request.headers['authorization'], 'Bearer testagram-native-access-token');
         return http.Response(
           jsonEncode({
             'ok': false,
