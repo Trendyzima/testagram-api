@@ -27,12 +27,12 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The runtime source baseline below records the merged `main` heads after the seven-organ integration merge sweep on 2026-11-20. Each six-runtime-repository source pin was checked against its Git tree; all declared source paths exist. The acceptance gates remain locked; this source baseline is not a deployment attestation. The six runtime source pins are recorded in `contracts/sources.lock.json`; this governance repository is identified separately. Backend PR #423 (social-platform schema foundation) is included in the Backend pin; its migration is source-mainline evidence, not proof that production has applied it.
+The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. The Backend pin intentionally targets the reviewed native-auth retirement candidate in PR #424 so the API bridge audits the code that removes the legacy runtime instead of the superseded mainline. The other five pins remain reviewed immutable baselines. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
 
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `855758a1df5cf6616f4196124ca929787327da82` |
-| Backend | `287d8669df9dbfcf2ae34f6f532925ca551de4bd` |
+| Backend | `5a7be197675c90da2c7b713034cc294481a58921` (PR #424 candidate) |
 | Data Centre | `182107393c219ac24078785271731ae7cf0837bf` |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `8dc66f06201fa0bfe62702a4c5a6dec61a4282e4` |
@@ -217,14 +217,14 @@ Still unexecuted or blocked:
 - The Backend native-auth staging smoke has not been dispatched. It requires the dedicated GitHub `staging` environment origin and test-account secrets, plus explicit staging-only confirmation.
 - The Data Centre live provider smoke has not been dispatched. It writes and deletes temporary objects and requires explicitly designated staging B2/R2 buckets and the manual confirmation input.
 - The Backend three-provider MinIO/B2/R2 lifecycle and the Data Centre B2/R2 lifecycle remain separate acceptance paths; neither has live end-to-end evidence recorded here.
-- Staff review still lacks a real TOTP/passkey challenge. A non-null MFA-enrolment timestamp and password reauthentication do not prove a second factor; staff-review production activation remains gated.
+- The Backend retirement candidate now implements real WebAuthn registration/assertion ceremonies, credential encryption, challenge expiry/replay protection, and Backend-issued MFA elevation. Staff-review production activation remains gated until the live Admin Console-to-Backend readiness handshake, independent enrollment, deployed credential ceremony, replay rejection and protected-action elevation pass against the production-like PostgreSQL stack.
 - Public registration, media replication, Federation delivery, CDN domain cutover and production feature activation remain subject to their individual gates and explicit approval.
 
 **Decision: NOT ACCEPTED for end-to-end staging or production until all required gates have passing evidence.** Merged branches and green repository CI do not waive the live integration, restore, security or deployment gates.
 
 ### Temporary immutable review pins for the open integration PRs
 
-The following source pins are intentionally temporary review baselines for the open Algorithm/Backend contract-alignment pull requests. They identify immutable commits, not merged mainline or deployed releases. After both provider PRs merge, refresh `contracts/sources.lock.json`, this document's baseline table, and all source snapshots to the resulting merged mainline SHAs before release acceptance.
+The following source pins are intentionally temporary review baselines for open provider pull requests. They identify immutable commits, not merged mainline or deployed releases. After the provider PRs merge, refresh `contracts/sources.lock.json`, this document's baseline table, and all source snapshots to the resulting merged mainline SHAs before release acceptance.
 
 | Repository | Review PR | Immutable review commit |
 |---|---|---|
