@@ -3,7 +3,7 @@ export type JsonObject = Record<string, unknown>;
 export interface TestagramApiOptions {
   /** Public Backend API origin, e.g. https://api.testagram.site */
   baseUrl: string;
-  /** Appwrite session JWT for the currently signed-in user. */
+  /** Testagram-native access token for the currently signed-in user. */
   getAccessToken?: () => string | undefined | Promise<string | undefined>;
   fetch?: typeof fetch;
   headers?: Record<string, string>;
@@ -45,7 +45,7 @@ export class TestagramApiClient {
     }
     if (authenticated) {
       const token = await this.options.getAccessToken?.();
-      if (!token) throw new Error("An Appwrite session JWT is required for this operation");
+      if (!token) throw new Error("A Testagram access token is required for this operation");
       headers.set("Authorization", `Bearer ${token}`);
     }
     const response = await this.fetcher(`${this.baseUrl}${path}`, {
