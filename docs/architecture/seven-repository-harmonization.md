@@ -35,10 +35,10 @@ Application tokens, verification-session tokens, reviewer capabilities, access t
 
 ### Native user sessions
 
-- Flutter uses Testagram-owned auth pages and the Backend native auth endpoints. It does not acquire an Appwrite user session as the primary login mechanism.
+- Flutter uses Testagram-owned auth pages and the Backend native auth endpoints. It does not acquire a session from an external identity provider.
 - Access tokens are short-lived. Refresh credentials are stored using platform secure storage, rotated on refresh and revocable server-side.
 - Backend validates signature, issuer, audience, expiry, session state, revocation and canonical account status before authorizing a request.
-- Native mode must fail closed. A native-token validation failure must never fall back to Appwrite validation.
+- Native mode must fail closed. A native-token validation failure must never fall back to an external identity provider.
 - The Backend retirement change removes the legacy identity and media adapter packages from the native runtime. Historical migration records are retained only to migrate and preserve prior attribution; they are not authentication providers or fallback paths. The legacy `/api/auth/registration-consent` route is not the native registration or account-provisioning authority.
 - Production activation, controlled staff enrollment, reviewer/admin WebAuthn and the live Admin Console-to-Backend readiness contract remain separate release gates. Do not infer production activation from merged source code.
 
