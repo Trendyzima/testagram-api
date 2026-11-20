@@ -19,7 +19,7 @@
       ],
       "baseUrl": "https://api.testagram.site",
       "exposure": "public",
-      "auth": "Testagram-native short-lived access JWT; PostgreSQL session/account checks on every protected request; opaque rotating refresh token accepted only by /api/auth/refresh; no Appwrite bearer fallback on end-user routes",
+      "auth": "Testagram-native short-lived access JWT; PostgreSQL session/account checks on every protected request; opaque rotating refresh token accepted only by /api/auth/refresh; no external identity-provider bearer fallback on end-user routes",
       "consumers": [
         "flutter-client"
       ],
@@ -31,7 +31,7 @@
         "contracts/internal/openapi/backend-user-activity-watchdog-v1.yaml"
       ],
       "status": "implemented-core-contract",
-      "notes": "Backend is the sole public product API and canonical identity authority. Mainline issues native Testagram sessions and checks PostgreSQL session/account state; legacy Appwrite IDs remain only as explicit reconciliation inputs and are not accepted as user bearer credentials. Admin Console staff sessions use the native Backend identity plus the encrypted testagram-staff cookie and PostgreSQL staff-role/MFA records. Registration remains fail-closed until private evidence, email, independent review and provisioning gates are enabled and accepted."
+      "notes": "Backend is the sole public product API and canonical identity authority. Mainline issues native Testagram sessions and checks PostgreSQL session/account state; legacy external-provider identifiers remain only as explicit reconciliation inputs and are not accepted as user bearer credentials. Admin Console staff sessions use the native Backend identity plus the encrypted testagram-staff cookie and PostgreSQL staff-role/MFA records. Registration remains fail-closed until private evidence, email, independent review and provisioning gates are enabled and accepted."
     },
     {
       "id": "flutter-client",
@@ -56,7 +56,7 @@
         "packages/dart/lib/testagram_api.dart"
       ],
       "status": "consumer-with-native-identity-and-public-api-contract",
-      "notes": "Flutter uses the Testagram-native Backend auth client for login, password recovery/reset, session restore, refresh and logout. It calls only the Backend public API with the short-lived native access token. Applicant and verification-session tokens are limited to their own identity operations; the native password is set only after approved provisioning. No Appwrite JWT is sent by the public client. Flutter must never receive service tokens, storage-provider keys, database credentials or private service URLs."
+      "notes": "Flutter uses the Testagram-native Backend auth client for login, password recovery/reset, session restore, refresh and logout. It calls only the Backend public API with the short-lived native access token. Applicant and verification-session tokens are limited to their own identity operations; the native password is set only after approved provisioning. No foreign-provider bearer token is sent by the public client. Flutter must never receive service tokens, storage-provider keys, database credentials or private service URLs."
     },
     {
       "id": "data-centre-platform",
