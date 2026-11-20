@@ -31,6 +31,7 @@ jobs:
       - run: npm run audit:locked-acceptance
       - run: npm run audit:navigation
       - run: npm run audit:seven-organ-bridge
+      - run: npm run audit:native-auth-only
 
   validate-dart:
     runs-on: ubuntu-latest
