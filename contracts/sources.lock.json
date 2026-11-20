@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "policy": "Immutable source pins identify exact reviewed commits. All six runtime source pins in this bridge target merged mainline SHAs, and every declared source path was checked against the corresponding Git tree. Refresh pins only after the provider change is merged and its source paths and contract snapshots are verified. The current reviewed source paths include Testagram-native end-user and staff authentication boundaries, rotating sessions, PostgreSQL account/session checks, and private-service token boundaries. Historical Appwrite account IDs remain explicit reconciliation inputs only; Appwrite JWTs are not accepted as native user or staff bearer credentials. Runtime deployment and public-domain routing require separate live evidence; identity activation, existing-account reconciliation and full Android/Web device acceptance remain gated. The retired Appwrite-based Fresh API is separately pinned as backend-fresh-legacy at its last reviewed immutable source commit; its route inventory is historical/legacy and is not the native public API contract.",
+  "policy": "Immutable source pins identify the six reviewed runtime organs at exact merged mainline commits. Every declared provider source path is checked against its corresponding Git tree. The Testagram-native Backend is the only end-user and staff identity/session authority. No Appwrite endpoint, SDK, JWT, database, server key, runtime service, or authentication fallback is part of the supported product architecture. Historical account identifiers and migration artifacts are inert records only and are never queried by the live authentication path. Runtime deployment, public routing, identity activation and device acceptance require separate live evidence.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
@@ -351,19 +351,6 @@
         "testagram-feed/internal/ranking/topics_test.go",
         "testagram-feed/internal/ranking/rank.go",
         "testagram-feed/internal/ranking/rank_test.go"
-      ]
-    },
-    "backend-fresh-legacy": {
-      "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "a6c2454f41ffb4f0f1beef00e623d7f038428cbb",
-      "checkoutPath": "source-repos/backend-fresh-legacy",
-      "sourcePaths": [
-        ".github/workflows/ci.yml",
-        ".github/workflows/instabox-deploy.yml",
-        "Dockerfile.fresh",
-        "cmd/fresh-api/main.go",
-        "internal/freshapi/server.go",
-        "scripts/guard-no-render.py"
       ]
     }
   },
