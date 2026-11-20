@@ -221,3 +221,12 @@ Still unexecuted or blocked:
 - Public registration, media replication, Federation delivery, CDN domain cutover and production feature activation remain subject to their individual gates and explicit approval.
 
 **Decision: NOT ACCEPTED for end-to-end staging or production until all required gates have passing evidence.** Merged branches and green repository CI do not waive the live integration, restore, security or deployment gates.
+
+### Temporary immutable review pins for the open integration PRs
+
+The following source pins are intentionally temporary review baselines for the open Algorithm/Backend contract-alignment pull requests. They identify immutable commits, not merged mainline or deployed releases. After both provider PRs merge, refresh `contracts/sources.lock.json`, this document's baseline table, and all source snapshots to the resulting merged mainline SHAs before release acceptance.
+
+| Repository | Review PR | Immutable review commit |
+|---|---|---|
+| Backend | [PR #419](https://github.com/Trendyzima/Testagram-backend-/pull/419) | `e26c6972b4c8c6fe625ee32ab7803119ee2e7847` |
+| Algorithm | [PR #27](https://github.com/Trendyzima/the-algorithm/pull/27) | `88b2ae0eb81e127768aaf4ef1ed19495ce6fda20` |

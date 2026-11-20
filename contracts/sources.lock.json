@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "b55a30bbeaeb0c7caafe55882a6b9db9cf446268",
+      "ref": "e26c6972b4c8c6fe625ee32ab7803119ee2e7847",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -337,7 +337,7 @@
     },
     "algorithm": {
       "fullName": "Trendyzima/the-algorithm",
-      "ref": "3734ff75d52019cb6d2cd0cd5273539fe6ab62e9",
+      "ref": "88b2ae0eb81e127768aaf4ef1ed19495ce6fda20",
       "checkoutPath": "source-repos/algorithm",
       "sourcePaths": [
         "testagram-feed/API-CONTRACT.md",

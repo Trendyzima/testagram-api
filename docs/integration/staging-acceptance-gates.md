@@ -4,14 +4,14 @@ This document defines evidence required before enabling public registration or p
 
 ## Safety rules
 
-- Use isolated staging Appwrite project, PostgreSQL database, Instabox bucket, R2 bucket and B2 bucket. Never run destructive tests against production data.
-- Do not print credentials, signed URLs, identity evidence, JWTs or recovery secrets in CI logs or artifacts.
-- Appwrite is the credential/session authority. Backend is the canonical account, authorization and product-data authority.
-- Never create or link a canonical account by email matching alone. Provisioning must bind the verified Appwrite user ID to exactly one canonical UUID.
+- Use an isolated staging deployment, PostgreSQL database, and explicitly designated non-production object buckets for every provider under test. Never run destructive tests against production data.
+- Do not print credentials, signed URLs, identity evidence, access JWTs, refresh tokens or recovery secrets in CI logs or artifacts.
+- Testagram Backend is the sole credential, session, canonical identity, authorization and product-data authority. End-user access uses Backend-issued short-lived Testagram access JWTs and opaque rotating refresh tokens.
+- Appwrite JWTs are not accepted as native end-user or staff bearer credentials. Historical Appwrite identifiers may be used only as explicit reconciliation inputs; never auto-link accounts by matching email.
 - Keep `TESTAGRAM_IDENTITY_REGISTRATION_ENABLED=false`, `FRESH_MEDIA_ENABLED=false` and `MEDIA_REPLICATION_ENABLED=false` until each owning service's gates pass.
 - Tests that create users, objects or posts must use deterministic test identities and clean up only their own staged resources.
 
-## 1. Identity approval and Appwrite provisioning
+## 1. Native identity approval and account provisioning
 
 Required positive path:
 
@@ -20,19 +20,20 @@ Required positive path:
 3. Confirm the evidence is private and inaccessible through public CDN routes or unauthenticated object URLs.
 4. Confirm one reviewer cannot approve alone; two distinct authorized reviewers must complete the decision.
 5. Obtain a short-lived provisioning authorization only after approval.
-6. Create the Appwrite user and redeem the authorization with a valid Appwrite JWT.
-7. Verify the Backend stores one canonical account UUID and one Appwrite identity mapping.
-8. Redeem the same authorization again; assert idempotent/no duplicate account creation.
-9. Verify email using the production-shaped callback URL in the staging Appwrite project.
-10. Sign in, obtain a fresh Appwrite JWT and resolve `GET /api/me/profile` to the same canonical UUID.
+6. Redeem the approved, short-lived provisioning authorization through the Backend's native registration/provisioning path; create exactly one canonical Testagram account.
+7. Verify the Backend persists the canonical account, native credential verifier and identity/application linkage transactionally, without requiring an Appwrite user or JWT.
+8. Redeem the same authorization again; assert idempotency and no duplicate account, username or credential records.
+9. Complete email verification using the Backend-issued, single-use, expiring verification flow and the configured staging callback origin.
+10. Sign in through `POST /api/auth/login`, obtain a short-lived Backend-issued access JWT and opaque refresh token, then resolve `GET /api/me/profile` to the same canonical account UUID.
 
 Required negative paths:
 
-- Unverified email, missing/expired/replayed token, mismatched Appwrite subject, rejected application, one-person approval, duplicate email/username, invalid evidence checksum, expired session and unavailable PostgreSQL/evidence storage must fail closed.
-- Unknown Appwrite identities must not be auto-linked by matching email.
-- Recovery callback must complete only for the intended staging user; invalid, expired and replayed recovery secrets must fail.
+- Unverified email, missing/expired/replayed provisioning or verification token, rejected application, one-person approval, duplicate email/username, invalid evidence checksum, expired session and unavailable PostgreSQL/evidence storage must fail closed.
+- Appwrite JWTs, foreign issuers/audiences, expired/revoked access tokens, unknown sessions and refresh-token replay must never authenticate a native user.
+- Refresh rotation must invalidate the prior refresh token; replay must revoke the affected session family. Logout and logout-all must revoke active access sessions.
+- Recovery must complete only for the intended staging account; invalid, expired and replayed recovery secrets must fail.
 
-Evidence to retain: redacted request IDs, test case IDs, reviewer decision IDs, canonical UUID (non-sensitive test fixture only), Appwrite user ID (staging only), and pass/fail result. Never retain evidence bytes or bearer/recovery tokens in artifacts.
+Evidence to retain: redacted request IDs, test case IDs, reviewer decision IDs, canonical UUID (non-sensitive test fixture only), and pass/fail result. Never retain evidence bytes or bearer/recovery tokens in artifacts.
 
 ## 2. Instabox + R2 + B2 durable replication
 
@@ -52,7 +53,7 @@ A CDN cache hit is not a replica. Provider ETags are not portable SHA-256 eviden
 
 ## 3. Media upload, post publication and feed read-back
 
-1. Authenticate a staging Appwrite user and resolve its canonical Backend profile.
+1. Authenticate a staging user through Backend-native login and resolve its canonical Backend profile.
 2. Request a media upload intent with bounded type/size and a unique idempotency key.
 3. Upload fixture bytes through the supported Backend upload path.
 4. Complete upload with the client-computed SHA-256; poll only within a bounded deadline.
@@ -71,10 +72,11 @@ Run against the same isolated staging environment and build-time public endpoint
 
 - Android debug/QA build installs and launches; web bundle loads from the staging Pages preview.
 - Registration stays unavailable unless the staging registration switch is explicitly enabled for the isolated project.
-- Exercise sign-up/application, email verification callback, sign-in, session restore, sign-out, forgot-password and reset callback.
+- Exercise the approved registration/application journey, Backend email-verification callback, native password sign-in, refresh rotation, app restart/session restoration using the opaque refresh token, sign-out, logout-all, forgot-password and reset callback.
+- Verify access JWTs are memory-only, refresh tokens use platform secure storage, and session restoration never treats a cached profile or expired access JWT as authenticated before Backend refresh succeeds.
 - Exercise approved identity provisioning and canonical profile resolution.
 - Exercise text post create/read-back, public image upload/attach, feed refresh and CDN image delivery.
-- Exercise expired JWT, revoked/unlinked account, Backend outage, Appwrite outage, storage outage, upload timeout and retry UI.
+- Exercise expired/revoked native access JWT, refresh-token replay, revoked session, Backend outage, PostgreSQL/evidence-storage outage, object-storage outage, upload timeout and retry UI.
 - Confirm no server-side credential or provider key appears in Dart defines, APK contents, web bundle, source maps or CI artifacts.
 
 Capture build SHA, app version, staging origin, test case IDs, backend request IDs, and redacted outcome. A mocked HTTP/widget test is not a staging journey.
