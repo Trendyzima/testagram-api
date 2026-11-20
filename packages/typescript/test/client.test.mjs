@@ -2,12 +2,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { TestagramApiClient, TestagramApiError } from "../src/index.ts";
 
-test("requires an Appwrite JWT for authenticated requests", async () => {
+test("requires a Testagram access token for authenticated requests", async () => {
   const client = new TestagramApiClient({
     baseUrl: "https://api.testagram.site",
     fetch: async () => new Response("{}", { status: 200 }),
   });
-  await assert.rejects(() => client.get("/api/feed/home"), /Appwrite session JWT is required/);
+  await assert.rejects(() => client.get("/api/feed/home"), /Testagram access token is required/);
 });
 
 test("preserves HTTP status and error body", async () => {
