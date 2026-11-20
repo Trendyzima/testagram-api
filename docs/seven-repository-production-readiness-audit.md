@@ -1,3 +1,5 @@
+> **Historical audit snapshot — superseded by the native-auth retirement work.** This report records the pre-migration architecture and findings as of 2026-11-11. Its provider references and deployment findings are historical evidence, not current implementation instructions. For current authentication and deployment boundaries, use [the native authentication security contract](security/authentication.md), [the seven-repository architecture baseline](architecture/seven-repository-harmonization.md), and [the staging acceptance gates](integration/staging-acceptance-gates.md).
+
 # Seven-repository production readiness audit
 
 **Audit date:** 2026-11-11  
