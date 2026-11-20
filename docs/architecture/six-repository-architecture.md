@@ -19,8 +19,8 @@ It must not proxy requests, own business data, store user credentials, execute r
 
 | Repository | Owns | Permitted communication |
 |---|---|---|
-| [Testagram Backend](https://github.com/Trendyzima/Testagram-backend-) | Public product API, Appwrite JWT validation, canonical identity, authorization, PostgreSQL product records, media lifecycle and orchestration | Appwrite Auth; private Algorithm, Data Centre and Federation APIs; CDN media origins/URLs |
-| [Flutter client](https://github.com/Trendyzima/testagram-flutter-client-) | Native UI, navigation, local UX state, device permissions and Appwrite session acquisition | Public Backend API only |
+| [Testagram Backend](https://github.com/Trendyzima/Testagram-backend-) | Public product API, Testagram-native access/refresh session validation, canonical identity, authorization, PostgreSQL product records, media lifecycle and orchestration | Private Algorithm, Data Centre and Federation APIs; CDN media origins/URLs |
+| [Flutter client](https://github.com/Trendyzima/testagram-flutter-client-) | Native UI, navigation, local UX state, device permissions and Testagram-native authentication client | Public Backend API only |
 | [Data Centre](https://github.com/Trendyzima/Testagram-data-centre-) | Platform operations, storage nodes, video processing, notification delivery, backups and infrastructure control plane | Private Backend/platform network, storage providers and node agents |
 | [CDN](https://github.com/Trendyzima/cdn-) | Public media byte delivery, HLS/DASH, cache, shield and edge routing | Media clients and configured origins; no product authorization |
 | [Federated Content](https://github.com/Trendyzima/federated-content) | ActivityPub actors/keys, remote actor cache, signed inbox, protocol outbox and remote delivery | Public ActivityPub peers and private Backend API |
@@ -34,7 +34,7 @@ It must not proxy requests, own business data, store user credentials, execute r
 flowchart TD
   Flutter[Flutter client]
   Backend[Go Backend / public API]
-  Appwrite[Appwrite Auth]
+  NativeAuth[Testagram Backend native authentication]
   DB[(Canonical PostgreSQL)]
   DC[Data Centre private services]
   CDN[CDN edge and shield]
@@ -42,9 +42,9 @@ flowchart TD
   Algo[The Algorithm]
   API[testagram-api contracts and SDKs]
 
-  Flutter -->|Appwrite session JWT| Backend
+  Flutter -->|Testagram-native access JWT| Backend
   Flutter -->|Public API v1| Backend
-  Backend -->|Validate session| Appwrite
+  Backend -->|Validate session and account in PostgreSQL| PostgreSQL
   Backend --> DB
   Backend -->|Bounded authorized candidates| Algo
   Algo -->|Candidate IDs and scores only| Backend
@@ -65,7 +65,7 @@ Dashed lines are governance/artifact relationships, not runtime traffic. The API
 ## Runtime paths
 
 ### User requests
-1. Flutter obtains a session JWT through the Appwrite Client SDK.
+1. Flutter signs in through the Backend native login endpoint and receives a short-lived access JWT plus an opaque rotating refresh token.
 2. Flutter sends the JWT to the Backend public API.
 3. Backend validates the JWT, resolves the canonical account and applies authorization.
 4. Backend reads/writes canonical PostgreSQL state and orchestrates private services.
@@ -91,7 +91,7 @@ Dashed lines are governance/artifact relationships, not runtime traffic. The API
 2. Federation consumes authorized event/outbox data through private authenticated Backend interfaces.
 3. Federation re-resolves actor eligibility and consent and persists protocol activities/delivery jobs.
 4. Remote delivery is asynchronous, signed and retried independently.
-5. Public inbox requests use ActivityPub HTTP Signatures, not Appwrite JWTs.
+5. Public inbox requests use ActivityPub HTTP Signatures, not user access JWTs.
 6. Backend remains authoritative for local blocks, visibility, deletion and federation preferences.
 
 ### Data Centre platform services
@@ -112,7 +112,7 @@ Do not silently update snapshots to `main`. Update `contracts/sources.lock.json`
 
 | Link | Current evidence | State |
 |---|---|---|
-| Flutter -> Backend | Appwrite JWT + public Backend routes; Dart SDK foundation | Contracted; app integration remains a consumer task |
+| Flutter -> Backend | Testagram-native access JWT + public Backend routes; Dart SDK foundation | Contracted; app integration remains a consumer task |
 | Backend -> Algorithm | Provider OpenAPI, Backend client and candidate-bound validation | Implemented interface; staging end-to-end still required |
 | Backend -> Federation | Private activity ingress, separate directional tokens, outbox/poller/worker controls | Partial; workers and public routing remain gated |
 | Backend -> Data Centre | Private platform OpenAPI and listener | Provider exists; Backend typed client/integration is a known gap |
