@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "02c6c3ee10e232a00246ef59663ca261bf58c32d",
+      "ref": "eeef300060d007c72b942b3f8952875844904ac3",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -170,12 +170,17 @@
         "tests/test_instabox_image_digest_verification.py",
         "tests/test_instabox_runtime_healthcheck_paths.py",
         "tests/test_instabox_watchdog.py",
-        "tests/test_self_hosted_backup_guards.py"
+        "tests/test_self_hosted_backup_guards.py",
+        "deploy/self-hosted/Caddyfile",
+        "admin-console/webauthn.go",
+        "migrations/20261121_native_staff_webauthn.sql",
+        "tests/test-native-staff-webauthn-migration.sh",
+        "docs/native-staff-webauthn.md"
       ]
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "1d751692828631f2344311582588d4c4c0c53ad1",
+      "ref": "6a767f7ae2fe30395d24cded9265dc7e53e759c1",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/native-auth-session-integration.yml",
@@ -244,7 +249,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "544c9d122bcfa138789b9153b7a406441e4cf29b",
+      "ref": "f760d65c02d3aacb839accf4d9566e59e3a30a98",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",
@@ -298,7 +303,8 @@
         "test/features/tv/tv_channel_cache_policy_test.dart",
         "test/features/tv/tv_playback_policy_test.dart",
         "test/features/wallet/wallet_screen_test.dart",
-        "tool/tv_health_monitor.mjs"
+        "tool/tv_health_monitor.mjs",
+        "test/backend_api_contract_test.dart"
       ]
     },
     "federation": {
