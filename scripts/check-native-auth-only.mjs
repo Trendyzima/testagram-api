@@ -2,9 +2,25 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 
+const sourceLock = JSON.parse(readFileSync("contracts/sources.lock.json", "utf8"));
+const missingCheckouts = Object.entries(sourceLock.repositories)
+  .filter(([, repository]) => !existsSync(resolve(repository.checkoutPath, ".git")))
+  .map(([name, repository]) => `${name} (${repository.checkoutPath})`);
+assert.equal(
+  missingCheckouts.length,
+  0,
+  `Native-auth audit requires all immutable source checkouts. Run npm run sources:checkout first. Missing: ${missingCheckouts.join(", ")}`,
+);
+
 const sdkPaths = [
   "packages/typescript/src/index.ts",
   "packages/typescript/test/client.test.mjs",
+  "packages/typescript/README.md",
+  "packages/dart/lib/testagram_api.dart",
+  "packages/dart/test/testagram_api_test.dart",
+  "packages/dart/example_client.dart",
+  "packages/dart/README.md",
+  "examples/http/home-feed.http",
   "contracts/openapi/testagram-v1.yaml",
 ];
 for (const path of sdkPaths) {
@@ -29,6 +45,7 @@ const roots = [
   "source-repos/flutter-client/ios",
   "source-repos/flutter-client/web",
   "source-repos/backend/cmd/api",
+  "source-repos/backend/cmd/fresh-api",
   "source-repos/backend/admin-console",
   "source-repos/backend/internal",
   "source-repos/backend/deploy/self-hosted",
@@ -48,6 +65,13 @@ const explicitFiles = [
   "source-repos/algorithm/testagram-feed/go.mod",
   "source-repos/federation/go.mod",
   "source-repos/flutter-client/pubspec.yaml",
+  "source-repos/backend/docker-compose.yml",
+  "source-repos/backend/.env.example",
+  "source-repos/backend/Dockerfile",
+  "source-repos/data-centre/backend/docker-compose.yml",
+  "source-repos/data-centre/vps/docker-compose.yml",
+  "source-repos/data-centre/vps/.env.example",
+  "source-repos/data-centre/vps/fresh.env.example",
 ];
 const extensions = new Set([
   ".go", ".dart", ".yaml", ".yml", ".json", ".toml", ".properties",
@@ -68,6 +92,7 @@ function walk(path) {
 }
 for (const root of roots) if (existsSync(resolve(root))) walk(resolve(root));
 for (const path of explicitFiles) if (existsSync(resolve(path))) scanned.push(resolve(path));
+assert.ok(scanned.length > 0, "Native-auth audit scanned zero provider files; refusing a vacuous pass.");
 const providerViolations = [];
 for (const path of new Set(scanned)) {
   const source = readFileSync(path, "utf8");
