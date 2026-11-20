@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "policy": "Immutable source pins identify exact reviewed commits. Production source pins target merged mainline SHAs. Draft cross-repository validation may temporarily pin an immutable reviewed feature-PR SHA; refresh the pin to mainline after that PR merges. The current reviewed mainline source paths include the Testagram-native end-user and staff authentication boundaries, rotating sessions, PostgreSQL account/session checks, and the private-service token boundaries. Historical Appwrite account IDs remain explicit reconciliation inputs only; Appwrite JWTs are not accepted as native user or staff bearer credentials. Runtime deployment and public-domain routing require separate live evidence; identity activation, existing-account reconciliation and full Android/Web device acceptance remain gated. The retired Appwrite-based Fresh API is separately pinned as backend-fresh-legacy at its last reviewed immutable source commit; its 22-route inventory is historical/legacy and is not the native public API contract.",
+  "policy": "Immutable source pins identify exact reviewed commits. All six runtime source pins in this bridge target merged mainline SHAs, and every declared source path was checked against the corresponding Git tree. Refresh pins only after the provider change is merged and its source paths and contract snapshots are verified. The current reviewed source paths include Testagram-native end-user and staff authentication boundaries, rotating sessions, PostgreSQL account/session checks, and private-service token boundaries. Historical Appwrite account IDs remain explicit reconciliation inputs only; Appwrite JWTs are not accepted as native user or staff bearer credentials. Runtime deployment and public-domain routing require separate live evidence; identity activation, existing-account reconciliation and full Android/Web device acceptance remain gated. The retired Appwrite-based Fresh API is separately pinned as backend-fresh-legacy at its last reviewed immutable source commit; its route inventory is historical/legacy and is not the native public API contract.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "e26c6972b4c8c6fe625ee32ab7803119ee2e7847",
+      "ref": "301cd904ddd786a2625df5910f3955b31370a5db",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -180,7 +180,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "6a767f7ae2fe30395d24cded9265dc7e53e759c1",
+      "ref": "182107393c219ac24078785271731ae7cf0837bf",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/native-auth-session-integration.yml",
@@ -225,7 +225,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "4e40463cfd11746c4ab89ccbc3d02a97f7cbee53",
+      "ref": "506f22f0ae42d359f01a1f940d48aa578469e0a0",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         ".github/workflows/ci.yml",
@@ -249,7 +249,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "5d8bbc09d46d6a7b7f0a852fd4e2251b5109cfbd",
+      "ref": "855758a1df5cf6616f4196124ca929787327da82",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",
@@ -310,7 +310,7 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "78e83a411afc8b9f46c687875b3cfd6db6d071b6",
+      "ref": "e6946a4c903219d729b778cd4ed91b909a66826a",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
         ".env.example",
@@ -337,7 +337,7 @@
     },
     "algorithm": {
       "fullName": "Trendyzima/the-algorithm",
-      "ref": "88b2ae0eb81e127768aaf4ef1ed19495ce6fda20",
+      "ref": "8dc66f06201fa0bfe62702a4c5a6dec61a4282e4",
       "checkoutPath": "source-repos/algorithm",
       "sourcePaths": [
         "testagram-feed/API-CONTRACT.md",
