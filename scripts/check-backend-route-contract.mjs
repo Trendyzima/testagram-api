@@ -20,7 +20,7 @@ const postTestsPath = resolve("source-repos/backend/cmd/api/social_post_create_t
 const inventory = JSON.parse(readFileSync(inventoryPath, "utf8"));
 const sourceLock = JSON.parse(readFileSync(resolve("contracts/sources.lock.json"), "utf8"));
 if (inventory.sourceRef !== sourceLock.repositories.backend.ref) {
-  throw new Error("Legacy Backend route inventory sourceRef does not match contracts/sources.lock.json.");
+  throw new Error("Backend public route inventory sourceRef does not match contracts/sources.lock.json.");
 }
 const postHandler = readFileSync(postHandlerPath, "utf8");
 const postTests = readFileSync(postTestsPath, "utf8");
