@@ -61,6 +61,9 @@ function walk(path) {
     return;
   }
   if (!extensions.has(path.slice(path.lastIndexOf(".")))) return;
+  // Unit/integration fixtures may name retired providers to prove that legacy
+  // paths are rejected. They are not shipped runtime source or configuration.
+  if (path.endsWith("_test.go") || path.endsWith(".test.mjs") || path.endsWith(".test.ts")) return;
   scanned.push(path);
 }
 for (const root of roots) if (existsSync(resolve(root))) walk(resolve(root));
