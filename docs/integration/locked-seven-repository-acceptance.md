@@ -27,17 +27,17 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. The Backend pin intentionally targets the native-auth retirement candidate in PR #424 so the API bridge audits the code that removes the legacy runtime instead of the superseded mainline. The other five pins target their latest observed mainline revisions; intervening changes are documented boundary/negative-fixture cleanups. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
+The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. Backend and CDN intentionally pin the exact open review candidates in PR #424 and PR #125 so the bridge audits the proposed native-auth and guarded-routing changes. The other four runtime pins target their latest observed mainline revisions. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
 
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `1f58971720c7a72139d56900a5895c49fa105639` |
-| Backend | `12369bd7ec796f4966b2cfeae9ac3684e169d5c9` (current PR #424 candidate) |
+| Backend | `cc33913f0fd4e86669f7c717e12b2503990e6d88` (PR #424 candidate; unmerged) |
 | Data Centre | `ada6f26a289775720bb47a639242dbd868388055` (PR #114 merged) |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` |
 | Federation | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` |
-| CDN | `490119514788c13c327ee05eb4ce068a0f73966e` |
+| CDN | `19f2ed0df2993ba833aee9526c2a7e6cbd4a0662` (PR #125 candidate; unmerged) |
 
 A source pin is not a deployment record. Every accepted staging and production run must separately record the actual running image digest and source revision. Mutable tags such as `main` and `latest` are not acceptable release identities.
 
@@ -363,3 +363,16 @@ The latest Backend Cloudflare audit #457 verified that the repository token is a
 The same inventory confirms that `testagram.site/.well-known/webfinger*` is still routed to `testagram-web`, while apex and www remain attached to Flutter Pages. The existing `testagram-cdn` Worker has an active five-minute Cron trigger and is explicitly excluded from cleanup candidates.
 
 The Cloudflare token is now active; the earlier missing-secret failure is no longer the current blocker. The remaining gates are the separate staging proof, explicit canonical-host/API-domain/WebFinger approvals, successful public API and Federation probes, and then the separately confirmed post-handoff cleanup of the detached legacy API Worker. No production resources were changed by audit #457.
+
+
+## 20. Backend security-stack reconciliation and fresh CI — 2026-11-22
+
+The immutable source lock remains on Backend PR #424 candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88`. Fresh GitHub evidence confirms Backend CI run #44946760094 completed successfully across all 15 jobs; the InstaBox workflow's input-validation job passed, but its actual `Deploy backend and private services` job was skipped. This is not deployment evidence.
+
+Backend PR #432 head `9f8c977a980f43e64889d8f166579edd67d61871` passed Backend CI run #44947171601 across all 15 jobs, and its Cloudflare domain-routing audit #44947171620 completed successfully as a read-only audit. Its database migration adds immutable request identity/payload, append-only approval evidence, eligibility checks at approval insertion, and an exact quorum check at the final approved transition. It does not implement the application-level transactional staff lifecycle executor and does not authorize enabling staff mutations.
+
+The branch ancestry is still not reconciled. Although PR #432 currently targets branch `native-auth/remove-appwrite-legacy-adapter` at the #424 candidate head, a direct commit comparison from #424 head to #432 head reports `diverged`, 32 commits ahead and 6 behind, with merge base `c627858a295fbf45b6dbdeeb54d2a5aa0a989470`. PR #431 head is `24eea9f623cf3fb37ca3aa79a9eac8a262785771`; its permission-handler correction overlaps the fail-closed implementation already present in #424. PR #432's historical description still names #431 as its stack dependency. Therefore, changing the PR base reference has not made its commit ancestry mergeable. Do not merge #431 or #432, do not force-push or rewrite their review history, and do not treat a green CI run as proof that the branch is merge-ready. A clean transplant/rebase of only the approval-integrity migration and its required tests onto #424 remains necessary, followed by fresh CI and independent review.
+
+All review submissions remain absent on PRs #424, #431, #432 and API bridge #116. The bridge PR #116 head `3d7114e19c731e337eb8bdcd072056cdca71cac7` passed API contract CI run #44947566386 in both Node and Dart jobs. Its source lock pins Backend #424 and CDN #125 candidates; it must be refreshed to exact merge commits only after those dependencies are independently reviewed and merged.
+
+No production deployment, DNS/domain transfer, Worker deletion, staff permission change or production routing mutation occurred during this audit. The production legacy Worker and WebFinger ownership blockers, separate staging-zone acceptance, and independent reviews remain release blockers.
