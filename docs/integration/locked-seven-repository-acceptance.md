@@ -36,7 +36,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Data Centre | `182107393c219ac24078785271731ae7cf0837bf` |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `8dc66f06201fa0bfe62702a4c5a6dec61a4282e4` |
-| Federation | `e6946a4c903219d729b778cd4ed91b909a66826a` |
+| Federation | `b44eca07a9c7641cf03ee685c025bcfe6dfc7858` |
 | CDN | `506f22f0ae42d359f01a1f940d48aa578469e0a0` |
 
 A source pin is not a deployment record. Every accepted staging and production run must separately record the actual running image digest and source revision. Mutable tags such as `main` and `latest` are not acceptable release identities.
@@ -230,3 +230,8 @@ The following source pins are intentionally temporary review baselines for open 
 |---|---|---|
 | Backend | [PR #419](https://github.com/Trendyzima/Testagram-backend-/pull/419) | `e26c6972b4c8c6fe625ee32ab7803119ee2e7847` |
 | Algorithm | [PR #27](https://github.com/Trendyzima/the-algorithm/pull/27) | `88b2ae0eb81e127768aaf4ef1ed19495ce6fda20` |
+
+
+## 9. Federation source-pin reconciliation — 2026-11-21
+
+Federated Content PR #50 (pgx dependency security/reliability update) was merged to `main` at `b44eca07a9c7641cf03ee685c025bcfe6dfc7858`. Both post-merge checks (`test` and `image`) completed successfully on that exact commit. The current federation source pin in `contracts/sources.lock.json` and the seven-organ registry is refreshed to this merge commit; PR #50 is recorded in the registry's merged pull-request history. This source refresh is not live federation deployment or protocol acceptance evidence.
