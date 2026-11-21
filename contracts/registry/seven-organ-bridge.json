@@ -52,10 +52,11 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "cdn",
-      "mainCommit": "1480d9c2da6f281ed4f9caf62c37705fdbe65e9d",
+      "mainCommit": "490119514788c13c327ee05eb4ce068a0f73966e",
       "mergedPullRequests": [
         122,
-        123
+        123,
+        124
       ]
     },
     {
