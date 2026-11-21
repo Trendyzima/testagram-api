@@ -2,39 +2,41 @@
 
 **Bridge branch:** `integration/seven-organ-bridge-20261120`  
 **Control plane:** `Trendyzima/testagram-api`  
-**Status:** candidate Backend retirement pin under CI review; runtime acceptance remains pending.
+**Status:** source pins and static wiring audited; Backend retirement candidate and live runtime acceptance remain pending.
 
-This bridge is a release-governance layer, not a monorepo and not a new runtime gateway. The six runtime organs remain independently owned repositories. The API repository coordinates their contracts, immutable source pins, compatibility checks and acceptance evidence.
+This repository is the build-time governance layer, not a monorepo and not a runtime gateway. The six runtime organs remain independently owned repositories. The API Control Plane coordinates their contracts, immutable source pins, generated SDKs, route inventory and compatibility checks.
 
-## 1. Seven organs and immutable mainline revisions
+## 1. Seven organs and locked source revisions
 
-| Organ | Repository | Accepted mainline revision |
-|---|---|---|
-| Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `855758a1df5cf6616f4196124ca929787327da82` |
-| Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `36560396c54294f9fe9bd4883eb983b8dc489e89` (PR #422 candidate; not yet merged to main) |
-| Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `182107393c219ac24078785271731ae7cf0837bf` |
-| CDN | [cdn-](https://github.com/Trendyzima/cdn-) | `506f22f0ae42d359f01a1f940d48aa578469e0a0` |
-| Algorithm | [the-algorithm](https://github.com/Trendyzima/the-algorithm) | `8dc66f06201fa0bfe62702a4c5a6dec61a4282e4` |
-| Federation | [federated-content](https://github.com/Trendyzima/federated-content) | `e6946a4c903219d729b778cd4ed91b909a66826a` |
-| Contract control plane | [testagram-api](https://github.com/Trendyzima/testagram-api) | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` (bridge base) |
+| Organ | Repository | Locked source revision | Source status |
+|---|---|---|---|
+| Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `761c41b247a49aac7e9b352493465e3c321a2ffb` | Current mainline |
+| Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `e6fdb962c2a10159df352312e01ea05842ffde13` | Temporary native-auth PR #424 candidate; not merged |
+| Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `a22d086c03fcf8a90323dc250e53d255c7aff26c` | Current mainline |
+| CDN | [cdn-](https://github.com/Trendyzima/cdn-) | `1480d9c2da6f281ed4f9caf62c37705fdbe65e9d` | Current mainline |
+| Algorithm | [the-algorithm](https://github.com/Trendyzima/the-algorithm) | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Current mainline |
+| Federation | [federated-content](https://github.com/Trendyzima/federated-content) | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Current mainline |
+| Contract control plane | [testagram-api](https://github.com/Trendyzima/testagram-api) | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` | Governance mainline; this bridge PR remains open |
 
-The six runtime pins are also stored in `contracts/sources.lock.json`. The bridge audit verifies that the manifest and lockfile agree. All 294 declared provider source paths (154 Backend, 38 Data Centre, 17 CDN, 54 Flutter, 20 Federation, 11 Algorithm) were checked against the exact Git trees and all were present.
+The six runtime pins are stored in `contracts/sources.lock.json`. The Backend pin is intentionally a temporary reviewed candidate so the bridge audits the native-only code before it is merged. It must be replaced with the exact Backend mainline merge SHA after PR #424 merges. The five other runtime revisions were compared with their previous pins; intervening changes were documentation-only.
 
-## 2. Merge set assembled
+## 2. Merged organ changes represented by this baseline
 
-The following reviewed PRs were merged into their owning organ's `main` branch after their reported checks passed:
+- Flutter: PRs #109 and #112 (navigation and native-auth deployment documentation).
+- Backend: PRs #418, #419, #421 and #423. PR #424 remains open and is not counted as merged.
+- Data Centre: PRs #111 and #112 (architecture and seven-organ ownership documentation).
+- CDN: PRs #122 and #123 (navigation and native media-authorization boundary documentation).
+- Algorithm: PRs #27, #28 and #29 (navigation and seven-organ ownership).
+- Federation: PRs #49, #50 and #51 (navigation, dependency reliability and native ownership boundary).
+- API Control Plane: PR #115 (seven-organ navigation and governance graph).
 
-- Flutter #109 — seven-repository navigation links.
-- Backend #419 — Algorithm feed-mode contract correction.
-- Backend #418 — seven-repository navigation links.
-- Backend #421 — remove legacy external-provider references from the canonical profile runtime.
-- API #115 — machine-checked seven-repository navigation graph.
-- Data Centre #111 — architecture corrections and acceptance evidence boundaries.
-- CDN #122 — seven-repository navigation links.
-- Algorithm #27 — seven-repository navigation links.
-- Federation #49 — seven-repository circuit links.
+The current bridge itself is PR #116. It remains open until the refreshed source-pin, SDK, route, documentation-residue and edge-wiring checks pass and the Backend candidate is independently reviewed and merged.
 
-The bridge manifest records these PR numbers and immutable resulting mainline revisions. Squash merges were used. No production deployment, DNS update, feature-flag change, provider write or secret mutation was performed as part of this source merge.
+Two test-only residue cleanup PRs are also open:
+- CDN PR #124 changes a negative authorization fixture label.
+- Data Centre PR #113 changes a negative invalid-issuer fixture label.
+
+These changes do not alter runtime behavior. Their CI and review must pass before merge.
 
 ## 3. Runtime ownership and edges
 
@@ -45,7 +47,7 @@ flowchart LR
   B -->|private platform and media APIs| D[Data Centre]
   B -->|viewer assertions / origin auth| C
   B -->|authorized candidate IDs| A[Algorithm]
-  B -->|directional private auth / outbox| X[Federation]
+  B -->|directional private auth / durable outbox| X[Federation]
   G[Testagram API control plane] -.->|build-time contracts and pins| F
   G -.-> B
   G -.-> D
@@ -54,87 +56,87 @@ flowchart LR
   G -.-> X
 ```
 
-- Backend is the only canonical authority for Testagram identity, sessions, authorization and product records.
-- Flutter calls public Backend APIs; it never calls private infrastructure or holds service/provider credentials.
-- Data Centre performs storage and infrastructure work. Backend still decides who may upload, view, attach or delete media.
-- CDN transports authorized bytes. Private viewer assertions and CDN-origin authentication are separate trust mechanisms.
-- Algorithm receives a bounded set of Backend-authorized candidate IDs and returns ordering/reasons only. Backend rechecks authorization and hydrates canonical records.
-- Federation owns protocol state, WebFinger/ActivityPub behavior and signed remote delivery. Backend owns local identity, canonical posts, consent and visibility.
-- API contracts and source pins are checked at build time. The API repository is never a runtime hop.
+- Backend is the sole authority for Testagram identity, sessions, authorization and canonical product records.
+- Flutter calls the public Backend API and approved media URLs only. It stores the rotating refresh credential in platform secure storage; short-lived access tokens remain in memory.
+- Data Centre performs storage and infrastructure work. Its user-aware video and notification routes validate Backend-native JWTs and recheck PostgreSQL session/account state. Platform service credentials remain separate.
+- CDN transports authorized bytes. Private viewer assertions and CDN-origin authentication are separate trust mechanisms; raw user JWTs are not forwarded as origin credentials.
+- Algorithm receives bounded Backend-authorized candidate IDs and returns ranking order/reasons only. Backend rechecks authorization and hydrates canonical records.
+- Federation owns protocol state and signed remote delivery. Backend owns local identity, canonical posts, consent and visibility.
+- The API Control Plane validates source pins and contracts at build time. It is never a runtime hop.
 
-## 4. Media paths must remain distinct
+## 4. Static edge-wiring acceptance
+
+The bridge cross-repository audit now verifies the implementation on both sides of each edge, not just the topology manifest:
+
+1. **Flutter → Backend:** native login/refresh client, secure refresh storage, in-memory access token and authenticated Backend request path.
+2. **Flutter → CDN:** approved media URL handling and object/viewer-bound private-media authorization.
+3. **Backend → Data Centre:** five versioned private media routes, dedicated bearer credential, request ID, bounded client timeout, redirect rejection, private Compose network and separate media database.
+4. **Data Centre → Backend identity:** video and notification user-aware routes require the shared native JWT secret and resolve canonical users through PostgreSQL session/account checks.
+5. **Backend → CDN:** Backend-issued short-lived viewer assertion, separate origin credential, private no-store behavior, and fail-closed origin relay.
+6. **Backend → Algorithm:** dedicated service bearer, API version, request ID, bounded timeout, 200-candidate/50-result limits and matching OpenAPI enum.
+7. **Backend → Federation:** distinct private ingress credential, API version, request ID, activity ID idempotency key, durable enqueue and rejection tests for missing/wrong-direction credentials.
+8. **API Control Plane → six runtime organs:** immutable source pins, provider snapshots, public route inventory, SDK generation and compatibility CI only.
+
+The static checks do not replace same-environment staging tests. Runtime reachability, secret provisioning, deployed revisions, retry behavior and failure recovery still require explicit evidence.
+
+## 5. Media paths remain distinct
 
 There are two separately implemented storage lifecycles and their evidence must not be mixed:
 
-1. Backend native virtual-storage path: the Backend's own media ledger and three-provider replication implementation. Its staging receipts must prove each configured media-byte origin independently.
-2. Data Centre dedicated media path: B2 is the media-byte primary and R2 is the verified media-byte replica. VPS MinIO and R2 metadata sidecars are metadata mirrors, not a third media-byte copy.
+1. **Backend native virtual-storage path:** Backend-owned media metadata/replica ledger with VPS MinIO primary and R2/B2 independent replicas.
+2. **Data Centre dedicated media path:** optional private media service with B2 media-byte primary and R2 verified replica. MinIO/R2 sidecars are metadata mirrors, not a third media-byte copy.
 
-A successful upload to one provider, a metadata sidecar, an ETag or a CDN cache hit is not proof of independent byte durability. Keep media feature flags fail-closed until each owning lifecycle has its own staging evidence.
+A successful upload to one provider, metadata sidecar, ETag or CDN cache hit is not proof of independent byte durability. Each lifecycle requires its own staging receipts for write, independent read-back, checksum, repair, primary-loss restore, retry and deletion tombstones.
 
-## 5. Branch and merge policy
+## 6. Provider-residue audit
 
-This bridge records the reviewed merge set, not an instruction to merge every branch name in GitHub. The branch inventory includes historical, backup, migration, experimental, legacy-provider and feature branches. A branch without a reviewed PR is not automatically merge-ready. Before any further merge, compare its exact tip against its organ's current `main`, inspect the complete diff, confirm current contract ownership, run relevant checks and resolve stale or conflicting work. Preserve backup branches as recovery references; never merge them into production by default.
+The expanded bridge audit scans runtime source, deployment configuration and documentation across all six runtime organs, plus the API Control Plane's public contracts and documentation. The last successful run scanned 418 runtime/deployment/configuration/documentation files and found no active external identity-provider integration.
 
-Flutter production-domain smoke PR #100 remains draft with a failed smoke run. It is deliberately excluded from this merge set and must be repaired and rerun before reconsideration.
+It also found 31 occurrences isolated to an explicit migration/CI compatibility allowlist. These are old schema identifiers and negative fixtures used to prove that legacy database installations can be upgraded and that old credentials are rejected. They are not runtime authentication dependencies. The audit fails if a new occurrence appears outside that allowlist.
 
-## 6. Complete branch census and forensic dispositions
+The compatibility residue must only be removed through a tested forward migration that preserves applied migration history and historical audit evidence. Do not delete or rewrite applied SQL migrations blindly. The allowlist and its exact file inventory are maintained in `scripts/check-native-auth-only.mjs`.
 
-The GitHub branch search was paginated to completion for all seven repositories. The inventory contained **938 branch refs** at the time of this pass:
+## 7. Production and security gates still open
 
-| Organ | Branch refs |
-|---|---:|
-| Flutter | 118 |
-| Backend | 399 |
-| API control plane | 112 |
-| Data Centre | 112 |
-| CDN | 120 |
-| Algorithm | 29 |
-| Federation | 48 |
-| **Total** | **938** |
+- Backend PR #424 requires independent review and merge. Its CI is source-level evidence; its deployment job was skipped.
+- Staff invitation, role-change and revocation need the complete two-person lifecycle.
+- Real browser WebAuthn registration/assertion, recovery, replay rejection and revoked-credential tests remain required.
+- Admin Console readiness must be verified against the deployed Backend and production-like PostgreSQL.
+- Public registration and staff enrollment remain fail-closed until all gates pass.
+- Production `api.testagram.site` remains associated with the legacy Worker. Deploy and health-check the native Backend origin before any custom-domain ownership transfer.
+- The CDN routing workflow must implement a tested ownership transfer, DNS/TLS continuity and rollback. Do not bypass its preflight.
+- Flutter production-domain, NodeInfo and WebFinger smoke acceptance remains unresolved; rerun after the correct origins are deployed.
+- Run each media lifecycle against designated staging buckets, then complete an isolated coordinated restore covering Backend PostgreSQL, Data Centre media state, object bytes, Federation state and encrypted recovery material.
+- Public Federation remains disabled until signed inbound verification, replay protection, SSRF controls, durable inbox/outbox, retries and independent peer interoperability pass.
+- Capture exact source SHAs and immutable image digests for every deployed organ. Green CI and published images do not prove deployment.
 
-A branch census is not permission to merge every ref. Many refs are backups, migration experiments, legacy-provider cutovers, old release candidates or stale snapshots. Only reviewed PRs with current diffs and passing required checks were merged. Branches without PRs were not merged directly into `main`.
+## 8. Branch and merge policy
 
-Representative branch-level decisions:
+This bridge records reviewed source revisions; it is not an instruction to merge every branch in GitHub. A branch without a reviewed PR is not automatically merge-ready. Before merging, compare its exact tip against the organ's current main, inspect the complete diff, confirm contract ownership, run relevant checks and resolve stale/conflicting work. Preserve backup branches as recovery references; never merge them into production by default.
 
-- Flutter `fix/webfinger-smoke-probe-handle-20261120` and CDN `fix/webfinger-negative-control-handle-20261120`: the changed workflow/test file blobs are already identical to current `main`; no duplicate cherry-pick is required.
-- Federation `fix/nodeinfo-discovery-runtime`: the inspected server, tests and configuration files are already identical to current `main`; the old branch is not a new fix to merge.
-- Data Centre `fix/live-media-smoke-staging-isolation`: not merged. Its workflow runs on pushes to `main` without requiring the explicit manual confirmation input, and its environment has fallback paths to general provider credentials. That is not an acceptable trigger for live provider writes.
-- Data Centre `feat/independent-media-backup-drill`: not merged. It is roughly 400 commits behind current main, requires a retired external-provider export, and does not back up/restore the dedicated media PostgreSQL ledger. Its offline object-byte verification is not a complete native Testagram disaster-recovery path.
-- Backend `fix/close-native-intake-until-staff-mfa-20261120`: not merged. The inspected change adds a readiness boolean and startup log but does not itself enforce a request-time registration/review gate; it is also substantially behind current main.
-- Backend `fix/backend-identity-review-live-mfa-claim`: not merged. It is 143 commits behind current main and needs a current-base rebase plus complete review before any code is considered.
-- CDN `fix/cloudflare-apex-federation-route-20261116`: not merged. It is 31 commits ahead and 18 behind with a broad routing/worker/workflow diff; it needs a focused rebase and live-route-specific checks, not a blind merge.
+The Flutter production smoke PR #100 remains open and is excluded from the merge set until its live-domain failures are repaired and rerun.
 
-### Production smoke evidence that remains a blocker
-
-The existing Flutter production-domain smoke run `44480693441` failed on 2026-11-19. Its read-only probes recorded:
-
-- `https://testagram.site/`: HTTP 200, no redirect Location; expected HTTP 308 to `https://www.testagram.site/`.
-- `https://testagram.site/.well-known/nodeinfo`: HTTP 200 but `text/html`, not NodeInfo JSON.
-- WebFinger for the real account `acct:crissbeat@testagram.site`: HTTP 503, `application/json`.
-
-The www frontend and Pages.dev shell returned HTTP 200. This failure is not a Flutter build failure and is not repaired by changing the smoke-test negative-control handle. It points to live apex/federation route ownership or deployed origin readiness. Keep PR #100 draft and do not claim public federation acceptance until the live routes are corrected and the same probes pass.
-
-## 7. Bridge validation
+## 9. Validation
 
 Run from this repository:
 
 ```sh
 npm ci
+npm run sources:checkout
+npm run lint:openapi
+npm run lint:internal-openapi
+npm run typecheck
+npm run build:sdk
+npm test
+npm run audit:backend-routes
+npm run audit:cross-repo
+npm run audit:locked-acceptance
+npm run audit:navigation
 npm run audit:seven-organ-bridge
-npm run check
+npm run audit:native-auth-only
+dart format .
+dart analyze
+dart test
 ```
 
-The offline bridge audit checks all seven repository identities, six immutable runtime source pins, the governance-only API boundary, declared graph edges and trust invariants. The existing cross-repository audit checks the pinned source files and contract snapshots. A green bridge audit is not a live deployment acceptance result.
-
-## 8. Remaining acceptance gates
-
-- Exact deployed image digests and source revisions for all six runtime organs.
-- Same-staging registration, email verification, native login, refresh rotation, logout and restart journey.
-- PostgreSQL account/session/product writes, authorization, transaction rollback and recovery.
-- Separate Backend and Data Centre media lifecycle acceptance, including provider read-back, checksums, replication, primary-loss restore and deletion.
-- CDN public/private authorization, expiry, cache isolation, range delivery and cross-account denial.
-- Federation signed inbound, replay protection, durable inbox/outbox and remote delivery against an independent peer.
-- Algorithm authenticated ranking, timeout/fallback, candidate-set enforcement and Backend authorization rechecks.
-- Live DNS, TLS, health probes, immutable deployment revisions and measured recovery.
-
-The locked G0–G7 acceptance document remains authoritative for the full evidence standard. Source merges and CI success do not close those runtime gates.
+A green bridge audit proves source/contract consistency only. It does not prove live deployment, DNS/TLS ownership, production WebAuthn, media-provider durability, Federation interoperability or disaster recovery.
