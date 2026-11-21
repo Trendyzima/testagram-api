@@ -44,6 +44,7 @@ for (const repo of bridge.repositories) {
       assert.equal(pin.ref, repo.candidateCommit, `${repo.id}: source pin must match the explicit review candidate`);
       assert.notEqual(repo.candidateCommit, repo.mainCommit, `${repo.id}: candidate must not be represented as merged mainline`);
       assert.ok(Number.isInteger(repo.candidatePullRequest) && repo.candidatePullRequest > 0, `${repo.id}: candidate PR evidence missing`);
+      assert.ok(!repo.mergedPullRequests.includes(repo.candidatePullRequest), `${repo.id}: unmerged candidate PR cannot be listed as merged`);
     } else {
       assert.equal(pin.ref, repo.mainCommit, `${repo.id}: bridge mainline commit and source pin differ`);
     }
