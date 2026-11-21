@@ -32,7 +32,7 @@ The six runtime pins are stored in `contracts/sources.lock.json`. The Backend pi
 
 The current bridge itself is PR #116. It remains open until the refreshed source-pin, SDK, route, documentation-residue and edge-wiring checks pass and the Backend candidate is independently reviewed and merged.
 
-Two test-only residue cleanup PRs are also open:
+One test-only residue cleanup PR is also open:
 - Flutter PR #113 removes retired-provider wording from two negative auth/widget fixtures.
 
 These changes do not alter runtime behavior. Their CI and review must pass before merge.
