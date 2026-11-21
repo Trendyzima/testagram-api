@@ -259,3 +259,20 @@ The bridge now records the latest observed default-branch revisions for the five
 The refreshed five mainline pins were compared with their previous locked revisions. The intervening changes were confined to documentation and did not alter runtime source paths or provider snapshots. The Backend candidate is intentionally not described as a merged mainline revision. Once PR #424 merges, the bridge must be refreshed to the exact resulting Backend main SHA and all relevant route/source evidence regenerated before accepting the integration.
 
 This source refresh fixes source-pin drift; it does not prove deployed interoperability. The exact contract CI run on this refreshed baseline must pass before the bridge is merge-ready.
+
+## 11. Seven-organ wiring and provider-residue verification — 2026-11-21
+
+API contract CI run `44896464421` passed both Node and Dart validation against the current bridge candidate. The bridge checker now requires the exact six approved runtime edges and six governance edges, rejects duplicate/missing/extra edges, checks each repository's exact owner/name, and rejects duplicate or path-traversing entries in immutable source inventories.
+
+The cross-organ audit verified:
+- Flutter-to-Backend native access/refresh/session boundary and the prohibition on direct private-service calls
+- Backend-to-Data-Centre private media contract, service-token separation, request IDs, timeout and live native-session checks on user-aware routes
+- Backend-to-CDN separation of user JWT, viewer assertion, origin and purge credentials, including assertion issuer/audience/owner/expiry validation
+- Backend-to-Algorithm bounded, already-authorized candidate flow
+- Backend-to-Federation directional service credentials and durable ingress/outbox contract
+
+The route inventory covers 105 static Backend routes across 50 production Go files; 67 operations are represented in OpenAPI. The native-only scan covers 418 runtime, deployment, configuration and documentation files across all six runtime organs and finds zero active external identity-provider integration.
+
+The exact 27 remaining historical matches are confined to migration/schema history, forward-only upgrade/cleanup migrations and their migration integration fixture, plus one negative CI guard that asserts retired provider configuration is absent. These records are intentionally retained so installations with the original migration ledger can upgrade safely and so the old schema/configuration can be explicitly rejected. They are not supported runtime code, SDKs, endpoints, credentials, session authorities or fallback paths. Deleting or rewriting applied migration history to make a text search return zero would break migration lineage and is not an acceptable production hardening step.
+
+Flutter PR #113, which removes obsolete provider labels from negative test fixtures, is merged at `1f58971720c7a72139d56900a5895c49fa105639`. Flutter PR #100 remains a live production-routing acceptance gate; Backend PR #424 remains the temporary native-auth candidate pin pending independent review and merge. CI success is not deployment evidence.
