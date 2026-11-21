@@ -331,7 +331,7 @@ The current `contracts/sources.lock.json` and `contracts/registry/seven-organ-br
 
 | Runtime organ | Mainline revision | Review candidate revision |
 |---|---|---|
-| Backend | `a793c55db8b5c258524bfef4b8872f5c6c1038e5` | PR #424: `12369bd7ec796f4966b2cfeae9ac3684e169d5c9` |
+| Backend | `a793c55db8b5c258524bfef4b8872f5c6c1038e5` | PR #424: `908ef6a92b20742317832bd7efe968f99cdcd5ed` |
 | CDN | `490119514788c13c327ee05eb4ce068a0f73966e` | PR #125: `19f2ed0df2993ba833aee9526c2a7e6cbd4a0662` |
 | Flutter | `1f58971720c7a72139d56900a5895c49fa105639` | Mainline; PR #100 remains an open production-smoke candidate |
 | Data Centre | `ada6f26a289775720bb47a639242dbd868388055` | Mainline |
@@ -345,3 +345,12 @@ The bridge cross-repository checker now also enforces the public ActivityPub dis
 The latest CDN candidate passed CI run #524, Worker tests #209, capacity #457 and no-production-deployment origin validation #93. The bridge's next CI run must pass all Node and Dart audits against this refreshed source set before PR #116 is considered merge-ready.
 
 Production acceptance remains **NOT ACCEPTED** until a separate staging Cloudflare zone proves the same route transition and full API/Federation smoke with staging-specific hostnames and credentials, followed by the three explicit production approvals. The production audit still shows the WebFinger route owned by `testagram-web`, the apex root returning HTTP 200 instead of the required 308 redirect, NodeInfo returning Flutter HTML, and the real-account WebFinger endpoint returning HTTP 503. No production routing, DNS, Pages, Worker, database, secret or feature-flag mutation is authorized by this source-pin refresh.
+
+
+## 18. Staff permission mutation fail-closed correction — 2026-11-21
+
+The latest Backend PR #424 candidate is `908ef6a92b20742317832bd7efe968f99cdcd5ed`. A forensic review found that the Admin Console's role-change, revocation and invitation handlers already return HTTP 501, but the permission-change handler still directly updated `native_staff_permission_overrides` after one owner's step-up. That bypassed the required two-person authorization boundary.
+
+The candidate now removes that direct SQL mutation and keeps permission changes HTTP 501 until a transactional executor applies an approved request only after two distinct authorized approvers. A regression test asserts that the handler remains closed and contains no direct permission write. The API bridge source lock includes both the handler and its regression test, and the cross-repository checker enforces this fail-closed rule. The approval ledger's current record-only behavior is not treated as staff lifecycle execution.
+
+This is a security closure, not a completed staff lifecycle. Invitation, role change, revocation and permission change remain unavailable until the two-person executor and its PostgreSQL integration tests are implemented. No production staff access or permissions were modified.
