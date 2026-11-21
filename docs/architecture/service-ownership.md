@@ -60,15 +60,17 @@ pass health and application-shell probes, Worker/DNS/Pages ownership must be
 enumerated, and the guarded rollback path must be available. Preserve the
 existing production routes until those conditions pass.
 
-## Authentication and identity migration state (2026-11-16)
+## Native identity and cross-organ integration state (2026-11-21)
 
-- Flutter mainline contains the Testagram-owned `NativeAuthClient`; it stores the rotating refresh credential in secure storage and keeps short-lived access tokens in memory.
-- Backend mainline contains native login/session primitives and the approved-identity provisioning path. Identity applications must pass independent evidence review and two-person account approval before a native account is provisioned; email verification is a separate required step.
-- The Backend's `TESTAGRAM_AUTH_PROVIDER` still defaults to `appwrite`. Native bearer authentication is deployment-gated; merged code is not evidence of a production provider cutover.
-- Appwrite remains a compatibility dependency for legacy deployments and for the staff identity-review/approval path. Reviewer credentials are never user sessions and must never be forwarded to other services.
-- Data Centre video and notification user-facing adapters still validate Appwrite JWTs in the current source. Native-session interoperability for those services is an explicit remaining migration gate. Do not remove their verifier or credentials until a native-token verifier, canonical-user mapping, revocation behavior and end-to-end tests are implemented.
-- The public Backend accepts the configured end-user authentication provider; a deployment must not assume that both providers are active simultaneously. Private service credentials remain separate, directional, server-side secrets.
-- Preserve canonical Testagram UUIDs, profile ownership, social records, media ownership and audit history during any identity linking or migration. Never link identities by matching an email alone.
+- Flutter uses the Testagram-owned native authentication client: short-lived access tokens remain in memory and rotating refresh credentials are stored only in platform secure storage.
+- Backend PR #424 is the reviewed native-auth retirement candidate currently pinned by the bridge. It removes the old provider adapter and parallel legacy runtime, and makes PostgreSQL-backed Testagram sessions the only supported user/staff identity authority. The PR remains open; this is not yet a merged-mainline or deployed-production claim.
+- Backend native access tokens are bound to canonical user IDs, session IDs and token versions. Protected routes recheck the live PostgreSQL session and account state; refresh rotation, replay rejection and revocation have PostgreSQL integration coverage.
+- Data Centre video and notification user-aware routes validate Backend-issued native JWTs. The video service resolves the token through its native verifier, and the notification service calls `nativeauth.ResolveUserID`; both use the shared auth secret and live PostgreSQL session/account checks. These user tokens are not platform service credentials.
+- Admin Console staff access uses native staff principals, role grants, encrypted staff sessions and WebAuthn-backed MFA elevation. The general two-person staff invitation/role-change/revocation lifecycle and live browser ceremony/recovery remain acceptance gates; staff enrollment and public registration stay closed until they pass.
+- Backend-to-Data-Centre, Backend-to-CDN, Backend-to-Algorithm and Backend-to-Federation use separate directional service credentials or object/viewer-bound assertions. User JWTs are never reused as service credentials.
+- The API Control Plane pins the six runtime organs and validates contracts/SDKs at build time only. It is not a runtime gateway, identity authority or product-data service.
+- The public API hostname is a target contract, not proof of live routing. Production still requires the exact Backend candidate to be reviewed, merged, deployed and health-checked before the legacy Worker association can be transferred safely.
+- Preserve canonical Testagram UUIDs, profile ownership, social records, media ownership and audit history during any schema upgrade. Never link identities by matching email alone.
 
 ## Cross-service invariants
 
