@@ -333,7 +333,7 @@ The current `contracts/sources.lock.json` and `contracts/registry/seven-organ-br
 |---|---|---|
 | Backend | `a793c55db8b5c258524bfef4b8872f5c6c1038e5` | PR #424: `cc33913f0fd4e86669f7c717e12b2503990e6d88` |
 | CDN | `490119514788c13c327ee05eb4ce068a0f73966e` | PR #125: `19f2ed0df2993ba833aee9526c2a7e6cbd4a0662` |
-| Flutter | `1f58971720c7a72139d56900a5895c49fa105639` | Mainline; PR #100 remains an open production-smoke candidate |
+| Flutter | `1f58971720c7a72139d56900a5895c49fa105639` | Mainline includes NodeInfo 2.1, real-account WebFinger, actor and unknown-account smoke; PR #100 is a stale draft based on older mainline |
 | Data Centre | `ada6f26a289775720bb47a639242dbd868388055` | Mainline |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline |
 | Federation | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Mainline |
