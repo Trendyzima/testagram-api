@@ -35,6 +35,7 @@ The current bridge itself is PR #116. It remains open until the refreshed source
 Two test-only residue cleanup PRs are also open:
 - CDN PR #124 changes a negative authorization fixture label.
 - Data Centre PR #113 changes a negative invalid-issuer fixture label.
+- Flutter PR #113 removes retired-provider wording from two negative auth/widget fixtures.
 
 These changes do not alter runtime behavior. Their CI and review must pass before merge.
 
