@@ -5,7 +5,7 @@
 - Testagram Backend is the public API runtime, canonical identity authority, wallet ledger owner and profile authorization authority.
 - PostgreSQL is the canonical store for wallet balances, ledger entries, transaction state and local profile fields.
 - Flutter is presentation and authenticated transport only. It must never calculate or mutate a balance locally.
-- Media bytes and upload lifecycle remain behind the Backend media gateway and the existing storage/CDN services.
+- Media bytes and upload lifecycle remain behind the Backend media gateway and the storage/CDN services.
 - Use Testagram's own approved design system, branding, typography, spacing, icons and component language.
 
 ## Wallet launch scope
@@ -24,7 +24,7 @@ Supported Backend capabilities:
 ### M-Pesa deposits
 
 1. Flutter asks the user for a Kenyan Safaricom number and a whole-KES amount.
-2. Backend validates the authenticated Appwrite session, active account, wallet state, amount limits and idempotency key.
+2. Backend validates the Testagram-native access token, canonical user, live PostgreSQL session/account state, wallet state, amount limits and idempotency key.
 3. Backend initiates an STK Push with Safaricom and persists the checkout identifiers and pending transaction.
 4. Flutter reports that the prompt was sent; it must not show the deposit as credited yet.
 5. Safaricom calls the public Backend callback. Backend validates callback details, independently queries Safaricom for payment confirmation and settles the top-up exactly once in a PostgreSQL transaction.
@@ -51,9 +51,9 @@ M-Pesa B2C withdrawals are **not part of the current native client release**. Do
 
 ## UI direction
 
-Use XClone's own profile and wallet surfaces as a product-specific reference for information hierarchy:
+Use a clear Testagram-owned information hierarchy:
 - wallet balance first, clear M-Pesa add-funds action, send action and transaction history;
 - profile cover and avatar, display name and handle, concise bio, location/website, follower counts and content timeline;
 - clear loading, empty, pending, failed, success and retry states.
 
-Do not copy X's trademarks, logos or exact visual assets. Keep Testagram's distinct brand treatment.
+Keep Testagram's distinct brand treatment and use only approved Testagram design-system assets.
