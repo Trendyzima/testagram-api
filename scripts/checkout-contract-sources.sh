@@ -5,7 +5,7 @@ LOCK="$ROOT/contracts/sources.lock.json"
 BRIDGE="$ROOT/contracts/registry/seven-organ-bridge.json"
 mkdir -p "$ROOT/source-repos"
 
-while IFS=$'\\t' read -r key full_name sha path sparse_dirs main_commit; do
+while IFS=$'\t' read -r key full_name sha path sparse_dirs main_commit; do
   target="$ROOT/$path"
   mkdir -p "$(dirname "$target")"
   if [[ ! -d "$target/.git" ]]; then
@@ -50,6 +50,6 @@ done < <(node -e '
   for (const [key,r] of Object.entries(x.repositories)) {
     const mainCommit = main.get(key);
     if (!/^[0-9a-f]{40}$/.test(mainCommit || "")) throw new Error(key + ": missing immutable mainCommit");
-    console.log([key,r.fullName,r.ref,r.checkoutPath,(sparse[key] || []).join(" "),mainCommit].join("\\t"));
+    console.log([key,r.fullName,r.ref,r.checkoutPath,(sparse[key] || []).join(" "),mainCommit].join("\t"));
   }
 ' "$LOCK" "$BRIDGE")
