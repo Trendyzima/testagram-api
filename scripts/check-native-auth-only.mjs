@@ -93,10 +93,15 @@ for (const [root, count] of perRoot) {
   assert.ok(count > 0, `Native-auth audit scanned zero source/config/docs files for ${root}`);
 }
 assert.ok(scanned.length > 0, "Native-auth audit scanned zero provider files; refusing a vacuous pass.");
+const nonRuntimeNegativeGuards = [
+  "source-repos/data-centre/.github/workflows/vps-ci.yml",
+  "source-repos/backend/scripts/test-identity-registration-migration.sh",
+];
 const providerViolations = [];
 for (const path of new Set(scanned)) {
   const source = readFileSync(path, "utf8");
-  if (/appwrite/i.test(source)) providerViolations.push(path);
+  const normalized = path.replaceAll("\\\\", "/");
+  if (/appwrite/i.test(source) && !nonRuntimeNegativeGuards.some((suffix) => normalized.endsWith(suffix))) providerViolations.push(path);
 }
 assert.equal(
   providerViolations.length,
@@ -117,6 +122,7 @@ const historicalCompatibilityAllowlist = new Set([
   "backend/scripts/test-identity-registration-migration.sh",
   "backend/tests/test_native_identity_migration_manifest.py",
   "backend/tests/test_native_auth_runtime_boundary.py",
+  "data-centre/.github/workflows/vps-ci.yml",
 ]);
 const exhaustiveFiles = [];
 const exhaustiveExcluded = new Set([".git", "node_modules", "vendor", "build", "dist", ".dart_tool", ".gradle", ".idea"]);
