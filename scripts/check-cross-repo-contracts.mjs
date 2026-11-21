@@ -211,7 +211,6 @@ if (!federationTests.includes("TestInternalActivityEndpointRejectsMissingService
 // service-name DNS is the stable federation-api:8081 upstream; the separate
 // standalone Federation compose file is only a local development harness.
 const backendCaddyfile = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/Caddyfile"), "utf8");
-const backendCompose = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/docker-compose.yml"), "utf8");
 for (const [label, source, marker] of [
   ["Data Centre Federation deployment", dataCentreCompose, "  federation-api:"],
   ["Data Centre Federation deployment", dataCentreCompose, "BACKEND_INTERNAL_URL: http://api:8082"],
