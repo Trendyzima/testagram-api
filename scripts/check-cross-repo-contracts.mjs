@@ -206,6 +206,35 @@ if (!federationTests.includes("TestInternalActivityEndpointRejectsMissingService
   fail.push("Federation ingress tests must prove missing and wrong-direction service credentials are rejected");
 }
 
+// Public ActivityPub discovery is a separate edge from the private Backend
+// ingress. Keep the Flutter smoke, Federation handlers, Caddy proxy and
+// Cloudflare route-transfer workflow aligned so WebFinger cannot terminate
+// at the Flutter Pages Worker while the apex is being migrated.
+const federationCaddy = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/Caddyfile"), "utf8");
+const flutterDomainSmoke = readFileSync(resolve(lock.repositories["flutter-client"].checkoutPath, ".github/workflows/domain-smoke.yml"), "utf8");
+const cdnWrangler = readFileSync(resolve(lock.repositories.cdn.checkoutPath, "cloudflare/wrangler.toml"), "utf8");
+const cdnRoutingWorkflow = readFileSync(resolve(lock.repositories.cdn.checkoutPath, ".github/workflows/restore-canonical-host-routing.yml"), "utf8");
+for (const [label, source, marker] of [
+  ["Federation public discovery", federationServer, 'HandleFunc("GET /.well-known/webfinger"'],
+  ["Federation public discovery", federationServer, 'HandleFunc("GET /.well-known/nodeinfo"'],
+  ["Federation public discovery", federationServer, 'HandleFunc("GET /nodeinfo/2.1"'],
+  ["Backend Caddy apex routing", federationCaddy, "@activitypub path /.well-known/webfinger* /.well-known/nodeinfo* /nodeinfo/* /users/* /inbox /outbox /objects/*"],
+  ["Backend Caddy apex routing", federationCaddy, "reverse_proxy federation-api:8081"],
+  ["Backend Caddy apex routing", federationCaddy, "header_up Host testagram.site"],
+  ["Flutter production smoke", flutterDomainSmoke, "NodeInfo discovery"],
+  ["Flutter production smoke", flutterDomainSmoke, "Real-account WebFinger"],
+  ["Flutter production smoke", flutterDomainSmoke, "acct:crissbeat@testagram.site"],
+  ["CDN apex route", cdnWrangler, 'pattern = "testagram.site/*"'],
+  ["CDN WebFinger route transfer", cdnRoutingWorkflow, "confirm_legacy_webfinger_route_transfer"],
+  ["CDN WebFinger route transfer", cdnRoutingWorkflow, 'select(.pattern=="testagram.site/.well-known/webfinger*")'],
+  ["CDN WebFinger route transfer", cdnRoutingWorkflow, 'steps.preflight.outputs.legacy_webfinger_route_id'],
+  ["CDN WebFinger route transfer", cdnRoutingWorkflow, 'DELETE "$API/zones/$zone_id/workers/routes/$route_id"'],
+  ["CDN WebFinger route rollback", cdnRoutingWorkflow, "Restore the exact legacy WebFinger route if apex verification fails"],
+  ["CDN WebFinger route rollback", cdnRoutingWorkflow, 'POST "$API/zones/$zone_id/workers/routes"'],
+]) {
+  if (!source.includes(marker)) fail.push(`${label} missing public Federation routing marker: ${marker}`);
+}
+
 const cdnServer = readFileSync(resolve(lock.repositories.cdn.checkoutPath, "internal/edge/server.go"), "utf8");
 const cdnTests = readFileSync(resolve(lock.repositories.cdn.checkoutPath, "internal/edge/server_test.go"), "utf8");
 for (const [label, source, marker] of [
