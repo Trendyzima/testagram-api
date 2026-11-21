@@ -37,8 +37,16 @@ for (const repo of bridge.repositories) {
     const pin = pins.repositories[repo.sourcePinKey];
     assert.ok(pin, `${repo.id}: source pin missing from contracts/sources.lock.json`);
     assert.equal(pin.fullName, repo.fullName, `${repo.id}: source pin repository mismatch`);
-    assert.equal(pin.ref, repo.mainCommit, `${repo.id}: bridge commit and source pin differ`);
-    assert.match(pin.ref, /^[0-9a-f]{40}$/);
+    assert.match(repo.mainCommit, /^[0-9a-f]{40}$/, `${repo.id}: invalid mainline commit`);
+    assert.match(pin.ref, /^[0-9a-f]{40}$/, `${repo.id}: invalid source pin commit`);
+    if (repo.candidateCommit) {
+      assert.match(repo.candidateCommit, /^[0-9a-f]{40}$/, `${repo.id}: invalid candidate commit`);
+      assert.equal(pin.ref, repo.candidateCommit, `${repo.id}: source pin must match the explicit review candidate`);
+      assert.notEqual(repo.candidateCommit, repo.mainCommit, `${repo.id}: candidate must not be represented as merged mainline`);
+      assert.ok(Number.isInteger(repo.candidatePullRequest) && repo.candidatePullRequest > 0, `${repo.id}: candidate PR evidence missing`);
+    } else {
+      assert.equal(pin.ref, repo.mainCommit, `${repo.id}: bridge mainline commit and source pin differ`);
+    }
     assert.ok(Array.isArray(pin.sourcePaths) && pin.sourcePaths.length > 0, `${repo.id}: source path inventory missing`);
     assert.equal(new Set(pin.sourcePaths).size, pin.sourcePaths.length, `${repo.id}: duplicate source path in immutable inventory`);
     for (const sourcePath of pin.sourcePaths) {
