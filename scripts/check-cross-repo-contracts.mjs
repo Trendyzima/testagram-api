@@ -89,6 +89,26 @@ for (const route of mediaRoutes) {
 if (!backendMediaClient.includes('"X-Testagram-API-Version"')) fail.push("Backend Data Centre client must send X-Testagram-API-Version");
 if (!dataCentreMediaServer.includes('r.Header.Get("X-Testagram-API-Version")')) fail.push("Data Centre media server must enforce X-Testagram-API-Version");
 
+const backendDataCentreClient = backendMediaClient;
+const dataCentreVideoAuth = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/video/native_auth.go"), "utf8");
+const dataCentreVideoMain = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/video/main.go"), "utf8");
+const dataCentreNotification = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/notification/main.go"), "utf8");
+for (const [label, source, marker] of [
+  ["Backend Data Centre media client", backendDataCentreClient, 'req.Header.Set("Authorization", "Bearer "+c.token)'],
+  ["Backend Data Centre media client", backendDataCentreClient, 'req.Header.Set("X-Request-ID", requestID())'],
+  ["Backend Data Centre media client", backendDataCentreClient, "Timeout: 10 * time.Second"],
+  ["Backend Data Centre media client", backendDataCentreClient, "http.ErrUseLastResponse"],
+  ["Data Centre video auth", dataCentreVideoMain, 'os.Getenv("TESTAGRAM_AUTH_JWT_SECRET")'],
+  ["Data Centre video auth", dataCentreVideoAuth, "nativeauth.ParseAccessToken"],
+  ["Data Centre video auth", dataCentreVideoAuth, "nativeauth.ResolveUserID"],
+  ["Data Centre notification auth", dataCentreNotification, 'mustEnv("TESTAGRAM_AUTH_JWT_SECRET")'],
+  ["Data Centre notification auth", dataCentreNotification, "nativeauth.ResolveUserID"],
+  ["Data Centre notification auth", dataCentreNotification, "context.WithTimeout(r.Context(), 4*time.Second)"],
+]) {
+  if (!source.includes(marker)) fail.push(`${label} missing native identity/private service wiring marker: ${marker}`);
+}
+
+
  // Deployment wiring is part of the Backend <-> Data Centre contract.
  // Fresh-media credentials stay in the Data Centre service. Separately, the
  // Backend's VPS-primary identity-evidence replicator requires B2/R2 replica
@@ -150,6 +170,7 @@ for (const [label, source, marker] of [
 ]) {
   if (!source.includes(marker)) fail.push(`${label} missing agreed ranking contract marker: ${marker}`);
 }
+if (!algorithmClient.includes('req.Header.Set("X-Request-ID", newRequestID())') || !algorithmClient.includes("1200 * time.Millisecond") || !algorithmClient.includes("timeout > 5*time.Second")) fail.push("Backend Algorithm client must use request IDs and a bounded timeout");
 if (!algorithmClient.includes("len(input.Candidates) > 200") || !algorithmClient.includes("input.Limit > 50")) {
   fail.push("Backend Algorithm client must enforce the 200-candidate / 50-result bounds");
 }
@@ -180,6 +201,7 @@ for (const [label, source, marker] of [
 ]) {
   if (!source.includes(marker)) fail.push(`${label} missing agreed durable-ingress contract marker: ${marker}`);
 }
+if (!backendFederationClient.includes('req.Header.Set("X-Testagram-API-Version", "1")') || !backendFederationClient.includes('req.Header.Set("X-Request-ID", requestID)') || !backendFederationClient.includes("Idempotency-Key")) fail.push("Backend Federation client must send version, request ID and idempotency identity");
 if (!federationTests.includes("TestInternalActivityEndpointRejectsMissingServiceCredential") || !federationTests.includes("TestInternalActivityEndpointUsesDedicatedIngressCredential")) {
   fail.push("Federation ingress tests must prove missing and wrong-direction service credentials are rejected");
 }
@@ -270,6 +292,20 @@ if (!dataCentreMediaProvisioner.includes("CREATE DATABASE") || !dataCentreMediaP
   fail.push("Data Centre media database provisioner must create a separate database and restricted runtime role");
 }
 
+
+const flutterNativeAuth = readFileSync(resolve(lock.repositories["flutter-client"].checkoutPath, "lib/core/auth/native_auth_client.dart"), "utf8");
+const flutterBackendApi = readFileSync(resolve(lock.repositories["flutter-client"].checkoutPath, "lib/core/backend_api.dart"), "utf8");
+for (const [label, source, marker] of [
+  ["Flutter native auth", flutterNativeAuth, "FlutterSecureStorage"],
+  ["Flutter native auth", flutterNativeAuth, "_refreshKey"],
+  ["Flutter native auth", flutterNativeAuth, "_accessToken"],
+  ["Flutter native auth", flutterNativeAuth, "_post('refresh'"],
+  ["Flutter Backend API", flutterBackendApi, "'Authorization': 'Bearer $token'"],
+  ["Flutter private media", flutterBackendApi, "Bearer v1."],
+]) {
+  if (!source.includes(marker)) fail.push(`${label} missing native-session/media contract marker: ${marker}`);
+}
+
 const publicSpec = readFileSync("contracts/openapi/testagram-v1.yaml", "utf8");
 if (/^  \/internal\//m.test(publicSpec) || publicSpec.includes("/api/cache/purge")) {
   fail.push("Private service or operator-only route leaked into public Backend OpenAPI");
@@ -278,4 +314,4 @@ if (fail.length) {
   console.error(fail.map((item) => `- ${item}`).join("\n"));
   process.exit(1);
 }
-console.log("Cross-repository contract audit passed: six immutable source pins, source paths, snapshots and public/private boundary verified.");
+console.log("Cross-repository contract audit passed: six immutable source pins, snapshots, all six runtime edges, native user-token propagation, private credentials and public/private boundaries verified.");
