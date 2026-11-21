@@ -12,7 +12,7 @@ This repository is the build-time governance layer, not a monorepo and not a run
 |---|---|---|---|
 | Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `761c41b247a49aac7e9b352493465e3c321a2ffb` | Current mainline |
 | Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `e6fdb962c2a10159df352312e01ea05842ffde13` | Temporary native-auth PR #424 candidate; not merged |
-| Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `a22d086c03fcf8a90323dc250e53d255c7aff26c` | Current mainline |
+| Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `58de0bf36b76f9cd74824901b6a86de29f420c65` | Current mainline |
 | CDN | [cdn-](https://github.com/Trendyzima/cdn-) | `490119514788c13c327ee05eb4ce068a0f73966e` | Current mainline |
 | Algorithm | [the-algorithm](https://github.com/Trendyzima/the-algorithm) | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Current mainline |
 | Federation | [federated-content](https://github.com/Trendyzima/federated-content) | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Current mainline |
@@ -24,7 +24,7 @@ The six runtime pins are stored in `contracts/sources.lock.json`. The Backend pi
 
 - Flutter: PRs #109 and #112 (navigation and native-auth deployment documentation).
 - Backend: PRs #418, #419, #421 and #423. PR #424 remains open and is not counted as merged.
-- Data Centre: PRs #111 and #112 (architecture and seven-organ ownership documentation).
+- Data Centre: PRs #111, #112 and #113 (architecture, seven-organ ownership and negative-issuer fixture cleanup).
 - CDN: PRs #122, #123 and #124 (navigation, native media-authorization boundary and negative-auth fixture cleanup).
 - Algorithm: PRs #27, #28 and #29 (navigation and seven-organ ownership).
 - Federation: PRs #49, #50 and #51 (navigation, dependency reliability and native ownership boundary).
@@ -33,7 +33,6 @@ The six runtime pins are stored in `contracts/sources.lock.json`. The Backend pi
 The current bridge itself is PR #116. It remains open until the refreshed source-pin, SDK, route, documentation-residue and edge-wiring checks pass and the Backend candidate is independently reviewed and merged.
 
 Two test-only residue cleanup PRs are also open:
-- Data Centre PR #113 changes a negative invalid-issuer fixture label.
 - Flutter PR #113 removes retired-provider wording from two negative auth/widget fixtures.
 
 These changes do not alter runtime behavior. Their CI and review must pass before merge.
