@@ -184,7 +184,7 @@
   ],
   "excludedFromAcceptance": [
     "A branch without a reviewed pull request is not automatically merged.",
-    "The Flutter production-domain smoke PR #100 remains draft and has a failing smoke check.",
+    "Flutter PR #100 remains a stale draft based on an older mainline and is not an accepted source pin; current Flutter mainline already carries stricter NodeInfo/WebFinger/actor smoke checks, while the live Cloudflare route inventory still blocks production Federation acceptance.",
     "Backend PR #424 and CDN PR #125 are declared candidate pins only; neither is merged or independently approved.",
     "Merged source revisions do not prove live DNS, TLS, deployment health, provider durability or end-to-end staging acceptance."
   ]
