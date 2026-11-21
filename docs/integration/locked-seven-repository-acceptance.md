@@ -240,3 +240,22 @@ Federated Content PR #50 (pgx dependency security/reliability update) was merged
 ## 10. Native MFA revocation and WebAuthn configuration hardening — 2026-11-21
 
 The Backend review pin now includes credential-bound MFA elevation and shared WebAuthn RP configuration attestation. Every privileged identity-review request and Admin Console sensitive action rechecks the exact authenticator used for step-up against PostgreSQL; revoked, unverified or clone-warned credentials invalidate outstanding elevation immediately. The Backend and Admin Console compare a canonical fingerprint of the configured RP ID and allowed origins; mismatches fail readiness closed. Regression tests cover the token binding, revocation, fingerprint mismatch and canonicalization. This remains source/CI evidence only: the live browser authenticator ceremony, recovery, and production origin have not yet been accepted.
+
+
+## 11. Seven-organ source-pin refresh — 2026-11-21
+
+The bridge now records the latest observed default-branch revisions for the five runtime organs whose intervening changes were documentation-only, while retaining the Backend PR #424 immutable review candidate until its merge. The API Control Plane remains a governance repository and is not a runtime organ dependency.
+
+| Organ | Repository | Locked source revision | Integration status |
+|---|---|---|---|
+| Flutter client | `Trendyzima/testagram-flutter-client-` | `761c41b247a49aac7e9b352493465e3c321a2ffb` | Mainline; PR #112 documentation cleanup merged |
+| Backend | `Trendyzima/Testagram-backend-` | `e6fdb962c2a10159df352312e01ea05842ffde13` | Temporary native-auth review candidate; PR #424 remains open |
+| Data Centre | `Trendyzima/Testagram-data-centre-` | `a22d086c03fcf8a90323dc250e53d255c7aff26c` | Mainline; PR #112 boundary documentation merged |
+| CDN | `Trendyzima/cdn-` | `1480d9c2da6f281ed4f9caf62c37705fdbe65e9d` | Mainline; PR #123 native media-auth documentation merged |
+| Algorithm | `Trendyzima/the-algorithm` | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline; PRs #28 and #29 ownership documentation merged |
+| Federation | `Trendyzima/federated-content` | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Mainline; PR #51 native boundary documentation merged |
+| API Control Plane | `Trendyzima/testagram-api` | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` | Governance-only mainline; this bridge remains an open candidate PR |
+
+The refreshed five mainline pins were compared with their previous locked revisions. The intervening changes were confined to documentation and did not alter runtime source paths or provider snapshots. The Backend candidate is intentionally not described as a merged mainline revision. Once PR #424 merges, the bridge must be refreshed to the exact resulting Backend main SHA and all relevant route/source evidence regenerated before accepting the integration.
+
+This source refresh fixes source-pin drift; it does not prove deployed interoperability. The exact contract CI run on this refreshed baseline must pass before the bridge is merge-ready.
