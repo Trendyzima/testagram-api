@@ -331,7 +331,7 @@ The current `contracts/sources.lock.json` and `contracts/registry/seven-organ-br
 
 | Runtime organ | Mainline revision | Review candidate revision |
 |---|---|---|
-| Backend | `a793c55db8b5c258524bfef4b8872f5c6c1038e5` | PR #424: `908ef6a92b20742317832bd7efe968f99cdcd5ed` |
+| Backend | `a793c55db8b5c258524bfef4b8872f5c6c1038e5` | PR #424: `cc33913f0fd4e86669f7c717e12b2503990e6d88` |
 | CDN | `490119514788c13c327ee05eb4ce068a0f73966e` | PR #125: `19f2ed0df2993ba833aee9526c2a7e6cbd4a0662` |
 | Flutter | `1f58971720c7a72139d56900a5895c49fa105639` | Mainline; PR #100 remains an open production-smoke candidate |
 | Data Centre | `ada6f26a289775720bb47a639242dbd868388055` | Mainline |
@@ -349,7 +349,7 @@ Production acceptance remains **NOT ACCEPTED** until a separate staging Cloudfla
 
 ## 18. Staff permission mutation fail-closed correction — 2026-11-21
 
-The latest Backend PR #424 candidate is `908ef6a92b20742317832bd7efe968f99cdcd5ed`. A forensic review found that the Admin Console's role-change, revocation and invitation handlers already return HTTP 501, but the permission-change handler still directly updated `native_staff_permission_overrides` after one owner's step-up. That bypassed the required two-person authorization boundary.
+The latest Backend PR #424 candidate is `cc33913f0fd4e86669f7c717e12b2503990e6d88`. A forensic review found that the Admin Console's role-change, revocation and invitation handlers already return HTTP 501, but the permission-change handler still directly updated `native_staff_permission_overrides` after one owner's step-up. That bypassed the required two-person authorization boundary.
 
 The candidate now removes that direct SQL mutation and keeps permission changes HTTP 501 until a transactional executor applies an approved request only after two distinct authorized approvers. A regression test asserts that the handler remains closed and contains no direct permission write. The API bridge source lock includes both the handler and its regression test, and the cross-repository checker enforces this fail-closed rule. The approval ledger's current record-only behavior is not treated as staff lifecycle execution.
 
