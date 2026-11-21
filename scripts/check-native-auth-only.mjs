@@ -104,3 +104,51 @@ assert.equal(
   `Appwrite runtime, SDK, endpoint, token or fallback remains in provider source/config files:\n${providerViolations.map((path) => `- ${path}`).join("\n")}`,
 );
 console.log(`Native-only authentication boundary: PASS (SDK/OpenAPI plus ${new Set(scanned).size} runtime, deployment, configuration and documentation files across all six runtime organs contain no external identity-provider integration)`);
+
+const historicalCompatibilityAllowlist = new Set([
+  "backend/migrations/20261106_appwrite_identity_bridge.sql",
+  "backend/migrations/20261106_appwrite_identity_link_audit.sql",
+  "backend/migrations/20261114_appwrite_registration_consent.sql",
+  "backend/migrations/20261115_testagram_native_auth_cutover_foundation.sql",
+  "backend/migrations/20261120_native_identity_historical_account_archive.sql",
+  "backend/migrations/20261120_native_identity_historical_admin_archive.sql",
+  "backend/migrations/20261120_native_identity_historical_attribution_archive.sql",
+  "backend/migrations/20261120_native_identity_historical_staff_archive.sql",
+  "backend/scripts/test-identity-registration-migration.sh",
+  "backend/tests/test_native_identity_migration_manifest.py",
+  "backend/tests/test_native_auth_runtime_boundary.py",
+]);
+const exhaustiveFiles = [];
+const exhaustiveExcluded = new Set([".git", "node_modules", "vendor", "build", "dist", ".dart_tool", ".gradle", ".idea"]);
+function walkExhaustive(path) {
+  const stat = statSync(path);
+  if (stat.isDirectory()) {
+    for (const entry of readdirSync(path)) {
+      if (exhaustiveExcluded.has(entry)) continue;
+      walkExhaustive(join(path, entry));
+    }
+    return;
+  }
+  if (extensions.has(path.slice(path.lastIndexOf(".")))) exhaustiveFiles.push(path);
+}
+for (const root of roots.filter((value) => value.startsWith("source-repos/"))) {
+  walkExhaustive(resolve(root));
+}
+const historicalHits = [];
+const unclassifiedHits = [];
+for (const path of new Set(exhaustiveFiles)) {
+  const source = readFileSync(path, "utf8");
+  if (!/appwrite/i.test(source)) continue;
+  const normalized = path.replaceAll("\\\\", "/");
+  const marker = normalized.indexOf("source-repos/");
+  const relative = marker >= 0 ? normalized.slice(marker + "source-repos/".length) : normalized;
+  if (historicalCompatibilityAllowlist.has(relative)) historicalHits.push(relative);
+  else unclassifiedHits.push(relative);
+}
+assert.equal(
+  unclassifiedHits.length,
+  0,
+  `Unclassified retired-provider traces remain outside the explicit migration/CI compatibility boundary:\\n${unclassifiedHits.sort().map((item) => `- ${item}`).join("\\n")}`,
+);
+console.log(`Historical compatibility residue is isolated to ${new Set(historicalHits).size} explicitly allowlisted migration/CI files; no other organ source, test, deployment, configuration or documentation file contains provider traces.`);
+
