@@ -228,7 +228,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "930f000e030fc920a749b99cae1e0c8c5c01d2b1",
+      "ref": "19f2ed0df2993ba833aee9526c2a7e6cbd4a0662",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         ".github/workflows/ci.yml",
@@ -248,7 +248,8 @@
         "internal/edge/integration_test.go",
         "internal/edge/server.go",
         "internal/edge/server_test.go",
-        ".github/workflows/cleanup-detached-api-worker.yml"
+        ".github/workflows/cleanup-detached-api-worker.yml",
+        "tests/test_restore_canonical_host_routing_guards.py"
       ]
     },
     "flutter-client": {
