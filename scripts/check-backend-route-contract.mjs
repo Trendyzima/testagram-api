@@ -14,6 +14,9 @@ function collectGoFiles(directory) {
 }
 collectGoFiles(backendDir);
 const source = backendFiles.map((path) => readFileSync(path, "utf8")).join("\n");
+if (/appwrite/i.test(source)) {
+  throw new Error("The canonical cmd/api runtime must contain no Appwrite integration, endpoint, token, SDK, or fallback.");
+}
 const postHandlerPath = resolve("source-repos/backend/cmd/api/social_post_create.go");
 const postTestsPath = resolve("source-repos/backend/cmd/api/social_post_create_test.go");
 
@@ -165,63 +168,3 @@ if (missingFromInventory.length || staleInventory.length || missingFromOpenApi.l
   process.exit(1);
 }
 console.log(`Backend route audit passed: ${registered.size} static routes inventoried across ${backendFiles.length} production Go files; ${inventory.routes.filter((item) => item.status === "contracted").length} contracted operations covered by OpenAPI; post idempotency behavior backed by handler and tests.`);
-
-
-// The legacy standalone Fresh API runtime is cmd/fresh-api, whose routes are
-// registered in internal/freshapi/server.go. Keep this audit separate from the
-// canonical Instabox cmd/api runtime: identical paths do not imply identical
-// wire contracts. Render is retired and must not be required for deployment.
-const freshInventoryPath = resolve("contracts/route-inventory/fresh-api-public-routes.json");
-const freshLegacyPin = sourceLock.repositories["backend-fresh-legacy"];
-if (!freshLegacyPin) throw new Error("The retired Fresh API must have its own immutable legacy source pin.");
-const freshServerPath = resolve("source-repos/backend-fresh-legacy/internal/freshapi/server.go");
-const freshMainPath = resolve("source-repos/backend-fresh-legacy/cmd/fresh-api/main.go");
-const freshDockerfilePath = resolve("source-repos/backend-fresh-legacy/Dockerfile.fresh");
-const deploymentGuardPath = resolve("source-repos/backend-fresh-legacy/scripts/guard-no-render.py");
-const deploymentWorkflowPath = resolve("source-repos/backend-fresh-legacy/.github/workflows/ci.yml");
-const instaboxDeployPath = resolve("source-repos/backend-fresh-legacy/.github/workflows/instabox-deploy.yml");
-const freshInventory = JSON.parse(readFileSync(freshInventoryPath, "utf8"));
-if (freshInventory.sourceRef !== freshLegacyPin.ref) {
-  throw new Error("Fresh API route inventory sourceRef does not match the separate legacy source pin.");
-}
-const freshServer = readFileSync(freshServerPath, "utf8");
-const freshMain = readFileSync(freshMainPath, "utf8");
-const freshDockerfile = readFileSync(freshDockerfilePath, "utf8");
-const deploymentGuard = readFileSync(deploymentGuardPath, "utf8");
-const deploymentWorkflow = readFileSync(deploymentWorkflowPath, "utf8");
-const instaboxDeploy = readFileSync(instaboxDeployPath, "utf8");
-const freshRegistered = new Set();
-for (const match of freshServer.matchAll(/mux\.HandleFunc\("([A-Z]+) ([^"]+)"\s*,/g)) {
-  freshRegistered.add(key(match[1], match[2]));
-}
-const freshExpected = new Set(freshInventory.routes.map(({ method, path }) => key(method, path)));
-const freshMissing = [...freshRegistered].filter((route) => !freshExpected.has(route)).sort();
-const freshStale = [...freshExpected].filter((route) => !freshRegistered.has(route)).sort();
-if (freshMissing.length || freshStale.length) {
-  console.error(JSON.stringify({ freshMissing, freshStale }, null, 2));
-  process.exit(1);
-}
-const validContractStatuses = new Set(["uncontracted", "compatibility-review", "contracted"]);
-for (const route of freshInventory.routes) {
-  if (!validContractStatuses.has(route.contractStatus)) throw new Error(`Unknown Fresh API contract status: ${route.contractStatus}`);
-  if (route.exposure === "internal" && !route.path.startsWith("/internal/")) {
-    throw new Error(`Fresh API internal route has a public path: ${route.method} ${route.path}`);
-  }
-  if (route.path.startsWith("/internal/") && route.exposure !== "internal") {
-    throw new Error(`Fresh API private route is incorrectly marked public: ${route.method} ${route.path}`);
-  }
-  if (route.registrationCondition !== "always" && !["identity_secret_and_appwrite_server_key_configured", "internal_token_configured", "storage_service_configured"].includes(route.registrationCondition)) {
-    throw new Error(`Unknown Fresh API registration condition: ${route.registrationCondition}`);
-  }
-}
-for (const marker of ["IDENTITY_PREAUTH_SECRET", "APPWRITE_SERVER_API_KEY", "FRESH_FEDERATION_INTERNAL_TOKEN", "FRESH_MEDIA_ENABLED"]) {
-  if (!freshMain.includes(marker)) throw new Error(`Fresh API runtime configuration marker missing: ${marker}`);
-}
-for (const marker of ["HEALTHCHECK", "healthcheck"]) {
-  if (!freshDockerfile.includes(marker)) throw new Error(`Fresh API Docker healthcheck marker missing: ${marker}`);
-}
-if (!deploymentGuard.includes("Instabox-only deployment guard passed")) throw new Error("Backend must retain the retired-hosting deployment guard.");
-if (!deploymentWorkflow.includes("python3 scripts/guard-no-render.py")) throw new Error("Backend CI must execute the Instabox-only deployment guard.");
-if (!instaboxDeploy.includes("scripts/start-instabox-deployment.sh")) throw new Error("Backend production deployment workflow must invoke the Instabox deployment script.");
-const freshUncontracted = freshInventory.routes.filter((route) => route.contractStatus !== "contracted").length;
-console.log(`Fresh API runtime audit passed: ${freshRegistered.size} routes match the pinned runtime inventory; ${freshUncontracted} remain explicitly blocked from public contract adoption pending wire-level review.`);

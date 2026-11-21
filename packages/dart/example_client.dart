@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 
 /// Minimal reference only. Production Flutter wiring should use the
-/// existing client transport and Appwrite session lifecycle in the app repo.
+/// Testagram-native authentication lifecycle in the Flutter app repo.
 class TestagramApiTransport {
   TestagramApiTransport({
     required this.baseUrl,
@@ -21,7 +21,7 @@ class TestagramApiTransport {
     if (authenticated) {
       final token = await accessToken();
       if (token == null || token.isEmpty) {
-        throw StateError('Appwrite session JWT is required');
+        throw StateError('Testagram-native Backend access token is required');
       }
       headers['Authorization'] = 'Bearer $token';
     }

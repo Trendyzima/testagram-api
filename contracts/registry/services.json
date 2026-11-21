@@ -19,7 +19,7 @@
       ],
       "baseUrl": "https://api.testagram.site",
       "exposure": "public",
-      "auth": "Testagram-native short-lived access JWT; PostgreSQL session/account checks on every protected request; opaque rotating refresh token accepted only by /api/auth/refresh; no Appwrite bearer fallback on end-user routes",
+      "auth": "Testagram-native short-lived access JWT; PostgreSQL session/account checks on every protected request; opaque rotating refresh token accepted only by /api/auth/refresh; no external identity-provider bearer fallback on end-user routes",
       "consumers": [
         "flutter-client"
       ],
@@ -30,8 +30,8 @@
         "contracts/internal/openapi/backend-tv-health-monitor-v1.yaml",
         "contracts/internal/openapi/backend-user-activity-watchdog-v1.yaml"
       ],
-      "status": "implemented-core-contract",
-      "notes": "Backend is the sole public product API and canonical identity authority. Mainline issues native Testagram sessions and checks PostgreSQL session/account state; legacy Appwrite IDs remain only as explicit reconciliation inputs and are not accepted as user bearer credentials. Admin Console staff sessions use the native Backend identity plus the encrypted testagram-staff cookie and PostgreSQL staff-role/MFA records. Registration remains fail-closed until private evidence, email, independent review and provisioning gates are enabled and accepted."
+      "status": "native-auth-retirement-candidate-pr-424-open-not-deployed",
+      "notes": "The bridge pins the immutable native-auth retirement candidate in Backend PR #424, not the current Backend mainline. The Backend mainline still contains an unused legacy external identity-provider adapter/source path; the PR candidate removes that adapter and legacy runtime/deployment entrypoints, making PostgreSQL-backed Testagram sessions the only supported user/staff identity path. PR #424 still requires independent review and merge; its CI is not deployment evidence. Production api.testagram.site remains associated with the legacy Worker until the native origin is deployed, health-checked and safely transferred. Registration remains fail-closed until identity evidence, email, independent review, provisioning and live WebAuthn readiness gates are accepted. Admin Console staff sessions use native Backend identity, encrypted testagram-staff cookie and PostgreSQL staff-role/MFA records."
     },
     {
       "id": "flutter-client",
@@ -56,7 +56,7 @@
         "packages/dart/lib/testagram_api.dart"
       ],
       "status": "consumer-with-native-identity-and-public-api-contract",
-      "notes": "Flutter uses the Testagram-native Backend auth client for login, password recovery/reset, session restore, refresh and logout. It calls only the Backend public API with the short-lived native access token. Applicant and verification-session tokens are limited to their own identity operations; the native password is set only after approved provisioning. No Appwrite JWT is sent by the public client. Flutter must never receive service tokens, storage-provider keys, database credentials or private service URLs."
+      "notes": "Flutter uses the Testagram-native Backend auth client for login, password recovery/reset, session restore, refresh and logout. It calls only the Backend public API with the short-lived native access token. Applicant and verification-session tokens are limited to their own identity operations; the native password is set only after approved provisioning. No foreign-provider bearer token is sent by the public client. Flutter must never receive service tokens, storage-provider keys, database credentials or private service URLs."
     },
     {
       "id": "data-centre-platform",
@@ -80,8 +80,8 @@
         "contracts/upstream/datacentre/internal-platform.openapi.yaml",
         "docs/integration/data-centre-platform-contract.md"
       ],
-      "status": "private-media-profile-merged-compose-optional-and-ci-verified-runtime-deployment-and-live-b2-r2-acceptance-pending",
-      "notes": "Data Centre PR #93 adds the private identity-evidence namespace to the existing B2-primary/R2-replica media lifecycle, a separate identity-evidence service token, authenticated readiness, ownership-bound reviewer retrieval/deletion, migration 003 and a manual live-provider smoke. Backend PR #360 adds a dedicated identity-evidence client using its own service credential and the /internal/v1/identity-evidence/ route family; general media credentials cannot cross into this namespace. Both PRs are merged and their repository CI passed. The guarded B2/R2 staging smoke has not yet run, and the optional Data Centre media profile remains unaccepted for runtime activation until actual staging write/read/hash/replication/restore/delete evidence passes. Keep DATA_CENTRE_MEDIA_ENABLED and FRESH_MEDIA_ENABLED at their reviewed safe values until the separate media lifecycle gates pass. The legacy Fresh preview remains separately isolated and is not a supported identity or media fallback. User-aware video and notification routes continue to validate Backend-native JWTs against live PostgreSQL session/account state; service tokens remain separate."
+      "status": "native-user-token-verification-and-private-platform-contract-implemented-live-staging-and-media-acceptance-pending",
+      "notes": "Data Centre video and notification user-aware routes validate Backend-issued native access JWTs and recheck live PostgreSQL session/account state. PLATFORM_INTERNAL_TOKEN remains a separate credential for protected platform writes. The dedicated media profile and its B2/R2 byte lifecycle are separate from the Backend native virtual-storage MinIO/R2/B2 path; neither is accepted without its own live staging evidence."
     },
     {
       "id": "cdn-edge",

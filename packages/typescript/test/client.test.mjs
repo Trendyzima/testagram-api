@@ -2,18 +2,30 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { TestagramApiClient, TestagramApiError } from "../src/index.ts";
 
-test("requires an Appwrite JWT for authenticated requests", async () => {
+test("requires a Testagram-native access token for authenticated requests", async () => {
   const client = new TestagramApiClient({
     baseUrl: "https://api.testagram.site",
     fetch: async () => new Response("{}", { status: 200 }),
   });
-  await assert.rejects(() => client.get("/api/feed/home"), /Appwrite session JWT is required/);
+  await assert.rejects(() => client.get("/api/feed/home"), /Testagram-native access token is required/);
+});
+
+test("sends only the Testagram-native access token as the bearer credential", async () => {
+  const client = new TestagramApiClient({
+    baseUrl: "https://api.testagram.site",
+    getAccessToken: () => "testagram-native-access-token",
+    fetch: async (_url, init) => {
+      assert.equal(new Headers(init.headers).get("authorization"), "Bearer testagram-native-access-token");
+      return new Response(JSON.stringify({ ok: true, data: {} }), { status: 200 });
+    },
+  });
+  await client.get("/api/feed/home");
 });
 
 test("preserves HTTP status and error body", async () => {
   const client = new TestagramApiClient({
     baseUrl: "https://api.testagram.site",
-    getAccessToken: () => "test-jwt",
+    getAccessToken: () => "testagram-access-token",
     fetch: async () => new Response(JSON.stringify({
       ok: false,
       data: null,

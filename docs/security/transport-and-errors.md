@@ -5,7 +5,7 @@
 - HTTPS outside local development.
 - JSON request/response bodies where an operation declares JSON.
 - UTF-8.
-- Bearer authentication with Appwrite session JWT for authenticated user operations.
+- Bearer authentication with the short-lived Testagram-native Backend access JWT for authenticated user operations.
 - Preserve server response status and request/correlation identifiers.
 - Treat response schemas marked extensible as provisional until Backend wire DTOs are verified.
 
@@ -16,7 +16,7 @@
 - Use an idempotency key only where the owning handler explicitly supports it; do not assume universal support.
 - Respect 429 and Retry-After.
 - Do not retry 400, 401, 403 or 404 without changing the request or authentication state.
-- On 401, re-authenticate through Appwrite; do not invent a local token refresh protocol.
+- On 401, use the Backend's native refresh endpoint with the opaque rotating refresh token held in platform secure storage; never fall back to an external identity provider.
 - On 403, show an access-denied state; do not substitute cached private content.
 - On 5xx, distinguish unavailable from empty data.
 

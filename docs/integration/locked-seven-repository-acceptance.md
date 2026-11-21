@@ -27,17 +27,17 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The runtime source baseline below was refreshed from the reviewed `main` heads observed on 2026-11-20. The acceptance gates remain locked; the source revisions are updated independently. The six runtime source pins are recorded in `contracts/sources.lock.json`; this governance repository is identified separately.
+The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. The Backend pin intentionally targets the native-auth retirement candidate in PR #424 so the API bridge audits the code that removes the legacy runtime instead of the superseded mainline. The other five pins target their latest observed mainline revisions; intervening changes are documented boundary/negative-fixture cleanups. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `5d8bbc09d46d6a7b7f0a852fd4e2251b5109cfbd` |
-| Backend | `b55a30bbeaeb0c7caafe55882a6b9db9cf446268` |
-| Data Centre | `6a767f7ae2fe30395d24cded9265dc7e53e759c1` |
-| Testagram API control plane | `03558a2bf68a25b6718cd15851a9e82b89af0d19` |
-| Algorithm | `3734ff75d52019cb6d2cd0cd5273539fe6ab62e9` |
-| Federation | `78e83a411afc8b9f46c687875b3cfd6db6d071b6` |
-| CDN | `4e40463cfd11746c4ab89ccbc3d02a97f7cbee53` |
+| Flutter | `1f58971720c7a72139d56900a5895c49fa105639` |
+| Backend | `54c7a6c3218aa85c83cfcde0570d2673678e26bc` (PR #424 candidate) |
+| Data Centre | `58de0bf36b76f9cd74824901b6a86de29f420c65` |
+| Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
+| Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` |
+| Federation | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` |
+| CDN | `490119514788c13c327ee05eb4ce068a0f73966e` |
 
 A source pin is not a deployment record. Every accepted staging and production run must separately record the actual running image digest and source revision. Mutable tags such as `main` and `latest` are not acceptable release identities.
 
@@ -58,14 +58,14 @@ A gate passes only with a reproducible test against the exact deployed build and
 
 ### G1 — Flutter → Backend native identity and user journey
 
-- Flutter uses the Testagram-native Backend login/refresh/recovery/session path; no Appwrite JWT fallback is accepted on end-user routes.
+- Flutter uses only the Testagram-native Backend login/refresh/recovery/session path. No external identity-provider endpoint, SDK, JWT, database, server key, session, or fallback is permitted in the supported runtime.
 - Access JWTs remain short-lived and in memory; only opaque rotating refresh tokens are stored in platform secure storage.
 - Backend validates signature, issuer, audience, expiry, token version, session ID, canonical user ID, live PostgreSQL session, account state and verification/provisioning state.
 - Exercise registration only through the approved staging provisioning process, email verification, login, refresh rotation, logout, logout-all, password recovery and session restoration.
 - Exercise authenticated profile read/update, post create/read, feed retrieval, media grant retrieval and denial for expired/revoked/foreign credentials.
 - Verify web and Android builds on real browsers/devices; prove no service token, storage key, private host, or database credential is bundled into the client.
 
-**Fail if:** identity is inferred from email equality, a revoked/expired/wrong-audience token is accepted, a refresh token is replayable, the client calls a private service directly, or user data is lost across refresh/logout/restore.
+**Fail if:** any request, build, runtime container, environment contract or client SDK depends on an external identity provider; any provider token is accepted; or native session checks can be bypassed.\n\n**Fail if:** identity is inferred from email equality, a revoked/expired/wrong-audience token is accepted, a refresh token is replayable, the client calls a private service directly, or user data is lost across refresh/logout/restore.
 
 ### G2 — Backend → Algorithm ranking
 
@@ -192,7 +192,7 @@ No test may report PASS if it ran against an unpinned or unknown build.
 
 The API contract validation workflow must execute the same full sequence on this PR head:
 
-1. `npm run sources:checkout` — sparse-checkout each immutable runtime pin and the separately pinned retired-source inventory.
+1. `npm run sources:checkout` — sparse-checkout each immutable runtime pin using only active source directories; no retired runtime source is checked out.
 2. `npm run lint:openapi` and `npm run lint:internal-openapi`.
 3. `npm run typecheck`, `npm run build:sdk`, and `npm test`.
 4. `npm run audit:backend-routes`, `npm run audit:cross-repo`, `npm run audit:locked-acceptance`, `npm run audit:tv-health-contract`, and `npm run audit:flutter-backend`.
@@ -217,16 +217,91 @@ Still unexecuted or blocked:
 - The Backend native-auth staging smoke has not been dispatched. It requires the dedicated GitHub `staging` environment origin and test-account secrets, plus explicit staging-only confirmation.
 - The Data Centre live provider smoke has not been dispatched. It writes and deletes temporary objects and requires explicitly designated staging B2/R2 buckets and the manual confirmation input.
 - The Backend three-provider MinIO/B2/R2 lifecycle and the Data Centre B2/R2 lifecycle remain separate acceptance paths; neither has live end-to-end evidence recorded here.
-- Staff review still lacks a real TOTP/passkey challenge. A non-null MFA-enrolment timestamp and password reauthentication do not prove a second factor; staff-review production activation remains gated.
+- The Backend retirement candidate now implements real WebAuthn registration/assertion ceremonies, credential encryption, challenge expiry/replay protection, and Backend-issued MFA elevation. Staff-review production activation remains gated until the live Admin Console-to-Backend readiness handshake, independent enrollment, deployed credential ceremony, replay rejection and protected-action elevation pass against the production-like PostgreSQL stack.
 - Public registration, media replication, Federation delivery, CDN domain cutover and production feature activation remain subject to their individual gates and explicit approval.
 
 **Decision: NOT ACCEPTED for end-to-end staging or production until all required gates have passing evidence.** Merged branches and green repository CI do not waive the live integration, restore, security or deployment gates.
 
 ### Temporary immutable review pins for the open integration PRs
 
-The following source pins are intentionally temporary review baselines for the open Algorithm/Backend contract-alignment pull requests. They identify immutable commits, not merged mainline or deployed releases. After both provider PRs merge, refresh `contracts/sources.lock.json`, this document's baseline table, and all source snapshots to the resulting merged mainline SHAs before release acceptance.
+The following source pins are intentionally temporary review baselines for open provider pull requests. They identify immutable commits, not merged mainline or deployed releases. After the provider PRs merge, refresh `contracts/sources.lock.json`, this document's baseline table, and all source snapshots to the resulting merged mainline SHAs before release acceptance.
 
 | Repository | Review PR | Immutable review commit |
 |---|---|---|
-| Backend | [PR #419](https://github.com/Trendyzima/Testagram-backend-/pull/419) | `e26c6972b4c8c6fe625ee32ab7803119ee2e7847` |
+| Backend | [PR #424](https://github.com/Trendyzima/Testagram-backend-/pull/424) | `54c7a6c3218aa85c83cfcde0570d2673678e26bc` |
 | Algorithm | [PR #27](https://github.com/Trendyzima/the-algorithm/pull/27) | `88b2ae0eb81e127768aaf4ef1ed19495ce6fda20` |
+
+
+## 9. Federation source-pin reconciliation — 2026-11-21
+
+Federated Content PR #50 (pgx dependency security/reliability update) was merged to `main` at `b44eca07a9c7641cf03ee685c025bcfe6dfc7858`. Both post-merge checks (`test` and `image`) completed successfully on that exact commit. The current federation source pin in `contracts/sources.lock.json` and the seven-organ registry is refreshed to this merge commit; PR #50 is recorded in the registry's merged pull-request history. This source refresh is not live federation deployment or protocol acceptance evidence.
+
+
+## 10. Native MFA revocation and WebAuthn configuration hardening — 2026-11-21
+
+The Backend review pin now includes credential-bound MFA elevation and shared WebAuthn RP configuration attestation. Every privileged identity-review request and Admin Console sensitive action rechecks the exact authenticator used for step-up against PostgreSQL; revoked, unverified or clone-warned credentials invalidate outstanding elevation immediately. The Backend and Admin Console compare a canonical fingerprint of the configured RP ID and allowed origins; mismatches fail readiness closed. Regression tests cover the token binding, revocation, fingerprint mismatch and canonicalization. This remains source/CI evidence only: the live browser authenticator ceremony, recovery, and production origin have not yet been accepted.
+
+
+## 11. Seven-organ source-pin refresh — 2026-11-21
+
+The bridge records four runtime organs at their latest merged mainline revisions and separately pins Backend PR #424 and CDN PR #125 as immutable review candidates. Their actual mainline SHAs remain recorded independently in the seven-organ registry. The API Control Plane remains a governance repository and is not a runtime organ dependency.
+
+| Organ | Repository | Locked source revision | Integration status |
+|---|---|---|---|
+| Flutter client | `Trendyzima/testagram-flutter-client-` | `1f58971720c7a72139d56900a5895c49fa105639` | Mainline; PRs #112 documentation cleanup and #113 retired-provider test-label cleanup merged |
+| Backend | `Trendyzima/Testagram-backend-` | `54c7a6c3218aa85c83cfcde0570d2673678e26bc` | Temporary native-auth review candidate; PR #424 remains open |
+| Data Centre | `Trendyzima/Testagram-data-centre-` | `58de0bf36b76f9cd74824901b6a86de29f420c65` | Mainline; PR #112 boundary documentation and PR #113 negative-issuer fixture cleanup merged |
+| CDN | `Trendyzima/cdn-` | `930f000e030fc920a749b99cae1e0c8c5c01d2b1` | Temporary guarded API-domain handoff candidate; PR #125 CI green, mainline remains `490119514788c13c327ee05eb4ce068a0f73966e` |
+| Algorithm | `Trendyzima/the-algorithm` | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline; PRs #28 and #29 ownership documentation merged |
+| Federation | `Trendyzima/federated-content` | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Mainline; PR #51 native boundary documentation merged |
+| API Control Plane | `Trendyzima/testagram-api` | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` | Governance-only mainline; this bridge remains an open candidate PR |
+
+The four refreshed mainline pins were compared with their previous locked revisions. The intervening changes were confined to documentation and negative-test-fixture cleanup and did not alter runtime source paths or provider snapshots. Backend and CDN candidate commits are intentionally not described as merged mainline revisions. Once PRs #424 and #125 merge, refresh both pins to their exact merge SHAs and regenerate all relevant route/source evidence before accepting the integration.
+
+This source refresh fixes source-pin drift; it does not prove deployed interoperability. The exact contract CI run on this refreshed baseline must pass before the bridge is merge-ready.
+
+## 11. Seven-organ wiring and provider-residue verification — 2026-11-21
+
+API contract CI run `44896464421` passed both Node and Dart validation against the current bridge candidate. The bridge checker now requires the exact six approved runtime edges and six governance edges, rejects duplicate/missing/extra edges, checks each repository's exact owner/name, and rejects duplicate or path-traversing entries in immutable source inventories.
+
+The cross-organ audit verified:
+- Flutter-to-Backend native access/refresh/session boundary and the prohibition on direct private-service calls
+- Backend-to-Data-Centre private media contract, service-token separation, request IDs, timeout and live native-session checks on user-aware routes
+- Backend-to-CDN separation of user JWT, viewer assertion, origin and purge credentials, including assertion issuer/audience/owner/expiry validation
+- Backend-to-Algorithm bounded, already-authorized candidate flow
+- Backend-to-Federation directional service credentials and durable ingress/outbox contract
+
+The route inventory covers 105 static Backend routes across 50 production Go files; 67 operations are represented in OpenAPI. The native-only scan covers 417 runtime, deployment, configuration and documentation files across all six runtime organs and finds zero active external identity-provider integration.
+That zero-active-integration result applies to the pinned Backend PR #424 candidate. Backend mainline is still at `287d8669df9dbfcf2ae34f6f532925ca551de4bd` and retains an unused legacy external identity-provider adapter/source path until PR #424 is independently reviewed and merged; do not describe the default branch as fully purged yet.
+
+The exact 27 remaining historical matches are confined to migration/schema history, forward-only upgrade/cleanup migrations and their migration integration fixture, plus one negative CI guard that asserts retired provider configuration is absent. These records are intentionally retained so installations with the original migration ledger can upgrade safely and so the old schema/configuration can be explicitly rejected. They are not supported runtime code, SDKs, endpoints, credentials, session authorities or fallback paths. Deleting or rewriting applied migration history to make a text search return zero would break migration lineage and is not an acceptable production hardening step.
+
+Flutter PR #113, which removes obsolete provider labels from negative test fixtures, is merged at `1f58971720c7a72139d56900a5895c49fa105639`. Flutter PR #100 remains a live production-routing acceptance gate; Backend PR #424 remains the temporary native-auth candidate pin pending independent review and merge. CI success is not deployment evidence.
+
+## 12. API custom-domain handoff remains a separate CDN acceptance gate — 2026-11-21
+
+CDN PR #125 is ready for independent review at candidate `930f000e030fc920a749b99cae1e0c8c5c01d2b1`. The API Control Plane source lock temporarily pins the CDN PR #125 candidate so bridge CI validates the handoff code; the registry separately records CDN mainline `490119514788c13c327ee05eb4ce068a0f73966e` and candidate status. The candidate is not represented as merged mainline. Its Worker tests (29/29), Wrangler custom-domain validation, workflow syntax, Go tests, race detector, vet, build, runtime-image checks and capacity qualification passed. The PR has not merged and no production Cloudflare mutation or deployment has run.
+
+The candidate requires a second explicit dispatch approval before transferring the exact `api.testagram.site` custom-domain owner from the legacy API Worker to the canonical `testagram-cdn` gateway. A separate post-cutover cleanup workflow then requires its own explicit confirmation and deletes only the detached `testagram-api` Worker after verifying the canonical owner, native API health, protected/private route boundaries and absence of routes, custom domains, schedules, service bindings and tail consumers. It removes only verified proxied A/AAAA/CNAME records for that exact hostname, verifies the new owner, and on failure recovers only to the Testagram-owned gateway. It must never reattach the legacy API Worker as a fallback.
+
+After CDN PR #125 merges, refresh this pin to its exact merge SHA and rerun the bridge. The live hostname must then pass API health, readiness, service identity, media, apex redirect, NodeInfo and real-account WebFinger probes before the CDN organ is accepted.
+
+## 13. Latest end-to-end production evidence — 2026-11-21
+
+- Backend PR #424 application, PostgreSQL identity, native staff WebAuthn, dual-control, schema, security and container checks passed at its pinned candidate. Its InstaBox deployment job was skipped; no live native API deployment is evidenced. Independent review remains outstanding.
+- A fresh read-only production smoke rerun still fails: `https://testagram.site/` returns HTTP 200 instead of the required 308 redirect to `www`; apex NodeInfo returns HTTP 200 HTML instead of JSON; and `acct:crissbeat@testagram.site` WebFinger returns HTTP 503. The Flutter web root, sign-in route and Pages.dev shell return HTTP 200. These are real production routing failures, not source-level contract failures.
+- The API Control Plane source lock temporarily pins both Backend PR #424 candidate `54c7a6c3218aa85c83cfcde0570d2673678e26bc` and CDN PR #125 candidate `930f000e030fc920a749b99cae1e0c8c5c01d2b1`. The registry separately records Backend mainline `287d8669df9dbfcf2ae34f6f532925ca551de4bd` and CDN mainline `490119514788c13c327ee05eb4ce068a0f73966e`; neither candidate is represented as merged. After either source PR merges, refresh the corresponding pin to the exact merge SHA and rerun the bridge.
+- The native-only source audit reports 27 intentionally retained historical migration/schema/upgrade-fixture matches. They are not runtime integrations or fallback authorities. Do not rewrite applied migration history to obtain a misleading zero-text-match result.
+- Backend PR #424 now adds a Chromium virtual-authenticator browser test for the Admin Console's actual `navigator.credentials.create()` and `navigator.credentials.get()` flows, including RP/origin/challenge checks and attestation/assertion payloads. This automated UI ceremony complements the PostgreSQL verification/replay tests; it does not replace a physical authenticator and live Backend staging ceremony.
+- Registration and privileged staff enrollment remain fail-closed until the browser test passes, the live Backend ceremony/recovery/replay checks pass, and production readiness and independent staff lifecycle gates are accepted.
+
+
+## 14. Current read-only production endpoint probe — 2026-11-21
+
+A fresh read-only fetch of the public endpoints returned:
+- `https://testagram.site/`: extraction returned `empty_content`; this does not establish an HTTP status or redirect.
+- `https://testagram.site/.well-known/nodeinfo`: fetch timed out.
+- `https://testagram.site/.well-known/webfinger?resource=acct%3Acrissbeat%40testagram.site`: HTTP 503.
+- `https://api.testagram.site/healthz`: HTTP 404. This path is not established as a public health operation in the locked API contract, so it is not treated as a public acceptance endpoint.
+
+The WebFinger 503 and NodeInfo timeout confirm federation discovery is still not production-accepted. No DNS, Worker, deployment, secret or feature-flag mutation was performed by these probes. The guarded CDN domain handoff and canonical apex/WebFinger routing remain blocked on review, staging acceptance and explicit production approvals.

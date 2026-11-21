@@ -4,7 +4,7 @@ This system contains **seven repositories total**: this API governance repositor
 
 | Caller | Receiver | Interface | Credential / trust | Current status |
 |---|---|---|---|---|
-| Flutter | Backend | Public HTTP API | Appwrite user-session JWT | Core routes implemented; Flutter adoption must pin SDK/contracts |
+| Flutter | Backend | Public HTTP API | Testagram-native short-lived access JWT; refresh token used only at `/api/auth/refresh` | Native client and Backend session endpoints implemented; production acceptance remains a separate gate |
 | Backend | Algorithm | `POST /v1/feed/rank` | Dedicated `ALGORITHM_INTERNAL_TOKEN` bearer, private network | Client and provider contract exist |
 | Federation | Backend | Actor resolution, readiness and outbox reads | `FEDERATION_BACKEND_INTERNAL_TOKEN` | Private client path documented; keep internal |
 | Backend | Federation | `POST /internal/v1/activities` | Distinct `FEDERATION_INTERNAL_TOKEN` bearer | Private ingress exists; delivery remains gated |
@@ -17,7 +17,7 @@ This system contains **seven repositories total**: this API governance repositor
 ## Correlation and error rules
 
 - Carry a bounded `X-Request-ID` across service-to-service calls; generate one at the first trusted ingress when absent.
-- Do not forward an Appwrite user JWT as a service-to-service credential.
+- Do not forward a user access JWT or refresh token as a service-to-service credential.
 - Distinct service credentials are directional and audience-specific. Rotating one must not require reusing another service's key.
 - Never log authorization headers, JWTs, service tokens, signed URLs, private content or raw webhook signatures.
 - Public Backend errors retain the Backend's documented nested `error.code` / `error.message` envelope and request ID. Internal providers may have their own error shape; adapters translate at the owning boundary.

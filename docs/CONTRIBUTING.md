@@ -27,6 +27,6 @@
 
 - Public OpenAPI describes public client routes only.
 - Never include private URLs, tokens, internal headers, database schemas or staff-only operations in public SDK output.
-- Appwrite JWT is an identity credential; authorization remains server-side.
+- Testagram-native Backend access tokens identify the current session; authorization remains server-side and is checked against PostgreSQL.
 - Avoid logging Authorization headers, cookies, media signed URLs or personal payloads.
 - Every mutation must enforce ownership/permission at the Backend.

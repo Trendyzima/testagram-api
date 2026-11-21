@@ -48,7 +48,7 @@ The six-runtime-repository integration contract documents these Backend endpoint
 - `GET /internal/v1/federation/actors/{handle}`
 - `GET /internal/v1/federation/actors/by-id/{user_id}`
 
-These are private service interfaces, not public client APIs. Federation uses the distinct `FEDERATION_BACKEND_INTERNAL_TOKEN` (injected into the Federation container as `BACKEND_INTERNAL_TOKEN`); Backend-to-Federation uses `FEDERATION_INTERNAL_TOKEN` (injected as `FEDERATION_INGRESS_TOKEN`). These values must be independently generated and at least 32 characters. No shared-token fallback is permitted. Never reuse Appwrite user JWTs or one directional token for the reverse direction.
+These are private service interfaces, not public client APIs. Federation uses the distinct `FEDERATION_BACKEND_INTERNAL_TOKEN` (injected into the Federation container as `BACKEND_INTERNAL_TOKEN`); Backend-to-Federation uses `FEDERATION_INTERNAL_TOKEN` (injected as `FEDERATION_INGRESS_TOKEN`). These values must be independently generated and at least 32 characters. No shared-token fallback is permitted. Never reuse user access tokens or one directional token for the reverse direction.
 
 Actor responses and outbox cursor DTOs must be promoted to strict machine-readable schemas after provider/consumer tests are aligned. This document does not invent response fields that are not currently frozen.
 

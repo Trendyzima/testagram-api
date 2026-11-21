@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "policy": "Immutable source pins identify exact reviewed commits. Production source pins target merged mainline SHAs. Draft cross-repository validation may temporarily pin an immutable reviewed feature-PR SHA; refresh the pin to mainline after that PR merges. The current reviewed mainline source paths include the Testagram-native end-user and staff authentication boundaries, rotating sessions, PostgreSQL account/session checks, and the private-service token boundaries. Historical Appwrite account IDs remain explicit reconciliation inputs only; Appwrite JWTs are not accepted as native user or staff bearer credentials. Runtime deployment and public-domain routing require separate live evidence; identity activation, existing-account reconciliation and full Android/Web device acceptance remain gated. The retired Appwrite-based Fresh API is separately pinned as backend-fresh-legacy at its last reviewed immutable source commit; its 22-route inventory is historical/legacy and is not the native public API contract.",
+  "policy": "Immutable source pins identify the exact six runtime organs under integration validation. A runtime pin may target an exact, explicitly declared pull-request candidate while that PR is open; its bridge manifest must record the candidate commit and PR number, must not list that PR as merged, and must be refreshed to the exact merged mainline commit after merge. Every declared provider source path is checked against its corresponding Git tree. The Testagram-native Backend is the only end-user and staff identity/session authority. No external identity-provider endpoint, SDK, bearer token, database, server key, runtime service, or authentication fallback is part of the supported product architecture. Historical account identifiers and migration artifacts are inert records only and are never queried by the live authentication path. Runtime deployment, public routing, identity activation and device acceptance require separate live evidence.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "e26c6972b4c8c6fe625ee32ab7803119ee2e7847",
+      "ref": "0ef58cad42ee2f24c63a93248f071942af3beb44",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -23,6 +23,7 @@
         "admin-console/web/app.css",
         "admin-console/web/app.js",
         "admin-console/web/index.html",
+        "admin-console/webauthn.go",
         "cmd/api/auth.go",
         "cmd/api/auth_test.go",
         "cmd/api/capability_search.go",
@@ -48,6 +49,9 @@
         "cmd/api/identity_provisioning_integration_test.go",
         "cmd/api/identity_review.go",
         "cmd/api/identity_review_evidence_test.go",
+        "cmd/api/identity_review_mfa_test.go",
+        "cmd/api/identity_review_webauthn_integration_test.go",
+        "cmd/api/identity_review_webauthn_readiness_integration_test.go",
         "cmd/api/iptv_social.go",
         "cmd/api/main.go",
         "cmd/api/media.go",
@@ -86,6 +90,7 @@
         "cmd/api/wallet_spaces_capability.go",
         "deploy/self-hosted/.env.example",
         "deploy/self-hosted/BACKUP-RESTORE.md",
+        "deploy/self-hosted/Caddyfile",
         "deploy/self-hosted/README.md",
         "deploy/self-hosted/apply-federation-outbox-migration.sh",
         "deploy/self-hosted/apply-media-replication-migrations.sh",
@@ -96,6 +101,7 @@
         "docs/architecture/native-identity-service.md",
         "docs/cdn-media-assertion-contract-v1.md",
         "docs/identity-evidence-staging-acceptance.md",
+        "docs/native-staff-webauthn.md",
         "docs/platform/auth-storage-production-hardening.md",
         "docs/platform/identity-registration-provisioning.md",
         "docs/platform/independent-auth.md",
@@ -109,22 +115,13 @@
         "internal/federationclient/client.go",
         "internal/federationoutbox/store.go",
         "internal/federationoutbox/worker.go",
-        "internal/freshapi/identity.go",
-        "internal/freshapi/identity_test.go",
-        "internal/freshapi/server.go",
-        "internal/freshapi/server_test.go",
-        "internal/freshfeed/feed.go",
-        "internal/freshfeed/feed_test.go",
-        "internal/freshstorage/backend_media.go",
-        "internal/freshstorage/backend_media_test.go",
-        "internal/freshstorage/lifecycle.go",
-        "internal/freshstorage/lifecycle_test.go",
-        "internal/freshstorage/providers.go",
-        "internal/freshstorage/providers_test.go",
-        "internal/freshstorage/retention_workers.go",
         "internal/media/signer.go",
         "internal/mediaassertion/assertion.go",
         "internal/mediaassertion/assertion_test.go",
+        "internal/nativeauth/elevation.go",
+        "internal/nativeauth/elevation_test.go",
+        "internal/nativeauth/webauthn_config.go",
+        "internal/nativeauth/webauthn_config_test.go",
         "internal/virtualstorage/identity_replication_live_test.go",
         "internal/virtualstorage/media_replication_live_test.go",
         "internal/virtualstorage/replication.go",
@@ -143,7 +140,6 @@
         "migrations/20261112_profile_presentation_fields.sql",
         "migrations/20261113_identity_registration_hardening.sql",
         "migrations/20261113_native_identity_verification.sql",
-        "migrations/20261114_appwrite_registration_consent.sql",
         "migrations/20261114_media_replication_publication_gate.sql",
         "migrations/20261114_native_identity_evidence.sql",
         "migrations/20261114_native_identity_integrity.sql",
@@ -156,31 +152,38 @@
         "migrations/20261117_native_staff_reviewer_grants.sql",
         "migrations/20261118_native_admin_console.sql",
         "migrations/20261119_native_identity_approval_ledger.sql",
+        "migrations/20261120_native_identity_historical_account_archive.sql",
+        "migrations/20261120_native_identity_historical_admin_archive.sql",
+        "migrations/20261120_native_identity_historical_attribution_archive.sql",
+        "migrations/20261120_native_identity_historical_staff_archive.sql",
+        "migrations/20261120_social_platform_product_foundation.sql",
+        "migrations/20261121_native_staff_webauthn.sql",
+        "scripts/archive/legacy-identity-provider-import.sql",
         "scripts/guard-no-render.py",
         "scripts/instabox-production-backup.sh",
         "scripts/instabox_watchdog.py",
-        "scripts/migrate-appwrite-identities.sql",
         "scripts/native-auth-staging-smoke.py",
         "scripts/self-hosted-backup.sh",
         "scripts/self-hosted-restore-drill.sh",
         "scripts/start-instabox-deployment.sh",
         "scripts/test-identity-registration-migration.sh",
         "scripts/validate-canonical-deploy-smoke.py",
+        "tests/test-native-staff-webauthn-migration.sh",
+        "tests/test-social-platform-product-foundation.sh",
         "tests/test_instabox_federation_runtime_contract.py",
         "tests/test_instabox_image_digest_verification.py",
         "tests/test_instabox_runtime_healthcheck_paths.py",
         "tests/test_instabox_watchdog.py",
+        "tests/test_native_auth_runtime_boundary.py",
+        "tests/test_native_identity_migration_manifest.py",
         "tests/test_self_hosted_backup_guards.py",
-        "deploy/self-hosted/Caddyfile",
-        "admin-console/webauthn.go",
-        "migrations/20261121_native_staff_webauthn.sql",
-        "tests/test-native-staff-webauthn-migration.sh",
-        "docs/native-staff-webauthn.md"
+        ".github/workflows/cloudflare-domain-routing-audit.yml",
+        "scripts/test-staff-webauthn-browser.mjs"
       ]
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "6a767f7ae2fe30395d24cded9265dc7e53e759c1",
+      "ref": "58de0bf36b76f9cd74824901b6a86de29f420c65",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/native-auth-session-integration.yml",
@@ -225,7 +228,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "4e40463cfd11746c4ab89ccbc3d02a97f7cbee53",
+      "ref": "930f000e030fc920a749b99cae1e0c8c5c01d2b1",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         ".github/workflows/ci.yml",
@@ -244,12 +247,13 @@
         "docs/six-repository-runtime-integration-contract.md",
         "internal/edge/integration_test.go",
         "internal/edge/server.go",
-        "internal/edge/server_test.go"
+        "internal/edge/server_test.go",
+        ".github/workflows/cleanup-detached-api-worker.yml"
       ]
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "5d8bbc09d46d6a7b7f0a852fd4e2251b5109cfbd",
+      "ref": "1f58971720c7a72139d56900a5895c49fa105639",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",
@@ -310,7 +314,7 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "78e83a411afc8b9f46c687875b3cfd6db6d071b6",
+      "ref": "3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
         ".env.example",
@@ -337,7 +341,7 @@
     },
     "algorithm": {
       "fullName": "Trendyzima/the-algorithm",
-      "ref": "88b2ae0eb81e127768aaf4ef1ed19495ce6fda20",
+      "ref": "92cf9b47e4de38306c4fe7b61ece24c3e075aa22",
       "checkoutPath": "source-repos/algorithm",
       "sourcePaths": [
         "testagram-feed/API-CONTRACT.md",
@@ -351,19 +355,6 @@
         "testagram-feed/internal/ranking/topics_test.go",
         "testagram-feed/internal/ranking/rank.go",
         "testagram-feed/internal/ranking/rank_test.go"
-      ]
-    },
-    "backend-fresh-legacy": {
-      "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "a6c2454f41ffb4f0f1beef00e623d7f038428cbb",
-      "checkoutPath": "source-repos/backend-fresh-legacy",
-      "sourcePaths": [
-        ".github/workflows/ci.yml",
-        ".github/workflows/instabox-deploy.yml",
-        "Dockerfile.fresh",
-        "cmd/fresh-api/main.go",
-        "internal/freshapi/server.go",
-        "scripts/guard-no-render.py"
       ]
     }
   },

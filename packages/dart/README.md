@@ -1,6 +1,6 @@
 # Testagram Dart API client
 
-This directory is a reusable Dart transport package for Flutter clients. It does not own authentication: pass the current Appwrite session JWT through `tokenProvider`.
+This directory is a reusable Dart transport package for Flutter clients. It does not own authentication: pass the current short-lived Testagram-native Backend access token through `tokenProvider`.
 
 ## Use from Flutter after the API repository is merged and tagged
 
@@ -20,7 +20,7 @@ Until a release tag exists, do not pin production applications to a moving featu
 ```dart
 final api = TestagramApiClient(
   baseUri: Uri.parse(const String.fromEnvironment('TESTAGRAM_API_URL')),
-  tokenProvider: () async => await appwriteAccount.createJWT().then((jwt) => jwt.jwt),
+  tokenProvider: () => nativeAuthClient.accessToken(),
 );
 
 final feed = await api.get('/api/feed/home', query: {
@@ -35,7 +35,7 @@ final post = await api.createPost(
 );
 ```
 
-The client parses the Backend's nested `error.code/message` envelope, preserves HTTP status and request IDs, and fails closed when an authenticated call has no JWT. It does not silently retry writes or invent successful responses.
+The client parses the Backend's nested `error.code/message` envelope, preserves HTTP status and request IDs, and fails closed when an authenticated call has no native access token. It does not silently retry writes or invent successful responses.
 
 ## Validate
 

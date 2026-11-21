@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-/// Resolves the current Appwrite session JWT. Return null only for public
-/// operations; authenticated calls fail closed when no token is available.
+/// Resolves the current short-lived Testagram-native Backend access token.
+/// Return null only for public operations; authenticated calls fail closed.
 typedef TestagramTokenProvider = Future<String?> Function();
 
 class TestagramApiException implements Exception {
@@ -76,7 +76,7 @@ class TestagramApiClient {
     if (authenticated) {
       final token = await _tokenProvider();
       if (token == null || token.trim().isEmpty) {
-        throw StateError('An Appwrite session JWT is required.');
+        throw StateError('A Testagram-native Backend access token is required.');
       }
       requestHeaders['Authorization'] = 'Bearer $token';
     }

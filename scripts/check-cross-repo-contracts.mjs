@@ -5,12 +5,11 @@ import { execFileSync } from "node:child_process";
 const lock = JSON.parse(readFileSync("contracts/sources.lock.json", "utf8"));
 const registry = JSON.parse(readFileSync("contracts/registry/services.json", "utf8"));
 const required = ["backend", "data-centre", "cdn", "flutter-client", "federation", "algorithm"];
-const optionalLegacy = ["backend-fresh-legacy"];
 const fail = [];
 const keys = Object.keys(lock.repositories).sort();
-const allowedKeys = [...required, ...optionalLegacy].sort();
+const allowedKeys = [...required].sort();
 if (required.some((key) => !keys.includes(key)) || keys.some((key) => !allowedKeys.includes(key))) {
-  fail.push(`Expected six runtime repositories plus the optional retired Fresh API pin; found: ${keys.join(", ")}`);
+  fail.push(`Expected exactly six native runtime repositories; found: ${keys.join(", ")}`);
 }
 const registryRepos = new Set(registry.services.map((s) => s.repository.toLowerCase()));
 const serviceIds = new Set();
@@ -24,18 +23,6 @@ for (const service of registry.services) {
   }
 }
 if (registry.services.length !== 6) fail.push(`Expected six runtime services; found ${registry.services.length}`);
-const legacyFresh = lock.repositories["backend-fresh-legacy"];
-if (!legacyFresh || legacyFresh.fullName !== lock.repositories.backend.fullName ||
-    !/^[a-f0-9]{40}$/.test(legacyFresh.ref) ||
-    legacyFresh.ref !== JSON.parse(readFileSync("contracts/route-inventory/fresh-api-public-routes.json", "utf8")).sourceRef) {
-  fail.push("Retired Fresh API must use a separate immutable Backend source pin matching its legacy route inventory.");
-} else {
-  const legacyRoot = resolve(legacyFresh.checkoutPath);
-  if (!existsSync(legacyRoot)) fail.push("Retired Fresh API source checkout is missing.");
-  for (const sourcePath of legacyFresh.sourcePaths) {
-    if (!existsSync(resolve(legacyRoot, sourcePath))) fail.push(`backend-fresh-legacy: pinned source path missing: ${sourcePath}`);
-  }
-}
 for (const key of required) {
   const entry = lock.repositories[key];
   if (!entry) continue;
@@ -102,6 +89,26 @@ for (const route of mediaRoutes) {
 if (!backendMediaClient.includes('"X-Testagram-API-Version"')) fail.push("Backend Data Centre client must send X-Testagram-API-Version");
 if (!dataCentreMediaServer.includes('r.Header.Get("X-Testagram-API-Version")')) fail.push("Data Centre media server must enforce X-Testagram-API-Version");
 
+const backendDataCentreClient = backendMediaClient;
+const dataCentreVideoAuth = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/video/native_auth.go"), "utf8");
+const dataCentreVideoMain = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/video/main.go"), "utf8");
+const dataCentreNotification = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/notification/main.go"), "utf8");
+for (const [label, source, marker] of [
+  ["Backend Data Centre media client", backendDataCentreClient, 'req.Header.Set("Authorization", "Bearer "+c.token)'],
+  ["Backend Data Centre media client", backendDataCentreClient, 'req.Header.Set("X-Request-ID", requestID())'],
+  ["Backend Data Centre media client", backendDataCentreClient, "Timeout: 10 * time.Second"],
+  ["Backend Data Centre media client", backendDataCentreClient, "http.ErrUseLastResponse"],
+  ["Data Centre video auth", dataCentreVideoMain, 'os.Getenv("TESTAGRAM_AUTH_JWT_SECRET")'],
+  ["Data Centre video auth", dataCentreVideoAuth, "nativeauth.ParseAccessToken"],
+  ["Data Centre video auth", dataCentreVideoAuth, "nativeauth.ResolveUserID"],
+  ["Data Centre notification auth", dataCentreNotification, 'mustEnv("TESTAGRAM_AUTH_JWT_SECRET")'],
+  ["Data Centre notification auth", dataCentreNotification, "nativeauth.ResolveUserID"],
+  ["Data Centre notification auth", dataCentreNotification, "context.WithTimeout(r.Context(), 4*time.Second)"],
+]) {
+  if (!source.includes(marker)) fail.push(`${label} missing native identity/private service wiring marker: ${marker}`);
+}
+
+
  // Deployment wiring is part of the Backend <-> Data Centre contract.
  // Fresh-media credentials stay in the Data Centre service. Separately, the
  // Backend's VPS-primary identity-evidence replicator requires B2/R2 replica
@@ -163,6 +170,7 @@ for (const [label, source, marker] of [
 ]) {
   if (!source.includes(marker)) fail.push(`${label} missing agreed ranking contract marker: ${marker}`);
 }
+if (!algorithmClient.includes('req.Header.Set("X-Request-ID", newRequestID())') || !algorithmClient.includes("1200 * time.Millisecond") || !algorithmClient.includes("timeout > 5*time.Second")) fail.push("Backend Algorithm client must use request IDs and a bounded timeout");
 if (!algorithmClient.includes("len(input.Candidates) > 200") || !algorithmClient.includes("input.Limit > 50")) {
   fail.push("Backend Algorithm client must enforce the 200-candidate / 50-result bounds");
 }
@@ -193,6 +201,7 @@ for (const [label, source, marker] of [
 ]) {
   if (!source.includes(marker)) fail.push(`${label} missing agreed durable-ingress contract marker: ${marker}`);
 }
+if (!backendFederationClient.includes('req.Header.Set("X-Testagram-API-Version", "1")') || !backendFederationClient.includes('req.Header.Set("X-Request-ID", requestID)') || !backendFederationClient.includes("Idempotency-Key")) fail.push("Backend Federation client must send version, request ID and idempotency identity");
 if (!federationTests.includes("TestInternalActivityEndpointRejectsMissingServiceCredential") || !federationTests.includes("TestInternalActivityEndpointUsesDedicatedIngressCredential")) {
   fail.push("Federation ingress tests must prove missing and wrong-direction service credentials are rejected");
 }
@@ -214,6 +223,17 @@ for (const [label, source, marker] of [
 
 // The Backend public/private CDN origin branch is now present on the pinned mainline.
 // Keep its authorization and method-correct signing path coupled to the CDN contract.
+const backendMediaAssertion = readFileSync(resolve(lock.repositories.backend.checkoutPath, "internal/mediaassertion/assertion.go"), "utf8");
+for (const marker of [
+  'issuer="testagram-backend"',
+  'audience="testagram-cdn"',
+  "DefaultTTL=2*time.Minute",
+  "maxTTL=5*time.Minute",
+  "hmac.Equal",
+  "m[1]!=owner",
+]) {
+  if (!backendMediaAssertion.includes(marker)) fail.push(`Backend CDN viewer assertion missing audience/owner/expiry binding: ${marker}`);
+}
 const backendMediaOrigin = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/media.go"), "utf8");
 const backendMediaOriginTests = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/media_cdn_origin_test.go"), "utf8");
 for (const [label, source, marker] of [
@@ -283,6 +303,20 @@ if (!dataCentreMediaProvisioner.includes("CREATE DATABASE") || !dataCentreMediaP
   fail.push("Data Centre media database provisioner must create a separate database and restricted runtime role");
 }
 
+
+const flutterNativeAuth = readFileSync(resolve(lock.repositories["flutter-client"].checkoutPath, "lib/core/auth/native_auth_client.dart"), "utf8");
+const flutterBackendApi = readFileSync(resolve(lock.repositories["flutter-client"].checkoutPath, "lib/core/backend_api.dart"), "utf8");
+for (const [label, source, marker] of [
+  ["Flutter native auth", flutterNativeAuth, "FlutterSecureStorage"],
+  ["Flutter native auth", flutterNativeAuth, "_refreshKey"],
+  ["Flutter native auth", flutterNativeAuth, "_accessToken"],
+  ["Flutter native auth", flutterNativeAuth, "_post('refresh'"],
+  ["Flutter Backend API", flutterBackendApi, "'Authorization': 'Bearer $token'"],
+  ["Flutter private media", flutterBackendApi, "Bearer v1."],
+]) {
+  if (!source.includes(marker)) fail.push(`${label} missing native-session/media contract marker: ${marker}`);
+}
+
 const publicSpec = readFileSync("contracts/openapi/testagram-v1.yaml", "utf8");
 if (/^  \/internal\//m.test(publicSpec) || publicSpec.includes("/api/cache/purge")) {
   fail.push("Private service or operator-only route leaked into public Backend OpenAPI");
@@ -291,4 +325,4 @@ if (fail.length) {
   console.error(fail.map((item) => `- ${item}`).join("\n"));
   process.exit(1);
 }
-console.log("Cross-repository contract audit passed: six immutable source pins, source paths, snapshots and public/private boundary verified.");
+console.log("Cross-repository contract audit passed: six immutable source pins, snapshots, all six runtime edges, native user-token propagation, private credentials and public/private boundaries verified.");
