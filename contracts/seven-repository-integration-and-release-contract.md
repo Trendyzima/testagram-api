@@ -1,7 +1,7 @@
 # Testagram seven-repository integration and release contract
 
 Status: reviewed integration baseline; **not** production cutover authorization.
-Reviewed: 2026-11-18.
+Reviewed: 2026-11-21.
 
 This repository is the contract control plane. It owns public/private OpenAPI, event schemas, SDKs, route inventories, immutable source pins and cross-repository compatibility CI. It is not a runtime service, identity provider, product database or authorization gateway.
 
@@ -9,7 +9,9 @@ The six runtime repositories are Flutter, Backend, Data Centre, CDN, Federation 
 
 ## Immutable source revisions
 
-The exact revisions used by contract CI are in `contracts/sources.lock.json`. Backend is pinned to reviewed native-auth retirement candidate `e6fdb962c2a10159df352312e01ea05842ffde13` while PR #424 is open; Data Centre `6a767f7ae2fe30395d24cded9265dc7e53e759c1`, CDN `4e40463cfd11746c4ab89ccbc3d02a97f7cbee53`, Flutter `5d8bbc09d46d6a7b7f0a852fd4e2251b5109cfbd`, Federation `78e83a411afc8b9f46c687875b3cfd6db6d071b6`, and Algorithm `3734ff75d52019cb6d2cd0cd5273539fe6ab62e9` remain pinned to reviewed immutable commits. After PR #424 merges, refresh Backend and route-inventory pins to the exact merge commit. No separate legacy Fresh API source is part of the supported deployment graph. A source pin is not evidence that a service is deployed.
+The API control plane bridge currently pins all six runtime organs to immutable source revisions; five are merged mainline commits, while Backend remains pinned to the reviewed PR #424 candidate until independent review and merge. The seventh repository is this governance/control-plane repository and is not included as a runtime dependency.
+
+The exact revisions used by contract CI are in `contracts/sources.lock.json`. Backend is pinned to reviewed native-auth retirement candidate `e6fdb962c2a10159df352312e01ea05842ffde13` while PR #424 is open; Data Centre `58de0bf36b76f9cd74824901b6a86de29f420c65`, CDN `490119514788c13c327ee05eb4ce068a0f73966e`, Flutter `761c41b247a49aac7e9b352493465e3c321a2ffb`, Federation `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d`, and Algorithm `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` remain pinned to reviewed immutable commits. After PR #424 merges, refresh Backend and route-inventory pins to the exact merge commit. No separate legacy Fresh API source is part of the supported deployment graph. A source pin is not evidence that a service is deployed.
 
 ## Ownership and allowed calls
 
