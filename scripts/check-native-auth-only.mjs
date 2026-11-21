@@ -120,8 +120,6 @@ const historicalCompatibilityAllowlist = new Set([
   "backend/migrations/20261120_native_identity_historical_attribution_archive.sql",
   "backend/migrations/20261120_native_identity_historical_staff_archive.sql",
   "backend/scripts/test-identity-registration-migration.sh",
-  "backend/tests/test_native_identity_migration_manifest.py",
-  "backend/tests/test_native_auth_runtime_boundary.py",
   "data-centre/.github/workflows/vps-ci.yml",
   "backend/migrations/20261108_communication_core.sql",
   "backend/migrations/20261109_iptv_social.sql",
@@ -140,8 +138,6 @@ const historicalCompatibilityAllowlist = new Set([
   "backend/migrations/20261119_native_identity_approval_ledger.sql",
   "backend/migrations/20261120_native_verification_decider.sql",
   "backend/migrations/neon/001_social_data_plane.sql",
-  "cdn/internal/edge/server_test.go",
-  "data-centre/backend/services/video/main_test.go",
   "flutter-client/test/features/auth/identity_verification_client_test.dart",
   "flutter-client/test/widget_test.dart",
 ]);
