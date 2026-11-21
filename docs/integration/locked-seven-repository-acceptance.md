@@ -272,6 +272,7 @@ The cross-organ audit verified:
 - Backend-to-Federation directional service credentials and durable ingress/outbox contract
 
 The route inventory covers 105 static Backend routes across 50 production Go files; 67 operations are represented in OpenAPI. The native-only scan covers 418 runtime, deployment, configuration and documentation files across all six runtime organs and finds zero active external identity-provider integration.
+That zero-active-integration result applies to the pinned Backend PR #424 candidate. Backend mainline is still at `287d8669df9dbfcf2ae34f6f532925ca551de4bd` and retains an unused legacy Appwrite adapter/source path until PR #424 is independently reviewed and merged; do not describe the default branch as fully purged yet.
 
 The exact 27 remaining historical matches are confined to migration/schema history, forward-only upgrade/cleanup migrations and their migration integration fixture, plus one negative CI guard that asserts retired provider configuration is absent. These records are intentionally retained so installations with the original migration ledger can upgrade safely and so the old schema/configuration can be explicitly rejected. They are not supported runtime code, SDKs, endpoints, credentials, session authorities or fallback paths. Deleting or rewriting applied migration history to make a text search return zero would break migration lineage and is not an acceptable production hardening step.
 
