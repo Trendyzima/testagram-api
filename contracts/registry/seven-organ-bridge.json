@@ -14,9 +14,10 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "flutter-client",
-      "mainCommit": "855758a1df5cf6616f4196124ca929787327da82",
+      "mainCommit": "761c41b247a49aac7e9b352493465e3c321a2ffb",
       "mergedPullRequests": [
-        109
+        109,
+        112
       ]
     },
     {
@@ -39,9 +40,10 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "data-centre",
-      "mainCommit": "182107393c219ac24078785271731ae7cf0837bf",
+      "mainCommit": "a22d086c03fcf8a90323dc250e53d255c7aff26c",
       "mergedPullRequests": [
-        111
+        111,
+        112
       ]
     },
     {
@@ -50,9 +52,10 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "cdn",
-      "mainCommit": "506f22f0ae42d359f01a1f940d48aa578469e0a0",
+      "mainCommit": "1480d9c2da6f281ed4f9caf62c37705fdbe65e9d",
       "mergedPullRequests": [
-        122
+        122,
+        123
       ]
     },
     {
@@ -61,9 +64,11 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "algorithm",
-      "mainCommit": "8dc66f06201fa0bfe62702a4c5a6dec61a4282e4",
+      "mainCommit": "92cf9b47e4de38306c4fe7b61ece24c3e075aa22",
       "mergedPullRequests": [
-        27
+        27,
+        28,
+        29
       ]
     },
     {
@@ -72,10 +77,11 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "federation",
-      "mainCommit": "b44eca07a9c7641cf03ee685c025bcfe6dfc7858",
+      "mainCommit": "3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d",
       "mergedPullRequests": [
         49,
-        50
+        50,
+        51
       ]
     },
     {
@@ -162,7 +168,8 @@
     "Federation owns protocol state and signed delivery, not local identity or canonical product records.",
     "Flutter never receives private service tokens, provider credentials, database credentials or private service URLs.",
     "The API control plane is build-time governance only and is never a runtime gateway.",
-    "No external identity provider is part of the supported runtime; native Testagram Backend authentication is the only user and staff authentication path."
+    "No external identity provider is part of the supported runtime; native Testagram Backend authentication is the only user and staff authentication path.",
+    "All six runtime source pins must match the latest reviewed or merged organ revisions; the Backend candidate pin is temporary until PR #424 merges, then must be replaced with its exact mainline merge SHA."
   ],
   "excludedFromAcceptance": [
     "A branch without a reviewed pull request is not automatically merged.",
