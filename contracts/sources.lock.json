@@ -226,7 +226,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "d2fc2af2248581cafe4b64a8cb4f654732d66962",
+      "ref": "51ed902a987ccb0b027bb9118f3ff02e0c7d8434",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         ".github/workflows/ci.yml",
@@ -245,7 +245,8 @@
         "docs/six-repository-runtime-integration-contract.md",
         "internal/edge/integration_test.go",
         "internal/edge/server.go",
-        "internal/edge/server_test.go"
+        "internal/edge/server_test.go",
+        ".github/workflows/cleanup-detached-api-worker.yml"
       ]
     },
     "flutter-client": {
