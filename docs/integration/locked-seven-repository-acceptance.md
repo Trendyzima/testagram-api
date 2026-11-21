@@ -192,7 +192,7 @@ No test may report PASS if it ran against an unpinned or unknown build.
 
 The API contract validation workflow must execute the same full sequence on this PR head:
 
-1. `npm run sources:checkout` — sparse-checkout each immutable runtime pin and the separately pinned retired-source inventory.
+1. `npm run sources:checkout` — sparse-checkout each immutable runtime pin using only active source directories; no retired runtime source is checked out.
 2. `npm run lint:openapi` and `npm run lint:internal-openapi`.
 3. `npm run typecheck`, `npm run build:sdk`, and `npm test`.
 4. `npm run audit:backend-routes`, `npm run audit:cross-repo`, `npm run audit:locked-acceptance`, `npm run audit:tv-health-contract`, and `npm run audit:flutter-backend`.
