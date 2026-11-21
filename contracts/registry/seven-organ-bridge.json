@@ -186,6 +186,7 @@
     "A branch without a reviewed pull request is not automatically merged.",
     "Flutter PR #100 remains a stale draft based on an older mainline and is not an accepted source pin; current Flutter mainline already carries stricter NodeInfo/WebFinger/actor smoke checks, while the live Cloudflare route inventory still blocks production Federation acceptance.",
     "Backend PR #424 and CDN PR #125 are declared candidate pins only; neither is merged or independently approved.",
-    "Merged source revisions do not prove live DNS, TLS, deployment health, provider durability or end-to-end staging acceptance."
+    "Merged source revisions do not prove live DNS, TLS, deployment health, provider durability or end-to-end staging acceptance.",
+    "Backend PR #432 approval-integrity migration remains a separate stacked candidate on overlapping PR #431; reconcile/rebase it onto the reviewed PR #424 candidate or its accepted mainline merge before merge."
   ]
 }
