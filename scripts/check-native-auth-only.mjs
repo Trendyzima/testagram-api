@@ -178,4 +178,5 @@ assert.equal(
   `Unclassified retired-provider traces remain outside the explicit migration/CI compatibility boundary:\\n${unclassifiedHits.sort().map((item) => `- ${item}`).join("\\n")}`,
 );
 console.log(`Historical compatibility residue is isolated to ${new Set(historicalHits).size} explicitly allowlisted migration/CI files; no other organ source, test, deployment, configuration or documentation file contains provider traces.`);
+console.log(`Historical compatibility files:\\n${[...new Set(historicalHits)].sort().map((item) => `- ${item}`).join("\\n")}`);
 
