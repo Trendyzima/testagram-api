@@ -32,8 +32,8 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `1f58971720c7a72139d56900a5895c49fa105639` |
-| Backend | `c627858a295fbf45b6dbdeeb54d2a5aa0a989470` (PR #424 candidate) |
-| Data Centre | `58de0bf36b76f9cd74824901b6a86de29f420c65` |
+| Backend | `12369bd7ec796f4966b2cfeae9ac3684e169d5c9` (current PR #424 candidate) |
+| Data Centre | `ada6f26a289775720bb47a639242dbd868388055` (PR #114 merged) |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` |
 | Federation | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` |
