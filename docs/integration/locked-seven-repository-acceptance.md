@@ -294,3 +294,13 @@ After CDN PR #125 merges, refresh this pin to its exact merge SHA and rerun the 
 - The native-only source audit reports 27 intentionally retained historical migration/schema/upgrade-fixture matches. They are not runtime integrations or fallback authorities. Do not rewrite applied migration history to obtain a misleading zero-text-match result.
 - Registration and privileged staff enrollment remain fail-closed until the real browser WebAuthn ceremony, recovery/replay, production readiness and staff lifecycle gates pass.
 
+
+## 14. Current read-only production endpoint probe — 2026-11-21
+
+A fresh read-only fetch of the public endpoints returned:
+- `https://testagram.site/`: extraction returned `empty_content`; this does not establish an HTTP status or redirect.
+- `https://testagram.site/.well-known/nodeinfo`: fetch timed out.
+- `https://testagram.site/.well-known/webfinger?resource=acct%3Acrissbeat%40testagram.site`: HTTP 503.
+- `https://api.testagram.site/healthz`: HTTP 404. This path is not established as a public health operation in the locked API contract, so it is not treated as a public acceptance endpoint.
+
+The WebFinger 503 and NodeInfo timeout confirm federation discovery is still not production-accepted. No DNS, Worker, deployment, secret or feature-flag mutation was performed by these probes. The guarded CDN domain handoff and canonical apex/WebFinger routing remain blocked on review, staging acceptance and explicit production approvals.
