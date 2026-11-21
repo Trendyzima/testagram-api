@@ -72,9 +72,10 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "federation",
-      "mainCommit": "e6946a4c903219d729b778cd4ed91b909a66826a",
+      "mainCommit": "b44eca07a9c7641cf03ee685c025bcfe6dfc7858",
       "mergedPullRequests": [
-        49
+        49,
+        50
       ]
     },
     {
