@@ -206,6 +206,32 @@ if (!federationTests.includes("TestInternalActivityEndpointRejectsMissingService
   fail.push("Federation ingress tests must prove missing and wrong-direction service credentials are rejected");
 }
 
+// Staff lifecycle remains closed until the two-person approval ledger has a
+// transactional executor. A single owner must not directly mutate staff
+// permissions, roles, invitations or revocations from the Admin Console.
+const backendAdminSecurity = readFileSync(resolve(lock.repositories.backend.checkoutPath, "admin-console/security.go"), "utf8");
+const backendAdminMain = readFileSync(resolve(lock.repositories.backend.checkoutPath, "admin-console/main.go"), "utf8");
+const permissionStart = backendAdminSecurity.indexOf("func (a *app) handleSetStaffPermission");
+const permissionEnd = backendAdminSecurity.indexOf("func (a *app) handleStaffList", permissionStart);
+if (permissionStart < 0 || permissionEnd < 0) {
+  fail.push("Backend Admin Console staff-permission handler is missing");
+} else {
+  const permissionHandler = backendAdminSecurity.slice(permissionStart, permissionEnd);
+  if (!permissionHandler.includes("http.StatusNotImplemented") || !permissionHandler.includes("two-person approval executor")) {
+    fail.push("Backend staff permission mutation must remain closed until the two-person executor is implemented");
+  }
+  for (const marker of ["native_staff_permission_overrides", "INSERT INTO", "UPDATE testagram_auth"]) {
+    if (permissionHandler.includes(marker)) fail.push(`Backend staff permission handler contains an unsafe direct mutation: ${marker}`);
+  }
+}
+for (const [label, source, marker] of [
+  ["Backend staff role change", backendAdminSecurity, 'http.StatusNotImplemented,map[string]string{"error":"Staff role changes require the two-person native staff approval workflow. No direct role mutation is permitted."}'],
+  ["Backend staff revocation", backendAdminSecurity, 'http.StatusNotImplemented,map[string]string{"error":"Staff revocation requires the two-person native staff approval workflow. No direct role mutation is permitted."}'],
+  ["Backend staff invitation", backendAdminMain, "Native staff invitation provisioning is not yet available"],
+]) {
+  if (!source.includes(marker)) fail.push(`${label} must remain closed until transactional two-person execution exists`);
+}
+
 // Verify the production Data Centre overlay actually joins Federation to both
 // private Backend networking and the Backend-owned Caddy edge. Docker Compose
 // service-name DNS is the stable federation-api:8081 upstream; the separate
