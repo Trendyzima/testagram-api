@@ -32,7 +32,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `855758a1df5cf6616f4196124ca929787327da82` |
-| Backend | `d2212363cb0597bdad99b7248066dff7ed1362e2` (PR #424 candidate) |
+| Backend | `e6fdb962c2a10159df352312e01ea05842ffde13` (PR #424 candidate) |
 | Data Centre | `182107393c219ac24078785271731ae7cf0837bf` |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `8dc66f06201fa0bfe62702a4c5a6dec61a4282e4` |
@@ -228,7 +228,7 @@ The following source pins are intentionally temporary review baselines for open 
 
 | Repository | Review PR | Immutable review commit |
 |---|---|---|
-| Backend | [PR #424](https://github.com/Trendyzima/Testagram-backend-/pull/424) | `d2212363cb0597bdad99b7248066dff7ed1362e2` |
+| Backend | [PR #424](https://github.com/Trendyzima/Testagram-backend-/pull/424) | `e6fdb962c2a10159df352312e01ea05842ffde13` |
 | Algorithm | [PR #27](https://github.com/Trendyzima/the-algorithm/pull/27) | `88b2ae0eb81e127768aaf4ef1ed19495ce6fda20` |
 
 
