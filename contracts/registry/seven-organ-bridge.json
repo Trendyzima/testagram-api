@@ -48,7 +48,9 @@
         111,
         112,
         113
-      ]
+      ],
+      "candidateCommit": "8b61fe03eb918d352f78d1142651167b3e9fe21a",
+      "candidatePullRequest": 114
     },
     {
       "id": "cdn",
