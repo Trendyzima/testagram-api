@@ -353,7 +353,7 @@ The latest Backend PR #424 candidate is `cc33913f0fd4e86669f7c717e12b2503990e6d8
 
 The candidate now removes that direct SQL mutation and keeps permission changes HTTP 501 until a transactional executor applies an approved request only after two distinct authorized approvers. A regression test asserts that the handler remains closed and contains no direct permission write. The API bridge source lock includes both the handler and its regression test, and the cross-repository checker enforces this fail-closed rule. The approval ledger's current record-only behavior is not treated as staff lifecycle execution.
 
-This is a security closure, not a completed staff lifecycle. Invitation, role change, revocation and permission change remain unavailable until the two-person executor and its PostgreSQL integration tests are implemented. No production staff access or permissions were modified.
+This is a security closure, not a completed staff lifecycle. Invitation, role change, revocation and permission change remain unavailable until the two-person executor and its PostgreSQL integration tests are implemented. No production staff access or permissions were modified. Backend PR #432 contains a separate database-level approval-integrity migration and passed CI #3739, but it is stacked on overlapping PR #431. Reconcile/rebase that migration onto the reviewed PR #424 candidate or its accepted mainline merge before merge; the bridge does not treat the stale stack as accepted.
 
 
 ## 19. Live Cloudflare legacy Worker inventory — 2026-11-21
