@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "54c7a6c3218aa85c83cfcde0570d2673678e26bc",
+      "ref": "0ef58cad42ee2f24c63a93248f071942af3beb44",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -176,7 +176,9 @@
         "tests/test_instabox_watchdog.py",
         "tests/test_native_auth_runtime_boundary.py",
         "tests/test_native_identity_migration_manifest.py",
-        "tests/test_self_hosted_backup_guards.py"
+        "tests/test_self_hosted_backup_guards.py",
+        ".github/workflows/cloudflare-domain-routing-audit.yml",
+        "scripts/test-staff-webauthn-browser.mjs"
       ]
     },
     "data-centre": {
