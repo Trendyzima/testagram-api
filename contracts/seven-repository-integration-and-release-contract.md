@@ -9,7 +9,7 @@ The six runtime repositories are Flutter, Backend, Data Centre, CDN, Federation 
 
 ## Immutable source revisions
 
-The exact revisions used by contract CI are in `contracts/sources.lock.json`. Backend is pinned to reviewed native-auth retirement candidate `1e536f95782b72354404847ad4a692cf8fed2bfa` while PR #424 is open; Data Centre `6a767f7ae2fe30395d24cded9265dc7e53e759c1`, CDN `4e40463cfd11746c4ab89ccbc3d02a97f7cbee53`, Flutter `5d8bbc09d46d6a7b7f0a852fd4e2251b5109cfbd`, Federation `78e83a411afc8b9f46c687875b3cfd6db6d071b6`, and Algorithm `3734ff75d52019cb6d2cd0cd5273539fe6ab62e9` remain pinned to reviewed immutable commits. After PR #424 merges, refresh Backend and route-inventory pins to the exact merge commit. No separate legacy Fresh API source is part of the supported deployment graph. A source pin is not evidence that a service is deployed.
+The exact revisions used by contract CI are in `contracts/sources.lock.json`. Backend is pinned to reviewed native-auth retirement candidate `03161c3fbbf9ad046986360024790f11e056ccc5` while PR #424 is open; Data Centre `6a767f7ae2fe30395d24cded9265dc7e53e759c1`, CDN `4e40463cfd11746c4ab89ccbc3d02a97f7cbee53`, Flutter `5d8bbc09d46d6a7b7f0a852fd4e2251b5109cfbd`, Federation `78e83a411afc8b9f46c687875b3cfd6db6d071b6`, and Algorithm `3734ff75d52019cb6d2cd0cd5273539fe6ab62e9` remain pinned to reviewed immutable commits. After PR #424 merges, refresh Backend and route-inventory pins to the exact merge commit. No separate legacy Fresh API source is part of the supported deployment graph. A source pin is not evidence that a service is deployed.
 
 ## Ownership and allowed calls
 
