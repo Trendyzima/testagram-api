@@ -32,7 +32,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `1f58971720c7a72139d56900a5895c49fa105639` |
-| Backend | `e6fdb962c2a10159df352312e01ea05842ffde13` (PR #424 candidate) |
+| Backend | `54c7a6c3218aa85c83cfcde0570d2673678e26bc` (PR #424 candidate) |
 | Data Centre | `58de0bf36b76f9cd74824901b6a86de29f420c65` |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` |
@@ -228,7 +228,7 @@ The following source pins are intentionally temporary review baselines for open 
 
 | Repository | Review PR | Immutable review commit |
 |---|---|---|
-| Backend | [PR #424](https://github.com/Trendyzima/Testagram-backend-/pull/424) | `e6fdb962c2a10159df352312e01ea05842ffde13` |
+| Backend | [PR #424](https://github.com/Trendyzima/Testagram-backend-/pull/424) | `54c7a6c3218aa85c83cfcde0570d2673678e26bc` |
 | Algorithm | [PR #27](https://github.com/Trendyzima/the-algorithm/pull/27) | `88b2ae0eb81e127768aaf4ef1ed19495ce6fda20` |
 
 
@@ -249,7 +249,7 @@ The bridge records four runtime organs at their latest merged mainline revisions
 | Organ | Repository | Locked source revision | Integration status |
 |---|---|---|---|
 | Flutter client | `Trendyzima/testagram-flutter-client-` | `1f58971720c7a72139d56900a5895c49fa105639` | Mainline; PRs #112 documentation cleanup and #113 retired-provider test-label cleanup merged |
-| Backend | `Trendyzima/Testagram-backend-` | `e6fdb962c2a10159df352312e01ea05842ffde13` | Temporary native-auth review candidate; PR #424 remains open |
+| Backend | `Trendyzima/Testagram-backend-` | `54c7a6c3218aa85c83cfcde0570d2673678e26bc` | Temporary native-auth review candidate; PR #424 remains open |
 | Data Centre | `Trendyzima/Testagram-data-centre-` | `58de0bf36b76f9cd74824901b6a86de29f420c65` | Mainline; PR #112 boundary documentation and PR #113 negative-issuer fixture cleanup merged |
 | CDN | `Trendyzima/cdn-` | `d2fc2af2248581cafe4b64a8cb4f654732d66962` | Temporary guarded API-domain handoff candidate; PR #125 CI green, mainline remains `490119514788c13c327ee05eb4ce068a0f73966e` |
 | Algorithm | `Trendyzima/the-algorithm` | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline; PRs #28 and #29 ownership documentation merged |
@@ -290,7 +290,7 @@ After CDN PR #125 merges, refresh this pin to its exact merge SHA and rerun the 
 
 - Backend PR #424 application, PostgreSQL identity, native staff WebAuthn, dual-control, schema, security and container checks passed at its pinned candidate. Its InstaBox deployment job was skipped; no live native API deployment is evidenced. Independent review remains outstanding.
 - A fresh read-only production smoke rerun still fails: `https://testagram.site/` returns HTTP 200 instead of the required 308 redirect to `www`; apex NodeInfo returns HTTP 200 HTML instead of JSON; and `acct:crissbeat@testagram.site` WebFinger returns HTTP 503. The Flutter web root, sign-in route and Pages.dev shell return HTTP 200. These are real production routing failures, not source-level contract failures.
-- The API Control Plane source lock temporarily pins both Backend PR #424 candidate `e6fdb962c2a10159df352312e01ea05842ffde13` and CDN PR #125 candidate `d2fc2af2248581cafe4b64a8cb4f654732d66962`. The registry separately records Backend mainline `287d8669df9dbfcf2ae34f6f532925ca551de4bd` and CDN mainline `490119514788c13c327ee05eb4ce068a0f73966e`; neither candidate is represented as merged. After either source PR merges, refresh the corresponding pin to the exact merge SHA and rerun the bridge.
+- The API Control Plane source lock temporarily pins both Backend PR #424 candidate `54c7a6c3218aa85c83cfcde0570d2673678e26bc` and CDN PR #125 candidate `d2fc2af2248581cafe4b64a8cb4f654732d66962`. The registry separately records Backend mainline `287d8669df9dbfcf2ae34f6f532925ca551de4bd` and CDN mainline `490119514788c13c327ee05eb4ce068a0f73966e`; neither candidate is represented as merged. After either source PR merges, refresh the corresponding pin to the exact merge SHA and rerun the bridge.
 - The native-only source audit reports 27 intentionally retained historical migration/schema/upgrade-fixture matches. They are not runtime integrations or fallback authorities. Do not rewrite applied migration history to obtain a misleading zero-text-match result.
 - Registration and privileged staff enrollment remain fail-closed until the real browser WebAuthn ceremony, recovery/replay, production readiness and staff lifecycle gates pass.
 
