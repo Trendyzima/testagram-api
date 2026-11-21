@@ -223,6 +223,17 @@ for (const [label, source, marker] of [
 
 // The Backend public/private CDN origin branch is now present on the pinned mainline.
 // Keep its authorization and method-correct signing path coupled to the CDN contract.
+const backendMediaAssertion = readFileSync(resolve(lock.repositories.backend.checkoutPath, "internal/mediaassertion/assertion.go"), "utf8");
+for (const marker of [
+  'issuer="testagram-backend"',
+  'audience="testagram-cdn"',
+  "DefaultTTL=2*time.Minute",
+  "maxTTL=5*time.Minute",
+  "hmac.Equal",
+  "m[1]!=owner",
+]) {
+  if (!backendMediaAssertion.includes(marker)) fail.push(`Backend CDN viewer assertion missing audience/owner/expiry binding: ${marker}`);
+}
 const backendMediaOrigin = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/media.go"), "utf8");
 const backendMediaOriginTests = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/media_cdn_origin_test.go"), "utf8");
 for (const [label, source, marker] of [
