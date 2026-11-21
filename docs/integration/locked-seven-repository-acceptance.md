@@ -244,19 +244,19 @@ The Backend review pin now includes credential-bound MFA elevation and shared We
 
 ## 11. Seven-organ source-pin refresh — 2026-11-21
 
-The bridge now records the latest observed default-branch revisions for the five runtime organs whose intervening changes were documentation or negative-test-fixture cleanup, while retaining the Backend PR #424 immutable review candidate until its merge. The API Control Plane remains a governance repository and is not a runtime organ dependency.
+The bridge records four runtime organs at their latest merged mainline revisions and separately pins Backend PR #424 and CDN PR #125 as immutable review candidates. Their actual mainline SHAs remain recorded independently in the seven-organ registry. The API Control Plane remains a governance repository and is not a runtime organ dependency.
 
 | Organ | Repository | Locked source revision | Integration status |
 |---|---|---|---|
 | Flutter client | `Trendyzima/testagram-flutter-client-` | `1f58971720c7a72139d56900a5895c49fa105639` | Mainline; PRs #112 documentation cleanup and #113 retired-provider test-label cleanup merged |
 | Backend | `Trendyzima/Testagram-backend-` | `e6fdb962c2a10159df352312e01ea05842ffde13` | Temporary native-auth review candidate; PR #424 remains open |
 | Data Centre | `Trendyzima/Testagram-data-centre-` | `58de0bf36b76f9cd74824901b6a86de29f420c65` | Mainline; PR #112 boundary documentation and PR #113 negative-issuer fixture cleanup merged |
-| CDN | `Trendyzima/cdn-` | `490119514788c13c327ee05eb4ce068a0f73966e` | Mainline; PR #123 native media-auth documentation and PR #124 negative-auth fixture cleanup merged |
+| CDN | `Trendyzima/cdn-` | `d2fc2af2248581cafe4b64a8cb4f654732d66962` | Temporary guarded API-domain handoff candidate; PR #125 CI green, mainline remains `490119514788c13c327ee05eb4ce068a0f73966e` |
 | Algorithm | `Trendyzima/the-algorithm` | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline; PRs #28 and #29 ownership documentation merged |
 | Federation | `Trendyzima/federated-content` | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Mainline; PR #51 native boundary documentation merged |
 | API Control Plane | `Trendyzima/testagram-api` | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` | Governance-only mainline; this bridge remains an open candidate PR |
 
-The refreshed five mainline pins were compared with their previous locked revisions. The intervening changes were confined to documentation and did not alter runtime source paths or provider snapshots. The Backend candidate is intentionally not described as a merged mainline revision. Once PR #424 merges, the bridge must be refreshed to the exact resulting Backend main SHA and all relevant route/source evidence regenerated before accepting the integration.
+The four refreshed mainline pins were compared with their previous locked revisions. The intervening changes were confined to documentation and negative-test-fixture cleanup and did not alter runtime source paths or provider snapshots. Backend and CDN candidate commits are intentionally not described as merged mainline revisions. Once PRs #424 and #125 merge, refresh both pins to their exact merge SHAs and regenerate all relevant route/source evidence before accepting the integration.
 
 This source refresh fixes source-pin drift; it does not prove deployed interoperability. The exact contract CI run on this refreshed baseline must pass before the bridge is merge-ready.
 
