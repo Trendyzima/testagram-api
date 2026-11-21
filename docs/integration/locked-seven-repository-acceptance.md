@@ -244,14 +244,14 @@ The Backend review pin now includes credential-bound MFA elevation and shared We
 
 ## 11. Seven-organ source-pin refresh — 2026-11-21
 
-The bridge now records the latest observed default-branch revisions for the five runtime organs whose intervening changes were documentation-only, while retaining the Backend PR #424 immutable review candidate until its merge. The API Control Plane remains a governance repository and is not a runtime organ dependency.
+The bridge now records the latest observed default-branch revisions for the five runtime organs whose intervening changes were documentation or negative-test-fixture cleanup, while retaining the Backend PR #424 immutable review candidate until its merge. The API Control Plane remains a governance repository and is not a runtime organ dependency.
 
 | Organ | Repository | Locked source revision | Integration status |
 |---|---|---|---|
 | Flutter client | `Trendyzima/testagram-flutter-client-` | `761c41b247a49aac7e9b352493465e3c321a2ffb` | Mainline; PR #112 documentation cleanup merged |
 | Backend | `Trendyzima/Testagram-backend-` | `e6fdb962c2a10159df352312e01ea05842ffde13` | Temporary native-auth review candidate; PR #424 remains open |
 | Data Centre | `Trendyzima/Testagram-data-centre-` | `58de0bf36b76f9cd74824901b6a86de29f420c65` | Mainline; PR #112 boundary documentation and PR #113 negative-issuer fixture cleanup merged |
-| CDN | `Trendyzima/cdn-` | `490119514788c13c327ee05eb4ce068a0f73966e` | Mainline; PR #123 native media-auth documentation merged |
+| CDN | `Trendyzima/cdn-` | `490119514788c13c327ee05eb4ce068a0f73966e` | Mainline; PR #123 native media-auth documentation and PR #124 negative-auth fixture cleanup merged |
 | Algorithm | `Trendyzima/the-algorithm` | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline; PRs #28 and #29 ownership documentation merged |
 | Federation | `Trendyzima/federated-content` | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Mainline; PR #51 native boundary documentation merged |
 | API Control Plane | `Trendyzima/testagram-api` | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` | Governance-only mainline; this bridge remains an open candidate PR |
