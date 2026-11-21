@@ -27,14 +27,14 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "287d8669df9dbfcf2ae34f6f532925ca551de4bd",
+      "mainCommit": "a5c87114cc5be174dd9e1fc2d5983a235efba865",
       "mergedPullRequests": [
         419,
         418,
         421,
         423
       ],
-      "candidateCommit": "c627858a295fbf45b6dbdeeb54d2a5aa0a989470",
+      "candidateCommit": "12369bd7ec796f4966b2cfeae9ac3684e169d5c9",
       "candidatePullRequest": 424
     },
     {
@@ -43,14 +43,13 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "data-centre",
-      "mainCommit": "58de0bf36b76f9cd74824901b6a86de29f420c65",
+      "mainCommit": "ada6f26a289775720bb47a639242dbd868388055",
       "mergedPullRequests": [
         111,
         112,
-        113
-      ],
-      "candidateCommit": "8b61fe03eb918d352f78d1142651167b3e9fe21a",
-      "candidatePullRequest": 114
+        113,
+        114
+      ]
     },
     {
       "id": "cdn",
