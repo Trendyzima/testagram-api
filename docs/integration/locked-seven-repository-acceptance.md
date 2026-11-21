@@ -32,7 +32,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `855758a1df5cf6616f4196124ca929787327da82` |
-| Backend | `03161c3fbbf9ad046986360024790f11e056ccc5` (PR #424 candidate) |
+| Backend | `45ffadceb7ecfb47b1db75494789e70e26ff96c1` (PR #424 candidate) |
 | Data Centre | `182107393c219ac24078785271731ae7cf0837bf` |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `8dc66f06201fa0bfe62702a4c5a6dec61a4282e4` |
@@ -228,10 +228,15 @@ The following source pins are intentionally temporary review baselines for open 
 
 | Repository | Review PR | Immutable review commit |
 |---|---|---|
-| Backend | [PR #419](https://github.com/Trendyzima/Testagram-backend-/pull/419) | `e26c6972b4c8c6fe625ee32ab7803119ee2e7847` |
+| Backend | [PR #424](https://github.com/Trendyzima/Testagram-backend-/pull/424) | `45ffadceb7ecfb47b1db75494789e70e26ff96c1` |
 | Algorithm | [PR #27](https://github.com/Trendyzima/the-algorithm/pull/27) | `88b2ae0eb81e127768aaf4ef1ed19495ce6fda20` |
 
 
 ## 9. Federation source-pin reconciliation — 2026-11-21
 
 Federated Content PR #50 (pgx dependency security/reliability update) was merged to `main` at `b44eca07a9c7641cf03ee685c025bcfe6dfc7858`. Both post-merge checks (`test` and `image`) completed successfully on that exact commit. The current federation source pin in `contracts/sources.lock.json` and the seven-organ registry is refreshed to this merge commit; PR #50 is recorded in the registry's merged pull-request history. This source refresh is not live federation deployment or protocol acceptance evidence.
+
+
+## 10. Native MFA revocation and WebAuthn configuration hardening — 2026-11-21
+
+The Backend review pin now includes credential-bound MFA elevation and shared WebAuthn RP configuration attestation. Every privileged identity-review request and Admin Console sensitive action rechecks the exact authenticator used for step-up against PostgreSQL; revoked, unverified or clone-warned credentials invalidate outstanding elevation immediately. The Backend and Admin Console compare a canonical fingerprint of the configured RP ID and allowed origins; mismatches fail readiness closed. Regression tests cover the token binding, revocation, fingerprint mismatch and canonicalization. This remains source/CI evidence only: the live browser authenticator ceremony, recovery, and production origin have not yet been accepted.
