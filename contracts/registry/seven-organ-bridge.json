@@ -27,13 +27,15 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "e6fdb962c2a10159df352312e01ea05842ffde13",
+      "mainCommit": "287d8669df9dbfcf2ae34f6f532925ca551de4bd",
       "mergedPullRequests": [
         419,
         418,
         421,
         423
-      ]
+      ],
+      "candidateCommit": "e6fdb962c2a10159df352312e01ea05842ffde13",
+      "candidatePullRequest": 424
     },
     {
       "id": "data-centre",
