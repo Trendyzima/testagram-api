@@ -376,3 +376,14 @@ The branch ancestry is still not reconciled. Although PR #432 currently targets 
 All review submissions remain absent on PRs #424, #431, #432 and API bridge #116. The bridge PR #116 head `3d7114e19c731e337eb8bdcd072056cdca71cac7` passed API contract CI run #44947566386 in both Node and Dart jobs. Its source lock pins Backend #424 and CDN #125 candidates; it must be refreshed to exact merge commits only after those dependencies are independently reviewed and merged.
 
 No production deployment, DNS/domain transfer, Worker deletion, staff permission change or production routing mutation occurred during this audit. The production legacy Worker and WebFinger ownership blockers, separate staging-zone acceptance, and independent reviews remain release blockers.
+
+
+## 21. Fresh read-only Cloudflare inventory — 2026-11-21 20:36 UTC
+
+Backend Cloudflare audit run #44947171620 completed successfully in GET-only mode. It independently reconfirms that `api.testagram.site` is a production custom domain owned by Worker `testagram-api`; the canonical `testagram-cdn` gateway does not own that hostname. The exact route `testagram.site/.well-known/webfinger*` remains assigned to `testagram-web`. Apex and `www` remain active Pages domains on `testagram-flutter-web`. The `testagram-cdn` Worker still has its `*/5 * * * *` Cron trigger and must remain excluded from orphan cleanup.
+
+The inventory additionally found a separate legacy Worker `testagram-heartbeat` carrying `SUPABASE_HEARTBEAT_RPC_URL` and `SUPABASE_PUBLISHABLE_KEY` bindings, plus a Worker named `xclone-9b4dz1-9b4dz1-8936-20260809`. These are live Cloudflare inventory findings, not approved Testagram architecture or dependencies. They are not authorized for deletion by this audit. Their ownership, route/domain references, schedules, service bindings, tail consumers and operational dependencies must be proven absent before a separate exact-name retirement workflow is proposed. Do not broaden the existing cleanup allowlist or delete either Worker as part of the API gateway handoff.
+
+The same audit reported eight Worker scripts in the account, four custom-domain bindings including the legacy API binding, and the Pages project `testagram-flutter-web`. It completed with no DNS, Worker, Pages, zone or account mutations. Credential values and DNS record contents were intentionally excluded from the audit summary.
+
+This fresh evidence expands the legacy edge inventory beyond the API Worker. The production release remains blocked on a separately accepted staging zone, canonical API-domain transfer, exact WebFinger route transfer, public API/Federation verification, and independent review. No production resource was changed.
