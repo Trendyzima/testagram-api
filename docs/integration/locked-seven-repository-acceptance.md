@@ -323,3 +323,25 @@ The bridge pins this exact Data Centre candidate, records PR #114 as unmerged ca
 - The Chromium Admin Console harness exercises real browser `navigator.credentials.create()` and `.get()` with a virtual authenticator, but it currently stubs `/api/**` responses. It proves the browser ceremony payload and UI flow, not the live Admin Console-to-Backend/PostgreSQL end-to-end path. A live staging ceremony remains required.
 - Staff lifecycle is not complete: `POST /api/staff/invite`, `PUT /api/admin/staff/{id}/role` and `DELETE /api/admin/staff/{id}` currently return HTTP 501. The two-person approval ledger records independent decisions but explicitly does not execute staff lifecycle mutations. Keep staff invitation, role changes and revocation closed until a transactional, independently approved implementation and integration tests exist.
 - Backend PR #424, CDN PR #125, Data Centre PR #114 and API Control Plane PR #116 remain candidate/open work at this acceptance snapshot. Do not merge the bridge or declare production acceptance until independent reviews, exact post-merge source-pin refresh, live Backend/Admin Console ceremony, staff lifecycle, production routing and real-account Federation probes pass.
+
+
+## 17. Authoritative source-pin refresh and apex Federation routing — 2026-11-21
+
+The current `contracts/sources.lock.json` and `contracts/registry/seven-organ-bridge.json` are authoritative over earlier historical snapshots in this document. The exact six runtime pins currently validated by the bridge are:
+
+| Runtime organ | Mainline revision | Review candidate revision |
+|---|---|---|
+| Backend | `a793c55db8b5c258524bfef4b8872f5c6c1038e5` | PR #424: `12369bd7ec796f4966b2cfeae9ac3684e169d5c9` |
+| CDN | `490119514788c13c327ee05eb4ce068a0f73966e` | PR #125: `19f2ed0df2993ba833aee9526c2a7e6cbd4a0662` |
+| Flutter | `1f58971720c7a72139d56900a5895c49fa105639` | Mainline; PR #100 remains an open production-smoke candidate |
+| Data Centre | `ada6f26a289775720bb47a639242dbd868388055` | Mainline |
+| Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline |
+| Federation | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Mainline |
+
+The seventh API Control Plane remains governance-only at `201fd3335c737e7fe36ed34dfa1ec07b03c31047`; it is not a runtime service or hop. Backend PR #424 and CDN PR #125 remain unmerged candidate pins and are not represented as accepted mainline revisions. Each candidate is checked against its exact current mainline by the source checkout/merge validation before the bridge audits the combined tree.
+
+The bridge cross-repository checker now also enforces the public ActivityPub discovery chain: Flutter's production NodeInfo/WebFinger smoke, Federation's public discovery handlers, Backend Caddy's apex proxy to `federation-api:8081`, CDN's apex Worker route, and the separately approved exact-owner WebFinger route removal and rollback workflow. CDN PR #125 now includes a separate default-off approval for the legacy `testagram.site/.well-known/webfinger*` route, exact ID/owner revalidation before deletion, and restoration of the exact prior `testagram-web` route if apex verification fails. Its workflow regression test is part of the CDN CI and is included in the immutable source inventory.
+
+The latest CDN candidate passed CI run #524, Worker tests #209, capacity #457 and no-production-deployment origin validation #93. The bridge's next CI run must pass all Node and Dart audits against this refreshed source set before PR #116 is considered merge-ready.
+
+Production acceptance remains **NOT ACCEPTED** until a separate staging Cloudflare zone proves the same route transition and full API/Federation smoke with staging-specific hostnames and credentials, followed by the three explicit production approvals. The production audit still shows the WebFinger route owned by `testagram-web`, the apex root returning HTTP 200 instead of the required 308 redirect, NodeInfo returning Flutter HTML, and the real-account WebFinger endpoint returning HTTP 503. No production routing, DNS, Pages, Worker, database, secret or feature-flag mutation is authorized by this source-pin refresh.
