@@ -279,6 +279,17 @@ Flutter PR #113, which removes obsolete provider labels from negative test fixtu
 
 ## 12. API custom-domain handoff remains a separate CDN acceptance gate — 2026-11-21
 
-The current CDN mainline pin remains the source baseline until its routing change is independently reviewed and merged. CDN PR #125 adds an explicit second approval for transferring the exact `api.testagram.site` custom-domain owner from the legacy API Worker to the canonical `testagram-cdn` gateway. It removes only the verified API-host A/AAAA/CNAME records required for Cloudflare Custom Domain creation, verifies the new owner and restores only the Testagram-owned gateway on failure. It must never reattach the legacy API Worker as a fallback.
+CDN PR #125 is now ready for independent review at candidate `d2fc2af2248581cafe4b64a8cb4f654732d66962`. The API Control Plane source lock pins that exact candidate so integration CI validates the guarded handoff contract, rather than silently validating the older CDN mainline. Its Worker tests, Wrangler custom-domain validation, workflow syntax, Go tests, race detector, vet, build, runtime-image checks and capacity qualification passed. The PR has not merged and no production Cloudflare mutation or deployment has run.
 
-CDN PR #125 is ready for independent review and its Worker suite (29/29), Wrangler custom-domain dry-run, workflow lint, Go tests/race/vet/build and scratch-image checks are green. It has not been dispatched against Cloudflare and is not deployed. The bridge source lock must not move to its candidate SHA until CDN PR #125 merges. The live hostname must then pass API health, readiness, service identity, media, apex, NodeInfo and WebFinger probes before the CDN organ is accepted.
+The candidate requires a second explicit dispatch approval before transferring the exact `api.testagram.site` custom-domain owner from the legacy API Worker to the canonical `testagram-cdn` gateway. It removes only verified proxied A/AAAA/CNAME records for that exact hostname, verifies the new owner, and on failure recovers only to the Testagram-owned gateway. It must never reattach the legacy API Worker as a fallback.
+
+After CDN PR #125 merges, refresh this pin to its exact merge SHA and rerun the bridge. The live hostname must then pass API health, readiness, service identity, media, apex redirect, NodeInfo and real-account WebFinger probes before the CDN organ is accepted.
+
+## 13. Latest end-to-end production evidence — 2026-11-21
+
+- Backend PR #424 application, PostgreSQL identity, native staff WebAuthn, dual-control, schema, security and container checks passed at its pinned candidate. Its InstaBox deployment job was skipped; no live native API deployment is evidenced. Independent review remains outstanding.
+- A fresh read-only production smoke rerun still fails: `https://testagram.site/` returns HTTP 200 instead of the required 308 redirect to `www`; apex NodeInfo returns HTTP 200 HTML instead of JSON; and `acct:crissbeat@testagram.site` WebFinger returns HTTP 503. The Flutter web root, sign-in route and Pages.dev shell return HTTP 200. These are real production routing failures, not source-level contract failures.
+- The API Control Plane source lock now points to the exact CDN PR #125 candidate and retains the Backend PR #424 candidate pin. Bridge CI is rerunning against those immutable inputs. After either source PR merges, refresh the corresponding pin to the exact merge SHA and rerun the bridge.
+- The native-only source audit reports 27 intentionally retained historical migration/schema/upgrade-fixture matches. They are not runtime integrations or fallback authorities. Do not rewrite applied migration history to obtain a misleading zero-text-match result.
+- Registration and privileged staff enrollment remain fail-closed until the real browser WebAuthn ceremony, recovery/replay, production readiness and staff lifecycle gates pass.
+
