@@ -180,7 +180,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "182107393c219ac24078785271731ae7cf0837bf",
+      "ref": "a22d086c03fcf8a90323dc250e53d255c7aff26c",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/native-auth-session-integration.yml",
@@ -225,7 +225,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "506f22f0ae42d359f01a1f940d48aa578469e0a0",
+      "ref": "1480d9c2da6f281ed4f9caf62c37705fdbe65e9d",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         ".github/workflows/ci.yml",
@@ -249,7 +249,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "855758a1df5cf6616f4196124ca929787327da82",
+      "ref": "761c41b247a49aac7e9b352493465e3c321a2ffb",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",
@@ -310,7 +310,7 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "b44eca07a9c7641cf03ee685c025bcfe6dfc7858",
+      "ref": "3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
         ".env.example",
@@ -337,7 +337,7 @@
     },
     "algorithm": {
       "fullName": "Trendyzima/the-algorithm",
-      "ref": "8dc66f06201fa0bfe62702a4c5a6dec61a4282e4",
+      "ref": "92cf9b47e4de38306c4fe7b61ece24c3e075aa22",
       "checkoutPath": "source-repos/algorithm",
       "sourcePaths": [
         "testagram-feed/API-CONTRACT.md",
