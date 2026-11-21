@@ -17,7 +17,17 @@ assert.equal(new Set(ids).size, 7, "duplicate repository identity in bridge mani
 assert.deepEqual(new Set(ids), expected, "bridge repository set is incomplete or contains an unknown organ");
 
 const byId = new Map(bridge.repositories.map((repo) => [repo.id, repo]));
+const expectedRepositories = new Map([
+  ["flutter-client", "Trendyzima/testagram-flutter-client-"],
+  ["backend", "Trendyzima/Testagram-backend-"],
+  ["data-centre", "Trendyzima/Testagram-data-centre-"],
+  ["cdn", "Trendyzima/cdn-"],
+  ["algorithm", "Trendyzima/the-algorithm"],
+  ["federation", "Trendyzima/federated-content"],
+  ["api-control-plane", "Trendyzima/testagram-api"],
+]);
 for (const repo of bridge.repositories) {
+  assert.equal(repo.fullName, expectedRepositories.get(repo.id), `${repo.id}: repository identity mismatch`);
   assert.match(repo.mainCommit, /^[0-9a-f]{40}$/, `${repo.id}: invalid immutable main commit`);
   assert.equal(repo.defaultBranch, "main", `${repo.id}: unexpected default branch`);
   assert.ok(repo.fullName.startsWith("Trendyzima/"), `${repo.id}: unexpected repository owner`);
@@ -30,6 +40,11 @@ for (const repo of bridge.repositories) {
     assert.equal(pin.ref, repo.mainCommit, `${repo.id}: bridge commit and source pin differ`);
     assert.match(pin.ref, /^[0-9a-f]{40}$/);
     assert.ok(Array.isArray(pin.sourcePaths) && pin.sourcePaths.length > 0, `${repo.id}: source path inventory missing`);
+    assert.equal(new Set(pin.sourcePaths).size, pin.sourcePaths.length, `${repo.id}: duplicate source path in immutable inventory`);
+    for (const sourcePath of pin.sourcePaths) {
+      assert.ok(typeof sourcePath === "string" && sourcePath.length > 0, `${repo.id}: invalid source path`);
+      assert.ok(!sourcePath.startsWith("/") && !sourcePath.split("/").includes(".."), `${repo.id}: source path escapes organ checkout`);
+    }
   } else {
     assert.equal(repo.id, "api-control-plane", "only the API control plane may be non-runtime");
     assert.equal(repo.kind, "governance");
