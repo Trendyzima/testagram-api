@@ -354,3 +354,12 @@ The latest Backend PR #424 candidate is `cc33913f0fd4e86669f7c717e12b2503990e6d8
 The candidate now removes that direct SQL mutation and keeps permission changes HTTP 501 until a transactional executor applies an approved request only after two distinct authorized approvers. A regression test asserts that the handler remains closed and contains no direct permission write. The API bridge source lock includes both the handler and its regression test, and the cross-repository checker enforces this fail-closed rule. The approval ledger's current record-only behavior is not treated as staff lifecycle execution.
 
 This is a security closure, not a completed staff lifecycle. Invitation, role change, revocation and permission change remain unavailable until the two-person executor and its PostgreSQL integration tests are implemented. No production staff access or permissions were modified.
+
+
+## 19. Live Cloudflare legacy Worker inventory — 2026-11-21
+
+The latest Backend Cloudflare audit #457 verified that the repository token is active and performed a read-only inventory. The active production API custom domain `api.testagram.site` is still attached to the legacy `testagram-api` Worker, not `testagram-cdn`. That legacy Worker script still exists and has legacy `SUPABASE_*` secret/text bindings (`SUPABASE_ANON_KEY`, `SUPABASE_JWKS_URL`, `SUPABASE_PROJECT_REF`, `SUPABASE_SECRET_KEY`, `SUPABASE_URL`); its last recorded deployment is 2026-09-14. This is a live legacy edge artifact and must be removed after the new gateway is accepted, not confused with intentionally preserved historical migration records.
+
+The same inventory confirms that `testagram.site/.well-known/webfinger*` is still routed to `testagram-web`, while apex and www remain attached to Flutter Pages. The existing `testagram-cdn` Worker has an active five-minute Cron trigger and is explicitly excluded from cleanup candidates.
+
+The Cloudflare token is now active; the earlier missing-secret failure is no longer the current blocker. The remaining gates are the separate staging proof, explicit canonical-host/API-domain/WebFinger approvals, successful public API and Federation probes, and then the separately confirmed post-handoff cleanup of the detached legacy API Worker. No production resources were changed by audit #457.
