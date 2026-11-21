@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "201fd3335c737e7fe36ed34dfa1ec07b03c31047"
   },
-  "status": "candidate-backend-pin-runtime-acceptance-pending",
+  "status": "candidate-backend-and-cdn-pins-runtime-acceptance-pending",
   "repositories": [
     {
       "id": "flutter-client",
@@ -61,7 +61,9 @@
         122,
         123,
         124
-      ]
+      ],
+      "candidateCommit": "d2fc2af2248581cafe4b64a8cb4f654732d66962",
+      "candidatePullRequest": 125
     },
     {
       "id": "algorithm",
@@ -174,11 +176,12 @@
     "Flutter never receives private service tokens, provider credentials, database credentials or private service URLs.",
     "The API control plane is build-time governance only and is never a runtime gateway.",
     "No external identity provider is part of the supported runtime; native Testagram Backend authentication is the only user and staff authentication path.",
-    "All six runtime source pins must match the latest reviewed or merged organ revisions; the Backend candidate pin is temporary until PR #424 merges, then must be replaced with its exact mainline merge SHA."
+    "All six runtime source pins must match the exact declared candidate or merged organ revisions; candidate pins remain unaccepted until independent review, merge and live acceptance, then must be replaced with their exact mainline merge SHAs."
   ],
   "excludedFromAcceptance": [
     "A branch without a reviewed pull request is not automatically merged.",
     "The Flutter production-domain smoke PR #100 remains draft and has a failing smoke check.",
+    "Backend PR #424 and CDN PR #125 are declared candidate pins only; neither is merged or independently approved.",
     "Merged source revisions do not prove live DNS, TLS, deployment health, provider durability or end-to-end staging acceptance."
   ]
 }
