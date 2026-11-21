@@ -40,58 +40,58 @@ assert.match(contract, /\/api\/auth\/refresh/);
 // SQL migration records are intentionally excluded: they remain immutable
 // migration history and are separately neutralized by the retirement migration.
 const roots = [
-  "source-repos/flutter-client/lib",
-  "source-repos/flutter-client/android",
-  "source-repos/flutter-client/ios",
-  "source-repos/flutter-client/web",
-  "source-repos/backend/cmd/api",
-  "source-repos/backend/cmd/fresh-api",
-  "source-repos/backend/admin-console",
-  "source-repos/backend/internal",
-  "source-repos/backend/deploy/self-hosted",
-  "source-repos/data-centre/backend",
-  "source-repos/data-centre/vps",
-  "source-repos/cdn/cmd",
-  "source-repos/cdn/internal",
-  "source-repos/cdn/cloudflare",
-  "source-repos/algorithm/testagram-feed",
-  "source-repos/federation/cmd",
-  "source-repos/federation/internal",
+  "source-repos/flutter-client",
+  "source-repos/backend",
+  "source-repos/data-centre",
+  "source-repos/cdn",
+  "source-repos/algorithm",
+  "source-repos/federation",
+  "docs",
+  "contracts",
+  "packages",
+  "examples",
 ];
-const explicitFiles = [
-  "source-repos/backend/go.mod",
-  "source-repos/data-centre/backend/go.mod",
-  "source-repos/cdn/go.mod",
-  "source-repos/algorithm/testagram-feed/go.mod",
-  "source-repos/federation/go.mod",
-  "source-repos/flutter-client/pubspec.yaml",
-  "source-repos/backend/docker-compose.yml",
-  "source-repos/backend/.env.example",
-  "source-repos/backend/Dockerfile",
-  "source-repos/data-centre/backend/docker-compose.yml",
-  "source-repos/data-centre/vps/docker-compose.yml",
-  "source-repos/data-centre/vps/.env.example",
-  "source-repos/data-centre/vps/fresh.env.example",
-];
+const excludedDirectories = new Set([
+  ".git", "node_modules", "vendor", "build", "dist", ".dart_tool",
+  ".gradle", ".idea", "migrations", "tests", "test", "__tests__", "fixtures",
+]);
 const extensions = new Set([
   ".go", ".dart", ".yaml", ".yml", ".json", ".toml", ".properties",
   ".gradle", ".kt", ".swift", ".plist", ".xml", ".env", ".sh", ".ts", ".js",
+  ".md", ".sql", ".html", ".css",
 ]);
 const scanned = [];
-function walk(path) {
+const missingRoots = [];
+const perRoot = new Map();
+function walk(path, files) {
   const stat = statSync(path);
   if (stat.isDirectory()) {
-    for (const entry of readdirSync(path)) walk(join(path, entry));
+    for (const entry of readdirSync(path)) {
+      if (excludedDirectories.has(entry)) continue;
+      walk(join(path, entry), files);
+    }
     return;
   }
   if (!extensions.has(path.slice(path.lastIndexOf(".")))) return;
-  // Unit/integration fixtures may name retired providers to prove that legacy
-  // paths are rejected. They are not shipped runtime source or configuration.
   if (path.endsWith("_test.go") || path.endsWith(".test.mjs") || path.endsWith(".test.ts")) return;
-  scanned.push(path);
+  files.push(path);
 }
-for (const root of roots) if (existsSync(resolve(root))) walk(resolve(root));
-for (const path of explicitFiles) if (existsSync(resolve(path))) scanned.push(resolve(path));
+for (const root of roots) {
+  if (!existsSync(resolve(root))) {
+    // Some optional SDK examples are absent on a given checkout, but every
+    // one of the six runtime source roots is mandatory.
+    if (root.startsWith("source-repos/")) missingRoots.push(root);
+    continue;
+  }
+  const files = [];
+  walk(resolve(root), files);
+  scanned.push(...files);
+  if (root.startsWith("source-repos/")) perRoot.set(root, files.length);
+}
+assert.deepEqual(missingRoots, [], `Native-auth audit missing runtime organ checkouts: ${missingRoots.join(", ")}`);
+for (const [root, count] of perRoot) {
+  assert.ok(count > 0, `Native-auth audit scanned zero source/config/docs files for ${root}`);
+}
 assert.ok(scanned.length > 0, "Native-auth audit scanned zero provider files; refusing a vacuous pass.");
 const providerViolations = [];
 for (const path of new Set(scanned)) {
@@ -103,4 +103,4 @@ assert.equal(
   0,
   `Appwrite runtime, SDK, endpoint, token or fallback remains in provider source/config files:\n${providerViolations.map((path) => `- ${path}`).join("\n")}`,
 );
-console.log(`Native-only authentication boundary: PASS (SDK/OpenAPI plus ${new Set(scanned).size} provider source/config files contain no Appwrite integration)`);
+console.log(`Native-only authentication boundary: PASS (SDK/OpenAPI plus ${new Set(scanned).size} runtime, deployment, configuration and documentation files across all six runtime organs contain no external identity-provider integration)`);
