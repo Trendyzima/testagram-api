@@ -27,17 +27,17 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. The Backend pin intentionally targets the reviewed native-auth retirement candidate in PR #424 so the API bridge audits the code that removes the legacy runtime instead of the superseded mainline. The other five pins remain reviewed immutable baselines. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
+The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. The Backend pin intentionally targets the native-auth retirement candidate in PR #424 so the API bridge audits the code that removes the legacy runtime instead of the superseded mainline. The other five pins target their latest observed mainline revisions; their intervening changes were documentation-only. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `855758a1df5cf6616f4196124ca929787327da82` |
+| Flutter | `761c41b247a49aac7e9b352493465e3c321a2ffb` |
 | Backend | `e6fdb962c2a10159df352312e01ea05842ffde13` (PR #424 candidate) |
-| Data Centre | `182107393c219ac24078785271731ae7cf0837bf` |
+| Data Centre | `a22d086c03fcf8a90323dc250e53d255c7aff26c` |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
-| Algorithm | `8dc66f06201fa0bfe62702a4c5a6dec61a4282e4` |
-| Federation | `b44eca07a9c7641cf03ee685c025bcfe6dfc7858` |
-| CDN | `506f22f0ae42d359f01a1f940d48aa578469e0a0` |
+| Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` |
+| Federation | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` |
+| CDN | `1480d9c2da6f281ed4f9caf62c37705fdbe65e9d` |
 
 A source pin is not a deployment record. Every accepted staging and production run must separately record the actual running image digest and source revision. Mutable tags such as `main` and `latest` are not acceptable release identities.
 
