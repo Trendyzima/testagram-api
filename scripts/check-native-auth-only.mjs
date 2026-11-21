@@ -120,7 +120,6 @@ const historicalCompatibilityAllowlist = new Set([
   "backend/migrations/20261120_native_identity_historical_attribution_archive.sql",
   "backend/migrations/20261120_native_identity_historical_staff_archive.sql",
   "backend/scripts/test-identity-registration-migration.sh",
-  "data-centre/.github/workflows/vps-ci.yml",
   "backend/migrations/20261108_communication_core.sql",
   "backend/migrations/20261109_iptv_social.sql",
   "backend/migrations/20261110_staff_roles.sql",
