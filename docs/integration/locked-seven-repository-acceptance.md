@@ -33,7 +33,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 |---|---|
 | Flutter | `761c41b247a49aac7e9b352493465e3c321a2ffb` |
 | Backend | `e6fdb962c2a10159df352312e01ea05842ffde13` (PR #424 candidate) |
-| Data Centre | `a22d086c03fcf8a90323dc250e53d255c7aff26c` |
+| Data Centre | `58de0bf36b76f9cd74824901b6a86de29f420c65` |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` |
 | Federation | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` |
@@ -250,7 +250,7 @@ The bridge now records the latest observed default-branch revisions for the five
 |---|---|---|---|
 | Flutter client | `Trendyzima/testagram-flutter-client-` | `761c41b247a49aac7e9b352493465e3c321a2ffb` | Mainline; PR #112 documentation cleanup merged |
 | Backend | `Trendyzima/Testagram-backend-` | `e6fdb962c2a10159df352312e01ea05842ffde13` | Temporary native-auth review candidate; PR #424 remains open |
-| Data Centre | `Trendyzima/Testagram-data-centre-` | `a22d086c03fcf8a90323dc250e53d255c7aff26c` | Mainline; PR #112 boundary documentation merged |
+| Data Centre | `Trendyzima/Testagram-data-centre-` | `58de0bf36b76f9cd74824901b6a86de29f420c65` | Mainline; PR #112 boundary documentation and PR #113 negative-issuer fixture cleanup merged |
 | CDN | `Trendyzima/cdn-` | `490119514788c13c327ee05eb4ce068a0f73966e` | Mainline; PR #123 native media-auth documentation merged |
 | Algorithm | `Trendyzima/the-algorithm` | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline; PRs #28 and #29 ownership documentation merged |
 | Federation | `Trendyzima/federated-content` | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Mainline; PR #51 native boundary documentation merged |
