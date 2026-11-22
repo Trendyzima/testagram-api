@@ -624,3 +624,23 @@ The following pins supersede earlier candidate snapshots above. Data Centre PR #
 Merge commits recorded during this consolidation: Flutter #121 `44d19f98808768750cfe5e590f8a451bf1cc404d`; Data Centre #115 `99edc3e096675f5c39ab6a9bd0050dcee30283a0`; Federation #52 `e8cf8f5013da52659b2d362ec3fc9a7a670f507a`; Federation #53 `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca`; API #117 `14e67fffb2150021d7b94bd8941f49ac0485d034`.
 
 The API bridge source lock now pins the merged Data Centre and Federation commits, and its registry records the updated Flutter, Data Centre, Federation and API governance mainline heads. The Backend and Flutter candidate refs remain explicitly unmerged. Refresh them only after their dependency stacks are independently reviewed and accepted. No production auth cutover, deployment, DNS/Cloudflare route change, VPS lifecycle action, secret rotation, production data change or destructive migration is authorized by this reconciliation.
+
+
+## Current exact source pin reconciliation — 2026-11-22
+
+This block is the current source-lock authority and supersedes older candidate/mainline snapshots above where they conflict. Historical sections are retained as audit history.
+
+| Runtime organ | Exact immutable source pin | Current provenance |
+|---|---|---|
+| Backend | `31040c345f286b5dd34a91ea8c94af3da21e704b` | Open PR #424 candidate; mainline conflict reconciliation and the communication/privacy, wallet and knowledge-engine stack are included through stacked PR #450. Exact-head CI is being revalidated. |
+| Flutter Client | `2d29bb883645bc6ffd6ef5ff3409cd1bd59d6c54` | Open PR #116 candidate; deep-link, social/knowledge, profile/wallet/monetization and messaging/calls stack included. Exact-head CI is being revalidated. |
+| Data Centre | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` | Current mainline; PR #115 merged. |
+| CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Current mainline; PR #125 merged. |
+| Federation | `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca` | Current mainline; PR #53 merged. |
+| Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Current mainline. |
+
+The API Control Plane governance mainline is `14e67fffb2150021d7b94bd8941f49ac0485d034`; the current bridge candidate is `5c3eb35bb2f64103555ebce6491e6b388258dbb6` before the route-inventory correction. The bridge candidate must pass fresh source checkout, route inventory, cross-organ contract, locked acceptance and native-auth residue checks before it can be marked ready.
+
+PR #424 and PR #116 remain open candidate branches, not merged mainline. PR #450 and PR #123 are merged into those respective feature branches only. Data Centre #115 and Federation #53 are actual mainline merges. None of these source pins proves live deployment, production WebAuthn, media durability, Federation interoperability or coordinated disaster recovery.
+
+The Backend production deployment is currently blocked by the missing GitHub production secret `TESTAGRAM_EDGE_PROXY_SHARED_TOKEN`. The deployment preflight fails before machine selection/start; no production deployment or DNS mutation occurred. Configure the same 64-character hexadecimal value used by the Cloudflare API Worker before retrying.
