@@ -558,7 +558,7 @@ This section supersedes all earlier status snapshots in this document where they
 - No separate Testagram staging Cloudflare zone or machine-verified staging attestation has been established. Cross-organ staging acceptance remains open.
 - The InstaBox deployment workflow's production deploy job was skipped for the pull request; the container workflow built without publishing on the PR event. No production DNS, Worker, Pages, database, staff permission or feature-flag mutation was performed by this continuation.
 - M-Pesa B2C withdrawals remain unavailable. An STK Push is not settlement; only provider-verified callback/query plus a committed PostgreSQL ledger transaction may credit a wallet.
-- Repository search across all seven organs found no Appwrite or Xclone matches in the searched source and documentation.
+- Repository search across all seven organs found no retired identity provider or Xclone matches in the searched source and documentation.
 
 ### Remaining release gates
 
