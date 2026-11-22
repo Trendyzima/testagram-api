@@ -12,20 +12,20 @@ This repository is the build-time governance layer, not a monorepo and not a run
 |---|---|---|---|
 | Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `1f58971720c7a72139d56900a5895c49fa105639` | Current mainline; PR #114 remains an unmerged candidate |
 | Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `cc33913f0fd4e86669f7c717e12b2503990e6d88` | Temporary native-auth PR #424 candidate; not merged |
-| Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `ada6f26a289775720bb47a639242dbd868388055` | Current mainline |
+| Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `17d050d9b74d193a1857bf53588f1ae2b47f12b5` | PR #115 identity-evidence OpenAPI candidate; not merged (mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
 | CDN | [cdn-](https://github.com/Trendyzima/cdn-) | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Current mainline; PR #125 merged |
 | Algorithm | [the-algorithm](https://github.com/Trendyzima/the-algorithm) | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Current mainline |
 | Federation | [federated-content](https://github.com/Trendyzima/federated-content) | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Current mainline |
 | Contract control plane | [testagram-api](https://github.com/Trendyzima/testagram-api) | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` | Governance mainline; this bridge PR remains open |
 
-The six runtime pins are stored in `contracts/sources.lock.json` and match the observed mainline heads, except Backend, which intentionally pins PR #424's exact native-auth candidate for pre-merge audit. After #424 merges, replace that pin with the exact Backend mainline merge SHA. The Flutter, Data Centre and CDN pins have been refreshed to their current mainline heads; CDN PR #125 is merged. Flutter PR #114 remains a candidate and is not part of the locked source pin. Backend PRs #434 and #435 remain stacked candidates behind #424 and are excluded from the accepted source pin until independently reviewed and merged.
+The six runtime pins are stored in `contracts/sources.lock.json`. Backend and Data Centre intentionally pin open review candidates (#424 and #115) for pre-merge contract audit; after each merges, replace its pin with the exact mainline merge SHA. Flutter, CDN, Algorithm and Federation pin current mainline heads. CDN PR #125 is merged. Flutter PR #114 remains a separate unmerged client candidate. Backend PRs #434 and #435 remain stacked behind #424 and are excluded from the source pin until independently reviewed and merged.
 
 ## 2. Merged organ changes represented by this baseline
 
-- Flutter: PRs #109 and #112 (navigation and native-auth deployment documentation).
-- Backend: PRs #418, #419, #421 and #423. PR #424 remains open and is not counted as merged.
-- Data Centre: PRs #111, #112 and #113 (architecture, seven-organ ownership and negative-issuer fixture cleanup).
-- CDN: PRs #122, #123 and #124 (navigation, native media-authorization boundary and negative-auth fixture cleanup).
+- Flutter: PRs #109, #112 and #113 (navigation, native-auth deployment documentation and negative-auth fixture cleanup).
+- Backend: PRs #418, #419, #421, #423, #426, #427 and #428. PR #424 remains open; #434 and #435 are stacked candidates and none is counted as merged.
+- Data Centre: PRs #111, #112, #113 and #114 (architecture, seven-organ ownership, negative-issuer fixture cleanup and media lifecycle hardening). PR #115 is an unmerged identity-evidence OpenAPI candidate.
+- CDN: PRs #122, #123, #124 and #125 (navigation, native media-authorization boundary, negative-auth fixture cleanup and guarded canonical-domain handoff).
 - Algorithm: PRs #27, #28 and #29 (navigation and seven-organ ownership).
 - Federation: PRs #49, #50 and #51 (navigation, dependency reliability and native ownership boundary).
 - API Control Plane: PR #115 (seven-organ navigation and governance graph).
@@ -69,7 +69,7 @@ The bridge cross-repository audit now verifies the implementation on both sides 
 
 1. **Flutter → Backend:** native login/refresh client, secure refresh storage, in-memory access token and authenticated Backend request path.
 2. **Flutter → CDN:** approved media URL handling and object/viewer-bound private-media authorization.
-3. **Backend → Data Centre:** the typed candidate client uses the versioned private media and identity-evidence routes, dedicated distinct bearer credentials, bounded timeouts, redirect rejection and the private service network. Data Centre's separate platform configuration/event/audit API is implemented, but a typed Backend consumer for that platform API is not verified and is not claimed as an active edge.
+3. **Backend → Data Centre:** the typed candidate client uses versioned private media grant/verify/status/delivery/deletion routes and separate identity-evidence routes with distinct credentials. The identity-evidence provider OpenAPI is proposed in Data Centre PR #115 and pinned here as a candidate; it is not yet merged or staging-accepted. Data Centre's separate platform configuration/event/audit API is implemented, but a typed Backend consumer is not verified and is not claimed as an active edge.
 4. **Data Centre → Backend identity:** video and notification user-aware routes require the shared native JWT secret and resolve canonical users through PostgreSQL session/account checks.
 5. **Backend → CDN:** Backend-issued short-lived viewer assertion, separate origin credential, private no-store behavior, and fail-closed origin relay.
 6. **Backend → Algorithm:** dedicated service bearer, API version, request ID, bounded timeout, 200-candidate/50-result limits and matching OpenAPI enum.
