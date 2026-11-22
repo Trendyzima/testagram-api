@@ -510,3 +510,41 @@ The API bridge branch now updates `contracts/sources.lock.json`, `contracts/regi
 ### Staging and production
 
 No separate Testagram staging Cloudflare zone or machine-verified staging attestation has been established. The merged CDN workflow is guarded but production-only; it must not be dispatched without the equivalent staging workflow and successful API, media, apex redirect, NodeInfo, WebFinger and actor/public-key probes. The last read-only inventory still identifies legacy production API/WebFinger routing and related Worker bindings. No production DNS, Worker, Pages, database, staff permission, feature flag or deployment mutation is authorized or evidenced by this reconciliation.
+
+
+## Feature integration reconciliation — 2026-11-22
+
+This section supersedes earlier candidate-pin snapshots above where they conflict.
+
+### Backend profile and wallet candidate
+
+- Backend PR #436 is a draft stacked on the exact Backend #424 head `cc33913f0fd4e86669f7c717e12b2503990e6d88`.
+- Exact PR #436 head: `e0ec8580fcbb6cfebc6d8033fd31c5464f74adb9`.
+- Adds authenticated `testagram.social.profile.resolve` with viewer-scoped discoverability, accepted-follow and block checks; the resolved UUID is passed through the canonical profile read handler.
+- Binds M-Pesa top-up idempotency keys to the original phone, whole-KES amount and currency. Reuse with a different payload returns conflict.
+- Adds owner-scoped status recovery by idempotency key and includes that key in the caller's wallet transaction history for restart reconciliation.
+- PR #436 must not merge until #424 is independently reviewed, accepted and merged; #436 then requires its own exact-head CI and independent review.
+
+### Flutter deep-link and wallet candidate
+
+- Flutter PR #115 is based on mainline `1f58971720c7a72139d56900a5895c49fa105639`.
+- Exact PR #115 head: `8a459719a2e24a30de0e6bfe421bcba0859dabb4`.
+- Adds allow-listed username profile, UUID profile and wallet landing link parsing; carries the initial route through the authentication gate and resolves usernames through the Backend.
+- Persists the M-Pesa request identity in secure storage before network dispatch, reuses the same key on retry, and recovers ambiguous attempts by the owner-scoped idempotency reference.
+- The Flutter repository contains no Android/iOS runner projects. Dart parsing and initial-route handling are not proof of native App Links or Universal Links. Verified Android `assetlinks.json`, iOS `apple-app-site-association`, signing identity and warm-link handling remain release gates.
+- PR #115 exact-head Flutter analysis, widget tests and platform builds remain pending; do not mark accepted until they complete.
+
+### Product and organ boundaries
+
+- Backend owns identity, profile visibility, wallet ledger and payment settlement. Flutter is an authenticated presentation client.
+- Data Centre owns infrastructure/storage mechanics; CDN serves authorized bytes; Algorithm ranks only Backend-authorized candidate IDs; Federation owns signed protocol delivery; API Control Plane remains build-time governance.
+- Wallet links open the wallet landing page only. They cannot encode recipients, amounts, checkout commands or initiate money movement.
+- M-Pesa STK acceptance is not settlement. Only provider-verified callback/query plus a committed PostgreSQL ledger transaction credits a wallet.
+- M-Pesa B2C withdrawal is not implemented and must not be exposed as an available client action.
+
+### Current CI evidence
+
+- Backend PR #436 CI run `44969983123` was queued at inspection.
+- Flutter PR #115 CI runs `44969985905`, `44969985881`, `44969985856` and `44969985870` were queued at inspection.
+- Queued is not passed. Independent reviews remain required.
+- No staging attestation or production deployment is implied by these feature branches.
