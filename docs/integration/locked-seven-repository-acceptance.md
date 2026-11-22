@@ -32,7 +32,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `03082cc7e2419dc3bac241fd12791043915ea760` (2026-11-22 mainline; social, knowledge and wallet client surfaces with Backend-backed feed/discovery contracts) |
-| Backend | `25ec8d687bcd450ffd86a769a8acc6c986d0dd34` (2026-11-22 mainline; immutable Flutter digest handoff and retry-safe InstaBox deployment polling) |
+| Backend | `dfc3905ff329f3bc9a654b407ed1ca4ac3fe59f4` (2026-11-22 mainline; production-verified immutable Flutter digest validation and VPS deployment) |
 | Data Centre | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` (2026-11-22 mainline; private identity-evidence API contract) |
 | Testagram API control plane | `14e67fffb2150021d7b94bd8941f49ac0485d034` (current mainline base; this bridge branch must incorporate any newer control-plane mainline commit before merge) |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` (2026-11-21 mainline) |
