@@ -14,11 +14,12 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "flutter-client",
-      "mainCommit": "1f58971720c7a72139d56900a5895c49fa105639",
+      "mainCommit": "44d19f98808768750cfe5e590f8a451bf1cc404d",
       "mergedPullRequests": [
         109,
         112,
-        113
+        113,
+        121
       ],
       "candidateCommit": "b818e6c2c2ec2dd909eb001afb9c055ab562b9bd",
       "candidatePullRequest": 120
@@ -48,15 +49,14 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "data-centre",
-      "mainCommit": "ada6f26a289775720bb47a639242dbd868388055",
+      "mainCommit": "99edc3e096675f5c39ab6a9bd0050dcee30283a0",
       "mergedPullRequests": [
         111,
         112,
         113,
-        114
-      ],
-      "candidateCommit": "f3abef58743d27d7a8f62b15fae7e3f7509ee1ef",
-      "candidatePullRequest": 115
+        114,
+        115
+      ]
     },
     {
       "id": "cdn",
@@ -91,14 +91,14 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "federation",
-      "mainCommit": "3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d",
+      "mainCommit": "cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca",
       "mergedPullRequests": [
         49,
         50,
-        51
-      ],
-      "candidateCommit": "4d7c26861240fae0fc8a69872dc326b3e1b2bbff",
-      "candidatePullRequest": 53
+        51,
+        52,
+        53
+      ]
     },
     {
       "id": "api-control-plane",
@@ -106,9 +106,10 @@
       "defaultBranch": "main",
       "kind": "governance",
       "sourcePinKey": null,
-      "mainCommit": "201fd3335c737e7fe36ed34dfa1ec07b03c31047",
+      "mainCommit": "14e67fffb2150021d7b94bd8941f49ac0485d034",
       "mergedPullRequests": [
-        115
+        115,
+        117
       ]
     }
   ],
