@@ -43,6 +43,8 @@ M-Pesa B2C withdrawals are **not part of the current native client release**. Do
 ## Profile contract
 
 - `GET /api/me/profile` returns the authenticated user's canonical profile.
+- `GET /api/social/profiles/{user_id}` returns an active profile only when the viewer is allowed to resolve it.
+- `testagram.social.profile.resolve` resolves a username through the authenticated Backend and applies the same discoverability, protected-account and block restrictions as profile reads.
 - `PUT /api/me/profile` updates display name, bio, website, location, social links, avatar key and cover key.
 - Profile media must first be uploaded through the authenticated Backend media gateway as public images. Backend verifies each selected key belongs to the caller and is ready before associating it with the profile.
 - Profile reads return CDN/public delivery URLs; clients must never construct URLs from raw storage keys.
@@ -57,3 +59,38 @@ Use a clear Testagram-owned information hierarchy:
 - clear loading, empty, pending, failed, success and retry states.
 
 Keep Testagram's distinct brand treatment and use only approved Testagram design-system assets.
+
+
+## Deep-link contract
+
+### Canonical destinations
+
+- Public username profile: `https://testagram.site/@{username}` and the equivalent `/u/{username}` path.
+- Canonical UUID profile: `https://testagram.site/profile/{user_id}`.
+- Wallet landing page: `https://testagram.site/wallet`.
+- The `testagram://profile/{username}` and `testagram://wallet` forms are reserved for native application delivery where the platform explicitly registers the Testagram scheme.
+
+### Resolution and authorization
+
+- Flutter parses only allow-listed Testagram HTTPS hosts and the registered Testagram scheme. It rejects arbitrary hosts, user-info URLs, fragments, malformed handles and unsupported paths.
+- Username links resolve through `testagram.social.profile.resolve`; the Backend performs viewer-scoped resolution and returns the canonical account UUID only if the viewer is allowed to discover the profile.
+- Flutter then loads the profile through the existing `GET /api/social/profiles/{user_id}` contract. It never bypasses profile privacy by resolving a username locally.
+- An incoming destination is retained across the authentication gate and opened only after the Backend validates the Testagram-native session.
+- Wallet links open the wallet landing screen only. They never carry a recipient, amount, transfer command, M-Pesa checkout identifier or payment instruction. A deep link must never initiate a money movement.
+
+### Platform association and release gate
+
+- Android App Links require a verified `assetlinks.json` association for the production package name and signing certificate.
+- iOS Universal Links require a valid `apple-app-site-association` file and matching Associated Domains entitlement.
+- The Flutter source repository currently contains the Dart client but not the Android/iOS runner projects. Native association files, signing identity and domain hosting must be added and verified in the actual mobile packaging repository before claiming cold-start or warm-start native link support.
+- Browser/web routing and the Dart route parser are necessary but do not alone prove native App Links or Universal Links.
+
+## Wallet retry and settlement safety
+
+- Every M-Pesa top-up attempt must persist its idempotency key and the exact normalized phone/amount payload before the first network request.
+- A retry after a timeout or lost response must reuse the same key for the same payload. It must never silently generate a new key for an unresolved attempt.
+- Backend must bind each idempotency key to the original phone, KES amount and currency. Reuse with a different payload returns an explicit conflict and must not return another customer's or another amount's checkout.
+- The Flutter client must recover an unresolved attempt after process restart, query the authoritative top-up state when a checkout ID is known, and block a new distinct deposit while the prior request is ambiguous.
+- A pending STK request is not a credit. Only a provider-verified callback/query and a committed PostgreSQL settlement transaction may change the wallet balance.
+- The transaction list and balance refresh remain read-only projections of the Backend ledger. Client-side balance arithmetic is prohibited.
+- M-Pesa B2C withdrawal remains unavailable until the separate payout lifecycle is implemented and independently accepted.
