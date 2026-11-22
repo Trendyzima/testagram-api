@@ -519,7 +519,7 @@ This section supersedes earlier candidate-pin snapshots above where they conflic
 ### Backend profile and wallet candidate
 
 - Backend PR #436 is a draft stacked on the exact Backend #424 head `cc33913f0fd4e86669f7c717e12b2503990e6d88`.
-- Exact PR #436 head: `e0ec8580fcbb6cfebc6d8033fd31c5464f74adb9`.
+- Exact PR #436 head: `f4cbc62121a7e20114358d89d6cd6add9beec36e`.
 - Adds authenticated `testagram.social.profile.resolve` with viewer-scoped discoverability, accepted-follow and block checks; the resolved UUID is passed through the canonical profile read handler.
 - Binds M-Pesa top-up idempotency keys to the original phone, whole-KES amount and currency. Reuse with a different payload returns conflict.
 - Adds owner-scoped status recovery by idempotency key and includes that key in the caller's wallet transaction history for restart reconciliation.
@@ -544,7 +544,7 @@ This section supersedes earlier candidate-pin snapshots above where they conflic
 
 ### Current CI evidence
 
-- Backend PR #436 CI run `44969983123` was queued at inspection.
+- Backend PR #436 CI run `44969983123` failed its initial gofmt gate; the changed Go files were formatted and the latest exact-head CI run is `44970439444` (queued at this inspection).
 - Flutter PR #115 CI runs `44969985905`, `44969985881`, `44969985856` and `44969985870` were queued at inspection.
 - Queued is not passed. Independent reviews remain required.
 - No staging attestation or production deployment is implied by these feature branches.
