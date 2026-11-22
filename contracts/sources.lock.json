@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "policy": "Immutable source pins identify the exact six runtime organs under integration validation. A runtime pin may target an exact, explicitly declared pull-request candidate while that PR is open; its bridge manifest must record the candidate commit and PR number, must not list that PR as merged, and must be refreshed to the exact merged mainline commit after merge. Every declared provider source path is checked against its corresponding Git tree. The Testagram-native Backend is the only end-user and staff identity/session authority. No external identity-provider endpoint, SDK, bearer token, database, server key, runtime service, or authentication fallback is part of the supported product architecture. Historical account identifiers and migration artifacts are inert records only and are never queried by the live authentication path. Runtime deployment, public routing, identity activation and device acceptance require separate live evidence.",
+  "policy": "Immutable source pins identify the exact six runtime organs under integration validation. A runtime pin must identify the exact current mainline commit after any integration PR is merged; unmerged candidates must be separately recorded and cannot be represented as accepted mainline. Every declared provider source path is checked against its corresponding Git tree. The Testagram-native Backend is the only end-user and staff identity/session authority. No external identity-provider endpoint, SDK, bearer token, database, server key, runtime service, or authentication fallback is part of the supported product architecture. Historical account identifiers and migration artifacts are inert records only and are never queried by the live authentication path. Runtime deployment, public routing, identity activation and device acceptance require separate live evidence.",
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "33844c9051b29e8b77ec4febc6c490e5dc404d2e",
+      "ref": "4c44c989d006a261ac06e4dcad4e30a8904e2cc8",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -271,7 +271,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "e8fa65f321ad700c9e5f04fef86cd5604da500b0",
+      "ref": "03082cc7e2419dc3bac241fd12791043915ea760",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",
