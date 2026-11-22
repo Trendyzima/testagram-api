@@ -109,7 +109,6 @@ for (const path of new Set(scanned)) {
   const source = readFileSync(path, "utf8");
   const normalized = path.replaceAll("\\", "/");
   if (!retiredIdentityProviderPattern.test(source) || nonRuntimeNegativeGuards.some((suffix) => normalized.endsWith(suffix))) continue;
-  const allowed = [...negativePolicyReferences.entries()].find(([suffix]) => normalized.endsWith(suffix))?.[1] ?? new Set();
   const activeMentions = source.split(/\r?\n/).filter((line) => retiredIdentityProviderPattern.test(line));
   if (activeMentions.length > 0) providerViolations.push(path);
 }
