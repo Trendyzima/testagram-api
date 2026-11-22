@@ -633,7 +633,7 @@ This block is the current source-lock authority and supersedes older candidate/m
 | Runtime organ | Exact immutable source pin | Current provenance |
 |---|---|---|
 | Backend | `33844c9051b29e8b77ec4febc6c490e5dc404d2e` | Open PR #424 candidate; mainline conflict reconciliation and the communication/privacy, wallet and knowledge-engine stack are included through stacked PR #450. Exact-head CI is being revalidated, including the Cloudflare API edge secret-before-route deployment guard. |
-| Flutter Client | `2d29bb883645bc6ffd6ef5ff3409cd1bd59d6c54` | Open PR #116 candidate; deep-link, social/knowledge, profile/wallet/monetization and messaging/calls stack included. Exact-head CI is being revalidated. |
+| Flutter Client | `e8fa65f321ad700c9e5f04fef86cd5604da500b0` | Open PR #116 candidate; deep-link, social/knowledge, profile/wallet/monetization and messaging/calls stack included, synced with latest mainline auth/keepalive fixes. Exact-head CI is being revalidated. |
 | Data Centre | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` | Current mainline; PR #115 merged. |
 | CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Current mainline; PR #125 merged. |
 | Federation | `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca` | Current mainline; PR #53 merged. |
