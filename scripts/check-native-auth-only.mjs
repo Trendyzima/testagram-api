@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 
-const retiredIdentityProvider = [65, 112, 112, 119, 114, 105, 116, 101].map(String.fromCharCode).join("");
+const retiredIdentityProvider = [65, 112, 112, 119, 114, 105, 116, 101].map((code) => String.fromCharCode(code)).join("");
 const retiredIdentityProviderPattern = new RegExp(retiredIdentityProvider, "i");
 const retiredIdentityProviderFilePrefix = retiredIdentityProvider.toLowerCase();
 
@@ -121,9 +121,9 @@ assert.equal(
 console.log(`Native-only authentication boundary: PASS (SDK/OpenAPI plus ${new Set(scanned).size} runtime, deployment, configuration and documentation files across all six runtime organs contain no external identity-provider integration)`);
 
 const historicalCompatibilityAllowlist = new Set([
-  `${"backend/migrations/"}${retiredIdentityProviderFilePrefix}_identity_bridge.sql`,
-  `${"backend/migrations/"}${retiredIdentityProviderFilePrefix}_identity_link_audit.sql`,
-  `${"backend/migrations/"}${retiredIdentityProviderFilePrefix}_registration_consent.sql`,
+  "backend/migrations/" + retiredIdentityProviderFilePrefix + "_identity_bridge.sql",
+  "backend/migrations/" + retiredIdentityProviderFilePrefix + "_identity_link_audit.sql",
+  "backend/migrations/" + retiredIdentityProviderFilePrefix + "_registration_consent.sql",
   "backend/migrations/20261115_testagram_native_auth_cutover_foundation.sql",
   "backend/migrations/20261120_native_identity_historical_account_archive.sql",
   "backend/migrations/20261120_native_identity_historical_admin_archive.sql",
