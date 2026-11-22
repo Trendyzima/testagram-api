@@ -236,6 +236,10 @@ const backendFederationClient = [
   readFileSync(resolve(lock.repositories.backend.checkoutPath, "internal/federationclient/remote_subscription.go"), "utf8"),
 ].join("\n");
 const federationServer = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/server.go"), "utf8");
+const federationATProto = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/atproto_internal.go"), "utf8");
+const federationRemoteObjects = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/remote_objects_internal.go"), "utf8");
+const federationPrivateOpenAPI = readFileSync("contracts/upstream/federation/backend-private-v1.openapi.yaml", "utf8");
+const internalFederationOpenAPI = readFileSync("contracts/internal/openapi/federation-ingress-v1.yaml", "utf8");
 const federationIngress = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/internal_activities.go"), "utf8");
 const federationTests = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/internal_activities_test.go"), "utf8");
 const federationRemoteSubscription = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/remote_subscriptions_internal.go"), "utf8");
@@ -251,6 +255,17 @@ for (const [label, source, marker] of [
   ["Federation server", federationServer, 'HandleFunc("POST /internal/v1/atproto/feed"'],
   ["Backend Federation client", backendFederationClient, '/internal/v1/remote-objects'],
   ["Federation server", federationServer, 'HandleFunc("POST /internal/v1/remote-objects"'],
+  ["Federation private provider OpenAPI", federationPrivateOpenAPI, "/internal/v1/activities:"],
+  ["Federation private provider OpenAPI", federationPrivateOpenAPI, "/internal/v1/remote-objects:"],
+  ["Federation private provider OpenAPI", federationPrivateOpenAPI, "/internal/v1/atproto/feed:"],
+  ["Federation private provider OpenAPI", federationPrivateOpenAPI, "/internal/v1/remote-subscriptions/verify:"],
+  ["API Control Plane Federation OpenAPI", internalFederationOpenAPI, "/internal/v1/remote-objects:"],
+  ["API Control Plane Federation OpenAPI", internalFederationOpenAPI, "/internal/v1/atproto/feed:"],
+  ["API Control Plane Federation OpenAPI", internalFederationOpenAPI, "/internal/v1/remote-subscriptions/verify:"],
+  ["Federation ATProto handler", federationATProto, "validInternalBearer(r, token)"],
+  ["Federation ATProto handler", federationATProto, "http.MaxBytesReader(w, r.Body, 16<<10)"],
+  ["Federation remote-object handler", federationRemoteObjects, "validInternalBearer(r, token)"],
+  ["Federation remote-object handler", federationRemoteObjects, "http.MaxBytesReader(w, r.Body, 32<<10)"],
   ["Backend Federation remote-subscription client", backendFederationClient, '/internal/v1/remote-subscriptions/verify'],
   ["Federation remote-subscription route", federationServer, 'HandleFunc("POST /internal/v1/remote-subscriptions/verify"'],
   ["Federation remote-subscription handler", federationRemoteSubscription, "validInternalBearer(r, token)"],
@@ -261,6 +276,7 @@ for (const [label, source, marker] of [
   if (!source.includes(marker)) fail.push(`${label} missing agreed durable-ingress contract marker: ${marker}`);
 }
 if (!backendFederationClient.includes('req.Header.Set("X-Testagram-API-Version", "1")') || !backendFederationClient.includes('req.Header.Set("X-Request-ID", requestID)') || !backendFederationClient.includes("Idempotency-Key")) fail.push("Backend Federation client must send version, request ID and idempotency identity");
+if (!federationPrivateOpenAPI.includes("federationServiceBearer") || !federationPrivateOpenAPI.includes("X-Testagram-API-Version")) fail.push("Federation private OpenAPI must document the dedicated service bearer and API version header");
 if (!federationTests.includes("TestInternalActivityEndpointRejectsMissingServiceCredential") || !federationTests.includes("TestInternalActivityEndpointUsesDedicatedIngressCredential")) {
   fail.push("Federation ingress tests must prove missing and wrong-direction service credentials are rejected");
 }
