@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "4c44c989d006a261ac06e4dcad4e30a8904e2cc8",
+  "sourceRef": "7731a20cbd7cfe5b055f9bfec0d5eb97498ce847",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across all production Go files in cmd/api at the exact current Backend mainline commit 4c44c989d006a261ac06e4dcad4e30a8904e2cc8. Refresh this inventory whenever Backend mainline changes; route status remains governed by the OpenAPI contract and independent acceptance gates.",
+  "note": "Static public/API route registrations across all production Go files in cmd/api at the exact locked Backend mainline commit 7731a20cbd7cfe5b055f9bfec0d5eb97498ce847. The release-pin refresh changes deployment handoff and regression/CI wiring, not API route registrations. Refresh this inventory whenever Backend mainline changes; route status remains governed by the OpenAPI contract and independent acceptance gates.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
