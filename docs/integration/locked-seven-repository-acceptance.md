@@ -27,13 +27,13 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. Flutter PR #114, Backend PR #436 (stacked on native-auth PR #424), Data Centre PR #115 and Federation PR #53 are pinned to exact open review candidates. CDN pins the exact merged PR #125 commit; Algorithm pins its latest observed mainline revision. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
+The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. Flutter PR #114, Backend PR #436 (stacked on native-auth PR #424), Data Centre PR #116 and Federation PR #53 are pinned to exact open review candidates. CDN pins the exact merged PR #125 commit; Algorithm pins its latest observed mainline revision. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `76ba92dc44ac8b4288765215a33cd572ff6f8389` (PR #115 deep-link/wallet candidate; mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
+| Flutter | `76ba92dc44ac8b4288765215a33cd572ff6f8389` (PR #116 deep-link/wallet candidate; mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
 | Backend | `f4cbc62121a7e20114358d89d6cd6add9beec36e` (PR #436 profile/wallet candidate; stacked on #424 `cc33913f0fd4e86669f7c717e12b2503990e6d88`) |
-| Data Centre | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` (PR #115 OpenAPI candidate; mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
+| Data Centre | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` (PR #116 OpenAPI candidate; mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` |
 | Federation | `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` (PR #53 candidate; mainline base `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d`) |
@@ -250,7 +250,7 @@ The bridge records four runtime organs at their latest merged mainline revisions
 |---|---|---|---|
 | Flutter client | `Trendyzima/testagram-flutter-client-` | `1f58971720c7a72139d56900a5895c49fa105639` | Mainline; PRs #112 documentation cleanup and #113 retired-provider test-label cleanup merged |
 | Backend | `Trendyzima/Testagram-backend-` | `a793c55db8b5c258524bfef4b8872f5c6c1038e5` | Mainline; PR #436 candidate `f4cbc62121a7e20114358d89d6cd6add9beec36e` is stacked on PR #424 candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88` |
-| Data Centre | `Trendyzima/Testagram-data-centre-` | `ada6f26a289775720bb47a639242dbd868388055` | Mainline; PR #115 identity-evidence OpenAPI candidate `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` |
+| Data Centre | `Trendyzima/Testagram-data-centre-` | `ada6f26a289775720bb47a639242dbd868388055` | Mainline; PR #116 identity-evidence OpenAPI candidate `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` |
 | CDN | `Trendyzima/cdn-` | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Mainline; PR #125 merged at this exact commit |
 | Algorithm | `Trendyzima/the-algorithm` | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline; PRs #28 and #29 ownership documentation merged |
 | Federation | `Trendyzima/federated-content` | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Mainline; PR #53 candidate `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` adds private Backend contract including remote-subscription verification |
@@ -528,11 +528,11 @@ This section supersedes earlier candidate-pin snapshots above where they conflic
 ### Flutter deep-link and wallet candidate
 
 - Flutter PR #114 is based on mainline `1f58971720c7a72139d56900a5895c49fa105639`.
-- Exact PR #115 head: `76ba92dc44ac8b4288765215a33cd572ff6f8389`.
+- Exact PR #116 head: `76ba92dc44ac8b4288765215a33cd572ff6f8389`.
 - Adds profile block controls, allow-listed username profile/UUID profile/wallet landing links, authentication-aware initial routing and Backend username resolution.
 - Persists M-Pesa request identity in secure storage before network dispatch, reuses the same key on retry, and recovers ambiguous attempts by the owner-scoped idempotency reference. Restores block/unblock API contract tests.
 - The Flutter repository contains no Android/iOS runner projects. Dart parsing and initial-route handling are not proof of native App Links or Universal Links. Verified Android `assetlinks.json`, iOS `apple-app-site-association`, signing identity and warm-link handling remain release gates.
-- PR #115 exact-head Flutter analysis, widget tests and platform builds remain pending; do not mark accepted until they complete.
+- PR #116 exact-head Flutter analysis, widget tests and platform builds remain pending; do not mark accepted until they complete.
 
 ### Product and organ boundaries
 
@@ -545,6 +545,8 @@ This section supersedes earlier candidate-pin snapshots above where they conflic
 ### Current CI evidence
 
 - Backend PR #436 CI run `44969983123` failed its initial gofmt gate; the changed Go files were formatted and the latest exact-head CI run is `44970439444` (queued at this inspection).
-- Flutter PR #115 latest exact-head CI runs `44970427486`, `44970427504`, `44970427446` and `44970427493` were in progress/pending at inspection.
+- Flutter PR #116 latest exact-head CI runs `44970427486`, `44970427504`, `44970427446` and `44970427493` were in progress/pending at inspection.
 - Queued is not passed. Independent reviews remain required.
 - No staging attestation or production deployment is implied by these feature branches.
+
+The earlier Flutter PRs #114 and #115 were closed as superseded; PR #116 now contains their profile/knowledge work plus the deep-link and wallet recovery changes in one mainline-targeted candidate.
