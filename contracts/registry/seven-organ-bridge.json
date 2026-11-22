@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "201fd3335c737e7fe36ed34dfa1ec07b03c31047"
   },
-  "status": "candidate-backend-and-flutter-pins-runtime-acceptance-pending",
+  "status": "backend-and-flutter-stacked-candidates-pinned-runtime-acceptance-pending",
   "repositories": [
     {
       "id": "flutter-client",
@@ -20,8 +20,8 @@
         112,
         113
       ],
-      "candidateCommit": "8988ef48c55811d6faccbfa05bebb486d4775f65",
-      "candidatePullRequest": 118
+      "candidateCommit": "714b0f9b3846c0a038db8ae7b01e2a49b626eefe",
+      "candidatePullRequest": 120
     },
     {
       "id": "backend",
@@ -39,8 +39,8 @@
         427,
         428
       ],
-      "candidateCommit": "a493cd5ab9185f4eb43d82aa2c05fa0107e59620",
-      "candidatePullRequest": 439
+      "candidateCommit": "0578db9f3cff5c943915eebee890bc1f97e461c2",
+      "candidatePullRequest": 441
     },
     {
       "id": "data-centre",
@@ -189,9 +189,12 @@
   ],
   "excludedFromAcceptance": [
     "A branch without a reviewed pull request is not automatically merged.",
-    "Flutter PR #100 remains a stale draft based on an older mainline and is not an accepted source pin; current Flutter mainline already carries stricter NodeInfo/WebFinger/actor smoke checks, while the live Cloudflare route inventory still blocks production Federation acceptance.",
-    "Backend PR #424 remains an unmerged base candidate and PR #436 is stacked directly on it; neither is accepted until sequential independent review and merge. CDN PR #125 is merged at 21a254e9f67dc7a8e55dca37151a6db532405e53.",
+    "Flutter PR chain #116 → #117 → #118 → #120 is open and unmerged; the lock pins the exact #120 head. These candidate screens and contracts are not production acceptance.",
+    "Backend PR chain #424 → #434 → #435 → #437 → #439 → #441 is open and unmerged; the lock pins the exact #441 head. Review and merge sequentially; do not merge stacked candidates out of order.",
+    "Backend PR #440 is validation-only and must be closed, never merged. It is not a runtime source candidate.",
+    "CDN PR #125 is merged at 21a254e9f67dc7a8e55dca37151a6db532405e53; its live production routing and staging acceptance remain separate gates.",
+    "Data Centre PR #115 and Federation PR #53 remain open candidate contracts and are not merged or staging-accepted.",
     "Merged source revisions do not prove live DNS, TLS, deployment health, provider durability or end-to-end staging acceptance.",
-    "Backend PR #432 approval-integrity migration remains a separate stacked candidate on overlapping PR #431; reconcile/rebase it onto the reviewed PR #424 candidate or its accepted mainline merge before merge."
+    "Backend approval-ledger changes are represented by the sequential #424 → #434 → #435 → #437 → #439 → #441 candidate chain; do not revive the superseded overlapping #431/#432 path."
   ]
 }
