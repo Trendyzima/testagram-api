@@ -27,13 +27,13 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. Backend intentionally pins the exact open review candidate in PR #424, and Data Centre pins the exact identity-evidence OpenAPI candidate in PR #115. CDN pins the exact merged PR #125 commit; Flutter, Algorithm and Federation pin their latest observed mainline revisions. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
+The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. Backend PR #424, Data Centre PR #115 and Flutter PR #114 are pinned to their exact open review candidates. CDN pins the exact merged PR #125 commit; Algorithm and Federation pin their latest observed mainline revisions. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `da1c78d69c9e83c27824dd59516f73ed77d1d8a4` (PR #114 candidate; mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
+| Flutter | `f2819268f03aa76c259e94839dd8afddc3542b69` (PR #114 candidate; mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
 | Backend | `cc33913f0fd4e86669f7c717e12b2503990e6d88` (PR #424 candidate; unmerged) |
-| Data Centre | `d37c6d9d233093698371f2ffdfbb68bf462a6a39` (PR #115 OpenAPI candidate; mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
+| Data Centre | `3d92c379e64fafa440eca9c81ec9edbc8007488e` (PR #115 OpenAPI candidate; mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` |
 | Federation | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` |
