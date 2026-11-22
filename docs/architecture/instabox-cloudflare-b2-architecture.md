@@ -106,3 +106,17 @@ Cloudflare R2 is an object origin, not the public delivery hostname. Do not rout
 8. Complete cross-repository staging tests before production DNS or storage cutover.
 
 No production DNS, bucket, secret, database or deployment change is authorized by this document.
+
+
+## Public API edge ingress (separate from media delivery)
+
+The public API hostname is handled by the Testagram-owned Cloudflare Worker `testagram-api-edge` on the exact route `api.testagram.site/*`. This is an API ingress only; it does not proxy viewer media and must not replace the CDN organ for `media.testagram.site`.
+
+- The Worker accepts only HTTPS requests for `api.testagram.site`, validates the fixed InstaBox HTTPS origin, removes client-supplied forwarding headers, and sets trusted forwarding metadata from Cloudflare's edge request.
+- The Worker adds the shared `EDGE_PROXY_SHARED_TOKEN`; Caddy's private `:8443` handler requires both `X-Forwarded-Host: api.testagram.site` and that token, then removes the token before forwarding to the Backend API service.
+- The same 32-byte hexadecimal value is stored as the GitHub secret `TESTAGRAM_EDGE_PROXY_SHARED_TOKEN`, the Cloudflare Worker secret `EDGE_PROXY_SHARED_TOKEN`, and the Backend machine's `.env` value `EDGE_PROXY_SHARED_TOKEN`. Never commit the value or generate a different value independently on either side.
+- The Cloudflare Worker script is deployed without a public route first. The secret is installed before the guarded workflow attaches `api.testagram.site/*`; route ownership and exact Cloudflare account/zone are rechecked immediately before attachment.
+- The known legacy Worker custom-domain binding is retained during staged handoff. Cloudflare Worker Routes take precedence over Custom Domains on the same hostname, so the exact API route can shadow the legacy binding without deleting the legacy Worker. Do not remove that fallback until native-origin health and rollback acceptance pass.
+- The route workflow is manual-dispatch only, requires explicit production confirmation, fails closed on overlapping routes, and verifies health, public search and unauthenticated-feed denial after cutover.
+
+The API edge shared token is currently a deployment blocker: the production GitHub secret is empty, so the Backend deployment workflow stops before machine selection/start. No route cutover has been performed.
