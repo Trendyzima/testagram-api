@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "f891c36992ac6d4cca7306cf2eb31644222c83f4",
+      "ref": "e558bd7f40c716b07aac29f22197aecdec862228",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -168,6 +168,7 @@
         "migrations/20261120_native_identity_historical_staff_archive.sql",
         "migrations/20261120_social_platform_product_foundation.sql",
         "migrations/20261121_native_staff_webauthn.sql",
+        "migrations/20261122_communication_media_encryption_truth.sql",
         "scripts/archive/legacy-identity-provider-import.sql",
         "scripts/guard-no-render.py",
         "scripts/instabox-production-backup.sh",
