@@ -428,3 +428,18 @@ A subsequent forensic refresh observed Backend PR #434 at head `25ebde27e54ae8af
 The Backend CI run `44965224380` is now running against this exact head; its Admin permissions and dual-control PostgreSQL integration job is included. Workflow syntax validation passed on this head. The immediately preceding Backend CI attempts were cancelled as newer commits arrived, so they are not acceptance evidence. Cloudflare audit remains read-only.
 
 PR #434 remains draft, with no independent review. The bridge lock remains pinned to the unmerged #424 source candidate and has not been advanced to #434 or any unmerged branch. This status is an audit snapshot only; refresh the Backend source pin after independent review and actual merge of the accepted dependency chain.
+
+
+## 24. Backend PR #434 exact-credential hardening and latest validation — 2026-11-22
+
+The latest Backend PR #434 head is `89e4663f330cb965f66db5614c41661ea037ffe2`. It remains directly based on #424 candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88`; a fresh Git comparison reports 21 commits ahead, 0 behind, with #424 itself as the merge base. PR #434 is still draft, mergeable, and has no independent review submissions.
+
+The approval ledger now persists both the exact WebAuthn RP ID and credential identifier from the verified elevation token. PostgreSQL insert and final-quorum guards require the same active, user-verified, non-cloned credential and lock it through the decision transaction. The Admin Console requires the elevation subject to match the authenticated staff principal and verifies the immutable canonical payload digest before appending an approval. Regression tests now assert the exact credential evidence is persisted and reject a mismatched payload digest or a different authenticator.
+
+The first full CI attempt after introducing the new credential columns exposed a real test-harness omission: the separate identity-registration PostgreSQL harness had not applied migration 061 and its fixture did not seed approver credentials. That harness now applies migration 061 twice to test idempotence, creates exact credential fixtures, and records credential-bound approval rows. The test suite now also asserts that the two exact credential IDs were persisted by the identity-review integration path. This correction is included in the current head; do not treat earlier cancelled or failed runs as final acceptance.
+
+Backend CI run `44965415739` and workflow syntax validation run `44965411063` were in progress when this snapshot was written. The Cloudflare domain-routing audit run `44965415787` is read-only and in progress. A fresh all-green run against this exact head is still required.
+
+The API bridge source lock remains intentionally pinned to the unmerged Backend #424 candidate and CDN #125 candidate. It has not been advanced to PR #434, and no moving branch name is used as an accepted dependency. Refresh the source lock only after independent security review and actual merge of the accepted Backend dependency chain, using the final merge commit SHA.
+
+No PR was merged. No production deployment, DNS or route transfer, Worker deletion, staff permission change or staging-zone acceptance occurred. Staff invitations, role changes, revocations and permission changes remain disabled until a transactional two-person executor is implemented and independently accepted.
