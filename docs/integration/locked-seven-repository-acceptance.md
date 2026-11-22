@@ -31,9 +31,9 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `638463c1e6d09137440cab8638729cc73eb9b98a` (PR #114 candidate; mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
-| Backend | `cc33913f0fd4e86669f7c717e12b2503990e6d88` (PR #424 candidate; unmerged) |
-| Data Centre | `3d92c379e64fafa440eca9c81ec9edbc8007488e` (PR #115 OpenAPI candidate; mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
+| Flutter | `8a459719a2e24a30de0e6bfe421bcba0859dabb4` (PR #115 deep-link/wallet candidate; mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
+| Backend | `f4cbc62121a7e20114358d89d6cd6add9beec36e` (PR #436 profile/wallet candidate; stacked on #424 `cc33913f0fd4e86669f7c717e12b2503990e6d88`) |
+| Data Centre | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` (PR #115 OpenAPI candidate; mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` |
 | Federation | `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` (PR #53 candidate; mainline base `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d`) |
@@ -249,11 +249,11 @@ The bridge records four runtime organs at their latest merged mainline revisions
 | Organ | Repository | Locked source revision | Integration status |
 |---|---|---|---|
 | Flutter client | `Trendyzima/testagram-flutter-client-` | `1f58971720c7a72139d56900a5895c49fa105639` | Mainline; PRs #112 documentation cleanup and #113 retired-provider test-label cleanup merged |
-| Backend | `Trendyzima/Testagram-backend-` | `c627858a295fbf45b6dbdeeb54d2a5aa0a989470` | Temporary native-auth review candidate; PR #424 remains open |
-| Data Centre | `Trendyzima/Testagram-data-centre-` | `58de0bf36b76f9cd74824901b6a86de29f420c65` | Mainline; PR #112 boundary documentation and PR #113 negative-issuer fixture cleanup merged |
-| CDN | `Trendyzima/cdn-` | `930f000e030fc920a749b99cae1e0c8c5c01d2b1` | Temporary guarded API-domain handoff candidate; PR #125 CI green, mainline remains `490119514788c13c327ee05eb4ce068a0f73966e` |
+| Backend | `Trendyzima/Testagram-backend-` | `a793c55db8b5c258524bfef4b8872f5c6c1038e5` | Mainline; PR #436 candidate `f4cbc62121a7e20114358d89d6cd6add9beec36e` is stacked on PR #424 candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88` |
+| Data Centre | `Trendyzima/Testagram-data-centre-` | `ada6f26a289775720bb47a639242dbd868388055` | Mainline; PR #115 identity-evidence OpenAPI candidate `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` |
+| CDN | `Trendyzima/cdn-` | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Mainline; PR #125 merged at this exact commit |
 | Algorithm | `Trendyzima/the-algorithm` | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline; PRs #28 and #29 ownership documentation merged |
-| Federation | `Trendyzima/federated-content` | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Mainline; PR #51 native boundary documentation merged |
+| Federation | `Trendyzima/federated-content` | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Mainline; PR #53 candidate `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` adds private Backend contract including remote-subscription verification |
 | API Control Plane | `Trendyzima/testagram-api` | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` | Governance-only mainline; this bridge remains an open candidate PR |
 
 The four refreshed mainline pins were compared with their previous locked revisions. The intervening changes were confined to documentation and negative-test-fixture cleanup and did not alter runtime source paths or provider snapshots. Backend and CDN candidate commits are intentionally not described as merged mainline revisions. Once PRs #424 and #125 merge, refresh both pins to their exact merge SHAs and regenerate all relevant route/source evidence before accepting the integration.
