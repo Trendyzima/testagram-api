@@ -36,7 +36,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Data Centre | `3d92c379e64fafa440eca9c81ec9edbc8007488e` (PR #115 OpenAPI candidate; mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` |
-| Federation | `27fa3eae535bfa3aaf249a7821103adbc16734ec` (PR #53 candidate; mainline base `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d`) |
+| Federation | `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` (PR #53 candidate; mainline base `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d`) |
 | CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` (PR #125 merged) |
 
 A source pin is not a deployment record. Every accepted staging and production run must separately record the actual running image digest and source revision. Mutable tags such as `main` and `latest` are not acceptable release identities.
