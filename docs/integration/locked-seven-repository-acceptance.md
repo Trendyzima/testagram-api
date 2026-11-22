@@ -605,3 +605,22 @@ The six runtime source pins below are the current immutable revisions in `contra
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline pin |
 
 Backend PR #440 is validation-only and must be closed, never merged. The API Control Plane remains build-time governance only and is not a runtime service or hop. No source pin implies deployment, production approval, provider durability or live end-to-end acceptance.
+
+
+## Authoritative source-pin reconciliation after documentation merges — 2026-11-22
+
+The following pins supersede earlier candidate snapshots above. Data Centre PR #115, Federation PRs #52/#53, API product architecture PR #117, and Flutter PR #121 have now been merged. The exact merge commits are recorded here; they do not imply production deployment or acceptance.
+
+| Organ | Exact source SHA | State |
+|---|---|---|
+| Backend | `2c76af240289931dab390360d107d1df2adddb2e` | Open Backend PR #441 candidate; security stack #424 → #434 → #435 → #437 → #439 → #441 remains unmerged and requires independent review |
+| Flutter client | `b818e6c2c2ec2dd909eb001afb9c055ab562b9bd` | Open Flutter PR #120 candidate; its mainline base now includes PR #121 merge `44d19f98808768750cfe5e590f8a451bf1cc404d` |
+| Data Centre | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` | Mainline after documentation contract PR #115 merge |
+| CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Mainline after PR #125 merge |
+| Federation | `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca` | Mainline after private bridge PR #53 and endpoint clarification PR #52 merges |
+| Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline; exact-head workflow evidence remains required |
+| API Control Plane | `14e67fffb2150021d7b94bd8941f49ac0485d034` | Mainline governance-only after PR #117 merge; not a runtime service or hop |
+
+Merge commits recorded during this consolidation: Flutter #121 `44d19f98808768750cfe5e590f8a451bf1cc404d`; Data Centre #115 `99edc3e096675f5c39ab6a9bd0050dcee30283a0`; Federation #52 `e8cf8f5013da52659b2d362ec3fc9a7a670f507a`; Federation #53 `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca`; API #117 `14e67fffb2150021d7b94bd8941f49ac0485d034`.
+
+The API bridge source lock now pins the merged Data Centre and Federation commits, and its registry records the updated Flutter, Data Centre, Federation and API governance mainline heads. The Backend and Flutter candidate refs remain explicitly unmerged. Refresh them only after their dependency stacks are independently reviewed and accepted. No production auth cutover, deployment, DNS/Cloudflare route change, VPS lifecycle action, secret rotation, production data change or destructive migration is authorized by this reconciliation.
