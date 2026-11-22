@@ -30,7 +30,7 @@ The six runtime pins are stored in `contracts/sources.lock.json`. Backend and Fl
 - Federation: PRs #49–#53 are merged into main (navigation, dependency reliability, native ownership boundary and private protocol contracts).
 - API Control Plane: PRs #115 and #117 are merged into main; bridge PR #116 is the active draft candidate.
 
-The current bridge itself is API Control Plane PR #116. Its source pins and cross-repository contract include the guarded Cloudflare API edge Worker, Caddy token gate, deployment secret propagation and route activation order. Full contract CI passed on exact head `c040cbff47c2adb8f75aff5d73485c3591182d41` (run `45006661103`).
+The current bridge itself is API Control Plane PR #116. Its source pins and cross-repository contract include the guarded Cloudflare API edge Worker, Caddy token gate, deployment secret propagation and route activation order. Full contract CI passed on exact head `2f912b111fced100254744cd11085b552f17da22` (run `45006780261`).
 
 Flutter PR #113's negative-auth fixture cleanup is already merged into main.
 
