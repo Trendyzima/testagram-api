@@ -78,10 +78,12 @@
       ],
       "contracts": [
         "contracts/upstream/datacentre/internal-platform.openapi.yaml",
-        "docs/integration/data-centre-platform-contract.md"
+        "docs/integration/data-centre-platform-contract.md",
+        "contracts/upstream/datacentre/media-lifecycle-v1.openapi.yaml",
+        "contracts/upstream/datacentre/identity-evidence-v1.openapi.yaml"
       ],
-      "status": "native-user-token-verification-and-private-platform-contract-implemented-live-staging-and-media-acceptance-pending",
-      "notes": "Data Centre video and notification user-aware routes validate Backend-issued native access JWTs and recheck live PostgreSQL session/account state. PLATFORM_INTERNAL_TOKEN remains a separate credential for protected platform writes. The dedicated media profile and its B2/R2 byte lifecycle are separate from the Backend native virtual-storage MinIO/R2/B2 path; neither is accepted without its own live staging evidence."
+      "status": "private-platform-and-media-provider-implemented-identity-evidence-contract-candidate-pr-115-live-staging-acceptance-pending",
+      "notes": "Data Centre video and notification user-aware routes validate Backend-issued native access JWTs and recheck live PostgreSQL session/account state. PLATFORM_INTERNAL_TOKEN remains separate for protected platform writes. The private media lifecycle API has a typed Backend client in native-auth candidate PR #424 and matching provider routes. Identity evidence is isolated under /internal/v1/identity-evidence/* with its own IDENTITY_EVIDENCE_INTERNAL_TOKEN and dedicated B2/R2 buckets; its provider OpenAPI contract is proposed in Data Centre PR #115 and pinned as a candidate in the bridge. Neither API has passed live staging acceptance. The generic platform config/events/audit API remains a separate service contract and no typed Backend consumer is claimed."
     },
     {
       "id": "cdn-edge",
@@ -142,7 +144,8 @@
       "repository": "Trendyzima/the-algorithm",
       "role": "private-ranking-provider",
       "authority": [
-        "ranking order and ranking scores only"
+        "ranking order and ranking scores only",
+        "ranking of Backend-authorized public hashtag candidates"
       ],
       "baseUrl": "http://algorithm:8092",
       "exposure": "private-network",
@@ -153,8 +156,8 @@
       "contracts": [
         "contracts/upstream/algorithm/openapi.yaml"
       ],
-      "status": "feed-ranking-contract-and-backend-client-static-contract-aligned-staging-acceptance-pending",
-      "notes": "Backend submits at most 200 already-authorized candidates to POST /v1/feed/rank and requests at most 50 results. The pinned Backend client and Algorithm OpenAPI agree on the path and API-version/service-bearer headers. Backend rejects unknown/duplicate IDs and rechecks current authorization before hydration. Staging service-authentication, timeout/fallback and load acceptance remain required."
+      "status": "feed-and-topic-ranking-contract-and-backend-client-static-contract-aligned-staging-acceptance-pending",
+      "notes": "Backend submits at most 200 already-authorized feed candidates to POST /v1/feed/rank and at most 200 Backend-authorized public hashtag candidates to POST /v1/topics/rank, requesting at most 50 results. The pinned Backend client, Algorithm handlers and OpenAPI agree on both routes, API-version/service-bearer headers and bounded inputs. Backend rejects unknown/duplicate IDs and rechecks current authorization before hydration. Staging service-authentication, timeout/fallback and load acceptance remain required."
     }
   ]
 }
