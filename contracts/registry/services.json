@@ -30,8 +30,8 @@
         "contracts/internal/openapi/backend-tv-health-monitor-v1.yaml",
         "contracts/internal/openapi/backend-user-activity-watchdog-v1.yaml"
       ],
-      "status": "native-auth-pr-424-candidate-plus-profile-wallet-pr-436-stacked-candidate-security-review-pending",
-      "notes": "Backend remains the canonical identity, authorization, content and relationship authority. Native authentication candidate PR #424 is the parent security gate. The pinned source candidate PR #436 is stacked on #424 and adds viewer-scoped username resolution through testagram.social.profile.resolve plus M-Pesa top-up idempotency binding/recovery. PR #434 approval-ledger integrity and PR #435 Q&A schema remain separate sequential candidates based on #424; the source pin does not imply they are merged. Independent security review, sequential rebase/integration and staging acceptance remain mandatory."
+      "status": "native-auth-pr-424-plus-approval-ledger-pr-434-qa-pr-435-profile-wallet-pr-437-communication-privacy-pr-439-and-fail-closed-followup-pr-441-candidates-review-pending",
+      "notes": "Backend remains the canonical identity, authorization, content, wallet and relationship authority. The current dependent review chain is PR #424 → #434 → #435 → #437 → #439 → #441. PR #437 adds viewer-scoped username resolution and owner-scoped M-Pesa idempotency recovery; #439 adds communication privacy/block enforcement; #441 is the fail-closed follow-up, closes additional delete/call-end policy routing gaps and removes legacy plaintext from message-list responses. All are open, unmerged candidates and the chain must be reviewed and merged sequentially. PR #440 is validation-only and must never be merged. Independent security review, exact-head CI, PostgreSQL concurrency tests and staging acceptance remain mandatory."
     },
     {
       "id": "flutter-client",
@@ -55,8 +55,8 @@
         "packages/dart/README.md",
         "packages/dart/lib/testagram_api.dart"
       ],
-      "status": "hybrid-social-knowledge-client-candidate-pr-114-ci-green-contract-audit-pending",
-      "notes": "Flutter PR #114 is the pinned candidate for the Testagram-owned hybrid social and knowledge experience: Home, Discover, Ask, Notifications and More navigation; Backend-authoritative feed ordering metadata; Discover All/Posts/People filters; typed notification actions; and profile block/unblock actions through contracted native Backend routes. The candidate includes profile safety API tests with canonical UUID version/variant validation. Q&A remains unavailable until Backend PR #435 adds handlers and API integration. Separate Flutter PR #115 proposes safe deep links and wallet M-Pesa retry recovery; it is not included in this source pin and must be reconciled separately before those flows are treated as integrated. Flutter must never receive service tokens, storage-provider keys, database credentials or private service URLs."
+      "status": "hybrid-social-knowledge-pr-116-deep-links-wallet-monetization-pr-117-messaging-calls-pr-118-plaintext-rendering-hardening-pr-120-candidates-review-pending",
+      "notes": "Flutter PR chain: #116 provides the consolidated social/knowledge, profile safety, deep-link, wallet and monetization foundations; #117 layers the hybrid social/knowledge UI; #118 adds direct-message and voice/video call destinations; #120 removes plaintext message rendering and adds a regression test. The current source pin is the exact #120 head and includes its stacked ancestors. Wallet and profile actions use authenticated Backend contracts. Monetization destinations are navigable foundations only; campaign, earnings, premium, subscription, boost, payout and gifts/tips workflows remain unavailable until their Backend contracts, ledger/provider reconciliation and end-to-end tests exist. Message composition and media calling remain disabled until verified E2EE and signaling/media lifecycles are implemented. Flutter native Android App Links/iOS Universal Links still require verified packaging associations."
     },
     {
       "id": "data-centre-platform",
