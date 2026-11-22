@@ -321,7 +321,7 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d",
+      "ref": "81259c37d943312de648e3754ea146c027bc7ee5",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
         ".env.example",
@@ -345,7 +345,8 @@
         "internal/worker/inbox_test.go",
         "internal/worker/outbox.go",
         "internal/worker/outbox_test.go",
-        "internal/httpapi/worker_status.go"
+        "internal/httpapi/worker_status.go",
+        "docs/internal/openapi/backend-private-v1.yaml"
       ]
     },
     "algorithm": {
@@ -397,6 +398,11 @@
       "repository": "data-centre",
       "sourcePath": "docs/platform/openapi/identity-evidence-v1.yaml",
       "snapshotPath": "contracts/upstream/datacentre/identity-evidence-v1.openapi.yaml"
+    },
+    {
+      "repository": "federation",
+      "sourcePath": "docs/internal/openapi/backend-private-v1.yaml",
+      "snapshotPath": "contracts/upstream/federation/backend-private-v1.openapi.yaml"
     }
   ]
 }
