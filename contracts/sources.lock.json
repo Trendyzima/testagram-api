@@ -190,10 +190,13 @@
         "tests/test_instabox_edge_proxy_secret.py",
         "tests/test_instabox_federation_runtime_contract.py",
         "tests/test_instabox_image_digest_verification.py",
+        "tests/test_instabox_postgres_readiness.py",
         "tests/test_instabox_runtime_healthcheck_paths.py",
         "tests/test_instabox_watchdog.py",
+        "tests/test_instabox_web_image_release_wiring.py",
         "tests/test_native_auth_runtime_boundary.py",
         "tests/test_native_identity_migration_manifest.py",
+        "tests/test_r2_managed_domain_request.py",
         "tests/test_self_hosted_backup_guards.py"
       ]
     },
