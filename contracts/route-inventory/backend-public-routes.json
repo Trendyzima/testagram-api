@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "33844c9051b29e8b77ec4febc6c490e5dc404d2e",
+  "sourceRef": "4c44c989d006a261ac06e4dcad4e30a8904e2cc8",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across all production Go files in cmd/api at the pinned Backend PR #424 candidate head 33844c9051b29e8b77ec4febc6c490e5dc404d2e. This candidate includes native auth, communication/privacy, wallet, knowledge-engine and the guarded Cloudflare API edge gateway. PR #424 remains open and unmerged; refresh this inventory to the exact mainline merge SHA only after independent review and mainline merge.",
+  "note": "Static public/API route registrations across all production Go files in cmd/api at the exact current Backend mainline commit 4c44c989d006a261ac06e4dcad4e30a8904e2cc8. Refresh this inventory whenever Backend mainline changes; route status remains governed by the OpenAPI contract and independent acceptance gates.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
