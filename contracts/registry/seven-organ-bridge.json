@@ -1,0 +1,206 @@
+{
+  "schemaVersion": 1,
+  "bridge": "testagram-seven-organ-bridge",
+  "createdFrom": {
+    "repository": "Trendyzima/testagram-api",
+    "branch": "main",
+    "commit": "14e67fffb2150021d7b94bd8941f49ac0485d034"
+  },
+  "status": "current-mainline-source-pins; runtime-acceptance-pending",
+  "repositories": [
+    {
+      "id": "flutter-client",
+      "fullName": "Trendyzima/testagram-flutter-client-",
+      "defaultBranch": "main",
+      "kind": "runtime",
+      "sourcePinKey": "flutter-client",
+      "mainCommit": "03082cc7e2419dc3bac241fd12791043915ea760",
+      "mergedPullRequests": [
+        109,
+        112,
+        113,
+        116,
+        121,
+        122
+      ]
+    },
+    {
+      "id": "backend",
+      "fullName": "Trendyzima/Testagram-backend-",
+      "defaultBranch": "main",
+      "kind": "runtime",
+      "sourcePinKey": "backend",
+      "mainCommit": "4c44c989d006a261ac06e4dcad4e30a8904e2cc8",
+      "mergedPullRequests": [
+        418,
+        419,
+        421,
+        423,
+        424,
+        426,
+        427,
+        428,
+        433,
+        443,
+        445,
+        447,
+        448,
+        449
+      ]
+    },
+    {
+      "id": "data-centre",
+      "fullName": "Trendyzima/Testagram-data-centre-",
+      "defaultBranch": "main",
+      "kind": "runtime",
+      "sourcePinKey": "data-centre",
+      "mainCommit": "99edc3e096675f5c39ab6a9bd0050dcee30283a0",
+      "mergedPullRequests": [
+        111,
+        112,
+        113,
+        114,
+        115
+      ]
+    },
+    {
+      "id": "cdn",
+      "fullName": "Trendyzima/cdn-",
+      "defaultBranch": "main",
+      "kind": "runtime",
+      "sourcePinKey": "cdn",
+      "mainCommit": "21a254e9f67dc7a8e55dca37151a6db532405e53",
+      "mergedPullRequests": [
+        122,
+        123,
+        124,
+        125
+      ]
+    },
+    {
+      "id": "algorithm",
+      "fullName": "Trendyzima/the-algorithm",
+      "defaultBranch": "main",
+      "kind": "runtime",
+      "sourcePinKey": "algorithm",
+      "mainCommit": "92cf9b47e4de38306c4fe7b61ece24c3e075aa22",
+      "mergedPullRequests": [
+        27,
+        28,
+        29
+      ]
+    },
+    {
+      "id": "federation",
+      "fullName": "Trendyzima/federated-content",
+      "defaultBranch": "main",
+      "kind": "runtime",
+      "sourcePinKey": "federation",
+      "mainCommit": "cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca",
+      "mergedPullRequests": [
+        49,
+        50,
+        51,
+        52,
+        53
+      ]
+    },
+    {
+      "id": "api-control-plane",
+      "fullName": "Trendyzima/testagram-api",
+      "defaultBranch": "main",
+      "kind": "governance",
+      "sourcePinKey": null,
+      "mainCommit": "14e67fffb2150021d7b94bd8941f49ac0485d034",
+      "mergedPullRequests": [
+        115,
+        117
+      ]
+    }
+  ],
+  "runtimeEdges": [
+    {
+      "from": "flutter-client",
+      "to": "backend",
+      "contract": "public HTTPS API; Testagram-native user session"
+    },
+    {
+      "from": "flutter-client",
+      "to": "cdn",
+      "contract": "approved media URLs and byte delivery only"
+    },
+    {
+      "from": "backend",
+      "to": "data-centre",
+      "contract": "private media and identity-evidence APIs with distinct service credentials; Data Centre platform config/events/audit API is not yet a verified Backend consumer edge"
+    },
+    {
+      "from": "backend",
+      "to": "cdn",
+      "contract": "viewer assertions and separate origin authentication"
+    },
+    {
+      "from": "backend",
+      "to": "algorithm",
+      "contract": "bounded authorized candidate IDs; rank/order only"
+    },
+    {
+      "from": "backend",
+      "to": "federation",
+      "contract": "directional private credentials and durable protocol outbox"
+    }
+  ],
+  "governanceEdges": [
+    {
+      "from": "api-control-plane",
+      "to": "flutter-client",
+      "contract": "build-time contracts, SDKs and source-pin CI"
+    },
+    {
+      "from": "api-control-plane",
+      "to": "backend",
+      "contract": "build-time contracts, route inventory and source-pin CI"
+    },
+    {
+      "from": "api-control-plane",
+      "to": "data-centre",
+      "contract": "build-time private schemas and source-pin CI"
+    },
+    {
+      "from": "api-control-plane",
+      "to": "cdn",
+      "contract": "build-time media contracts and source-pin CI"
+    },
+    {
+      "from": "api-control-plane",
+      "to": "algorithm",
+      "contract": "build-time ranker OpenAPI and source-pin CI"
+    },
+    {
+      "from": "api-control-plane",
+      "to": "federation",
+      "contract": "build-time federation contracts and source-pin CI"
+    }
+  ],
+  "invariants": [
+    "Backend is the canonical identity, session, authorization and product-data authority.",
+    "Data Centre owns infrastructure and storage mechanics, never product authorization.",
+    "CDN delivers bytes; it does not decide product visibility or ownership.",
+    "Algorithm ranks only Backend-authorized candidate IDs and cannot hydrate canonical records.",
+    "Federation owns protocol state and signed delivery, not local identity or canonical product records.",
+    "Flutter never receives private service tokens, provider credentials, database credentials or private service URLs.",
+    "The API control plane is build-time governance only and is never a runtime gateway.",
+    "No external identity provider is part of the supported runtime; native Testagram Backend authentication is the only user and staff authentication path.",
+    "All six runtime source pins identify exact current mainline commits; production and product acceptance remain independent gates."
+  ],
+  "excludedFromAcceptance": [
+    "Backend PR #424 and its reviewed communication, wallet and knowledge-engine stack are merged. The source pin is refreshed to current Backend mainline 4c44c989d006a261ac06e4dcad4e30a8904e2cc8.",
+    "Flutter PR #116 is merged. The source pin is refreshed to current Flutter mainline 03082cc7e2419dc3bac241fd12791043915ea760. The web image built from this commit is published and smoke-tested; production rollout is pending.",
+    "Backend production deployment run 45038404739 succeeded on the existing InstaBox machine testagramdb. Backend, PostgreSQL, Flutter web, Go CDN, Algorithm, Federation, Data Centre media/platform/worker/video/notification and edge proxy health checks passed. Private B2/R2 write-read-delete probes and directional Backend/Federation credential checks passed.",
+    "The deployed release keeps public registration, staff enrollment and Federation delivery workers fail-closed until their independent acceptance gates pass. Successful deployment is not proof of native-auth migration, WebAuthn live acceptance, ActivityPub interoperability or production registration readiness.",
+    "CDN PR #125 is merged at 21a254e9f67dc7a8e55dca37151a6db532405e53. Go CDN origin is installed and healthy; Cloudflare Worker deployment and canonical hostname routing remain separate production cutover gates and are not inferred from source CI.",
+    "Data Centre PR #115 and Federation PR #53 are merged into their respective main branches and pinned to exact current mainline commits.",
+    "Merged source revisions and healthy VPS containers do not prove end-user device acceptance, M-Pesa settlement, full media durability/restore, cross-instance Federation interoperability or disaster recovery.",
+    "Backend approval-ledger and communication changes are in the reviewed #424 mainline history. Do not revive the superseded overlapping #431/#432 path."
+  ]
+}

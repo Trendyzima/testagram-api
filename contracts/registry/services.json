@@ -19,7 +19,7 @@
       ],
       "baseUrl": "https://api.testagram.site",
       "exposure": "public",
-      "auth": "Testagram-native short-lived access JWT; PostgreSQL session/account checks on every protected request; opaque rotating refresh token accepted only by /api/auth/refresh; no Appwrite bearer fallback on end-user routes",
+      "auth": "Testagram-native short-lived access JWT; PostgreSQL session/account checks on every protected request; opaque rotating refresh token accepted only by /api/auth/refresh; no external identity-provider bearer fallback on end-user routes",
       "consumers": [
         "flutter-client"
       ],
@@ -30,8 +30,8 @@
         "contracts/internal/openapi/backend-tv-health-monitor-v1.yaml",
         "contracts/internal/openapi/backend-user-activity-watchdog-v1.yaml"
       ],
-      "status": "implemented-core-contract",
-      "notes": "Backend is the sole public product API and canonical identity authority. Mainline issues native Testagram sessions and checks PostgreSQL session/account state; legacy Appwrite IDs remain only as explicit reconciliation inputs and are not accepted as user bearer credentials. Admin Console staff sessions use the native Backend identity plus the encrypted testagram-staff cookie and PostgreSQL staff-role/MFA records. Registration remains fail-closed until private evidence, email, independent review and provisioning gates are enabled and accepted."
+      "status": "native-auth-pr-424-plus-approval-ledger-pr-434-qa-pr-435-profile-wallet-pr-437-communication-privacy-pr-439-and-fail-closed-followup-pr-441-candidates-review-pending",
+      "notes": "Backend remains the canonical identity, authorization, content, wallet and relationship authority. The current dependent review chain is PR #424 → #434 → #435 → #437 → #439 → #441. PR #437 adds viewer-scoped username resolution and owner-scoped M-Pesa idempotency recovery; #439 adds communication privacy/block enforcement; #441 is the fail-closed follow-up, closes additional delete/call-end policy routing gaps and removes legacy plaintext from message-list responses. All are open, unmerged candidates and the chain must be reviewed and merged sequentially. PR #440 is validation-only and must never be merged. Independent security review, exact-head CI, PostgreSQL concurrency tests and staging acceptance remain mandatory."
     },
     {
       "id": "flutter-client",
@@ -55,8 +55,8 @@
         "packages/dart/README.md",
         "packages/dart/lib/testagram_api.dart"
       ],
-      "status": "consumer-with-native-identity-and-public-api-contract",
-      "notes": "Flutter uses the Testagram-native Backend auth client for login, password recovery/reset, session restore, refresh and logout. It calls only the Backend public API with the short-lived native access token. Applicant and verification-session tokens are limited to their own identity operations; the native password is set only after approved provisioning. No Appwrite JWT is sent by the public client. Flutter must never receive service tokens, storage-provider keys, database credentials or private service URLs."
+      "status": "hybrid-social-knowledge-pr-116-deep-links-wallet-monetization-pr-117-messaging-calls-pr-118-plaintext-rendering-hardening-pr-120-candidates-review-pending",
+      "notes": "Flutter PR chain: #116 provides the consolidated social/knowledge, profile safety, deep-link, wallet and monetization foundations; #117 layers the hybrid social/knowledge UI; #118 adds direct-message and voice/video call destinations; #120 removes plaintext message rendering and adds a regression test. The current source pin is the exact #120 head and includes its stacked ancestors. Wallet and profile actions use authenticated Backend contracts. Monetization destinations are navigable foundations only; campaign, earnings, premium, subscription, boost, payout and gifts/tips workflows remain unavailable until their Backend contracts, ledger/provider reconciliation and end-to-end tests exist. Message composition and media calling remain disabled until verified E2EE and signaling/media lifecycles are implemented. Flutter native Android App Links/iOS Universal Links still require verified packaging associations."
     },
     {
       "id": "data-centre-platform",
@@ -78,10 +78,12 @@
       ],
       "contracts": [
         "contracts/upstream/datacentre/internal-platform.openapi.yaml",
-        "docs/integration/data-centre-platform-contract.md"
+        "docs/integration/data-centre-platform-contract.md",
+        "contracts/upstream/datacentre/media-lifecycle-v1.openapi.yaml",
+        "contracts/upstream/datacentre/identity-evidence-v1.openapi.yaml"
       ],
-      "status": "private-media-profile-merged-compose-optional-and-ci-verified-runtime-deployment-and-live-b2-r2-acceptance-pending",
-      "notes": "Data Centre PR #93 adds the private identity-evidence namespace to the existing B2-primary/R2-replica media lifecycle, a separate identity-evidence service token, authenticated readiness, ownership-bound reviewer retrieval/deletion, migration 003 and a manual live-provider smoke. Backend PR #360 adds a dedicated identity-evidence client using its own service credential and the /internal/v1/identity-evidence/ route family; general media credentials cannot cross into this namespace. Both PRs are merged and their repository CI passed. The guarded B2/R2 staging smoke has not yet run, and the optional Data Centre media profile remains unaccepted for runtime activation until actual staging write/read/hash/replication/restore/delete evidence passes. Keep DATA_CENTRE_MEDIA_ENABLED and FRESH_MEDIA_ENABLED at their reviewed safe values until the separate media lifecycle gates pass. The legacy Fresh preview remains separately isolated and is not a supported identity or media fallback. User-aware video and notification routes continue to validate Backend-native JWTs against live PostgreSQL session/account state; service tokens remain separate."
+      "status": "private-platform-and-media-provider-implemented-identity-evidence-contract-candidate-pr-115-live-staging-acceptance-pending",
+      "notes": "Data Centre video and notification user-aware routes validate Backend-issued native access JWTs and recheck live PostgreSQL session/account state. PLATFORM_INTERNAL_TOKEN remains separate for protected platform writes. The private media lifecycle API has a typed Backend client in native-auth candidate PR #424 and matching provider routes. Identity evidence is isolated under /internal/v1/identity-evidence/* with its own IDENTITY_EVIDENCE_INTERNAL_TOKEN and dedicated B2/R2 buckets; its provider OpenAPI contract is proposed in Data Centre PR #115 and pinned as a candidate in the bridge. Neither API has passed live staging acceptance. The generic platform config/events/audit API remains a separate service contract and no typed Backend consumer is claimed."
     },
     {
       "id": "cdn-edge",
@@ -119,7 +121,8 @@
         "protocol outbox and delivery state",
         "remote delivery",
         "signed delivery of Backend-authorized public Create activities",
-        "public dereferencing of Backend-canonical ActivityPub Notes"
+        "public dereferencing of Backend-canonical ActivityPub Notes",
+        "AT Protocol public author-feed adapter and DID allowlist projection"
       ],
       "baseUrl": "https://federation.testagram.site",
       "exposure": "public-activitypub-and-private-backend-api",
@@ -132,17 +135,19 @@
         "contracts/upstream/federation/public-activitypub.openapi.yaml",
         "docs/integration/federation-private-contract.md",
         "contracts/upstream/federation/post-published.v1.schema.json",
-        "contracts/internal/openapi/federation-ingress-v1.yaml"
+        "contracts/internal/openapi/federation-ingress-v1.yaml",
+        "contracts/upstream/federation/backend-private-v1.openapi.yaml"
       ],
-      "status": "private-ingress-and-backend-client-implemented-public-worker-interoperability-gated",
-      "notes": "Backend publishes authorized activities to the private /internal/v1/activities ingress using a dedicated direction-specific service bearer and activity ID idempotency key. Federation authenticates the ingress, verifies Backend actor eligibility, durably enqueues the outbox item and acknowledges 202 only after acceptance. Federation-to-Backend uses a separate bearer. Public routing, inbound activity projections, delivery workers and external-peer interoperability remain gated; durable acceptance is not proof of delivery."
+      "status": "activitypub-and-atproto-private-bridge-contract-candidate-pr-53-live-staging-acceptance-pending",
+      "notes": "Federation remains a protocol adapter, not the identity or visibility authority. ActivityPub and AT Protocol are separate protocol implementations. The private Backend bridge now has a provider OpenAPI candidate in PR #53 covering durable ActivityPub activity enqueue, Backend-authorized remote-object pages and Backend-authorized ATProto author feeds, and protocol-native remote identity verification for pending ActivityPub/Bluesky subscriptions. The Backend client supplies actor URI/DID allowlists and revalidates returned provenance; Federation must not select viewer follows or create local Testagram identities. PR #53 is pinned for cross-organ contract audit but is not merged; staging service-auth, timeout/fallback and load acceptance remain pending."
     },
     {
       "id": "algorithm",
       "repository": "Trendyzima/the-algorithm",
       "role": "private-ranking-provider",
       "authority": [
-        "ranking order and ranking scores only"
+        "ranking order and ranking scores only",
+        "ranking of Backend-authorized public hashtag candidates"
       ],
       "baseUrl": "http://algorithm:8092",
       "exposure": "private-network",
@@ -153,8 +158,8 @@
       "contracts": [
         "contracts/upstream/algorithm/openapi.yaml"
       ],
-      "status": "feed-ranking-contract-and-backend-client-static-contract-aligned-staging-acceptance-pending",
-      "notes": "Backend submits at most 200 already-authorized candidates to POST /v1/feed/rank and requests at most 50 results. The pinned Backend client and Algorithm OpenAPI agree on the path and API-version/service-bearer headers. Backend rejects unknown/duplicate IDs and rechecks current authorization before hydration. Staging service-authentication, timeout/fallback and load acceptance remain required."
+      "status": "feed-and-topic-ranking-contract-and-backend-client-static-contract-aligned-staging-acceptance-pending",
+      "notes": "Backend submits at most 200 already-authorized feed candidates to POST /v1/feed/rank and at most 200 Backend-authorized public hashtag candidates to POST /v1/topics/rank, requesting at most 50 results. The pinned Backend client, Algorithm handlers and OpenAPI agree on both routes, API-version/service-bearer headers and bounded inputs. Backend rejects unknown/duplicate IDs and rechecks current authorization before hydration. Staging service-authentication, timeout/fallback and load acceptance remain required."
     }
   ]
 }

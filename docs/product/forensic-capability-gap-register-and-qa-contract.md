@@ -147,7 +147,7 @@ Important integrity rules:
 - Avoid mutable counters as the sole source of truth. If counters are added, prove trigger correctness and provide reconciliation queries.
 - Migration is additive, forward-only, idempotent under the project's runner contract, and preserves every historical migration. No old migration is edited or removed.
 - Revoke PUBLIC privileges and grant only the exact application roles required by the reviewed Backend source. Do not use schema-wide blanket grants/revocations.
-- Do not add Supabase, PostgREST, Redis/Valkey, Upstash, Appwrite or Xclone dependencies.
+- Do not add unapproved third-party database, identity, cache, or queue dependencies.
 
 ## 6. Proposed public API contract (not yet registered or shipped)
 

@@ -4,11 +4,12 @@ This system contains **seven repositories total**: this API governance repositor
 
 | Caller | Receiver | Interface | Credential / trust | Current status |
 |---|---|---|---|---|
-| Flutter | Backend | Public HTTP API | Appwrite user-session JWT | Core routes implemented; Flutter adoption must pin SDK/contracts |
-| Backend | Algorithm | `POST /v1/feed/rank` | Dedicated `ALGORITHM_INTERNAL_TOKEN` bearer, private network | Client and provider contract exist |
+| Flutter | Backend | Public HTTP API | Testagram-native short-lived access JWT; refresh token used only at `/api/auth/refresh` | PR #114 candidate adds native block/unblock client methods against contracted Backend routes; full session and production acceptance remain separate gates |
+| Backend | Algorithm | `POST /v1/feed/rank`, `POST /v1/topics/rank` | Dedicated `ALGORITHM_INTERNAL_TOKEN` bearer, private network; API version and request ID on both | Typed Backend client and both provider routes/OpenAPI operations exist; Backend owns candidate authorization and hydration |
 | Federation | Backend | Actor resolution, readiness and outbox reads | `FEDERATION_BACKEND_INTERNAL_TOKEN` | Private client path documented; keep internal |
 | Backend | Federation | `POST /internal/v1/activities` | Distinct `FEDERATION_INTERNAL_TOKEN` bearer | Private ingress exists; delivery remains gated |
-| Backend | Data Centre platform | `/v1/config/*`, `/v1/events`, `/v1/audit` | `PLATFORM_INTERNAL_TOKEN` for protected writes | Provider API exists; Backend typed client is not verified |
+| Backend | Data Centre media / identity evidence | `/internal/v1/media/*`, `/internal/v1/identity-evidence/*` | Separate `FRESH_DATA_CENTRE_INTERNAL_TOKEN` and `IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN`; never reused | Typed Backend client and matching Data Centre routes exist in the PR #424 candidate; staging/runtime acceptance remains pending |
+| Backend | Data Centre platform | `/v1/config/*`, `/v1/events`, `/v1/audit` | `PLATFORM_INTERNAL_TOKEN` for protected writes | Provider API exists; Backend typed consumer is not verified and is not claimed as active |
 | Backend | CDN | Backend-authorized media issuance and byte-delivery contract | Dedicated Backend-to-CDN issuer assertion, key/scope/expiry-bound; playback token separate; purge token operator-only | Issuer contract is a release gate; CDN must not infer visibility from a caller-controlled query flag |
 | Data Centre | CDN / object storage | Origin and media byte paths | Server-side origin credentials; never browser-visible | Deployment-specific |
 | Federation | remote instances | ActivityPub WebFinger, actor, inbox/outbox | HTTP Signatures and HTTPS | Protocol surface exists; public rollout gated |
@@ -17,7 +18,7 @@ This system contains **seven repositories total**: this API governance repositor
 ## Correlation and error rules
 
 - Carry a bounded `X-Request-ID` across service-to-service calls; generate one at the first trusted ingress when absent.
-- Do not forward an Appwrite user JWT as a service-to-service credential.
+- Do not forward a user access JWT or refresh token as a service-to-service credential.
 - Distinct service credentials are directional and audience-specific. Rotating one must not require reusing another service's key.
 - Never log authorization headers, JWTs, service tokens, signed URLs, private content or raw webhook signatures.
 - Public Backend errors retain the Backend's documented nested `error.code` / `error.message` envelope and request ID. Internal providers may have their own error shape; adapters translate at the owning boundary.

@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "e26c6972b4c8c6fe625ee32ab7803119ee2e7847",
+  "sourceRef": "4c44c989d006a261ac06e4dcad4e30a8904e2cc8",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across all production Go files in cmd/api at the reviewed Backend feature-PR commit e26c6972b4c8c6fe625ee32ab7803119ee2e7847. /readyz and /metrics are served only on the private :8082 listener and are intentionally excluded from this public route inventory. Dynamic auth actions are asserted separately; registered-only routes are not approved for client adoption until promoted into OpenAPI.",
+  "note": "Static public/API route registrations across all production Go files in cmd/api at the exact current Backend mainline commit 4c44c989d006a261ac06e4dcad4e30a8904e2cc8. Refresh this inventory whenever Backend mainline changes; route status remains governed by the OpenAPI contract and independent acceptance gates.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
@@ -28,7 +28,7 @@
     {
       "method": "DELETE",
       "path": "/api/social/blocks/{target_user_id}",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "DELETE",
@@ -383,7 +383,7 @@
     {
       "method": "POST",
       "path": "/api/social/blocks",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",

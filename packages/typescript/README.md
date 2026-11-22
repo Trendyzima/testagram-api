@@ -24,7 +24,7 @@ import { TestagramApiClient, endpoints } from "@trendyzima/testagram-api-client"
 
 const api = new TestagramApiClient({
   baseUrl: "https://api.testagram.site",
-  getAccessToken: async () => appwriteJwt,
+  getAccessToken: async () => testagramAccessToken,
 });
 
 const feed = await api.get(endpoints.homeFeed);
@@ -35,7 +35,11 @@ const created = await api.createPost({
 });
 ```
 
-The caller supplies the Appwrite session JWT. The SDK does not store credentials, authorize resources, retry mutations or bypass Backend ownership. Use a published version pinned by the consuming repository's lockfile.
+Authenticated operations use the OpenAPI `testagramBearer` scheme, backed by the current short-lived Testagram-native Backend access token. The caller supplies that token. The SDK does not store credentials, authorize resources, retry mutations or bypass Backend ownership. Use a published version pinned by the consuming repository's lockfile.
+
+## Native session lifecycle
+
+The OpenAPI `loginWithTestagramCredentials` operation starts a native session and returns a short-lived access token plus an opaque rotating refresh token. Keep the refresh token in platform secure storage and use it only with the Backend `/api/auth/refresh` endpoint. Never send the refresh token as a bearer credential. Logout revokes the active Backend session.
 
 ## Build and release
 

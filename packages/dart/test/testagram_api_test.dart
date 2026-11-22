@@ -6,12 +6,12 @@ import 'package:http/http.dart' as http;
 import 'package:testagram_api/testagram_api.dart';
 
 void main() {
-  test('sends Appwrite bearer token and parses nested Backend errors', () async {
+  test('sends Testagram-native bearer token and parses nested Backend errors', () async {
     final client = TestagramApiClient(
       baseUri: Uri.parse('https://api.testagram.site'),
-      tokenProvider: () async => 'appwrite-jwt',
+      tokenProvider: () async => 'testagram-native-access-token',
       httpClient: MockClient((request) async {
-        expect(request.headers['authorization'], 'Bearer appwrite-jwt');
+        expect(request.headers['authorization'], 'Bearer testagram-native-access-token');
         return http.Response(
           jsonEncode({
             'ok': false,

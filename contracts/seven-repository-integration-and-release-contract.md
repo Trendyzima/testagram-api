@@ -1,7 +1,7 @@
 # Testagram seven-repository integration and release contract
 
 Status: reviewed integration baseline; **not** production cutover authorization.
-Reviewed: 2026-11-18.
+Reviewed: 2026-11-21.
 
 This repository is the contract control plane. It owns public/private OpenAPI, event schemas, SDKs, route inventories, immutable source pins and cross-repository compatibility CI. It is not a runtime service, identity provider, product database or authorization gateway.
 
@@ -9,7 +9,9 @@ The six runtime repositories are Flutter, Backend, Data Centre, CDN, Federation 
 
 ## Immutable source revisions
 
-The exact revisions used by contract CI are in `contracts/sources.lock.json`. The current `main` source pins refreshed on 2026-11-20 are Backend `b55a30bbeaeb0c7caafe55882a6b9db9cf446268`, Data Centre `6a767f7ae2fe30395d24cded9265dc7e53e759c1`, CDN `4e40463cfd11746c4ab89ccbc3d02a97f7cbee53`, Flutter `5d8bbc09d46d6a7b7f0a852fd4e2251b5109cfbd`, Federation `78e83a411afc8b9f46c687875b3cfd6db6d071b6`, and Algorithm `3734ff75d52019cb6d2cd0cd5273539fe6ab62e9`. The retired Appwrite-based Fresh API is separately pinned at `backend-fresh-legacy` commit `a6c2454f41ffb4f0f1beef00e623d7f038428cbb` solely for legacy route/deployment audit. Contract CI checks exact immutable checkouts and snapshots. A source pin is not evidence that a service is deployed.
+The API control plane bridge currently pins all six runtime organs to immutable source revisions; four are merged mainline commits, while Backend PR #424 and CDN PR #125 are separately identified review candidates until independent review and merge. The seventh repository is this governance/control-plane repository and is not included as a runtime dependency.
+
+The exact revisions used by contract CI are in `contracts/sources.lock.json`. Backend is pinned to native-auth retirement candidate `54c7a6c3218aa85c83cfcde0570d2673678e26bc` (PR #424), while its mainline remains `287d8669df9dbfcf2ae34f6f532925ca551de4bd`. CDN is pinned to guarded API-domain handoff candidate `d2fc2af2248581cafe4b64a8cb4f654732d66962` (PR #125), while its mainline remains `490119514788c13c327ee05eb4ce068a0f73966e`. Flutter `1f58971720c7a72139d56900a5895c49fa105639`, Data Centre `58de0bf36b76f9cd74824901b6a86de29f420c65`, Federation `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d`, and Algorithm `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` remain pinned to reviewed mainline commits. The registry records each candidate separately from its actual mainline revision; after PRs #424 and #125 merge, refresh their pins to the exact merge commits and regenerate route/source evidence. No separate legacy Fresh API source is part of the supported deployment graph. A source pin is not evidence that a service is deployed.
 
 ## Ownership and allowed calls
 
@@ -37,9 +39,9 @@ The exact revisions used by contract CI are in `contracts/sources.lock.json`. Th
 
 ### Native authentication and staff sessions
 
-- The Backend is the only end-user credential issuer. Current mainline uses Testagram-native sessions; the native API path does not accept Appwrite JWTs as a compatibility fallback.
-- The Admin Console signs in through the same Backend-native login endpoint. It stores its session inside the encrypted `testagram-staff` cookie (`HttpOnly`, `Secure`, `SameSite=Strict`) and checks the enabled PostgreSQL staff principal and role grant. Backend mainline now includes controlled staff WebAuthn enrollment, independent owner authorization, expiring single-use ceremonies, cryptographic registration/assertion verification, credential-counter/replay checks and backend-signed five-minute `mfa_at` elevation. The Console keeps the elevated proof server-side and forwards it to protected Backend actions; browser-local MFA flags are not trusted. This is implementation evidence, not production acceptance: migration/readiness, exact RP ID/origin configuration, live enrollment, assertion, replay rejection and protected-action elevation must pass against the deployed Console and Backend before staff MFA is marked operational.
-- Staff enrollment remains fail-closed unless a separately authorized enrollment window is active. Owner-authorized enrollment requires a different enabled staff principal, a recent WebAuthn elevation and a reasoned, expiring authorization. Historical Appwrite account IDs are retained only for explicit reconciliation; email equality is never an account-linking rule.
+- The Backend is the only end-user credential issuer. Current native-auth implementation uses Testagram-issued sessions; the native API path does not accept foreign-provider tokens as a compatibility fallback.
+- The Admin Console signs in through the same Backend-native login endpoint. It stores its session inside the encrypted `testagram-staff` cookie (`HttpOnly`, `Secure`, `SameSite=Strict`) and checks the enabled PostgreSQL staff principal and role grant. Backend PR #424 candidate `54c7a6c3218aa85c83cfcde0570d2673678e26bc` implements controlled WebAuthn enrollment for already-provisioned staff, independent owner authorization, expiring single-use ceremonies, cryptographic registration/assertion verification, credential-counter/replay checks and Backend-signed five-minute `mfa_at` elevation. This candidate is not yet merged to Backend mainline. The Console keeps the elevated proof server-side and forwards it to protected Backend actions; browser-local MFA flags are not trusted. This is implementation evidence, not production acceptance: migration/readiness, exact RP ID/origin configuration, live enrollment, assertion, replay rejection and protected-action elevation must pass against the deployed Console and Backend before staff MFA is marked operational.
+- Staff enrollment remains fail-closed unless a separately authorized enrollment window is active. Owner-authorized enrollment requires a different enabled staff principal, a recent WebAuthn elevation and a reasoned, expiring authorization. Historical external-provider account identifiers are retained only for explicit reconciliation; email equality is never an account-linking rule.
 - The Backend and user-aware Data Centre services must share the same `TESTAGRAM_AUTH_JWT_SECRET`. Data Centre video/notification handlers validate the JWT and then recheck the live PostgreSQL session/account state; a signature alone never grants access.
 - Data Centre platform routes use `PLATFORM_INTERNAL_TOKEN`, not a user access JWT. Federation ingress/read credentials, Algorithm internal token, CDN viewer assertion, CDN origin token and purge token are separate identities with separate audiences.
 
@@ -78,7 +80,7 @@ The exact revisions used by contract CI are in `contracts/sources.lock.json`. Th
 
 ### Fresh API runtime boundary
 
-The legacy Fresh API runtime is absent from current Backend `main` and is separately pinned at its last reviewed source revision for a 22-route legacy inventory audit. Data Centre `vps/docker-compose.yml` still references a Fresh Backend image with Appwrite endpoint/project/database/server-key configuration. It is not the supported native user-authenticated public API; Flutter must use Backend `cmd/api`. Do not remove the legacy image or its configuration until production traffic, account reconciliation, rollback and cutover are verified and separately approved.
+The legacy Fresh API entrypoint and provider adapters are removed from the native-auth Backend candidate. Data Centre `vps/docker-compose.yml` selects the canonical Backend image built from `cmd/api`; it no longer references a separate Fresh Backend image or external identity-provider configuration. PR #424 must pass all required checks and independent review before merge. Production traffic cutover, account reconciliation, rollback and activation still require separate evidence and approval.
 
 ### TV / HLS
 
@@ -90,7 +92,7 @@ The legacy Fresh API runtime is absent from current Backend `main` and is separa
 
 ## Contract and CI boundaries
 
-- The Backend route inventory is pinned to the exact Backend `main` source SHA in `contracts/route-inventory/backend-public-routes.json`; the current inventory audits static routes and explicitly marks registered-only operations. Contract CI must verify parity after each source-pin refresh. The separate Fresh API inventory contains 22 routes explicitly marked uncontracted pending wire-level review. CI passing means the inventory is accurately marked; it does not approve those 22 routes for public clients.
+- The Backend route inventory is pinned to the exact Backend retirement candidate SHA in `contracts/route-inventory/backend-public-routes.json`; the inventory audits static routes and explicitly marks registered-only operations. Contract CI verifies parity against the immutable source pin. The legacy Fresh API inventory is historical evidence only: its runtime and entrypoint are deleted from the native-auth Backend candidate, and none of its routes is part of the supported public API or SDK. CI passing does not promote historical routes into public client support.
 - API cross-repository CI checks immutable source checkout, OpenAPI lint, SDK build, tests, Backend route inventory and cross-repository snapshots.
 - Every source path in the current six runtime pins must exist at the pinned commit. Every snapshot must match its upstream source byte-for-byte.
 - A contract change requires producer, consumer, schema, fixtures, route inventory and pin updates in the same reviewed integration cycle.

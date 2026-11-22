@@ -27,17 +27,17 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The runtime source baseline below was refreshed from the reviewed `main` heads observed on 2026-11-20. The acceptance gates remain locked; the source revisions are updated independently. The six runtime source pins are recorded in `contracts/sources.lock.json`; this governance repository is identified separately.
+The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. This revision refreshes the baseline to the exact observed mainline commits of all six runtime repositories as of 2026-11-22. The control-plane bridge branch remains a review candidate and is one commit behind current control-plane mainline; it must be reconciled before merge. This is an integration-review source baseline, not a deployment attestation. A migration present in a pinned source tree is source evidence, not proof that production has applied it.
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `5d8bbc09d46d6a7b7f0a852fd4e2251b5109cfbd` |
-| Backend | `b55a30bbeaeb0c7caafe55882a6b9db9cf446268` |
-| Data Centre | `6a767f7ae2fe30395d24cded9265dc7e53e759c1` |
-| Testagram API control plane | `03558a2bf68a25b6718cd15851a9e82b89af0d19` |
-| Algorithm | `3734ff75d52019cb6d2cd0cd5273539fe6ab62e9` |
-| Federation | `78e83a411afc8b9f46c687875b3cfd6db6d071b6` |
-| CDN | `4e40463cfd11746c4ab89ccbc3d02a97f7cbee53` |
+| Flutter | `03082cc7e2419dc3bac241fd12791043915ea760` (2026-11-22 mainline; social, knowledge and wallet client surfaces with Backend-backed feed/discovery contracts) |
+| Backend | `4c44c989d006a261ac06e4dcad4e30a8904e2cc8` (2026-11-22 mainline; native identity schema preflight aligned with archived legacy tables) |
+| Data Centre | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` (2026-11-22 mainline; private identity-evidence API contract) |
+| Testagram API control plane | `14e67fffb2150021d7b94bd8941f49ac0485d034` (current mainline base; this bridge branch must incorporate any newer control-plane mainline commit before merge) |
+| Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` (2026-11-21 mainline) |
+| Federation | `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca` (2026-11-22 mainline; private Backend federation bridge contract) |
+| CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` (2026-11-22 mainline; guarded native API custom-domain handoff) |
 
 A source pin is not a deployment record. Every accepted staging and production run must separately record the actual running image digest and source revision. Mutable tags such as `main` and `latest` are not acceptable release identities.
 
@@ -58,14 +58,14 @@ A gate passes only with a reproducible test against the exact deployed build and
 
 ### G1 — Flutter → Backend native identity and user journey
 
-- Flutter uses the Testagram-native Backend login/refresh/recovery/session path; no Appwrite JWT fallback is accepted on end-user routes.
+- Flutter uses only the Testagram-native Backend login/refresh/recovery/session path. No external identity-provider endpoint, SDK, JWT, database, server key, session, or fallback is permitted in the supported runtime.
 - Access JWTs remain short-lived and in memory; only opaque rotating refresh tokens are stored in platform secure storage.
 - Backend validates signature, issuer, audience, expiry, token version, session ID, canonical user ID, live PostgreSQL session, account state and verification/provisioning state.
 - Exercise registration only through the approved staging provisioning process, email verification, login, refresh rotation, logout, logout-all, password recovery and session restoration.
 - Exercise authenticated profile read/update, post create/read, feed retrieval, media grant retrieval and denial for expired/revoked/foreign credentials.
 - Verify web and Android builds on real browsers/devices; prove no service token, storage key, private host, or database credential is bundled into the client.
 
-**Fail if:** identity is inferred from email equality, a revoked/expired/wrong-audience token is accepted, a refresh token is replayable, the client calls a private service directly, or user data is lost across refresh/logout/restore.
+**Fail if:** any request, build, runtime container, environment contract or client SDK depends on an external identity provider; any provider token is accepted; or native session checks can be bypassed.\n\n**Fail if:** identity is inferred from email equality, a revoked/expired/wrong-audience token is accepted, a refresh token is replayable, the client calls a private service directly, or user data is lost across refresh/logout/restore.
 
 ### G2 — Backend → Algorithm ranking
 
@@ -192,7 +192,7 @@ No test may report PASS if it ran against an unpinned or unknown build.
 
 The API contract validation workflow must execute the same full sequence on this PR head:
 
-1. `npm run sources:checkout` — sparse-checkout each immutable runtime pin and the separately pinned retired-source inventory.
+1. `npm run sources:checkout` — sparse-checkout each immutable runtime pin using only active source directories; no retired runtime source is checked out.
 2. `npm run lint:openapi` and `npm run lint:internal-openapi`.
 3. `npm run typecheck`, `npm run build:sdk`, and `npm test`.
 4. `npm run audit:backend-routes`, `npm run audit:cross-repo`, `npm run audit:locked-acceptance`, `npm run audit:tv-health-contract`, and `npm run audit:flutter-backend`.
@@ -217,16 +217,462 @@ Still unexecuted or blocked:
 - The Backend native-auth staging smoke has not been dispatched. It requires the dedicated GitHub `staging` environment origin and test-account secrets, plus explicit staging-only confirmation.
 - The Data Centre live provider smoke has not been dispatched. It writes and deletes temporary objects and requires explicitly designated staging B2/R2 buckets and the manual confirmation input.
 - The Backend three-provider MinIO/B2/R2 lifecycle and the Data Centre B2/R2 lifecycle remain separate acceptance paths; neither has live end-to-end evidence recorded here.
-- Staff review still lacks a real TOTP/passkey challenge. A non-null MFA-enrolment timestamp and password reauthentication do not prove a second factor; staff-review production activation remains gated.
+- The Backend retirement candidate now implements real WebAuthn registration/assertion ceremonies, credential encryption, challenge expiry/replay protection, and Backend-issued MFA elevation. Staff-review production activation remains gated until the live Admin Console-to-Backend readiness handshake, independent enrollment, deployed credential ceremony, replay rejection and protected-action elevation pass against the production-like PostgreSQL stack.
 - Public registration, media replication, Federation delivery, CDN domain cutover and production feature activation remain subject to their individual gates and explicit approval.
 
 **Decision: NOT ACCEPTED for end-to-end staging or production until all required gates have passing evidence.** Merged branches and green repository CI do not waive the live integration, restore, security or deployment gates.
 
 ### Temporary immutable review pins for the open integration PRs
 
-The following source pins are intentionally temporary review baselines for the open Algorithm/Backend contract-alignment pull requests. They identify immutable commits, not merged mainline or deployed releases. After both provider PRs merge, refresh `contracts/sources.lock.json`, this document's baseline table, and all source snapshots to the resulting merged mainline SHAs before release acceptance.
+The following source pins are intentionally temporary review baselines for open provider pull requests. They identify immutable commits, not merged mainline or deployed releases. After the provider PRs merge, refresh `contracts/sources.lock.json`, this document's baseline table, and all source snapshots to the resulting merged mainline SHAs before release acceptance.
 
 | Repository | Review PR | Immutable review commit |
 |---|---|---|
-| Backend | [PR #419](https://github.com/Trendyzima/Testagram-backend-/pull/419) | `e26c6972b4c8c6fe625ee32ab7803119ee2e7847` |
+| Backend | [PR #424](https://github.com/Trendyzima/Testagram-backend-/pull/424) | `c627858a295fbf45b6dbdeeb54d2a5aa0a989470` |
 | Algorithm | [PR #27](https://github.com/Trendyzima/the-algorithm/pull/27) | `88b2ae0eb81e127768aaf4ef1ed19495ce6fda20` |
+
+
+## 9. Federation source-pin reconciliation — 2026-11-21
+
+Federated Content PR #50 (pgx dependency security/reliability update) was merged to `main` at `b44eca07a9c7641cf03ee685c025bcfe6dfc7858`. Both post-merge checks (`test` and `image`) completed successfully on that exact commit. The current federation source pin in `contracts/sources.lock.json` and the seven-organ registry is refreshed to this merge commit; PR #50 is recorded in the registry's merged pull-request history. This source refresh is not live federation deployment or protocol acceptance evidence.
+
+
+## 10. Native MFA revocation and WebAuthn configuration hardening — 2026-11-21
+
+The Backend review pin now includes credential-bound MFA elevation and shared WebAuthn RP configuration attestation. Every privileged identity-review request and Admin Console sensitive action rechecks the exact authenticator used for step-up against PostgreSQL; revoked, unverified or clone-warned credentials invalidate outstanding elevation immediately. The Backend and Admin Console compare a canonical fingerprint of the configured RP ID and allowed origins; mismatches fail readiness closed. Regression tests cover the token binding, revocation, fingerprint mismatch and canonicalization. This remains source/CI evidence only: the live browser authenticator ceremony, recovery, and production origin have not yet been accepted.
+
+
+## 11. Seven-organ source-pin refresh — 2026-11-21
+
+The bridge records four runtime organs at their latest merged mainline revisions and separately pins Backend PR #424 and CDN PR #125 as immutable review candidates. Their actual mainline SHAs remain recorded independently in the seven-organ registry. The API Control Plane remains a governance repository and is not a runtime organ dependency.
+
+| Organ | Repository | Locked source revision | Integration status |
+|---|---|---|---|
+| Flutter client | `Trendyzima/testagram-flutter-client-` | `1f58971720c7a72139d56900a5895c49fa105639` | Mainline; PRs #112 documentation cleanup and #113 retired-provider test-label cleanup merged |
+| Backend | `Trendyzima/Testagram-backend-` | `a793c55db8b5c258524bfef4b8872f5c6c1038e5` | Mainline; PR #436 candidate `93da847b74d2e874595d113deacbbcda3c283b3a` is stacked on PR #424 candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88` |
+| Data Centre | `Trendyzima/Testagram-data-centre-` | `ada6f26a289775720bb47a639242dbd868388055` | Mainline; PR #116 identity-evidence OpenAPI candidate `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` |
+| CDN | `Trendyzima/cdn-` | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Mainline; PR #125 merged at this exact commit |
+| Algorithm | `Trendyzima/the-algorithm` | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline; PRs #28 and #29 ownership documentation merged |
+| Federation | `Trendyzima/federated-content` | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Mainline; PR #53 candidate `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` adds private Backend contract including remote-subscription verification |
+| API Control Plane | `Trendyzima/testagram-api` | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` | Governance-only mainline; this bridge remains an open candidate PR |
+
+The four refreshed mainline pins were compared with their previous locked revisions. The intervening changes were confined to documentation and negative-test-fixture cleanup and did not alter runtime source paths or provider snapshots. Backend and CDN candidate commits are intentionally not described as merged mainline revisions. Once PRs #424 and #125 merge, refresh both pins to their exact merge SHAs and regenerate all relevant route/source evidence before accepting the integration.
+
+This source refresh fixes source-pin drift; it does not prove deployed interoperability. The exact contract CI run on this refreshed baseline must pass before the bridge is merge-ready.
+
+## 11. Seven-organ wiring and provider-residue verification — 2026-11-21
+
+API contract CI run `44896464421` passed both Node and Dart validation against the current bridge candidate. The bridge checker now requires the exact six approved runtime edges and six governance edges, rejects duplicate/missing/extra edges, checks each repository's exact owner/name, and rejects duplicate or path-traversing entries in immutable source inventories.
+
+The cross-organ audit verified:
+- Flutter-to-Backend native access/refresh/session boundary and the prohibition on direct private-service calls
+- Backend-to-Data-Centre private media contract, service-token separation, request IDs, timeout and live native-session checks on user-aware routes
+- Backend-to-CDN separation of user JWT, viewer assertion, origin and purge credentials, including assertion issuer/audience/owner/expiry validation
+- Backend-to-Algorithm bounded, already-authorized candidate flow
+- Backend-to-Federation directional service credentials and durable ingress/outbox contract
+
+The route inventory covers 105 static Backend routes across 50 production Go files; 67 operations are represented in OpenAPI. The native-only scan covers 417 runtime, deployment, configuration and documentation files across all six runtime organs and finds zero active external identity-provider integration.
+That zero-active-integration result applies to the pinned Backend PR #424 candidate. Backend mainline is still at `287d8669df9dbfcf2ae34f6f532925ca551de4bd` and retains an unused legacy external identity-provider adapter/source path until PR #424 is independently reviewed and merged; do not describe the default branch as fully purged yet.
+
+The exact 27 remaining historical matches are confined to migration/schema history, forward-only upgrade/cleanup migrations and their migration integration fixture, plus one negative CI guard that asserts retired provider configuration is absent. These records are intentionally retained so installations with the original migration ledger can upgrade safely and so the old schema/configuration can be explicitly rejected. They are not supported runtime code, SDKs, endpoints, credentials, session authorities or fallback paths. Deleting or rewriting applied migration history to make a text search return zero would break migration lineage and is not an acceptable production hardening step.
+
+Flutter PR #113, which removes obsolete provider labels from negative test fixtures, is merged at `1f58971720c7a72139d56900a5895c49fa105639`. Flutter PR #100 remains a live production-routing acceptance gate; Backend PR #424 remains the temporary native-auth candidate pin pending independent review and merge. CI success is not deployment evidence.
+
+## 12. API custom-domain handoff remains a separate CDN acceptance gate — 2026-11-21
+
+CDN PR #125 is ready for independent review at candidate `930f000e030fc920a749b99cae1e0c8c5c01d2b1`. The API Control Plane source lock temporarily pins the CDN PR #125 candidate so bridge CI validates the handoff code; the registry separately records CDN mainline `490119514788c13c327ee05eb4ce068a0f73966e` and candidate status. The candidate is not represented as merged mainline. Its Worker tests (29/29), Wrangler custom-domain validation, workflow syntax, Go tests, race detector, vet, build, runtime-image checks and capacity qualification passed. The PR has not merged and no production Cloudflare mutation or deployment has run.
+
+The candidate requires a second explicit dispatch approval before transferring the exact `api.testagram.site` custom-domain owner from the legacy API Worker to the canonical `testagram-cdn` gateway. A separate post-cutover cleanup workflow then requires its own explicit confirmation and deletes only the detached `testagram-api` Worker after verifying the canonical owner, native API health, protected/private route boundaries and absence of routes, custom domains, schedules, service bindings and tail consumers. It removes only verified proxied A/AAAA/CNAME records for that exact hostname, verifies the new owner, and on failure recovers only to the Testagram-owned gateway. It must never reattach the legacy API Worker as a fallback.
+
+After CDN PR #125 merges, refresh this pin to its exact merge SHA and rerun the bridge. The live hostname must then pass API health, readiness, service identity, media, apex redirect, NodeInfo and real-account WebFinger probes before the CDN organ is accepted.
+
+## 13. Latest end-to-end production evidence — 2026-11-21
+
+- Backend PR #424 application, PostgreSQL identity, native staff WebAuthn, dual-control, schema, security and container checks passed at its pinned candidate. Its InstaBox deployment job was skipped; no live native API deployment is evidenced. Independent review remains outstanding.
+- A fresh read-only production smoke rerun still fails: `https://testagram.site/` returns HTTP 200 instead of the required 308 redirect to `www`; apex NodeInfo returns HTTP 200 HTML instead of JSON; and `acct:crissbeat@testagram.site` WebFinger returns HTTP 503. The Flutter web root, sign-in route and Pages.dev shell return HTTP 200. These are real production routing failures, not source-level contract failures.
+- The API Control Plane source lock temporarily pins Backend PR #424 candidate `c627858a295fbf45b6dbdeeb54d2a5aa0a989470`, Data Centre PR #114 candidate `8b61fe03eb918d352f78d1142651167b3e9fe21a`, and CDN PR #125 candidate `930f000e030fc920a749b99cae1e0c8c5c01d2b1`. The registry separately records Backend mainline `287d8669df9dbfcf2ae34f6f532925ca551de4bd`, Data Centre mainline `58de0bf36b76f9cd74824901b6a86de29f420c65`, and CDN mainline `490119514788c13c327ee05eb4ce068a0f73966e`; none of these candidates is represented as merged. After either source PR merges, refresh the corresponding pin to the exact merge SHA and rerun the bridge.
+- The native-only source audit previously reported 27 intentionally retained historical migration/schema/upgrade-fixture matches. The Data Centre candidate removes its obsolete provider-name negative assertions from VPS CI, so that file no longer needs a historical-residue exception. They are not runtime integrations or fallback authorities. Do not rewrite applied migration history to obtain a misleading zero-text-match result.
+- Backend PR #424 now adds a Chromium virtual-authenticator browser test for the Admin Console's actual `navigator.credentials.create()` and `navigator.credentials.get()` flows, including RP/origin/challenge checks and attestation/assertion payloads. This automated UI ceremony complements the PostgreSQL verification/replay tests; it does not replace a physical authenticator and live Backend staging ceremony.
+- Registration and privileged staff enrollment remain fail-closed until the browser test passes, the live Backend ceremony/recovery/replay checks pass, and production readiness and independent staff lifecycle gates are accepted.
+
+
+## 14. Current read-only production endpoint probe — 2026-11-21
+
+A fresh read-only fetch of the public endpoints returned:
+- `https://testagram.site/`: extraction returned `empty_content`; this does not establish an HTTP status or redirect.
+- `https://testagram.site/.well-known/nodeinfo`: fetch timed out.
+- `https://testagram.site/.well-known/webfinger?resource=acct%3Acrissbeat%40testagram.site`: HTTP 503.
+- `https://api.testagram.site/healthz`: HTTP 404. This path is not established as a public health operation in the locked API contract, so it is not treated as a public acceptance endpoint.
+
+The WebFinger 503 and NodeInfo timeout confirm federation discovery is still not production-accepted. No DNS, Worker, deployment, secret or feature-flag mutation was performed by these probes. The guarded CDN domain handoff and canonical apex/WebFinger routing remain blocked on review, staging acceptance and explicit production approvals.
+
+## 15. Data Centre candidate cleanup — 2026-11-21
+
+Data Centre PR #114 (`8b61fe03eb918d352f78d1142651167b3e9fe21a`) removes obsolete external-provider-name grep assertions from the VPS CI workflow. Those assertions were text-only negative checks and duplicated the API Control Plane's exhaustive native-only audit. The workflow retains the independent obsolete deployment-variable guard, Testagram Backend image assertion, native authentication configuration check, route assertions and service contract validation. No runtime code, credentials, database schema or production infrastructure changed.
+
+The bridge pins this exact Data Centre candidate, records PR #114 as unmerged candidate evidence, and removes the workflow from the historical compatibility allowlist. The expected historical residue count is now 26; the immutable original migration files and migration-upgrade fixtures remain untouched.
+
+## 16. Latest bridge CI and production blockers — 2026-11-21
+
+- API Control Plane PR #116 candidate `5a9180d35bc26c2c48a2bffb700b9418d6d7a85b` passed Node and Dart CI run `44923230908`. The run verified the seven-organ manifest, six immutable runtime pins, six runtime edges, six governance edges, Flutter/API contract, 105 static Backend routes, 67 OpenAPI operations, 45 Flutter client paths, and native-only authentication audit.
+- The native-only audit inspected 418 runtime, deployment, configuration and documentation files across all six runtime organs and found no active external identity-provider integration. The remaining 26 allowlisted matches are confined to immutable historical SQL migration records and the upgrade/compatibility test fixture. The Data Centre VPS CI negative-string checks have been removed in PR #114; the source pin now targets that candidate.
+- Backend PR #424 candidate `c627858a295fbf45b6dbdeeb54d2a5aa0a989470` passed Backend CI, PostgreSQL identity/registration/recovery/dual-control tests, native staff WebAuthn PostgreSQL tests, Chromium virtual-authenticator UI tests, security scan, container publish and Cloudflare read-only audit. The production deploy sub-job was skipped; this is not evidence of a live deployment.
+- CDN PR #125 candidate `930f000e030fc920a749b99cae1e0c8c5c01d2b1` passed Worker, capacity, CI and no-production-deployment source validation. The guarded production custom-domain handoff has not been dispatched.
+- Data Centre PR #114 candidate `8b61fe03eb918d352f78d1142651167b3e9fe21a` has passed Android and encrypted restore-drill jobs; its Go/VPS validation was still running at the last check.
+- Flutter production smoke PR #100 remains failing against live production: apex `/` returned HTTP 200 instead of the required 308 redirect; NodeInfo discovery returned HTTP 200 with Flutter HTML instead of JSON; and real-account WebFinger returned HTTP 503. `www`, sign-in and Pages.dev Flutter shells returned HTTP 200. This is an actual routing/federation acceptance failure.
+- The Chromium Admin Console harness exercises real browser `navigator.credentials.create()` and `.get()` with a virtual authenticator, but it currently stubs `/api/**` responses. It proves the browser ceremony payload and UI flow, not the live Admin Console-to-Backend/PostgreSQL end-to-end path. A live staging ceremony remains required.
+- Staff lifecycle is not complete: `POST /api/staff/invite`, `PUT /api/admin/staff/{id}/role` and `DELETE /api/admin/staff/{id}` currently return HTTP 501. The two-person approval ledger records independent decisions but explicitly does not execute staff lifecycle mutations. Keep staff invitation, role changes and revocation closed until a transactional, independently approved implementation and integration tests exist.
+- Backend PR #424, CDN PR #125, Data Centre PR #114 and API Control Plane PR #116 remain candidate/open work at this acceptance snapshot. Do not merge the bridge or declare production acceptance until independent reviews, exact post-merge source-pin refresh, live Backend/Admin Console ceremony, staff lifecycle, production routing and real-account Federation probes pass.
+
+
+## 17. Authoritative source-pin refresh and apex Federation routing — 2026-11-21
+
+The current `contracts/sources.lock.json` and `contracts/registry/seven-organ-bridge.json` are authoritative over earlier historical snapshots in this document. The exact six runtime pins currently validated by the bridge are:
+
+| Runtime organ | Mainline revision | Review candidate revision |
+|---|---|---|
+| Backend | `a793c55db8b5c258524bfef4b8872f5c6c1038e5` | PR #424: `cc33913f0fd4e86669f7c717e12b2503990e6d88` |
+| CDN | `490119514788c13c327ee05eb4ce068a0f73966e` | PR #125: `21a254e9f67dc7a8e55dca37151a6db532405e53` |
+| Flutter | `1f58971720c7a72139d56900a5895c49fa105639` | Mainline includes NodeInfo 2.1, real-account WebFinger, actor and unknown-account smoke; PR #100 is a stale draft based on older mainline |
+| Data Centre | `ada6f26a289775720bb47a639242dbd868388055` | Mainline |
+| Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline |
+| Federation | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Mainline |
+
+The seventh API Control Plane remains governance-only at `201fd3335c737e7fe36ed34dfa1ec07b03c31047`; it is not a runtime service or hop. Backend PR #424 and CDN PR #125 remain unmerged candidate pins and are not represented as accepted mainline revisions. Each candidate is checked against its exact current mainline by the source checkout/merge validation before the bridge audits the combined tree.
+
+The bridge cross-repository checker now also enforces the public ActivityPub discovery chain: Flutter's production NodeInfo/WebFinger smoke, Federation's public discovery handlers, Backend Caddy's apex proxy to `federation-api:8081`, CDN's apex Worker route, and the separately approved exact-owner WebFinger route removal and rollback workflow. CDN PR #125 now includes a separate default-off approval for the legacy `testagram.site/.well-known/webfinger*` route, exact ID/owner revalidation before deletion, and restoration of the exact prior `testagram-web` route if apex verification fails. Its workflow regression test is part of the CDN CI and is included in the immutable source inventory.
+
+The latest CDN candidate passed CI run #524, Worker tests #209, capacity #457 and no-production-deployment origin validation #93. The bridge's next CI run must pass all Node and Dart audits against this refreshed source set before PR #116 is considered merge-ready.
+
+Production acceptance remains **NOT ACCEPTED** until a separate staging Cloudflare zone proves the same route transition and full API/Federation smoke with staging-specific hostnames and credentials, followed by the three explicit production approvals. The production audit still shows the WebFinger route owned by `testagram-web`, the apex root returning HTTP 200 instead of the required 308 redirect, NodeInfo returning Flutter HTML, and the real-account WebFinger endpoint returning HTTP 503. No production routing, DNS, Pages, Worker, database, secret or feature-flag mutation is authorized by this source-pin refresh.
+
+
+## 18. Staff permission mutation fail-closed correction — 2026-11-21
+
+The latest Backend PR #424 candidate is `cc33913f0fd4e86669f7c717e12b2503990e6d88`. A forensic review found that the Admin Console's role-change, revocation and invitation handlers already return HTTP 501, but the permission-change handler still directly updated `native_staff_permission_overrides` after one owner's step-up. That bypassed the required two-person authorization boundary.
+
+The candidate now removes that direct SQL mutation and keeps permission changes HTTP 501 until a transactional executor applies an approved request only after two distinct authorized approvers. A regression test asserts that the handler remains closed and contains no direct permission write. The API bridge source lock includes both the handler and its regression test, and the cross-repository checker enforces this fail-closed rule. The approval ledger's current record-only behavior is not treated as staff lifecycle execution.
+
+This is a security closure, not a completed staff lifecycle. Invitation, role change, revocation and permission change remain unavailable until the two-person executor and its PostgreSQL integration tests are implemented. No production staff access or permissions were modified. Backend PR #432 contains a separate database-level approval-integrity migration and passed CI #3739, but it is stacked on overlapping PR #431. Reconcile/rebase that migration onto the reviewed PR #424 candidate or its accepted mainline merge before merge; the bridge does not treat the stale stack as accepted.
+
+
+## 19. Live Cloudflare legacy Worker inventory — 2026-11-21
+
+The latest Backend Cloudflare audit #457 verified that the repository token is active and performed a read-only inventory. The active production API custom domain `api.testagram.site` is still attached to the legacy `testagram-api` Worker, not `testagram-cdn`. That legacy Worker script still exists and has legacy `SUPABASE_*` secret/text bindings (`SUPABASE_ANON_KEY`, `SUPABASE_JWKS_URL`, `SUPABASE_PROJECT_REF`, `SUPABASE_SECRET_KEY`, `SUPABASE_URL`); its last recorded deployment is 2026-09-14. This is a live legacy edge artifact and must be removed after the new gateway is accepted, not confused with intentionally preserved historical migration records.
+
+The same inventory confirms that `testagram.site/.well-known/webfinger*` is still routed to `testagram-web`, while apex and www remain attached to Flutter Pages. The existing `testagram-cdn` Worker has an active five-minute Cron trigger and is explicitly excluded from cleanup candidates.
+
+The Cloudflare token is now active; the earlier missing-secret failure is no longer the current blocker. The remaining gates are the separate staging proof, explicit canonical-host/API-domain/WebFinger approvals, successful public API and Federation probes, and then the separately confirmed post-handoff cleanup of the detached legacy API Worker. No production resources were changed by audit #457.
+
+
+## 20. Backend security-stack reconciliation and fresh CI — 2026-11-22
+
+The immutable source lock remains on Backend PR #424 candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88`. Fresh GitHub evidence confirms Backend CI run #44946760094 completed successfully across all 15 jobs; the InstaBox workflow's input-validation job passed, but its actual `Deploy backend and private services` job was skipped. This is not deployment evidence.
+
+Backend PR #432 head `9f8c977a980f43e64889d8f166579edd67d61871` passed Backend CI run #44947171601 across all 15 jobs, and its Cloudflare domain-routing audit #44947171620 completed successfully as a read-only audit. Its database migration adds immutable request identity/payload, append-only approval evidence, eligibility checks at approval insertion, and an exact quorum check at the final approved transition. It does not implement the application-level transactional staff lifecycle executor and does not authorize enabling staff mutations.
+
+The branch ancestry is still not reconciled. Although PR #432 currently targets branch `native-auth candidate branch` at the #424 candidate head, a direct commit comparison from #424 head to #432 head reports `diverged`, 32 commits ahead and 6 behind, with merge base `c627858a295fbf45b6dbdeeb54d2a5aa0a989470`. PR #431 head is `24eea9f623cf3fb37ca3aa79a9eac8a262785771`; its permission-handler correction overlaps the fail-closed implementation already present in #424. PR #432's historical description still names #431 as its stack dependency. Therefore, changing the PR base reference has not made its commit ancestry mergeable. Do not merge #431 or #432, do not force-push or rewrite their review history, and do not treat a green CI run as proof that the branch is merge-ready. A clean transplant/rebase of only the approval-integrity migration and its required tests onto #424 remains necessary, followed by fresh CI and independent review.
+
+All review submissions remain absent on PRs #424, #431, #432 and API bridge #116. The bridge PR #116 head `3d7114e19c731e337eb8bdcd072056cdca71cac7` passed API contract CI run #44947566386 in both Node and Dart jobs. Its source lock pins Backend #424 and CDN #125 candidates; it must be refreshed to exact merge commits only after those dependencies are independently reviewed and merged.
+
+No production deployment, DNS/domain transfer, Worker deletion, staff permission change or production routing mutation occurred during this audit. The production legacy Worker and WebFinger ownership blockers, separate staging-zone acceptance, and independent reviews remain release blockers.
+
+
+## 21. Fresh read-only Cloudflare inventory — 2026-11-21 20:36 UTC
+
+Backend Cloudflare audit run #44947171620 completed successfully in GET-only mode. It independently reconfirms that `api.testagram.site` is a production custom domain owned by Worker `testagram-api`; the canonical `testagram-cdn` gateway does not own that hostname. The exact route `testagram.site/.well-known/webfinger*` remains assigned to `testagram-web`. Apex and `www` remain active Pages domains on `testagram-flutter-web`. The `testagram-cdn` Worker still has its `*/5 * * * *` Cron trigger and must remain excluded from orphan cleanup.
+
+The inventory additionally found a separate legacy Worker `testagram-heartbeat` carrying `SUPABASE_HEARTBEAT_RPC_URL` and `SUPABASE_PUBLISHABLE_KEY` bindings, plus a Worker named `xclone-9b4dz1-9b4dz1-8936-20260809`. These are live Cloudflare inventory findings, not approved Testagram architecture or dependencies. They are not authorized for deletion by this audit. Their ownership, route/domain references, schedules, service bindings, tail consumers and operational dependencies must be proven absent before a separate exact-name retirement workflow is proposed. Do not broaden the existing cleanup allowlist or delete either Worker as part of the API gateway handoff.
+
+The same audit reported eight Worker scripts in the account, four custom-domain bindings including the legacy API binding, and the Pages project `testagram-flutter-web`. It completed with no DNS, Worker, Pages, zone or account mutations. Credential values and DNS record contents were intentionally excluded from the audit summary.
+
+This fresh evidence expands the legacy edge inventory beyond the API Worker. The production release remains blocked on a separately accepted staging zone, canonical API-domain transfer, exact WebFinger route transfer, public API/Federation verification, and independent review. No production resource was changed.
+
+
+## 22. Clean Backend approval-integrity transplant — 2026-11-22
+
+The former Backend PR #432 stack has been reconciled into a new clean candidate, PR #434, directly descended from PR #424's native-auth candidate. The clean branch has one commit ahead and zero commits behind its exact #424 base. It carries only the independent approval-integrity migration, migration runner and Compose wiring, CI fixtures, integration-test updates and migration-manifest tests. It does not copy the overlapping #431 permission-handler correction; #424's HTTP 501 fail-closed staff permission handler and regression test remain inherited unchanged.
+
+PR #434's initial clean transplant CI passed all 15 jobs. Further forensic review identified missing explicit expiry/replay/concurrency coverage and a credential-revocation race at the database boundary. The candidate was hardened to lock approver principal, identity, active role-grant and WebAuthn credential rows through approval commit, and its CI now tests expired-request rejection/expiry transition, duplicate-decision replay, approval-evidence deletion, and a concurrent approval-versus-credential-revocation transaction. The latest head is `eebd2f633f3df4200821a0d390903877fa75726c`; fresh Backend CI run #44964570240 is pending at the time of this update. The previous green run does not validate these newest changes. Independent security review remains absent.
+
+The approval row still records approver identity but does not persist the exact WebAuthn credential ID and ceremony/session evidence used for step-up. The application verifies the authenticator from the recent step-up token, while the database trigger verifies active eligible credentials. This remaining credential-evidence binding must be resolved or explicitly accepted by an independent security reviewer before the approval ledger can be accepted. Staff invitations, role changes, revocations and permission changes remain disabled.
+
+## 23. Staging workflow and live edge inventory gaps — 2026-11-22
+
+A forensic read of CDN PR #125's production routing workflow found that it contains exact-owner API custom-domain and WebFinger route transfer guards, default-off approvals and rollback logic, but it does not execute or verify a separate staging-zone acceptance workflow. The phrase "after staging acceptance" appears in an error message; it is not a machine-verified staging attestation. The CDN repository currently has no staging-specific workflow or staging Wrangler configuration in the candidate tree. The production routing workflow must not be dispatched until a separate staging acceptance artifact exists and is verified against the exact CDN candidate and staging zone.
+
+The latest read-only Cloudflare inventory enumerated the visible zones as `blueski.top`, `streamora.co.ke` and `testagram.site`; it did not show a separate Testagram staging zone. It confirms the live custom-domain owner `heartbeat.testagram.site` is Worker `testagram-heartbeat`, which retains legacy `SUPABASE_HEARTBEAT_RPC_URL` and `SUPABASE_PUBLISHABLE_KEY` bindings. Therefore that Worker is not an orphan and must not be deleted or detached without a separate replacement and migration plan. The inventory also found `xclone-9b4dz1-9b4dz1-8936-20260809`; it had no route, custom domain, Cron or bindings in the observed inventory, but ownership/source provenance still needs verification before any cleanup.
+
+Backend PR #433's guarded cleanup workflow lists heartbeat and the unexpected Worker as separate exact-name candidates, but its custom-domain and consumer preflights should block heartbeat while the live custom domain remains. No dry-run cleanup was dispatched, and no Worker was deleted. The active five-minute `testagram-cdn` Cron remains excluded from cleanup.
+
+The API bridge source lock intentionally remains pinned to the unmerged Backend #424 and CDN #125 candidates. It must not be advanced to PR #434 or any candidate head until the exact reviewed changes are merged and the accepted merge commits are known. No production DNS, route, Worker, Pages, staff permission or deployment mutation occurred.
+
+
+## 22. Backend approval-integrity transplant supersedes the stale #431/#432 stack — 2026-11-22
+
+Backend PR #434 (`security/native-approval-ledger-integrity-on-424-20261122`) is the clean replacement candidate for the former #432 stack. It is directly based on PR #424's exact native-auth candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88`; Git comparison reports the base as the merge base, 8 commits ahead and 0 behind at the last ancestry check. It excludes #431's overlapping permission-handler correction; the #424 fail-closed permission handler and regression test remain inherited from the base.
+
+PR #434 carries the approval-integrity migration, ordered migration application and Compose mount, PostgreSQL fixtures, migration-manifest checks, and exact WebAuthn RP ID plus credential-ID binding for every new approval. The application decision path now obtains the exact authenticator ID from the credential-bound recent step-up and writes it with the approval record. The approval-quorum trigger checks that exact credential remains active, verified and not clone-warned at finalization. Admin readiness checks the new schema columns.
+
+The latest PR #434 head observed during this update was `f95340a9f81ea3257e8d7fdb48db33b496bed5e6`; its workflow syntax check passed, while Backend CI and the Cloudflare audit were still running/queued. Earlier complete Backend CI on the predecessor head passed all 15 jobs, but did not cover all later exact-credential/readiness changes. The latest commit adds the credential-bound schema requirement to the migration readiness diagnostics. Therefore PR #434 remains draft and unaccepted pending fresh CI on its final stable head and independent security review.
+
+The bridge source lock deliberately remains pinned to PR #424, not #434: #434 is a stacked, unmerged security candidate and must not be represented as an accepted source dependency. Refresh the Backend lock only after the #424/#434 dependency chain is independently reviewed and actually merged; then pin the resulting merge commit, not a moving branch name. PR #431/#432 must not be merged separately.
+
+No production migration, staff permission enablement, deployment, Cloudflare routing change or cleanup is authorized by this candidate. Staff invitations, role changes, revocations and permission changes remain disabled.
+
+
+## 23. Latest Backend transplant head and CI state — 2026-11-22
+
+A subsequent forensic refresh observed Backend PR #434 at head `25ebde27e54ae8af28b91910846e48158cb1771f`, still directly based on PR #424 head `cc33913f0fd4e86669f7c717e12b2503990e6d88`. Git comparison remains clean: 16 commits ahead, 0 behind. The newest change adds a PostgreSQL negative test proving an approver cannot substitute a different authenticator credential for the exact credential registered to that staff principal.
+
+The Backend CI run `44965224380` is now running against this exact head; its Admin permissions and dual-control PostgreSQL integration job is included. Workflow syntax validation passed on this head. The immediately preceding Backend CI attempts were cancelled as newer commits arrived, so they are not acceptance evidence. Cloudflare audit remains read-only.
+
+PR #434 remains draft, with no independent review. The bridge lock remains pinned to the unmerged #424 source candidate and has not been advanced to #434 or any unmerged branch. This status is an audit snapshot only; refresh the Backend source pin after independent review and actual merge of the accepted dependency chain.
+
+
+## 24. Backend PR #434 exact-credential hardening and latest validation — 2026-11-22
+
+The latest Backend PR #434 head is `89e4663f330cb965f66db5614c41661ea037ffe2`. It remains directly based on #424 candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88`; a fresh Git comparison reports 21 commits ahead, 0 behind, with #424 itself as the merge base. PR #434 is still draft, mergeable, and has no independent review submissions.
+
+The approval ledger now persists both the exact WebAuthn RP ID and credential identifier from the verified elevation token. PostgreSQL insert and final-quorum guards require the same active, user-verified, non-cloned credential and lock it through the decision transaction. The Admin Console requires the elevation subject to match the authenticated staff principal and verifies the immutable canonical payload digest before appending an approval. Regression tests now assert the exact credential evidence is persisted and reject a mismatched payload digest or a different authenticator.
+
+The first full CI attempt after introducing the new credential columns exposed a real test-harness omission: the separate identity-registration PostgreSQL harness had not applied migration 061 and its fixture did not seed approver credentials. That harness now applies migration 061 twice to test idempotence, creates exact credential fixtures, and records credential-bound approval rows. The test suite now also asserts that the two exact credential IDs were persisted by the identity-review integration path. This correction is included in the current head; do not treat earlier cancelled or failed runs as final acceptance.
+
+Backend CI run `44965415739` and workflow syntax validation run `44965411063` were in progress when this snapshot was written. The Cloudflare domain-routing audit run `44965415787` is read-only and in progress. A fresh all-green run against this exact head is still required.
+
+The API bridge source lock remains intentionally pinned to the unmerged Backend #424 candidate and CDN #125 candidate. It has not been advanced to PR #434, and no moving branch name is used as an accepted dependency. Refresh the source lock only after independent security review and actual merge of the accepted Backend dependency chain, using the final merge commit SHA.
+
+No PR was merged. No production deployment, DNS or route transfer, Worker deletion, staff permission change or staging-zone acceptance occurred. Staff invitations, role changes, revocations and permission changes remain disabled until a transactional two-person executor is implemented and independently accepted.
+
+
+## 25. Additional Worker ownership detail from read-only Cloudflare audit — 2026-11-22
+
+Cloudflare audit job `44965369931` succeeded in GET-only mode. It confirms that `testagram-heartbeat` owns the enabled production custom domain `heartbeat.testagram.site` in zone `testagram.site`, and the zone has a proxied AAAA record for that hostname. The Worker still carries `SUPABASE_HEARTBEAT_RPC_URL` and `SUPABASE_PUBLISHABLE_KEY` bindings. It has no reported Cron trigger, route or tail consumer in this inventory, but its custom-domain and DNS ownership prove it is live. Do not delete it or remove its hostname during the API gateway cleanup; it requires a separate native heartbeat replacement, health verification, exact domain transfer and separate retirement approval.
+
+The unexplained Worker `xclone-9b4dz1-9b4dz1-8936-20260809` has no listed custom domain, route, Cron trigger, binding or tail consumer; latest deployment source is `dash_template` (2026-08-15). However, the audit reports `workers_dev=unknown`, so its public workers.dev endpoint status is not proven. Keep it out of all deletion allowlists until that endpoint and account-level service references are explicitly checked.
+
+The same audit shows `testagram-web` has a `17 3 * * *` Cron trigger as well as the exact WebFinger route. The route-transfer workflow must transfer only the exact WebFinger route ID; it must not delete/redeploy `testagram-web` or remove its Cron trigger. The CDN Worker has its own active five-minute Cron and remains protected from cleanup.
+
+No DNS, Worker, Pages, zone or account mutations occurred. This narrows the API cleanup scope but does not authorize any production cleanup or route transfer.
+
+
+## 25. Backend PR #434 final candidate CI completed — 2026-11-22
+
+Backend PR #434's current head is `4c7a5a74b5e9209f63dff4e0d6b4ee6439f3b10c`, directly descended from PR #424 candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88`. Git comparison reports 22 commits ahead, 0 behind, with #424 as the exact merge base. Its changed files are limited to the approval-integrity migration, Admin Console decision path and regression coverage, PostgreSQL provisioning fixtures, self-hosted migration preflight/Compose wiring, migration harness and CI workflow.
+
+Fresh Backend CI run `44965539075` completed successfully across all 15 jobs on the exact #434 head. Workflow syntax validation run `44965534370` also passed. The read-only Cloudflare domain-routing audit `44965539105` passed. The CI includes PostgreSQL dual-control and identity-registration integration, exact WebAuthn credential binding, mismatched payload-digest rejection, migration idempotence, Compose validation, browser WebAuthn, race detector, Vet, Build and runtime-boundary checks.
+
+The exact WebAuthn RP ID and credential identifier are now persisted on each new approval record. The database trigger checks the same credential at insert and final quorum transition and locks it against concurrent revocation. The application binds the approval to the authenticated elevation subject and verifies the immutable canonical payload digest before recording. Historical unbound approval rows are not accepted into a new quorum; affected pending requests must expire and be re-requested.
+
+**Acceptance remains pending:** PR #434 is still draft and has no independent review submission. It is not merged. PR #424 also remains open and requires its own independent review. The old #431/#432 branches must not be merged separately. The bridge source lock remains pinned to the unmerged #424 candidate, not #434; it must only move to the actual accepted merge commit after the dependency chain is independently reviewed and merged.
+
+The latest Cloudflare inventory still shows no separate Testagram staging zone among the visible zones. `api.testagram.site` remains on `testagram-api` with legacy Supabase bindings; `testagram.site/.well-known/webfinger*` remains on `testagram-web`; `heartbeat.testagram.site` remains on `testagram-heartbeat`; the unexpected Worker remains provenance-unverified; and `testagram-cdn` retains its protected five-minute Cron. The audit was read-only. No production routing, DNS, Worker, Pages, staff permission or deployment mutation occurred.
+
+
+## 26. Backend PR #434 full CI acceptance snapshot — 2026-11-22
+
+Backend PR #434's stable candidate head is `4c7a5a74b5e9209f63dff4e0d6b4ee6439f3b10c`, directly based on PR #424 candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88`. Git comparison confirms 22 commits ahead, 0 behind, with the #424 candidate as the merge base.
+
+Fresh Backend CI run `44965539075` completed successfully across all 15 jobs on that exact head. This includes:
+- Admin permissions and dual-control PostgreSQL integration, including concurrent approval-versus-credential-revocation serialization.
+- Identity registration PostgreSQL migration/invariant integration, now applying migration 061 twice and seeding exact RP/credential-bound approver fixtures.
+- Exact WebAuthn registration/assertion browser integration.
+- Native staff WebAuthn credential, replay and counter tests.
+- Go race detector, vet, build and vulnerability scan.
+- Self-hosted Compose validation and all other PostgreSQL/MinIO integration jobs.
+
+Cloudflare read-only audit `44965539105` and workflow syntax validation `44965534370` also succeeded. No production Cloudflare changes occurred.
+
+PR #434 remains draft and has zero independent review submissions. Green CI is candidate evidence only; it is not a merge approval or production migration attestation. The source lock remains intentionally pinned to unmerged #424 candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88`, not #434. Refresh it only after independent review and actual merge of the accepted dependency chain, using the final merge commit SHA. Staff invitations, role changes, revocations and permission changes remain disabled.
+
+
+## Current execution reconciliation — 2026-11-22 03:55 UTC
+
+This section is the current authoritative status and supersedes earlier historical snapshots in this document wherever they describe CDN PR #125 as unmerged or describe the old source pins as current.
+
+### Immutable source pins
+
+- Backend mainline remains `a793c55db8b5c258524bfef4b8872f5c6c1038e5`; Backend PR #424 remains an unmerged candidate at `cc33913f0fd4e86669f7c717e12b2503990e6d88`.
+- CDN PR #125 is **merged** at `21a254e9f67dc7a8e55dca37151a6db532405e53`. The source lock and seven-organ registry now pin this exact merge commit as CDN mainline and no longer classify #125 as a candidate.
+- Data Centre remains pinned to `ada6f26a289775720bb47a639242dbd868388055`; Flutter to `1f58971720c7a72139d56900a5895c49fa105639`; Algorithm to `92cf9b47e4de38306c4fe7b61ece24c3e075aa22`; Federation to `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d`; API Control Plane mainline baseline to `201fd3335c737e7fe36ed34dfa1ec07b03c31047`.
+- Backend #434 is the clean approval-integrity candidate at `2c74c4017ef0cc54a250e070c470d950a0df314e`, directly based on #424. Its exact-head Backend CI, workflow syntax and read-only Cloudflare audit passed. No independent review is recorded.
+- Backend #435 is now based on the exact #434 head `2c74c4017ef0cc54a250e070c470d950a0df314e`; its current head is `1e165ae9d5ca2f4ebdf7a7b4b25b7294f43a2149`. Its Backend CI, Cloudflare audit and Knowledge Engine schema workflow are in progress. The earlier schema-only success on its prior head is not acceptance for this latest head.
+- Do not merge #424, #434 or #435 without independent review and the required sequential checks. #435 must remain stacked on the exact accepted #434 revision.
+
+### Flutter CI rerun
+
+The latest recorded Flutter feature revision is `b3ed56d6aa2a4822d0687cdc4d32cfa98cbc7cf8`. The Cloudflare Pages build passed, but the Validate Flutter Client and Flutter Client CI jobs were cancelled before dependency resolution, analysis, tests or builds. Both jobs were explicitly rerun. The reruns were again cancelled while restoring the Flutter SDK cache (approximately 1.67 GB); no Dart analysis or Flutter test result was produced. This is an infrastructure/cache-stage cancellation, not a test failure and not a pass. The Flutter gate remains open.
+
+### API Control Plane refresh
+
+The API bridge branch now updates `contracts/sources.lock.json`, `contracts/registry/seven-organ-bridge.json`, `contracts/route-inventory/backend-public-routes.json` and this acceptance record. The CDN pin now identifies the merged #125 SHA; the Backend route-inventory explanatory source SHA now matches the pinned #424 candidate. The refreshed bridge head is `3e2e420b8c6d293b4e1552cb79a97e69d84f2a0a`. The preceding bridge CI passed on the prior head; no check result is yet recorded for this refreshed head. Keep PR #116 open until exact-head Node and Dart contract CI passes and the Backend dependency chain is reviewed and accepted.
+
+### Staging and production
+
+No separate Testagram staging Cloudflare zone or machine-verified staging attestation has been established. The merged CDN workflow is guarded but production-only; it must not be dispatched without the equivalent staging workflow and successful API, media, apex redirect, NodeInfo, WebFinger and actor/public-key probes. The last read-only inventory still identifies legacy production API/WebFinger routing and related Worker bindings. No production DNS, Worker, Pages, database, staff permission, feature flag or deployment mutation is authorized or evidenced by this reconciliation.
+
+
+
+## Current authoritative execution state — 2026-11-22
+
+This section supersedes all earlier status snapshots in this document where they conflict. Source pins are immutable and the API Control Plane source lock is authoritative.
+
+### Exact source pins
+
+- Backend candidate: PR #437, `93da847b74d2e874595d113deacbbcda3c283b3a`, stacked on Backend #435 head `1e165ae9d5ca2f4ebdf7a7b4b25b7294f43a2149`. The required merge order remains #424 → #434 → #435 → #437.
+- Flutter candidate: PR #116, `5b49a549701a6a4f2fcf6f694db5f6384008e8ff`. This is the consolidated social/knowledge/profile-safety, deep-link and wallet candidate targeting main.
+- Data Centre candidate: PR #115, `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef`.
+- Federation candidate: PR #53, `4d7c26861240fae0fc8a69872dc326b3e1b2bbff`.
+- CDN mainline: PR #125 merged at `21a254e9f67dc7a8e55dca37151a6db532405e53`.
+- Algorithm mainline: `92cf9b47e4de38306c4fe7b61ece24c3e075aa22`; PR #29 is merged.
+- The current source lock contains 176 Backend source paths and 60 Flutter source paths, plus the locked Data Centre, CDN, Federation and Algorithm paths. The latest source-tree comparison found no missing pinned paths.
+
+### Backend profile and wallet work
+
+- PR #437 adds authenticated `testagram.social.profile.resolve`; Backend enforces account activity, discoverability, accepted-follow visibility and mutual block restrictions before returning the canonical profile.
+- M-Pesa idempotency keys are bound to the normalized phone, whole-KES amount and currency. Reuse with a different payload returns conflict.
+- The Backend supports owner-scoped status recovery by the original idempotency key, including when a checkout ID was not returned to the client.
+- The Flutter client persists the exact attempt before network dispatch and reuses the same key on ambiguous retries.
+- Backend PR #437 is ready for independent review and remains stacked on #435. Its exact-head Backend CI run `44972023262` passed, as did the Knowledge Engine PostgreSQL schema and Cloudflare domain routing audit. The complete Go tests/race detector, vet, build, route/security checks and PostgreSQL integration matrix are green.
+- The first exact-head attempt exposed a missing final newline in `wallet_mpesa.go`; this was corrected, and the final pinned head passed the full Backend CI.
+
+### Flutter profile, deep-link and wallet work
+
+- PR #116 consolidates the former #114 social/knowledge and profile-block work with the deep-link and wallet recovery changes. The earlier Flutter PRs #114 and #115 are closed as superseded.
+- Profile blocking uses the verified Backend block endpoint. Reporting, muting and a full blocked-account management list are not exposed because corresponding complete Backend contracts have not been verified.
+- Supported deep links are username profiles, UUID profiles and the wallet landing page. The wallet link is navigation-only; it cannot carry a payment instruction. Posts, notifications, threads and Federation activity links remain out of scope until their authorization contracts are implemented.
+- Flutter PR #116 exact-head checks passed: Validate Flutter Client `44971162549`, Flutter Client CI `44971162674`, Cloudflare Pages build `44971162645`, and web-container build `44971162564`.
+- Android App Links and iOS Universal Links remain unaccepted because this Flutter source repository has no Android/iOS runner projects, signing association files or verified warm-link delivery. The Dart parser and web build do not prove native links.
+
+### API Control Plane and organ validation
+
+- API Control Plane PR #116's latest code/source-lock revision `7fccbb7e8c61c5b2c48091a3e8393bacb7215829` passed API contract CI run `44971990433` (Node and Dart). Subsequent commits only update the acceptance document.
+- The cross-repository suite now checks Backend profile resolution, block safety, allow-listed deep links, wallet idempotency binding, secure persistence-before-dispatch and the wallet-only navigation boundary.
+- Data Centre PR #115 and Federation PR #53 have successful candidate CI runs. Both still require independent review; neither is merged.
+- CDN PR #125 is merged. The Backend's CDN-origin PostgreSQL integration and read-only Cloudflare routing audit passed on the latest Backend feature validation.
+- Algorithm is pinned to its merged mainline commit; the pinned commit has no direct workflow status recorded. The API bridge contract suite validates the integration contract but is not a substitute for live Algorithm staging tests.
+
+### Reviews, staging and production
+
+- No independent review submissions are recorded on Backend #424/#434/#435/#437, Flutter #116, API Control Plane #116, Data Centre #115 or Federation #53. None of these open candidates is approved for merge.
+- No separate Testagram staging Cloudflare zone or machine-verified staging attestation has been established. Cross-organ staging acceptance remains open.
+- The InstaBox deployment workflow's production deploy job was skipped for the pull request; the container workflow built without publishing on the PR event. No production DNS, Worker, Pages, database, staff permission or feature-flag mutation was performed by this continuation.
+- M-Pesa B2C withdrawals remain unavailable. An STK Push is not settlement; only provider-verified callback/query plus a committed PostgreSQL ledger transaction may credit a wallet.
+- Repository search across all seven organs found no retired identity provider or Xclone matches in the searched source and documentation.
+
+### Remaining release gates
+
+1. Complete Backend #437 exact-head CI, then independently review and merge #424 → #434 → #435 → #437 in order.
+2. Complete independent review of Flutter #116, API Control Plane #116, Data Centre #115 and Federation #53.
+3. Run signed Android/iOS deep-link tests after native runner projects and association files exist.
+4. Run isolated staging tests for profile privacy/blocking, wallet idempotency/settlement, Backend ↔ Data Centre ↔ CDN media delivery, Federation signatures/actor discovery and Algorithm authorization/ranking.
+5. Obtain staging attestation and explicit production release approval.
+
+The platform is not declared fully integrated or production-ready.
+
+## 27. Exact source-pin reconciliation — 2026-11-22 09:44 UTC
+
+This section supersedes earlier candidate-pin snapshots where they conflict. The immutable values below are the current source-lock and seven-organ registry values at the time of this reconciliation. They are review candidates or mainline pins, not evidence of production acceptance.
+
+| Organ | Exact immutable source pin | Current provenance and acceptance state |
+|---|---|---|
+| Backend | `7dbdfe65436e8b96becac664ce9b5269b85508d3` | Open draft PR #441 candidate; its API tests/static-check job was still in progress at this snapshot. Required dependency sequence is #424 → #434 → #435 → #437 → #439 → #441. PR #440 is validation-only and is not a merge candidate. |
+| Flutter client | `b818e6c2c2ec2dd909eb001afb9c055ab562b9bd` | Open draft PR #120 candidate, stacked on #118 → #117 → #116. Build and image publication checks passed; Cloudflare Pages was still in progress at this snapshot. |
+| Data Centre | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` | Open draft PR #115 candidate; Go, Android and isolated encrypted restore checks passed. |
+| CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Merged mainline after CDN PR #125. Its exact mainline source pin is not a candidate branch. |
+| Federation | `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` | Open draft PR #53 candidate; test and image checks passed. |
+| Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Current mainline pin. The current main commit is documentation-only and has no check runs attached to this exact SHA; older successful runs are not attributed to it. |
+| API Control Plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` | Mainline governance baseline only; API Control Plane is build-time governance, not a runtime dependency. |
+
+The Backend and Flutter candidate pins above are intentionally ahead of their respective mainline SHAs. They must remain identified as unmerged candidates and must not be described as deployed or accepted. Refresh candidate pins only when the corresponding source candidate changes; replace them with exact merge commit SHAs only after independent review and actual merge in the required dependency order.
+
+At this snapshot, the read-only Flutter production probes on main SHA `1f58971720c7a72139d56900a5895c49fa105639` fail: production apex returns HTTP 200 instead of the required 308 redirect, NodeInfo discovery returns the Flutter HTML shell instead of JSON, and the real-account WebFinger endpoint returns HTTP 503. The TV catalogue monitor also receives HTTP 404 from the production API origin although the current Backend source registers the route. These are live routing/deployment acceptance failures; no DNS, Worker, Pages, VPS or production deployment mutation is authorized by this record.
+
+The API Control Plane locked-acceptance audit checks every immutable source pin against this document. This exact-pin section is retained as a regression fixture so a source-lock change cannot silently leave the acceptance record stale. Historical status sections above are preserved as audit evidence; this section is the latest reconciliation only.
+
+
+## Exact source-pin refresh — 2026-11-22
+
+The six runtime source pins below are the current immutable revisions in `contracts/sources.lock.json`. Candidate PRs remain open/unmerged and are not accepted production dependencies until sequential independent review, merge and live acceptance.
+
+| Runtime organ | Exact source SHA | Candidate status |
+|---|---|---|
+| Backend | `2c76af240289931dab390360d107d1df2adddb2e` | PR #441, stacked on #439 → #437 → #435 → #434 → #424; draft, unmerged |
+| Flutter client | `b818e6c2c2ec2dd909eb001afb9c055ab562b9bd` | PR #120, stacked on #118 → #117 → #116; draft, unmerged |
+| Data Centre | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` | PR #115 candidate; unmerged |
+| CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` | PR #125 merged; live routing acceptance remains separate |
+| Federation | `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` | PR #53 candidate; unmerged |
+| Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline pin |
+
+Backend PR #440 is validation-only and must be closed, never merged. The API Control Plane remains build-time governance only and is not a runtime service or hop. No source pin implies deployment, production approval, provider durability or live end-to-end acceptance.
+
+
+## Authoritative source-pin reconciliation after documentation merges — 2026-11-22
+
+The following pins supersede earlier candidate snapshots above. Data Centre PR #115, Federation PRs #52/#53, API product architecture PR #117, and Flutter PR #121 have now been merged. The exact merge commits are recorded here; they do not imply production deployment or acceptance.
+
+| Organ | Exact source SHA | State |
+|---|---|---|
+| Backend | `2c76af240289931dab390360d107d1df2adddb2e` | Open Backend PR #441 candidate; security stack #424 → #434 → #435 → #437 → #439 → #441 remains unmerged and requires independent review |
+| Flutter client | `b818e6c2c2ec2dd909eb001afb9c055ab562b9bd` | Open Flutter PR #120 candidate; its mainline base now includes PR #121 merge `44d19f98808768750cfe5e590f8a451bf1cc404d` |
+| Data Centre | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` | Mainline after documentation contract PR #115 merge |
+| CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Mainline after PR #125 merge |
+| Federation | `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca` | Mainline after private bridge PR #53 and endpoint clarification PR #52 merges |
+| Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline; exact-head workflow evidence remains required |
+| API Control Plane | `14e67fffb2150021d7b94bd8941f49ac0485d034` | Mainline governance-only after PR #117 merge; not a runtime service or hop |
+
+Merge commits recorded during this consolidation: Flutter #121 `44d19f98808768750cfe5e590f8a451bf1cc404d`; Data Centre #115 `99edc3e096675f5c39ab6a9bd0050dcee30283a0`; Federation #52 `e8cf8f5013da52659b2d362ec3fc9a7a670f507a`; Federation #53 `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca`; API #117 `14e67fffb2150021d7b94bd8941f49ac0485d034`.
+
+The API bridge source lock now pins the merged Data Centre and Federation commits, and its registry records the updated Flutter, Data Centre, Federation and API governance mainline heads. The Backend and Flutter candidate refs remain explicitly unmerged. Refresh them only after their dependency stacks are independently reviewed and accepted. No production auth cutover, deployment, DNS/Cloudflare route change, VPS lifecycle action, secret rotation, production data change or destructive migration is authorized by this reconciliation.
+
+
+## Current exact source pin reconciliation — 2026-11-22
+
+This block is the current source-lock authority and supersedes older candidate/mainline snapshots above where they conflict. Historical sections are retained as audit history.
+
+| Runtime organ | Exact immutable source pin | Current provenance |
+|---|---|---|
+| Backend | `33844c9051b29e8b77ec4febc6c490e5dc404d2e` | Open PR #424 candidate; mainline conflict reconciliation and the communication/privacy, wallet and knowledge-engine stack are included through stacked PR #450. Exact-head CI passed, including the Cloudflare API edge secret-before-route deployment guard. |
+| Flutter Client | `e8fa65f321ad700c9e5f04fef86cd5604da500b0` | Open PR #116 candidate; deep-link, social/knowledge, profile/wallet/monetization and messaging/calls stack included, synced with latest mainline auth/keepalive fixes. Exact-head CI passed on run `45006213049`, including the Android release-mode QA APK. |
+| Data Centre | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` | Current mainline; PR #115 merged. |
+| CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Current mainline; PR #125 merged. |
+| Federation | `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca` | Current mainline; PR #53 merged. |
+| Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Current mainline. |
+
+The API Control Plane governance mainline is `14e67fffb2150021d7b94bd8941f49ac0485d034`; bridge PR #116 passed full contract CI on exact head `d7cf494275ecd4a89037452efabf126096451404` (run `45006902417` on its parent; the final head change was documentation-only), including source checkout, route inventory, cross-organ contract, locked acceptance, native-auth residue and API edge ingress checks. It is ready for independent review, not merged.
+
+PR #424 and PR #116 remain open candidate branches, not merged mainline. PR #450 and PR #123 are merged into those respective feature branches only. Data Centre #115 and Federation #53 are actual mainline merges. None of these source pins proves live deployment, production WebAuthn, media durability, Federation interoperability or coordinated disaster recovery.
+
+The Backend production deployment is currently blocked by the missing GitHub production secret `TESTAGRAM_EDGE_PROXY_SHARED_TOKEN`. The deployment preflight fails before machine selection/start; no production deployment or DNS mutation occurred. Configure the same 64-character hexadecimal value used by the Cloudflare API Worker before retrying.
+
+
+## 28. Exact source-pin and deployment reconciliation — 2026-11-22 15:50 UTC
+
+This section is the latest source-pin and deployment reconciliation. It supersedes older candidate/mainline snapshots above wherever they conflict; historical evidence is retained for audit traceability.
+
+| Organ | Exact current mainline SHA | State |
+|---|---|---|
+| Backend | `4c44c989d006a261ac06e4dcad4e30a8904e2cc8` | PR #424 merged; current mainline includes the reviewed native-auth and communication stack plus subsequent deployment repairs |
+| Flutter Client | `03082cc7e2419dc3bac241fd12791043915ea760` | PR #116 merged; latest mainline passed Flutter analysis, unit/widget tests, Android debug and QA builds, web build and image smoke test |
+| Data Centre | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` | Current mainline; PR #115 merged |
+| CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Current mainline; PR #125 merged |
+| Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Current mainline; deployed runtime image is digest-pinned |
+| Federation | `cbd9f2587f8d7ce0703c4123c9a2bd76bb51ca` | Current mainline; PR #53 merged |
+| API Control Plane | `14e67fffb2150021d7b94bd8941f49ac0485d034` | Governance-only mainline; never a runtime service or hop |
+
+### Verified existing InstaBox deployment
+
+Backend production deployment run [45038404739](https://github.com/Trendyzima/Testagram-backend-/actions/runs/45038404739) completed successfully against the existing machine `testagramdb` (`m_agq4me2xgrgx5ge52ts437tqea`). It did not create a replacement machine or reset PostgreSQL/storage.
+
+The run verified healthy Backend API, PostgreSQL, Flutter web, Go CDN, Algorithm, Federation API, Data Centre media/platform/worker/video/notification services and the Caddy edge. It also completed private B2/R2 write-read-delete probes, Backend/Federation directional credential acceptance/rejection checks, public API/CDN/Apex HTTPS health checks and private endpoint isolation. Federation delivery, inbox processing and public acceptance workers remain disabled pending G3.
+
+### Remaining rollout and acceptance boundaries
+
+- The Flutter web image built from current Flutter mainline after the successful Backend deployment. Its immutable digest is `sha256:58017cbd5a7266653dab0f7df1877d852dc13ee25aab71f26245eb5a60d85a61`; it passed registry pull and container smoke tests. It was not part of run 45038404739, which used the prior Flutter image. Backend PR #462 pins the new exact digest for a controlled in-place rollout; merge only after its exact-head checks pass.
+- Flutter PR #125 updates the manual domain smoke to match the deliberate G3 fail-closed state. It does not change DNS, Worker routes or production services.
+- Public NodeInfo/WebFinger remains HTTP 503 until G3 protocol acceptance passes. The apex root redirects ordinary web traffic to `www.testagram.site`.
+- CDN Cloudflare Worker deployment and canonical hostname route reconciliation remain separate, explicitly gated production cutovers. Source CI and the successful VPS origin deployment do not prove that the public Cloudflare route transfer has occurred.
+- The current API bridge refreshes Backend and Flutter source pins to exact current mainline commits and updates the Backend route inventory. Its Node/Dart contract CI must pass on the final exact head before merge.
+- Native identity, WebAuthn staff enrollment, M-Pesa settlement, full media durability/restore, independent Federation interoperability, end-user device acceptance and coordinated disaster recovery remain separate G0-G7 gates.
+
+**Release decision remains NOT ACCEPTED** until all required G0-G7 staging and production evidence is recorded. Healthy containers and a successful deployment workflow are not substitutes for those gates.

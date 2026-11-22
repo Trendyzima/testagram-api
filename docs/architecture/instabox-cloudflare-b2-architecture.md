@@ -6,7 +6,7 @@
 
 | Plane | System | Authority |
 |---|---|---|
-| Identity | Appwrite | Passwords, email verification, sessions and recovery; not the canonical social-profile database |
+| Identity | Testagram Backend native authentication | Password hashes, email verification, short-lived access JWTs, opaque rotating refresh sessions, recovery and canonical account status in PostgreSQL |
 | Application data | Instabox VPS PostgreSQL | Canonical users/profiles, relationships, posts, privacy, moderation, media metadata, analytics events and transactional outboxes |
 | VPS media replica | Instabox VPS private S3-compatible object store | Full verified media copy on attached storage; never public |
 | Cloud object replica | Cloudflare R2 | Full verified media copy in a private bucket; storage, not delivery CDN |
@@ -15,17 +15,17 @@
 | DNS and domain security | Cloudflare DNS | Authoritative DNS, DNSSEC, domain records and DNS analytics; media records point to Testagram CDN |
 | Cloudflare analytics | Cloudflare Analytics / Web Analytics | Aggregated DNS, request and website performance telemetry; not the product analytics database |
 | Platform operations | Testagram Data Centre | VPS assembly, storage-node health, capacity, replication, monitoring, backups and restore |
-| Product authorization | Testagram Backend | Public application API; verifies Appwrite session, resolves VPS PostgreSQL identity, authorizes media and owns quotas/lifecycle |
+| Product authorization | Testagram Backend | Public application API; verifies native session and live PostgreSQL account state, authorizes media and owns quotas/lifecycle |
 | Contracts | testagram-api | Versioned schemas and cross-repository compatibility; never a runtime database or proxy |
 
 ## Sign-in and application data
 
-1. Flutter obtains an Appwrite session.
-2. Flutter sends the Appwrite session JWT to Testagram Backend.
-3. Backend validates the session with Appwrite and resolves the explicit Appwrite-to-Testagram identity mapping in PostgreSQL on Instabox VPS.
+1. Flutter signs in through the Testagram-owned Backend authentication API.
+2. Flutter sends the short-lived Testagram-native access JWT to the Backend.
+3. Backend validates JWT signature, issuer, audience, expiry, session revocation and account status against PostgreSQL. No external identity-provider call or bearer fallback is used.
 4. Backend reads and writes canonical user/profile/social data in that PostgreSQL database.
 5. Data Centre services use narrowly scoped private service interfaces and the same canonical identity mapping; they do not create competing user records.
-6. Appwrite IDs are identity-provider identifiers, not public Testagram user IDs. Never auto-link accounts by matching email addresses.
+6. Historical external-provider identifiers are inert reconciliation metadata only; they are never accepted as credentials or auto-linked by email equality.
 
 The production PostgreSQL primary runs on Instabox VPS. Do not point the canonical product database at Neon or Cloudflare D1. Keep PostgreSQL private, encrypted in transit, with durable volumes, WAL/PITR or equivalent tested recovery, off-host encrypted backups and restore drills. A VPS loss must not destroy the only database copy.
 
@@ -83,14 +83,14 @@ Cloudflare R2 is an object origin, not the public delivery hostname. Do not rout
 - No browser or mobile build may contain provider credentials, internal tokens or origin signing keys.
 - Replication is checksum-driven, idempotent, observable and repairable in either direction.
 - Alert on replica lag, missing copies, checksum mismatch, capacity, PostgreSQL WAL/backup age, failed restores, CDN origin failures and analytics pipeline lag.
-- Restore drills must restore PostgreSQL plus representative media from independent copies, verify checksums, log in with a staging Appwrite account, authorize a private media read and play it through Testagram CDN.
+- Restore drills must restore PostgreSQL plus representative media from independent copies, verify checksums, log in with a staging Testagram-native account, authorize a private media read and play it through Testagram CDN.
 
 ## Repository ownership
 
 - Backend: canonical PostgreSQL identity/data; upload authorization; media metadata and replica ledger; three-provider lifecycle; product analytics event API.
 - Data Centre: Instabox VPS deployment, private object-store service, replica workers/repair scheduling, backups, monitoring and restore drills.
 - CDN: custom edge/shield delivery, authorization, cache isolation and private origin failover across VPS/R2/B2.
-- Flutter: Appwrite session and Backend-only product/media APIs; no direct provider credentials.
+- Flutter: Testagram-native Backend session and Backend-only product/media APIs; no direct provider credentials.
 - testagram-api: shared API/storage/replication/analytics contracts.
 - Federation and Algorithm: consume Backend-authorized canonical data only; neither becomes a second user database.
 
@@ -106,3 +106,17 @@ Cloudflare R2 is an object origin, not the public delivery hostname. Do not rout
 8. Complete cross-repository staging tests before production DNS or storage cutover.
 
 No production DNS, bucket, secret, database or deployment change is authorized by this document.
+
+
+## Public API edge ingress (separate from media delivery)
+
+The public API hostname is handled by the Testagram-owned Cloudflare Worker `testagram-api-edge` on the exact route `api.testagram.site/*`. This is an API ingress only; it does not proxy viewer media and must not replace the CDN organ for `media.testagram.site`.
+
+- The Worker accepts only HTTPS requests for `api.testagram.site`, validates the fixed InstaBox HTTPS origin, removes client-supplied forwarding headers, and sets trusted forwarding metadata from Cloudflare's edge request.
+- The Worker adds the shared `EDGE_PROXY_SHARED_TOKEN`; Caddy's private `:8443` handler requires both `X-Forwarded-Host: api.testagram.site` and that token, then removes the token before forwarding to the Backend API service.
+- The same 32-byte hexadecimal value is stored as the GitHub secret `TESTAGRAM_EDGE_PROXY_SHARED_TOKEN`, the Cloudflare Worker secret `EDGE_PROXY_SHARED_TOKEN`, and the Backend machine's `.env` value `EDGE_PROXY_SHARED_TOKEN`. Never commit the value or generate a different value independently on either side.
+- The Cloudflare Worker script is deployed without a public route first. The secret is installed before the guarded workflow attaches `api.testagram.site/*`; route ownership and exact Cloudflare account/zone are rechecked immediately before attachment.
+- The known legacy Worker custom-domain binding is retained during staged handoff. Cloudflare Worker Routes take precedence over Custom Domains on the same hostname, so the exact API route can shadow the legacy binding without deleting the legacy Worker. Do not remove that fallback until native-origin health and rollback acceptance pass.
+- The route workflow is manual-dispatch only, requires explicit production confirmation, fails closed on overlapping routes, and verifies health, public search and unauthenticated-feed denial after cutover.
+
+The API edge shared token is currently a deployment blocker: the production GitHub secret is empty, so the Backend deployment workflow stops before machine selection/start. No route cutover has been performed.

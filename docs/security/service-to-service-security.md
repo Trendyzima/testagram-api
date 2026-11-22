@@ -14,12 +14,12 @@
 | CDN viewer assertion | Backend-authorized media clients | CDN private-media assertion relay and trusted origin | General API authentication or service-to-service identity |
 | CDN origin and purge tokens | Backend/CDN runtime and authorized operators | Trusted CDN origin and purge routes respectively | Public SDK or client bundle |
 | S3/object-store credentials | Backend/Data Centre runtime | Object storage | Flutter, CDN public responses or API docs |
-| Legacy Appwrite session/API key | Legacy Fresh Backend image only | Its retained `/auth/v1/*` compatibility runtime | Native Backend `cmd/api`, Flutter, Data Centre platform APIs and all new clients |
 
 ## Mandatory controls
 
 - Use a unique high-entropy secret for each service direction and audience.
-- The Backend and user-aware Data Centre services must use the same `TESTAGRAM_AUTH_JWT_SECRET`; the Data Centre still rechecks the live PostgreSQL session/account state and does not trust a valid signature alone.
+- Backend and user-aware Data Centre services use the same `TESTAGRAM_AUTH_JWT_SECRET`; Data Centre still rechecks the live PostgreSQL session/account state and does not trust a valid signature alone.
+- No retired external identity-provider bearer, API key, SDK, endpoint or fallback is accepted by any Testagram runtime service.
 - Store credentials only in server-side deployment secret stores. No secret may appear in this repository, `.env.example` with a real value, generated SDK, public OpenAPI document, mobile build define or frontend bundle.
 - Validate credentials in constant time where bearer comparison is implemented.
 - Rotate secrets independently and document a staged overlap window.

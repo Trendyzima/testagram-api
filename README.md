@@ -27,7 +27,7 @@ The API contract, compatibility, client SDK and integration-governance repositor
 
 ## Critical integration rules
 
-1. Flutter uses the Testagram-owned `NativeAuthClient` and sends short-lived Testagram access tokens to the Backend. Protected end-user routes use native Backend sessions and live PostgreSQL session/account checks; no Appwrite bearer fallback is accepted. Runtime deployment and existing-account reconciliation still require their own staged evidence.
+1. Flutter uses the Testagram-owned `NativeAuthClient` and sends short-lived Testagram access tokens to the Backend. Protected end-user routes use native Backend sessions and live PostgreSQL session/account checks; no external identity-provider bearer fallback is accepted. Runtime deployment and existing-account reconciliation still require their own staged evidence.
 2. Staff review uses native Backend sessions, the encrypted Testagram staff cookie and PostgreSQL staff-role/MFA records. Historical account identifiers are reconciliation inputs only; they are not accepted as user or staff bearer credentials. Never treat this repository, a generated SDK, or a client-side claim as an authorization boundary.
 3. Flutter must not call PostgreSQL, object storage, private Data Centre endpoints, Federation, or Algorithm directly.
 4. CDN media URLs are for byte delivery; media ownership, upload authorization and attachment to posts remain Backend-controlled.

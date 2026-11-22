@@ -1171,6 +1171,77 @@ paths:
         '201': { description: Reply created. }
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/social/blocks:
+    post:
+      operationId: blockUser
+      tags: [Social]
+      summary: Block a Testagram account
+      description: Requires a Testagram-native access JWT. Backend verifies both canonical accounts, applies the block atomically, and removes follow relationships in both directions. Blocking does not expose the target account's private data.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [target_user_id]
+              properties:
+                target_user_id: { type: string, format: uuid }
+      responses:
+        '200':
+          description: The account is blocked (including an idempotent repeat).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    required: [blocked]
+                    properties:
+                      blocked: { const: true }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { description: Block action rate limit exceeded. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/blocks/{target_user_id}:
+    parameters:
+      - name: target_user_id
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    delete:
+      operationId: unblockUser
+      tags: [Social]
+      summary: Remove the caller's block of a Testagram account
+      description: Removes only the caller's block. Previous follow relationships are not recreated.
+      responses:
+        '200':
+          description: The block is removed or was already absent.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    required: [unblocked]
+                    properties:
+                      unblocked: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { description: Block action rate limit exceeded. }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/social/follows:
     post:
       operationId: followUser

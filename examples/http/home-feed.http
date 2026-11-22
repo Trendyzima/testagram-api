@@ -1,7 +1,7 @@
 ### Authenticated home feed
 GET https://api.testagram.site/api/feed/home?filter=following
 Accept: application/json
-Authorization: Bearer {{appwrite_session_jwt}}
+Authorization: Bearer {{testagram_access_token}}
 
 ### Readiness (no user token)
 GET https://api.testagram.site/readyz
