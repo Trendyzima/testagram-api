@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "2c76af240289931dab390360d107d1df2adddb2e",
+  "sourceRef": "31040c345f286b5dd34a91ea8c94af3da21e704b",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across all production Go files in cmd/api at the pinned Backend PR #441 candidate head 2c76af240289931dab390360d107d1df2adddb2e. PR #441 is stacked after Backend #439 → #437 → #435 → #434 → #424; refresh this inventory to the merged Backend mainline SHA only after the complete sequence is independently reviewed and merged. /readyz and /metrics remain private-listener-only and dynamic auth actions are asserted separately.",
+  "note": "Static public/API route registrations across all production Go files in cmd/api at the pinned Backend PR #424 candidate head 31040c345f286b5dd34a91ea8c94af3da21e704b. This candidate includes the native-auth branch plus the communication/privacy, wallet and knowledge-engine stack merged through stacked PR #450. PR #424 remains open and unmerged; refresh this inventory to the exact mainline merge SHA only after independent review and mainline merge. /readyz and /metrics remain private-listener-only and dynamic auth actions are asserted separately.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
