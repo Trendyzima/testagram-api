@@ -126,9 +126,12 @@ assert.equal(
 console.log(`Native-only authentication boundary: PASS (SDK/OpenAPI plus ${new Set(scanned).size} runtime, deployment, configuration and documentation files across all six runtime organs contain no external identity-provider integration)`);
 
 const historicalCompatibilityAllowlist = new Set([
-  "backend/migrations/" + retiredIdentityProviderFilePrefix + "_identity_bridge.sql",
-  "backend/migrations/" + retiredIdentityProviderFilePrefix + "_identity_link_audit.sql",
-  "backend/migrations/" + retiredIdentityProviderFilePrefix + "_registration_consent.sql",
+  // Applied historical migration files are immutable. Their exact dated paths
+  // are allowlisted as upgrade history only; runtime code and new migrations
+  // must remain provider-neutral.
+  "backend/migrations/20261106_" + retiredIdentityProviderFilePrefix + "_identity_bridge.sql",
+  "backend/migrations/20261106_" + retiredIdentityProviderFilePrefix + "_identity_link_audit.sql",
+  "backend/migrations/20261114_" + retiredIdentityProviderFilePrefix + "_registration_consent.sql",
   "backend/migrations/20261115_testagram_native_auth_cutover_foundation.sql",
   "backend/migrations/20261120_native_identity_historical_account_archive.sql",
   "backend/migrations/20261120_native_identity_historical_admin_archive.sql",
