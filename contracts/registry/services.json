@@ -121,7 +121,8 @@
         "protocol outbox and delivery state",
         "remote delivery",
         "signed delivery of Backend-authorized public Create activities",
-        "public dereferencing of Backend-canonical ActivityPub Notes"
+        "public dereferencing of Backend-canonical ActivityPub Notes",
+        "AT Protocol public author-feed adapter and DID allowlist projection"
       ],
       "baseUrl": "https://federation.testagram.site",
       "exposure": "public-activitypub-and-private-backend-api",
@@ -134,10 +135,11 @@
         "contracts/upstream/federation/public-activitypub.openapi.yaml",
         "docs/integration/federation-private-contract.md",
         "contracts/upstream/federation/post-published.v1.schema.json",
-        "contracts/internal/openapi/federation-ingress-v1.yaml"
+        "contracts/internal/openapi/federation-ingress-v1.yaml",
+        "contracts/upstream/federation/backend-private-v1.openapi.yaml"
       ],
-      "status": "private-ingress-and-backend-client-implemented-public-worker-interoperability-gated",
-      "notes": "Backend publishes authorized activities to the private /internal/v1/activities ingress using a dedicated direction-specific service bearer and activity ID idempotency key. Federation authenticates the ingress, verifies Backend actor eligibility, durably enqueues the outbox item and acknowledges 202 only after acceptance. Federation-to-Backend uses a separate bearer. Public routing, inbound activity projections, delivery workers and external-peer interoperability remain gated; durable acceptance is not proof of delivery."
+      "status": "activitypub-and-atproto-private-bridge-contract-candidate-pr-53-live-staging-acceptance-pending",
+      "notes": "Federation remains a protocol adapter, not the identity or visibility authority. ActivityPub and AT Protocol are separate protocol implementations. The private Backend bridge now has a provider OpenAPI candidate in PR #53 covering durable ActivityPub activity enqueue, Backend-authorized remote-object pages and Backend-authorized ATProto author feeds. The Backend client supplies actor URI/DID allowlists and revalidates returned provenance; Federation must not select viewer follows or create local Testagram identities. PR #53 is pinned for cross-organ contract audit but is not merged; staging service-auth, timeout/fallback and load acceptance remain pending."
     },
     {
       "id": "algorithm",
