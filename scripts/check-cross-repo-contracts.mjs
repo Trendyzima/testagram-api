@@ -373,7 +373,7 @@ const backendApiEdgeTests = readFileSync(resolve(lock.repositories.backend.check
 const backendApiEdgeWorkflow = readFileSync(resolve(lock.repositories.backend.checkoutPath, ".github/workflows/cloudflare-api-gateway.yml"), "utf8");
 const backendApiEdgeWrangler = readFileSync(resolve(lock.repositories.backend.checkoutPath, "infra/cloudflare-api-gateway/wrangler.toml"), "utf8");
 const backendApiEdgeDeployTest = readFileSync(resolve(lock.repositories.backend.checkoutPath, "tests/test_cloudflare_api_gateway_deployment_order.py"), "utf8");
-const backendEdgeEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
+const backendApiEdgeEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
 const backendDeployScript = readFileSync(resolve(lock.repositories.backend.checkoutPath, "scripts/start-instabox-deployment.sh"), "utf8");
 for (const [label, source, marker] of [
   ["Backend API edge Worker", backendApiEdgeWorker, 'const EXPECTED_ORIGIN_HOST = "8443-agq4me2xgrgx5ge52ts437tqea.instabox.tech"'],
@@ -397,7 +397,7 @@ for (const [label, source, marker] of [
   ["Backend Caddy API edge", backendCaddyfile, "header_up -X-Testagram-Edge-Token"],
   ["Backend Caddy API edge", backendCaddyfile, "reverse_proxy api:8080"],
   ["Backend Compose API edge", backendCompose, "EDGE_PROXY_SHARED_TOKEN: ${EDGE_PROXY_SHARED_TOKEN:?Set EDGE_PROXY_SHARED_TOKEN in .env}"],
-  ["Backend edge env template", backendEdgeEnvExample, "EDGE_PROXY_SHARED_TOKEN=REPLACE_WITH_A_SEPARATE_RANDOM_32_BYTE_EDGE_TOKEN"],
+  ["Backend edge env template", backendApiEdgeEnvExample, "EDGE_PROXY_SHARED_TOKEN=REPLACE_WITH_A_SEPARATE_RANDOM_32_BYTE_EDGE_TOKEN"],
   ["Backend deployment token persistence", backendDeployScript, 'write_env_value EDGE_PROXY_SHARED_TOKEN "$TESTAGRAM_EDGE_PROXY_SHARED_TOKEN"'],
   ["Backend deployment token forwarding", backendDeployScript, "EDGE_PROXY_SHARED_TOKEN:$edge_proxy_token"],
 ]) {
