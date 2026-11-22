@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "201fd3335c737e7fe36ed34dfa1ec07b03c31047"
   },
-  "status": "candidate-backend-and-cdn-pins-runtime-acceptance-pending",
+  "status": "candidate-backend-and-flutter-pins-runtime-acceptance-pending",
   "repositories": [
     {
       "id": "flutter-client",
@@ -20,8 +20,8 @@
         112,
         113
       ],
-      "candidateCommit": "f2819268f03aa76c259e94839dd8afddc3542b69",
-      "candidatePullRequest": 114
+      "candidateCommit": "8a459719a2e24a30de0e6bfe421bcba0859dabb4",
+      "candidatePullRequest": 115
     },
     {
       "id": "backend",
@@ -39,8 +39,8 @@
         427,
         428
       ],
-      "candidateCommit": "cc33913f0fd4e86669f7c717e12b2503990e6d88",
-      "candidatePullRequest": 424
+      "candidateCommit": "e0ec8580fcbb6cfebc6d8033fd31c5464f74adb9",
+      "candidatePullRequest": 436
     },
     {
       "id": "data-centre",
@@ -190,7 +190,7 @@
   "excludedFromAcceptance": [
     "A branch without a reviewed pull request is not automatically merged.",
     "Flutter PR #100 remains a stale draft based on an older mainline and is not an accepted source pin; current Flutter mainline already carries stricter NodeInfo/WebFinger/actor smoke checks, while the live Cloudflare route inventory still blocks production Federation acceptance.",
-    "Backend PR #424 and CDN PR #125 are declared candidate pins only; neither is merged or independently approved.",
+    "Backend PR #424 remains an unmerged base candidate and PR #436 is stacked directly on it; neither is accepted until sequential independent review and merge. CDN PR #125 is merged at 21a254e9f67dc7a8e55dca37151a6db532405e53.",
     "Merged source revisions do not prove live DNS, TLS, deployment health, provider durability or end-to-end staging acceptance.",
     "Backend PR #432 approval-integrity migration remains a separate stacked candidate on overlapping PR #431; reconcile/rebase it onto the reviewed PR #424 candidate or its accepted mainline merge before merge."
   ]
