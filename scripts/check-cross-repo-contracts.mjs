@@ -316,10 +316,9 @@ for (const [label, source, marker] of [
   if (!source.includes(marker)) fail.push(`${label} must remain closed until transactional two-person execution exists`);
 }
 
-// Verify the production Data Centre overlay actually joins Federation to both
-// private Backend networking and the Backend-owned Caddy edge. Docker Compose
-// service-name DNS is the stable federation-api:8081 upstream; the separate
-// standalone Federation compose file is only a local development harness.
+// Verify the production Data Centre overlay joins Federation to private
+// Backend networking. Public ActivityPub remains fail-closed at Caddy until
+// the locked G3 protocol acceptance gate is independently passed.
 const backendCaddyfile = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/Caddyfile"), "utf8");
 for (const [label, source, marker] of [
   ["Data Centre Federation deployment", dataCentreCompose, "  federation-api:"],
@@ -330,16 +329,14 @@ for (const [label, source, marker] of [
   ["Backend private API", backendCompose, 'INTERNAL_LISTEN_ADDR: ":8082"'],
   ["Backend Caddy deployment", backendCompose, "name: testagram-self-hosted"],
   ["Backend Caddy deployment", backendCompose, "networks: [edge, control-plane, platform]"],
-  ["Backend Caddy federation proxy", backendCaddyfile, "reverse_proxy federation-api:8081"],
-  ["Backend Caddy federation proxy", backendCaddyfile, "header_up Host testagram.site"],
+  ["Backend Caddy Federation gate", backendCaddyfile, 'respond "Federation is disabled until locked G3 protocol acceptance passes." 503'],
 ]) {
   if (!source.includes(marker)) fail.push(`${label} missing shared-network federation wiring: ${marker}`);
 }
 
-// Public ActivityPub discovery is a separate edge from the private Backend
-// ingress. Keep the Flutter smoke, Federation handlers, Caddy proxy and
-// Cloudflare route-transfer workflow aligned so WebFinger cannot terminate
-// at the Flutter Pages Worker while the apex is being migrated.
+// Public ActivityPub discovery is deliberately disabled until G3 acceptance.
+// Keep the protocol handlers and apex path matcher present, but require Caddy
+// to return 503 rather than proxying unaccepted public federation traffic.
 const federationCaddy = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/Caddyfile"), "utf8");
 const flutterDomainSmoke = readFileSync(resolve(lock.repositories["flutter-client"].checkoutPath, ".github/workflows/domain-smoke.yml"), "utf8");
 const cdnWrangler = readFileSync(resolve(lock.repositories.cdn.checkoutPath, "cloudflare/wrangler.toml"), "utf8");
@@ -349,11 +346,9 @@ for (const [label, source, marker] of [
   ["Federation public discovery", federationServer, 'HandleFunc("GET /.well-known/nodeinfo"'],
   ["Federation public discovery", federationServer, 'HandleFunc("GET /nodeinfo/2.1"'],
   ["Backend Caddy apex routing", federationCaddy, "@activitypub path /.well-known/webfinger* /.well-known/nodeinfo* /nodeinfo/* /users/* /inbox /outbox /objects/*"],
-  ["Backend Caddy apex routing", federationCaddy, "reverse_proxy federation-api:8081"],
-  ["Backend Caddy apex routing", federationCaddy, "header_up Host testagram.site"],
-  ["Flutter production smoke", flutterDomainSmoke, "NodeInfo discovery"],
-  ["Flutter production smoke", flutterDomainSmoke, "Real-account WebFinger"],
-  ["Flutter production smoke", flutterDomainSmoke, "acct:crissbeat@testagram.site"],
+  ["Backend Caddy apex fail-closed gate", federationCaddy, 'respond "Federation is disabled until locked G3 protocol acceptance passes." 503'],
+  ["Backend Caddy ordinary web redirect", federationCaddy, "redir https://www.testagram.site{uri} 308"],
+  ["Flutter production smoke", flutterDomainSmoke, "Flutter application shell"],
   ["CDN apex route", cdnWrangler, 'pattern = "testagram.site/*"'],
   ["CDN WebFinger route transfer", cdnRoutingWorkflow, "confirm_legacy_webfinger_route_transfer"],
   ["CDN WebFinger route transfer", cdnRoutingWorkflow, 'select(.pattern=="testagram.site/.well-known/webfinger*")'],
@@ -399,7 +394,7 @@ for (const [label, source, marker] of [
   ["Backend Caddy API edge", backendCaddyfile, "reverse_proxy api:8080"],
   ["Backend Compose API edge", backendCompose, "EDGE_PROXY_SHARED_TOKEN: ${EDGE_PROXY_SHARED_TOKEN:?Set EDGE_PROXY_SHARED_TOKEN in .env}"],
   ["Backend edge env template", backendApiEdgeEnvExample, "EDGE_PROXY_SHARED_TOKEN=REPLACE_WITH_A_SEPARATE_RANDOM_32_BYTE_EDGE_TOKEN"],
-  ["Backend deployment token persistence", backendDeployScript, 'write_env_value EDGE_PROXY_SHARED_TOKEN "$TESTAGRAM_EDGE_PROXY_SHARED_TOKEN"'],
+  ["Backend deployment token persistence", backendDeployScript, 'write_env_value EDGE_PROXY_SHARED_TOKEN "$EDGE_PROXY_SHARED_TOKEN"'],
   ["Backend deployment token forwarding", backendDeployScript, "EDGE_PROXY_SHARED_TOKEN:$edge_proxy_token"],
 ]) {
   if (!source.includes(marker)) fail.push(`${label} missing shared API edge contract marker: ${marker}`);
