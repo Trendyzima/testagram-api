@@ -4,7 +4,7 @@ This system contains **seven repositories total**: this API governance repositor
 
 | Caller | Receiver | Interface | Credential / trust | Current status |
 |---|---|---|---|---|
-| Flutter | Backend | Public HTTP API | Testagram-native short-lived access JWT; refresh token used only at `/api/auth/refresh` | Native client and Backend session endpoints implemented; production acceptance remains a separate gate |
+| Flutter | Backend | Public HTTP API | Testagram-native short-lived access JWT; refresh token used only at `/api/auth/refresh` | PR #114 candidate adds native block/unblock client methods against contracted Backend routes; full session and production acceptance remain separate gates |
 | Backend | Algorithm | `POST /v1/feed/rank`, `POST /v1/topics/rank` | Dedicated `ALGORITHM_INTERNAL_TOKEN` bearer, private network; API version and request ID on both | Typed Backend client and both provider routes/OpenAPI operations exist; Backend owns candidate authorization and hydration |
 | Federation | Backend | Actor resolution, readiness and outbox reads | `FEDERATION_BACKEND_INTERNAL_TOKEN` | Private client path documented; keep internal |
 | Backend | Federation | `POST /internal/v1/activities` | Distinct `FEDERATION_INTERNAL_TOKEN` bearer | Private ingress exists; delivery remains gated |
