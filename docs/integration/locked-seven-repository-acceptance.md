@@ -589,3 +589,19 @@ The Backend and Flutter candidate pins above are intentionally ahead of their re
 At this snapshot, the read-only Flutter production probes on main SHA `1f58971720c7a72139d56900a5895c49fa105639` fail: production apex returns HTTP 200 instead of the required 308 redirect, NodeInfo discovery returns the Flutter HTML shell instead of JSON, and the real-account WebFinger endpoint returns HTTP 503. The TV catalogue monitor also receives HTTP 404 from the production API origin although the current Backend source registers the route. These are live routing/deployment acceptance failures; no DNS, Worker, Pages, VPS or production deployment mutation is authorized by this record.
 
 The API Control Plane locked-acceptance audit checks every immutable source pin against this document. This exact-pin section is retained as a regression fixture so a source-lock change cannot silently leave the acceptance record stale. Historical status sections above are preserved as audit evidence; this section is the latest reconciliation only.
+
+
+## Exact source-pin refresh — 2026-11-22
+
+The six runtime source pins below are the current immutable revisions in `contracts/sources.lock.json`. Candidate PRs remain open/unmerged and are not accepted production dependencies until sequential independent review, merge and live acceptance.
+
+| Runtime organ | Exact source SHA | Candidate status |
+|---|---|---|
+| Backend | `2c76af240289931dab390360d107d1df2adddb2e` | PR #441, stacked on #439 → #437 → #435 → #434 → #424; draft, unmerged |
+| Flutter client | `b818e6c2c2ec2dd909eb001afb9c055ab562b9bd` | PR #120, stacked on #118 → #117 → #116; draft, unmerged |
+| Data Centre | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` | PR #115 candidate; unmerged |
+| CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` | PR #125 merged; live routing acceptance remains separate |
+| Federation | `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` | PR #53 candidate; unmerged |
+| Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline pin |
+
+Backend PR #440 is validation-only and must be closed, never merged. The API Control Plane remains build-time governance only and is not a runtime service or hop. No source pin implies deployment, production approval, provider durability or live end-to-end acceptance.
