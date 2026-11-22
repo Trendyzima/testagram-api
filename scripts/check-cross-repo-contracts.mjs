@@ -231,10 +231,15 @@ if (!topicRankingContract.includes("required: [limit, candidates]") || !topicRan
   fail.push("Algorithm topic OpenAPI must bound Backend-authorized candidates and require a result limit");
 }
 
-const backendFederationClient = readFileSync(resolve(lock.repositories.backend.checkoutPath, "internal/federationclient/client.go"), "utf8");
+const backendFederationClient = [
+  readFileSync(resolve(lock.repositories.backend.checkoutPath, "internal/federationclient/client.go"), "utf8"),
+  readFileSync(resolve(lock.repositories.backend.checkoutPath, "internal/federationclient/remote_subscription.go"), "utf8"),
+].join("\n");
 const federationServer = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/server.go"), "utf8");
 const federationIngress = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/internal_activities.go"), "utf8");
 const federationTests = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/internal_activities_test.go"), "utf8");
+const federationRemoteSubscription = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/remote_subscriptions_internal.go"), "utf8");
+const federationRemoteSubscriptionTests = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/remote_subscriptions_internal_test.go"), "utf8");
 for (const [label, source, marker] of [
   ["Backend Federation client", backendFederationClient, "/internal/v1/activities"],
   ["Backend Federation client", backendFederationClient, 'req.Header.Set("Idempotency-Key", input.ActivityID)'],
@@ -246,12 +251,21 @@ for (const [label, source, marker] of [
   ["Federation server", federationServer, 'HandleFunc("POST /internal/v1/atproto/feed"'],
   ["Backend Federation client", backendFederationClient, '/internal/v1/remote-objects'],
   ["Federation server", federationServer, 'HandleFunc("POST /internal/v1/remote-objects"'],
+  ["Backend Federation remote-subscription client", backendFederationClient, '/internal/v1/remote-subscriptions/verify'],
+  ["Federation remote-subscription route", federationServer, 'HandleFunc("POST /internal/v1/remote-subscriptions/verify"'],
+  ["Federation remote-subscription handler", federationRemoteSubscription, "validInternalBearer(r, token)"],
+  ["Federation remote-subscription handler", federationRemoteSubscription, "s.backend.VerifyRemoteSubscription"],
+  ["Federation remote-subscription handler", federationRemoteSubscription, "resolveRemoteActivityPubActor"],
+  ["Federation remote-subscription handler", federationRemoteSubscription, "s.atproto.AuthorFeedByDID"],
 ]) {
   if (!source.includes(marker)) fail.push(`${label} missing agreed durable-ingress contract marker: ${marker}`);
 }
 if (!backendFederationClient.includes('req.Header.Set("X-Testagram-API-Version", "1")') || !backendFederationClient.includes('req.Header.Set("X-Request-ID", requestID)') || !backendFederationClient.includes("Idempotency-Key")) fail.push("Backend Federation client must send version, request ID and idempotency identity");
 if (!federationTests.includes("TestInternalActivityEndpointRejectsMissingServiceCredential") || !federationTests.includes("TestInternalActivityEndpointUsesDedicatedIngressCredential")) {
   fail.push("Federation ingress tests must prove missing and wrong-direction service credentials are rejected");
+}
+if (!federationRemoteSubscriptionTests.includes("TestResolveRemoteActivityPubActorRejectsUnsafeIdentitiesBeforeNetwork")) {
+  fail.push("Federation remote-subscription actor-resolution safety regression test is missing");
 }
 
 // Staff lifecycle remains closed until the two-person approval ledger has a
