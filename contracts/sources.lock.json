@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "ad90fa6add08c7f91e69da8bd4135638d9930a54",
+      "ref": "5d548d4907673131c4c05a61a97ee9a34b807e9e",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -181,7 +181,8 @@
         ".github/workflows/cloudflare-domain-routing-audit.yml",
         "scripts/staff-webauthn-browser-check.mjs",
         "cmd/api/social_test.go",
-        "cmd/api/wallet_capability_test.go"
+        "cmd/api/wallet_capability_test.go",
+        "docs/profile-wallet-idempotency.md"
       ]
     },
     "data-centre": {
