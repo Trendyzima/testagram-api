@@ -28,7 +28,7 @@
     {
       "method": "DELETE",
       "path": "/api/social/blocks/{target_user_id}",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "DELETE",
@@ -383,7 +383,7 @@
     {
       "method": "POST",
       "path": "/api/social/blocks",
-      "status": "registered-only"
+      "status": "contracted"
     },
     {
       "method": "POST",
