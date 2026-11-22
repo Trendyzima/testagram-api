@@ -569,3 +569,23 @@ This section supersedes all earlier status snapshots in this document where they
 5. Obtain staging attestation and explicit production release approval.
 
 The platform is not declared fully integrated or production-ready.
+
+## 27. Exact source-pin reconciliation — 2026-11-22 09:44 UTC
+
+This section supersedes earlier candidate-pin snapshots where they conflict. The immutable values below are the current source-lock and seven-organ registry values at the time of this reconciliation. They are review candidates or mainline pins, not evidence of production acceptance.
+
+| Organ | Exact immutable source pin | Current provenance and acceptance state |
+|---|---|---|
+| Backend | `7dbdfe65436e8b96becac664ce9b5269b85508d3` | Open draft PR #441 candidate; its API tests/static-check job was still in progress at this snapshot. Required dependency sequence is #424 → #434 → #435 → #437 → #439 → #441. PR #440 is validation-only and is not a merge candidate. |
+| Flutter client | `b818e6c2c2ec2dd909eb001afb9c055ab562b9bd` | Open draft PR #120 candidate, stacked on #118 → #117 → #116. Build and image publication checks passed; Cloudflare Pages was still in progress at this snapshot. |
+| Data Centre | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` | Open draft PR #115 candidate; Go, Android and isolated encrypted restore checks passed. |
+| CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Merged mainline after CDN PR #125. Its exact mainline source pin is not a candidate branch. |
+| Federation | `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` | Open draft PR #53 candidate; test and image checks passed. |
+| Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Current mainline pin. The current main commit is documentation-only and has no check runs attached to this exact SHA; older successful runs are not attributed to it. |
+| API Control Plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` | Mainline governance baseline only; API Control Plane is build-time governance, not a runtime dependency. |
+
+The Backend and Flutter candidate pins above are intentionally ahead of their respective mainline SHAs. They must remain identified as unmerged candidates and must not be described as deployed or accepted. Refresh candidate pins only when the corresponding source candidate changes; replace them with exact merge commit SHAs only after independent review and actual merge in the required dependency order.
+
+At this snapshot, the read-only Flutter production probes on main SHA `1f58971720c7a72139d56900a5895c49fa105639` fail: production apex returns HTTP 200 instead of the required 308 redirect, NodeInfo discovery returns the Flutter HTML shell instead of JSON, and the real-account WebFinger endpoint returns HTTP 503. The TV catalogue monitor also receives HTTP 404 from the production API origin although the current Backend source registers the route. These are live routing/deployment acceptance failures; no DNS, Worker, Pages, VPS or production deployment mutation is authorized by this record.
+
+The API Control Plane locked-acceptance audit checks every immutable source pin against this document. This exact-pin section is retained as a regression fixture so a source-lock change cannot silently leave the acceptance record stale. Historical status sections above are preserved as audit evidence; this section is the latest reconciliation only.
