@@ -30,8 +30,8 @@
         "contracts/internal/openapi/backend-tv-health-monitor-v1.yaml",
         "contracts/internal/openapi/backend-user-activity-watchdog-v1.yaml"
       ],
-      "status": "native-auth-retirement-candidate-pr-424-open-not-deployed",
-      "notes": "The bridge pins the immutable native-auth retirement candidate in Backend PR #424, not the current Backend mainline. The Backend mainline at a793c55db8b5c258524bfef4b8872f5c6c1038e5 still contains an unused legacy external identity-provider adapter/source path; the PR candidate removes that adapter and legacy runtime/deployment entrypoints, making PostgreSQL-backed Testagram sessions the only supported user/staff identity path. PR #424 still requires independent review and merge; its CI is not deployment evidence. Production api.testagram.site remains associated with the legacy Worker until the native origin is deployed, health-checked and safely transferred. Registration remains fail-closed until identity evidence, email, independent review, provisioning and live WebAuthn readiness gates are accepted. Admin Console staff sessions use native Backend identity, encrypted testagram-staff cookie and PostgreSQL staff-role/MFA records."
+      "status": "native-auth-pr-424-candidate-plus-profile-wallet-pr-436-stacked-candidate-security-review-pending",
+      "notes": "Backend remains the canonical identity, authorization, content and relationship authority. Native authentication candidate PR #424 is the parent security gate. The pinned source candidate PR #436 is stacked on #424 and adds viewer-scoped username resolution through testagram.social.profile.resolve plus M-Pesa top-up idempotency binding/recovery. PR #434 approval-ledger integrity and PR #435 Q&A schema remain separate sequential candidates based on #424; the source pin does not imply they are merged. Independent security review, sequential rebase/integration and staging acceptance remain mandatory."
     },
     {
       "id": "flutter-client",
