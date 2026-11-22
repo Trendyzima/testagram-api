@@ -484,3 +484,29 @@ Fresh Backend CI run `44965539075` completed successfully across all 15 jobs on 
 Cloudflare read-only audit `44965539105` and workflow syntax validation `44965534370` also succeeded. No production Cloudflare changes occurred.
 
 PR #434 remains draft and has zero independent review submissions. Green CI is candidate evidence only; it is not a merge approval or production migration attestation. The source lock remains intentionally pinned to unmerged #424 candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88`, not #434. Refresh it only after independent review and actual merge of the accepted dependency chain, using the final merge commit SHA. Staff invitations, role changes, revocations and permission changes remain disabled.
+
+
+## Current execution reconciliation — 2026-11-22 03:55 UTC
+
+This section is the current authoritative status and supersedes earlier historical snapshots in this document wherever they describe CDN PR #125 as unmerged or describe the old source pins as current.
+
+### Immutable source pins
+
+- Backend mainline remains `a793c55db8b5c258524bfef4b8872f5c6c1038e5`; Backend PR #424 remains an unmerged candidate at `cc33913f0fd4e86669f7c717e12b2503990e6d88`.
+- CDN PR #125 is **merged** at `21a254e9f67dc7a8e55dca37151a6db532405e53`. The source lock and seven-organ registry now pin this exact merge commit as CDN mainline and no longer classify #125 as a candidate.
+- Data Centre remains pinned to `ada6f26a289775720bb47a639242dbd868388055`; Flutter to `1f58971720c7a72139d56900a5895c49fa105639`; Algorithm to `92cf9b47e4de38306c4fe7b61ece24c3e075aa22`; Federation to `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d`; API Control Plane mainline baseline to `201fd3335c737e7fe36ed34dfa1ec07b03c31047`.
+- Backend #434 is the clean approval-integrity candidate at `2c74c4017ef0cc54a250e070c470d950a0df314e`, directly based on #424. Its exact-head Backend CI, workflow syntax and read-only Cloudflare audit passed. No independent review is recorded.
+- Backend #435 is now based on the exact #434 head `2c74c4017ef0cc54a250e070c470d950a0df314e`; its current head is `1e165ae9d5ca2f4ebdf7a7b4b25b7294f43a2149`. Its Backend CI, Cloudflare audit and Knowledge Engine schema workflow are in progress. The earlier schema-only success on its prior head is not acceptance for this latest head.
+- Do not merge #424, #434 or #435 without independent review and the required sequential checks. #435 must remain stacked on the exact accepted #434 revision.
+
+### Flutter CI rerun
+
+The latest recorded Flutter feature revision is `b3ed56d6aa2a4822d0687cdc4d32cfa98cbc7cf8`. The Cloudflare Pages build passed, but the Validate Flutter Client and Flutter Client CI jobs were cancelled before dependency resolution, analysis, tests or builds. Both jobs were explicitly rerun. The reruns were again cancelled while restoring the Flutter SDK cache (approximately 1.67 GB); no Dart analysis or Flutter test result was produced. This is an infrastructure/cache-stage cancellation, not a test failure and not a pass. The Flutter gate remains open.
+
+### API Control Plane refresh
+
+The API bridge branch now updates `contracts/sources.lock.json`, `contracts/registry/seven-organ-bridge.json`, `contracts/route-inventory/backend-public-routes.json` and this acceptance record. The CDN pin now identifies the merged #125 SHA; the Backend route-inventory explanatory source SHA now matches the pinned #424 candidate. The refreshed bridge head is `3e2e420b8c6d293b4e1552cb79a97e69d84f2a0a`. The preceding bridge CI passed on the prior head; no check result is yet recorded for this refreshed head. Keep PR #116 open until exact-head Node and Dart contract CI passes and the Backend dependency chain is reviewed and accepted.
+
+### Staging and production
+
+No separate Testagram staging Cloudflare zone or machine-verified staging attestation has been established. The merged CDN workflow is guarded but production-only; it must not be dispatched without the equivalent staging workflow and successful API, media, apex redirect, NodeInfo, WebFinger and actor/public-key probes. The last read-only inventory still identifies legacy production API/WebFinger routing and related Worker bindings. No production DNS, Worker, Pages, database, staff permission, feature flag or deployment mutation is authorized or evidenced by this reconciliation.
