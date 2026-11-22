@@ -27,7 +27,7 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. Backend PR #424, Data Centre PR #115 and Flutter PR #114 are pinned to their exact open review candidates. CDN pins the exact merged PR #125 commit; Algorithm and Federation pin their latest observed mainline revisions. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
+The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. Flutter PR #114, Backend PR #436 (stacked on native-auth PR #424), Data Centre PR #115 and Federation PR #53 are pinned to exact open review candidates. CDN pins the exact merged PR #125 commit; Algorithm pins its latest observed mainline revision. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
 
 | Repository | Baseline commit |
 |---|---|
