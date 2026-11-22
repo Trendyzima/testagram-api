@@ -527,7 +527,7 @@ This section supersedes earlier candidate-pin snapshots above where they conflic
 
 ### Flutter deep-link and wallet candidate
 
-- Flutter PR #115 is based on mainline `1f58971720c7a72139d56900a5895c49fa105639`.
+- Flutter PR #114 is based on mainline `1f58971720c7a72139d56900a5895c49fa105639`.
 - Exact PR #115 head: `76ba92dc44ac8b4288765215a33cd572ff6f8389`.
 - Adds profile block controls, allow-listed username profile/UUID profile/wallet landing links, authentication-aware initial routing and Backend username resolution.
 - Persists M-Pesa request identity in secure storage before network dispatch, reuses the same key on retry, and recovers ambiguous attempts by the owner-scoped idempotency reference. Restores block/unblock API contract tests.
