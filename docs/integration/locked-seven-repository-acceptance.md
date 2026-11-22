@@ -644,3 +644,35 @@ The API Control Plane governance mainline is `14e67fffb2150021d7b94bd8941f49ac04
 PR #424 and PR #116 remain open candidate branches, not merged mainline. PR #450 and PR #123 are merged into those respective feature branches only. Data Centre #115 and Federation #53 are actual mainline merges. None of these source pins proves live deployment, production WebAuthn, media durability, Federation interoperability or coordinated disaster recovery.
 
 The Backend production deployment is currently blocked by the missing GitHub production secret `TESTAGRAM_EDGE_PROXY_SHARED_TOKEN`. The deployment preflight fails before machine selection/start; no production deployment or DNS mutation occurred. Configure the same 64-character hexadecimal value used by the Cloudflare API Worker before retrying.
+
+
+## 28. Exact source-pin and deployment reconciliation — 2026-11-22 15:50 UTC
+
+This section is the latest source-pin and deployment reconciliation. It supersedes older candidate/mainline snapshots above wherever they conflict; historical evidence is retained for audit traceability.
+
+| Organ | Exact current mainline SHA | State |
+|---|---|---|
+| Backend | `4c44c989d006a261ac06e4dcad4e30a8904e2cc8` | PR #424 merged; current mainline includes the reviewed native-auth and communication stack plus subsequent deployment repairs |
+| Flutter Client | `03082cc7e2419dc3bac241fd12791043915ea760` | PR #116 merged; latest mainline passed Flutter analysis, unit/widget tests, Android debug and QA builds, web build and image smoke test |
+| Data Centre | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` | Current mainline; PR #115 merged |
+| CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Current mainline; PR #125 merged |
+| Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Current mainline; deployed runtime image is digest-pinned |
+| Federation | `cbd9f2587f8d7ce0703c4123c9a2bd76bb51ca` | Current mainline; PR #53 merged |
+| API Control Plane | `14e67fffb2150021d7b94bd8941f49ac0485d034` | Governance-only mainline; never a runtime service or hop |
+
+### Verified existing InstaBox deployment
+
+Backend production deployment run [45038404739](https://github.com/Trendyzima/Testagram-backend-/actions/runs/45038404739) completed successfully against the existing machine `testagramdb` (`m_agq4me2xgrgx5ge52ts437tqea`). It did not create a replacement machine or reset PostgreSQL/storage.
+
+The run verified healthy Backend API, PostgreSQL, Flutter web, Go CDN, Algorithm, Federation API, Data Centre media/platform/worker/video/notification services and the Caddy edge. It also completed private B2/R2 write-read-delete probes, Backend/Federation directional credential acceptance/rejection checks, public API/CDN/Apex HTTPS health checks and private endpoint isolation. Federation delivery, inbox processing and public acceptance workers remain disabled pending G3.
+
+### Remaining rollout and acceptance boundaries
+
+- The Flutter web image built from current Flutter mainline after the successful Backend deployment. Its immutable digest is `sha256:58017cbd5a7266653dab0f7df1877d852dc13ee25aab71f26245eb5a60d85a61`; it passed registry pull and container smoke tests. It was not part of run 45038404739, which used the prior Flutter image. Backend PR #462 pins the new exact digest for a controlled in-place rollout; merge only after its exact-head checks pass.
+- Flutter PR #125 updates the manual domain smoke to match the deliberate G3 fail-closed state. It does not change DNS, Worker routes or production services.
+- Public NodeInfo/WebFinger remains HTTP 503 until G3 protocol acceptance passes. The apex root redirects ordinary web traffic to `www.testagram.site`.
+- CDN Cloudflare Worker deployment and canonical hostname route reconciliation remain separate, explicitly gated production cutovers. Source CI and the successful VPS origin deployment do not prove that the public Cloudflare route transfer has occurred.
+- The current API bridge refreshes Backend and Flutter source pins to exact current mainline commits and updates the Backend route inventory. Its Node/Dart contract CI must pass on the final exact head before merge.
+- Native identity, WebAuthn staff enrollment, M-Pesa settlement, full media durability/restore, independent Federation interoperability, end-user device acceptance and coordinated disaster recovery remain separate G0-G7 gates.
+
+**Release decision remains NOT ACCEPTED** until all required G0-G7 staging and production evidence is recorded. Healthy containers and a successful deployment workflow are not substitutes for those gates.
