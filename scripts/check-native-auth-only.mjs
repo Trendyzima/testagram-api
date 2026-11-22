@@ -98,10 +98,24 @@ const nonRuntimeNegativeGuards = [
   "source-repos/backend/scripts/test-identity-registration-migration.sh",
 ];
 const providerViolations = [];
+// A product-policy document may name a retired provider only in a sentence
+// that explicitly forbids adding it. Allow that exact negative-only sentence;
+// every other provider mention in source, configuration or documentation fails.
+const negativePolicyReferences = new Map([
+  [
+    "docs/product/forensic-capability-gap-register-and-qa-contract.md",
+    new Set([
+      "- Do not add Supabase, PostgREST, Redis/Valkey, Upstash, Appwrite or Xclone dependencies.",
+    ]),
+  ],
+]);
 for (const path of new Set(scanned)) {
   const source = readFileSync(path, "utf8");
   const normalized = path.replaceAll("\\\\", "/");
-  if (/appwrite/i.test(source) && !nonRuntimeNegativeGuards.some((suffix) => normalized.endsWith(suffix))) providerViolations.push(path);
+  if (!/appwrite/i.test(source) || nonRuntimeNegativeGuards.some((suffix) => normalized.endsWith(suffix))) continue;
+  const allowed = [...negativePolicyReferences.entries()].find(([suffix]) => normalized.endsWith(suffix))?.[1] ?? new Set();
+  const activeMentions = source.split(/\\r?\\n/).filter((line) => /appwrite/i.test(line) && !allowed.has(line.trim()));
+  if (activeMentions.length > 0) providerViolations.push(path);
 }
 assert.equal(
   providerViolations.length,
