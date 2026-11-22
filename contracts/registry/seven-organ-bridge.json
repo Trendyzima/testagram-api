@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "14e67fffb2150021d7b94bd8941f49ac0485d034"
   },
-  "status": "native-auth-communication-and-flutter-feature-candidates-pinned; runtime-acceptance-pending",
+  "status": "current-mainline-source-pins; runtime-acceptance-pending",
   "repositories": [
     {
       "id": "flutter-client",
@@ -14,16 +14,15 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "flutter-client",
-      "mainCommit": "dc9ff61a701ec64214c5993453311f9caf630927",
+      "mainCommit": "03082cc7e2419dc3bac241fd12791043915ea760",
       "mergedPullRequests": [
         109,
         112,
         113,
+        116,
         121,
         122
-      ],
-      "candidateCommit": "e8fa65f321ad700c9e5f04fef86cd5604da500b0",
-      "candidatePullRequest": 116
+      ]
     },
     {
       "id": "backend",
@@ -31,12 +30,13 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "aa88f93d05a48061dd372d369edaac6da0d8f65e",
+      "mainCommit": "4c44c989d006a261ac06e4dcad4e30a8904e2cc8",
       "mergedPullRequests": [
         418,
         419,
         421,
         423,
+        424,
         426,
         427,
         428,
@@ -46,9 +46,7 @@
         447,
         448,
         449
-      ],
-      "candidateCommit": "33844c9051b29e8b77ec4febc6c490e5dc404d2e",
-      "candidatePullRequest": 424
+      ]
     },
     {
       "id": "data-centre",
@@ -98,7 +96,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "federation",
-      "mainCommit": "cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca",
+      "mainCommit": "cbd9f2587f8d7ce0703c4123c9a2bd76bb51ca",
       "mergedPullRequests": [
         49,
         50,
@@ -193,16 +191,16 @@
     "Flutter never receives private service tokens, provider credentials, database credentials or private service URLs.",
     "The API control plane is build-time governance only and is never a runtime gateway.",
     "No external identity provider is part of the supported runtime; native Testagram Backend authentication is the only user and staff authentication path.",
-    "All six runtime source pins must match the exact declared candidate or merged organ revisions; candidate pins remain unaccepted until independent review, merge and live acceptance, then must be replaced with their exact mainline merge SHAs."
+    "All six runtime source pins identify exact current mainline commits; production and product acceptance remain independent gates."
   ],
   "excludedFromAcceptance": [
-    "Flutter PR #116 is the open integration candidate at 2d29bb883645bc6ffd6ef5ff3409cd1bd59d6c54. PRs #117, #118, #120 and #123 are merged into stacked feature branches only; none of those changes is yet in Flutter main. The full combined #116 CI must pass before merge.",
-    "Backend PR #424 is the open native-auth and communication candidate at 31040c345f286b5dd34a91ea8c94af3da21e704b. Its mainline conflict resolution is complete. The communication, wallet and knowledge-engine stack from #434/#435/#437/#439/#441 was brought into the #424 branch through PR #450; these are stacked-branch merges, not mainline merges. Exact-head #424 CI must pass before merge.",
-    "Backend PR #440 is validation-only and is closed without merge. It must never be merged.",
-    "CDN PR #125 is merged at 21a254e9f67dc7a8e55dca37151a6db532405e53; its live production routing and staging acceptance remain separate gates.",
-    "Data Centre PR #115 and Federation PR #53 are merged into their respective main branches and are pinned to the exact current mainline commits.",
-    "Merged source revisions do not prove live DNS, TLS, deployment health, provider durability or end-to-end staging acceptance.",
-    "The Backend edge-proxy deployment repair PR #449 is merged into main. The latest production deploy stopped at the preflight because TESTAGRAM_EDGE_PROXY_SHARED_TOKEN is not configured in the production GitHub environment; no machine start or production deployment occurred.",
-    "Backend approval-ledger and communication changes must remain within the reviewed #424 candidate stack. Do not revive the superseded overlapping #431/#432 path."
+    "Backend PR #424 and its reviewed communication, wallet and knowledge-engine stack are merged. The source pin is refreshed to current Backend mainline 4c44c989d006a261ac06e4dcad4e30a8904e2cc8.",
+    "Flutter PR #116 is merged. The source pin is refreshed to current Flutter mainline 03082cc7e2419dc3bac241fd12791043915ea760. The web image built from this commit is published and smoke-tested; production rollout is pending.",
+    "Backend production deployment run 45038404739 succeeded on the existing InstaBox machine testagramdb. Backend, PostgreSQL, Flutter web, Go CDN, Algorithm, Federation, Data Centre media/platform/worker/video/notification and edge proxy health checks passed. Private B2/R2 write-read-delete probes and directional Backend/Federation credential checks passed.",
+    "The deployed release keeps public registration, staff enrollment and Federation delivery workers fail-closed until their independent acceptance gates pass. Successful deployment is not proof of native-auth migration, WebAuthn live acceptance, ActivityPub interoperability or production registration readiness.",
+    "CDN PR #125 is merged at 21a254e9f67dc7a8e55dca37151a6db532405e53. Go CDN origin is installed and healthy; Cloudflare Worker deployment and canonical hostname routing remain separate production cutover gates and are not inferred from source CI.",
+    "Data Centre PR #115 and Federation PR #53 are merged into their respective main branches and pinned to exact current mainline commits.",
+    "Merged source revisions and healthy VPS containers do not prove end-user device acceptance, M-Pesa settlement, full media durability/restore, cross-instance Federation interoperability or disaster recovery.",
+    "Backend approval-ledger and communication changes are in the reviewed #424 mainline history. Do not revive the superseded overlapping #431/#432 path."
   ]
 }
