@@ -8,7 +8,8 @@ This system contains **seven repositories total**: this API governance repositor
 | Backend | Algorithm | `POST /v1/feed/rank` | Dedicated `ALGORITHM_INTERNAL_TOKEN` bearer, private network | Client and provider contract exist |
 | Federation | Backend | Actor resolution, readiness and outbox reads | `FEDERATION_BACKEND_INTERNAL_TOKEN` | Private client path documented; keep internal |
 | Backend | Federation | `POST /internal/v1/activities` | Distinct `FEDERATION_INTERNAL_TOKEN` bearer | Private ingress exists; delivery remains gated |
-| Backend | Data Centre platform | `/v1/config/*`, `/v1/events`, `/v1/audit` | `PLATFORM_INTERNAL_TOKEN` for protected writes | Provider API exists; Backend typed client is not verified |
+| Backend | Data Centre media / identity evidence | `/internal/v1/media/*`, `/internal/v1/identity-evidence/*` | Separate `FRESH_DATA_CENTRE_INTERNAL_TOKEN` and `IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN`; never reused | Typed Backend client and matching Data Centre routes exist in the PR #424 candidate; staging/runtime acceptance remains pending |
+| Backend | Data Centre platform | `/v1/config/*`, `/v1/events`, `/v1/audit` | `PLATFORM_INTERNAL_TOKEN` for protected writes | Provider API exists; Backend typed consumer is not verified and is not claimed as active |
 | Backend | CDN | Backend-authorized media issuance and byte-delivery contract | Dedicated Backend-to-CDN issuer assertion, key/scope/expiry-bound; playback token separate; purge token operator-only | Issuer contract is a release gate; CDN must not infer visibility from a caller-controlled query flag |
 | Data Centre | CDN / object storage | Origin and media byte paths | Server-side origin credentials; never browser-visible | Deployment-specific |
 | Federation | remote instances | ActivityPub WebFinger, actor, inbox/outbox | HTTP Signatures and HTTPS | Protocol surface exists; public rollout gated |
