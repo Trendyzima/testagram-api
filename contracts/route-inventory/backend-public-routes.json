@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "7731a20cbd7cfe5b055f9bfec0d5eb97498ce847",
+  "sourceRef": "92ff5e90856f48460497466a2d1ec5112b85e24c",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across all production Go files in cmd/api at the exact locked Backend mainline commit 7731a20cbd7cfe5b055f9bfec0d5eb97498ce847. The release-pin refresh changes deployment handoff and regression/CI wiring, not API route registrations. Refresh this inventory whenever Backend mainline changes; route status remains governed by the OpenAPI contract and independent acceptance gates.",
+  "note": "Static public/API route registrations across all production Go files in cmd/api at the exact locked Backend mainline commit 92ff5e90856f48460497466a2d1ec5112b85e24c. Backend PR #473 changes the API edge Worker upstream origin and adds regression tests; it does not alter Go API route registrations. Refresh this inventory whenever Backend mainline changes; route status remains governed by the OpenAPI contract and independent acceptance gates.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
