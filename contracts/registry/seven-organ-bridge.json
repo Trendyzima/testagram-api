@@ -52,7 +52,9 @@
         112,
         113,
         114
-      ]
+      ],
+      "candidateCommit": "17d050d9b74d193a1857bf53588f1ae2b47f12b5",
+      "candidatePullRequest": 115
     },
     {
       "id": "cdn",
