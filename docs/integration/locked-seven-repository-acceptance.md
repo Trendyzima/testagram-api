@@ -510,3 +510,61 @@ The API bridge branch now updates `contracts/sources.lock.json`, `contracts/regi
 ### Staging and production
 
 No separate Testagram staging Cloudflare zone or machine-verified staging attestation has been established. The merged CDN workflow is guarded but production-only; it must not be dispatched without the equivalent staging workflow and successful API, media, apex redirect, NodeInfo, WebFinger and actor/public-key probes. The last read-only inventory still identifies legacy production API/WebFinger routing and related Worker bindings. No production DNS, Worker, Pages, database, staff permission, feature flag or deployment mutation is authorized or evidenced by this reconciliation.
+
+
+## Latest continuation reconciliation — 2026-11-22
+
+This section supersedes older status snapshots above where their run IDs, workflow states or branch heads differ.
+
+### Current source pin verification
+
+All six runtime pins in `contracts/sources.lock.json` were compared against the exact `refs/heads/main` values:
+
+- Backend main: `a793c55db8b5c258524bfef4b8872f5c6c1038e5`; separate review candidate #424: `cc33913f0fd4e86669f7c717e12b2503990e6d88`.
+- Data Centre main: `ada6f26a289775720bb47a639242dbd868388055`.
+- CDN main: `21a254e9f67dc7a8e55dca37151a6db532405e53` (merged PR #125).
+- Flutter main: `1f58971720c7a72139d56900a5895c49fa105639`; PR #114 is a separate feature candidate and is not the mainline pin.
+- Federation main: `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d`.
+- Algorithm main: `92cf9b47e4de38306c4fe7b61ece24c3e075aa22`.
+
+Each source pin matches its repository's observed main branch ref. The API Control Plane is governance-only at `201fd3335c737e7fe36ed34dfa1ec07b03c31047`.
+
+### Backend sequential candidates
+
+- PR #424 exact candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88`: Backend CI and associated candidate checks passed. The PR-triggered InstaBox workflow's input-validation job passed, but the actual `Deploy backend and private services` job was **skipped**. No deployment of the #424 candidate is claimed.
+- PR #434 exact head `2c74c4017ef0cc54a250e070c470d950a0df314e`, based on #424: Backend CI and read-only Cloudflare audit passed. It remains open and draft.
+- PR #435 exact head `1e165ae9d5ca2f4ebdf7a7b4b25b7294f43a2149`, based on the exact #434 head: all 15 Backend CI jobs passed, including dual-control PostgreSQL, identity registration, WebAuthn browser assertion, schema, Compose and security jobs; its Knowledge Engine PostgreSQL schema and Cloudflare audit also passed.
+- No independent review submission is recorded on #424, #434 or #435. Do not merge or rebase these dependencies out of order. The old #431/#432 overlapping stack is not an alternative merge path.
+
+A separate mainline deployment run for Backend SHA `a793c55db8b5c258524bfef4b8872f5c6c1038e5` completed successfully on 2026-11-21 (workflow run `44940436560`). This is the pre-#424 mainline deployment, not deployment of the native-auth retirement candidate. The candidate must not be described as live.
+
+### Flutter PR #114 and profile safety
+
+Flutter PR #114 is currently at `da1c78d69c9e83c27824dd59516f73ed77d1d8a4`, based on main `1f58971720c7a72139d56900a5895c49fa105639`. Its earlier exact head `52b239169542903f894d82eb09905c1e315f52b5` passed Validate Flutter Client, Flutter web-container build and Cloudflare Pages build. The subsequent profile-safety hardening changed the current head; current exact-head CI must finish before acceptance. At the latest inspection, dependency resolution and Dart analysis had passed, while unit/widget tests and Android/web build jobs were still running.
+
+Profile safety contract findings on Backend candidate #424:
+
+- OpenAPI documents `POST /api/social/blocks` and `DELETE /api/social/blocks/{target_user_id}`.
+- Blocking is transactional, validates both accounts, rejects self-blocking, removes follows in both directions, and is idempotent.
+- The profile read handler deliberately returns the same unavailable response when either party has blocked the other.
+- There is no public `GET /api/social/blocks` list or per-target block-state route. Consequently the client can block, and the API client can call unblock when it has a canonical target ID, but the user-facing blocked-account recovery/unblock journey is not complete.
+- No Backend report or mute route is present in the verified public route registrations. Do not expose report/mute controls until their Backend authorization, persistence, moderation and contract behavior are implemented and tested.
+
+Flutter PR #114 now contains authenticated block/unblock API methods and a confirmed profile block action. During this continuation, client-side UUID validation was aligned with Backend UUID version/variant validation, the unblock method was changed to use the same canonical validator, duplicate profile block controls were consolidated, and malformed-ID regression cases were added. These edits are in the current PR head; they are not accepted until exact-head Flutter CI passes. No unblock UI is claimed while the blocked-account listing contract is absent.
+
+### Other runtime organs
+
+- Data Centre exact main pin `ada6f26a289775720bb47a639242dbd868388055`: Android, Go and isolated encrypted database restore-drill checks passed.
+- CDN exact main pin `21a254e9f67dc7a8e55dca37151a6db532405e53`: Worker, capacity and CI checks passed.
+- Federation exact main pin `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d`: CI and container publication passed. Federation PR #52 remains open as a documentation-only private-network endpoint clarification; it is not merged into the pin.
+- Algorithm exact main pin `92cf9b47e4de38306c4fe7b61ece24c3e075aa22`: its exact commit currently has queued third-party check suites and no completed GitHub Actions check result was confirmed in this inspection. Repository code search returned no Appwrite, Supabase or Xclone source hits. Third-party check-suite app labels are not evidence of runtime dependencies.
+
+### API Control Plane bridge
+
+PR #116 is at `e52177b603aa5f18e89e532816d01d98fe2c77b0`. Its latest API contract CI run `44968780919` passed both Node and Dart validation on that exact head. The PR remains open and has no independent review submission. Do not merge it solely because contract CI is green.
+
+### Production and staging boundary
+
+The #424 candidate has not been deployed. The older mainline Backend deployment above is not proof of native-auth cutover. The production API hostname still requires a separately approved Worker custom-domain transfer from the legacy `testagram-api` Worker, and the stale apex WebFinger route requires its own exact-owner transfer/rollback. No machine-verified separate Testagram staging zone or staging acceptance artifact has been established. Do not dispatch the production routing workflow until staging has passed API health/readiness, media authorization, apex redirect, NodeInfo, WebFinger and actor/public-key probes.
+
+No production DNS, Worker, Pages, database, staff-permission, identity-registration or deployment mutation was made during this continuation.
