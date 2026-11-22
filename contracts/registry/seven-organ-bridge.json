@@ -60,14 +60,13 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "cdn",
-      "mainCommit": "490119514788c13c327ee05eb4ce068a0f73966e",
+      "mainCommit": "21a254e9f67dc7a8e55dca37151a6db532405e53",
       "mergedPullRequests": [
         122,
         123,
-        124
-      ],
-      "candidateCommit": "19f2ed0df2993ba833aee9526c2a7e6cbd4a0662",
-      "candidatePullRequest": 125
+        124,
+        125
+      ]
     },
     {
       "id": "algorithm",
