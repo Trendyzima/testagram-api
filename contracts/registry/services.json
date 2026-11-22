@@ -55,8 +55,8 @@
         "packages/dart/README.md",
         "packages/dart/lib/testagram_api.dart"
       ],
-      "status": "hybrid-social-knowledge-client-candidate-pr-114-open-ci-and-contract-audit-pending",
-      "notes": "Flutter PR #114 proposes the Testagram-owned hybrid social and knowledge experience: Home, Discover, Ask, Notifications and More navigation; Backend-authoritative feed ordering metadata; Discover All/Posts/People filters; typed notification actions; and profile block action through the native Backend API. The candidate adds contract-backed POST/DELETE block operations and API tests; it does not add mute/report controls without verified Backend routes. Q&A remains explicitly unavailable until Backend PR #435 adds handlers and API integration. PR #114 is pinned as a candidate for cross-organ route audit, not accepted or merged. Flutter must never receive service tokens, storage-provider keys, database credentials or private service URLs."
+      "status": "hybrid-social-knowledge-client-candidate-pr-114-ci-green-contract-audit-pending",
+      "notes": "Flutter PR #114 is the pinned candidate for the Testagram-owned hybrid social and knowledge experience: Home, Discover, Ask, Notifications and More navigation; Backend-authoritative feed ordering metadata; Discover All/Posts/People filters; typed notification actions; and profile block/unblock actions through contracted native Backend routes. The candidate includes profile safety API tests with canonical UUID version/variant validation. Q&A remains unavailable until Backend PR #435 adds handlers and API integration. Separate Flutter PR #115 proposes safe deep links and wallet M-Pesa retry recovery; it is not included in this source pin and must be reconciled separately before those flows are treated as integrated. Flutter must never receive service tokens, storage-provider keys, database credentials or private service URLs."
     },
     {
       "id": "data-centre-platform",
