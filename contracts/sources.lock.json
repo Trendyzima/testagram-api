@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "cc33913f0fd4e86669f7c717e12b2503990e6d88",
+      "ref": "e0ec8580fcbb6cfebc6d8033fd31c5464f74adb9",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -179,7 +179,9 @@
         "tests/test_native_identity_migration_manifest.py",
         "tests/test_self_hosted_backup_guards.py",
         ".github/workflows/cloudflare-domain-routing-audit.yml",
-        "scripts/staff-webauthn-browser-check.mjs"
+        "scripts/staff-webauthn-browser-check.mjs",
+        "cmd/api/social_test.go",
+        "cmd/api/wallet_capability_test.go"
       ]
     },
     "data-centre": {
@@ -256,7 +258,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "638463c1e6d09137440cab8638729cc73eb9b98a",
+      "ref": "8a459719a2e24a30de0e6bfe421bcba0859dabb4",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",
@@ -316,7 +318,11 @@
         "docs/product/hybrid-social-knowledge-screen-system.md",
         "lib/features/knowledge/knowledge_hub_screen.dart",
         "test/features/knowledge/knowledge_hub_screen_test.dart",
-        "test/profile_safety_api_test.dart"
+        "test/profile_safety_api_test.dart",
+        "lib/core/testagram_deep_link.dart",
+        "lib/features/wallet/topup_attempt_store.dart",
+        "test/core/testagram_deep_link_test.dart",
+        "test/features/wallet/topup_attempt_store_test.dart"
       ]
     },
     "federation": {
