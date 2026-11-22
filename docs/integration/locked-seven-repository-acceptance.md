@@ -546,7 +546,7 @@ This section supersedes all earlier status snapshots in this document where they
 
 ### API Control Plane and organ validation
 
-- API Control Plane PR #116 currently has documentation head `a7ff5980b957cd028714f2b8d85bc761bd4184d2`; the latest code/source-lock head `7fccbb7e8c61c5b2c48091a3e8393bacb7215829` passed API contract CI run `44971990433` (Node and Dart). The subsequent change is acceptance-document-only.
+- API Control Plane PR #116's latest code/source-lock revision `7fccbb7e8c61c5b2c48091a3e8393bacb7215829` passed API contract CI run `44971990433` (Node and Dart). Subsequent commits only update the acceptance document.
 - The cross-repository suite now checks Backend profile resolution, block safety, allow-listed deep links, wallet idempotency binding, secure persistence-before-dispatch and the wallet-only navigation boundary.
 - Data Centre PR #115 and Federation PR #53 have successful candidate CI runs. Both still require independent review; neither is merged.
 - CDN PR #125 is merged. The Backend's CDN-origin PostgreSQL integration and read-only Cloudflare routing audit passed on the latest Backend feature validation.
