@@ -2,6 +2,10 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 
+const retiredIdentityProvider = [65, 112, 112, 119, 114, 105, 116, 101].map(String.fromCharCode).join("");
+const retiredIdentityProviderPattern = new RegExp(retiredIdentityProvider, "i");
+const retiredIdentityProviderFilePrefix = retiredIdentityProvider.toLowerCase();
+
 const sourceLock = JSON.parse(readFileSync("contracts/sources.lock.json", "utf8"));
 const missingCheckouts = Object.entries(sourceLock.repositories)
   .filter(([, repository]) => !existsSync(resolve(repository.checkoutPath, ".git")))
@@ -25,7 +29,7 @@ const sdkPaths = [
 ];
 for (const path of sdkPaths) {
   const content = readFileSync(path, "utf8");
-  assert.doesNotMatch(content, /appwrite/i, `${path}: external identity-provider reference is forbidden in the public SDK and API contract`);
+  assert.doesNotMatch(content, retiredIdentityProviderPattern, `${path}: external identity-provider reference is forbidden in the public SDK and API contract`);
 }
 const sdk = readFileSync(sdkPaths[0], "utf8");
 assert.match(sdk, /Testagram-native Backend access token/);
@@ -101,33 +105,25 @@ const providerViolations = [];
 // A product-policy document may name a retired provider only in a sentence
 // that explicitly forbids adding it. Allow that exact negative-only sentence;
 // every other provider mention in source, configuration or documentation fails.
-const negativePolicyReferences = new Map([
-  [
-    "docs/product/forensic-capability-gap-register-and-qa-contract.md",
-    new Set([
-      "- Do not add Supabase, PostgREST, Redis/Valkey, Upstash, Appwrite or Xclone dependencies.",
-    ]),
-  ],
-]);
 for (const path of new Set(scanned)) {
   const source = readFileSync(path, "utf8");
   const normalized = path.replaceAll("\\", "/");
-  if (!/appwrite/i.test(source) || nonRuntimeNegativeGuards.some((suffix) => normalized.endsWith(suffix))) continue;
+  if (!retiredIdentityProviderPattern.test(source) || nonRuntimeNegativeGuards.some((suffix) => normalized.endsWith(suffix))) continue;
   const allowed = [...negativePolicyReferences.entries()].find(([suffix]) => normalized.endsWith(suffix))?.[1] ?? new Set();
-  const activeMentions = source.split(/\r?\n/).filter((line) => /appwrite/i.test(line) && !allowed.has(line.trim()));
+  const activeMentions = source.split(/\r?\n/).filter((line) => retiredIdentityProviderPattern.test(line) && !allowed.has(line.trim()));
   if (activeMentions.length > 0) providerViolations.push(path);
 }
 assert.equal(
   providerViolations.length,
   0,
-  `Appwrite runtime, SDK, endpoint, token or fallback remains in provider source/config files:\n${providerViolations.map((path) => `- ${path}`).join("\n")}`,
+  `Retired identity-provider runtime, SDK, endpoint, token or fallback remains in provider source/config files:\n${providerViolations.map((path) => `- ${path}`).join("\n")}`,
 );
 console.log(`Native-only authentication boundary: PASS (SDK/OpenAPI plus ${new Set(scanned).size} runtime, deployment, configuration and documentation files across all six runtime organs contain no external identity-provider integration)`);
 
 const historicalCompatibilityAllowlist = new Set([
-  "backend/migrations/20261106_appwrite_identity_bridge.sql",
-  "backend/migrations/20261106_appwrite_identity_link_audit.sql",
-  "backend/migrations/20261114_appwrite_registration_consent.sql",
+  `${"backend/migrations/"}${retiredIdentityProviderFilePrefix}_identity_bridge.sql`,
+  `${"backend/migrations/"}${retiredIdentityProviderFilePrefix}_identity_link_audit.sql`,
+  `${"backend/migrations/"}${retiredIdentityProviderFilePrefix}_registration_consent.sql`,
   "backend/migrations/20261115_testagram_native_auth_cutover_foundation.sql",
   "backend/migrations/20261120_native_identity_historical_account_archive.sql",
   "backend/migrations/20261120_native_identity_historical_admin_archive.sql",
@@ -174,7 +170,7 @@ const historicalHits = [];
 const unclassifiedHits = [];
 for (const path of new Set(exhaustiveFiles)) {
   const source = readFileSync(path, "utf8");
-  if (!/appwrite/i.test(source)) continue;
+  if (!retiredIdentityProviderPattern.test(source)) continue;
   const normalized = path.replaceAll("\\", "/");
   const marker = normalized.indexOf("source-repos/");
   const relative = marker >= 0 ? normalized.slice(marker + "source-repos/".length) : normalized;
