@@ -183,7 +183,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "ada6f26a289775720bb47a639242dbd868388055",
+      "ref": "17d050d9b74d193a1857bf53588f1ae2b47f12b5",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/native-auth-session-integration.yml",
@@ -223,7 +223,8 @@
         "vps/DEPLOYMENT.md",
         "vps/backup.sh",
         "vps/docker-compose.yml",
-        "vps/restore-drill.sh"
+        "vps/restore-drill.sh",
+        "docs/platform/openapi/identity-evidence-v1.yaml"
       ]
     },
     "cdn": {
@@ -384,6 +385,11 @@
       "repository": "data-centre",
       "sourcePath": "docs/platform/openapi/media-lifecycle-v1.yaml",
       "snapshotPath": "contracts/upstream/datacentre/media-lifecycle-v1.openapi.yaml"
+    },
+    {
+      "repository": "data-centre",
+      "sourcePath": "docs/platform/openapi/identity-evidence-v1.yaml",
+      "snapshotPath": "contracts/upstream/datacentre/identity-evidence-v1.openapi.yaml"
     }
   ]
 }
