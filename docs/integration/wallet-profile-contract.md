@@ -57,3 +57,38 @@ Use a clear Testagram-owned information hierarchy:
 - clear loading, empty, pending, failed, success and retry states.
 
 Keep Testagram's distinct brand treatment and use only approved Testagram design-system assets.
+
+
+## Deep-link contract
+
+### Canonical destinations
+
+- Username profile: `https://testagram.site/@{username}` or `/u/{username}`.
+- UUID profile: `https://testagram.site/profile/{user_id}`.
+- Wallet landing page: `https://testagram.site/wallet`.
+- The `testagram://profile/{username}` and `testagram://wallet` forms are reserved for native app delivery where the platform explicitly registers the Testagram scheme.
+
+### Resolution and authorization
+
+- Flutter accepts only the allow-listed Testagram HTTPS hosts, the registered Testagram scheme and local app route names. It rejects unknown hosts, non-HTTPS web URLs, user-info URLs, query strings, fragments, malformed handles and unsupported paths.
+- Username links resolve through authenticated `testagram.social.profile.resolve`; the Backend applies account activity, discoverability, accepted-follow and block checks, then returns the canonical UUID.
+- Flutter loads the profile through the existing canonical profile read path. It never resolves a username locally or bypasses protected-profile authorization.
+- The initial destination is retained across the authentication gate and opened only after a valid Testagram-native session is restored.
+- Wallet links open the wallet landing screen only. They never encode recipient, amount, phone number, checkout ID or payment command and cannot initiate a transfer or deposit.
+
+### Native association release gate
+
+- Android App Links require a verified `assetlinks.json` matching the production package and signing certificate.
+- iOS Universal Links require a valid `apple-app-site-association` file and matching Associated Domains entitlement.
+- The Flutter source repository currently contains Dart client sources but no Android/iOS runner projects. Native association files, signing identity and domain hosting must be completed and verified in the mobile packaging repository before native cold-start or warm-start links are accepted.
+- A Dart parser and successful web build do not prove native link support.
+
+## Wallet retry and settlement safety
+
+- Flutter persists the normalized Kenyan Safaricom phone, whole-KES amount and idempotency key in secure storage before the first network request.
+- A retry after a timeout or lost response reuses the same key and exact payload. A different deposit is blocked while the previous attempt is ambiguous.
+- Backend binds each key to its original phone, amount and currency. Reuse with a different payload returns `IDEMPOTENCY_CONFLICT`.
+- `testagram.wallet.mpesa.status` accepts the owner's idempotency key as well as the provider checkout ID, allowing the client to recover when the initial response was lost.
+- A pending STK request is not a credit. Only a provider-verified callback/query and committed PostgreSQL settlement transaction may change the wallet balance.
+- Wallet balance and transaction history remain read-only Backend projections. Client-side balance arithmetic is prohibited.
+- M-Pesa B2C withdrawal remains unavailable until its separate payout lifecycle is implemented and independently accepted.
