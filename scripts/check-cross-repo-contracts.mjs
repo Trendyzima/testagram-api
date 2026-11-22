@@ -489,6 +489,56 @@ const publicSpec = readFileSync("contracts/openapi/testagram-v1.yaml", "utf8");
 if (/^  \/internal\//m.test(publicSpec) || publicSpec.includes("/api/cache/purge")) {
   fail.push("Private service or operator-only route leaked into public Backend OpenAPI");
 }
+
+const backendSocialCapabilities = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/capability_social.go"), "utf8");
+const backendSocialProfiles = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/social_profile.go"), "utf8");
+const backendWalletMpesa = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/wallet_mpesa.go"), "utf8");
+const flutterDeepLinks = readFileSync(resolve(lock.repositories["flutter-client"].checkoutPath, "lib/core/testagram_deep_link.dart"), "utf8");
+const flutterMainShell = readFileSync(resolve(lock.repositories["flutter-client"].checkoutPath, "lib/app/main_shell.dart"), "utf8");
+const flutterProfileScreen = readFileSync(resolve(lock.repositories["flutter-client"].checkoutPath, "lib/features/profile/profile_screen.dart"), "utf8");
+const flutterWalletScreen = readFileSync(resolve(lock.repositories["flutter-client"].checkoutPath, "lib/features/wallet/wallet_screen.dart"), "utf8");
+const flutterTopUpStore = readFileSync(resolve(lock.repositories["flutter-client"].checkoutPath, "lib/features/wallet/topup_attempt_store.dart"), "utf8");
+const profileWalletContract = readFileSync("docs/integration/wallet-profile-contract.md", "utf8");
+
+for (const [label, source, marker] of [
+  ["Backend social capability", backendSocialCapabilities, "testagram.social.profile.resolve"],
+  ["Backend profile resolver", backendSocialProfiles, "validSocialUsername"],
+  ["Backend profile resolver", backendSocialProfiles, "discoverable_by_username"],
+  ["Backend profile resolver", backendSocialProfiles, "NOT EXISTS("],
+  ["Backend profile resolver", backendSocialProfiles, "socialProfileReadFor"],
+  ["Backend profile resolver", backendSocialProfiles, "PROFILE_NOT_FOUND"],
+  ["Flutter profile resolver", flutterBackendApi, "testagram.social.profile.resolve"],
+  ["Flutter profile resolver", flutterBackendApi, "resolveProfileUsername"],
+  ["Flutter profile safety UI", flutterProfileScreen, "_blockProfileAccount"],
+  ["Flutter profile safety UI", flutterProfileScreen, "widget.api.blockUser"],
+  ["Flutter deep links", flutterDeepLinks, "testagram.site"],
+  ["Flutter deep links", flutterDeepLinks, "uri.hasQuery"],
+  ["Flutter deep links", flutterDeepLinks, "uri.hasFragment"],
+  ["Flutter deep links", flutterMainShell, "initialDeepLink"],
+  ["Flutter deep links", flutterMainShell, "resolveProfileUsername"],
+  ["Backend M-Pesa idempotency", backendWalletMpesa, "mpesaTopupRequestMatches"],
+  ["Backend M-Pesa idempotency", backendWalletMpesa, "IDEMPOTENCY_CONFLICT"],
+  ["Backend M-Pesa idempotency", backendWalletMpesa, "TOPUP_RECONCILIATION_PENDING"],
+  ["Backend M-Pesa idempotency", backendWalletMpesa, "idempotency_key"],
+  ["Flutter M-Pesa persistence", flutterTopUpStore, "FlutterSecureStorage"],
+  ["Flutter M-Pesa persistence", flutterTopUpStore, "idempotency_key"],
+  ["Flutter M-Pesa recovery", flutterBackendApi, "getMpesaTopUpAttemptStatus"],
+  ["Flutter M-Pesa recovery", flutterWalletScreen, "_topUpAttemptStore.save(attempt)"],
+  ["Flutter M-Pesa recovery", flutterWalletScreen, "getMpesaTopUpAttemptStatus"],
+  ["Profile/wallet product contract", profileWalletContract, "## Deep-link contract"],
+  ["Profile/wallet product contract", profileWalletContract, "## Wallet retry and settlement safety"],
+]) {
+  if (!source.includes(marker)) fail.push(`${label} missing cross-repository acceptance marker: ${marker}`);
+}
+const persistedAttemptAt = flutterWalletScreen.indexOf("_topUpAttemptStore.save(attempt)");
+const firstTopUpRequestAt = flutterWalletScreen.indexOf("requestMpesaTopUp(");
+if (persistedAttemptAt < 0 || firstTopUpRequestAt < 0 || persistedAttemptAt > firstTopUpRequestAt) {
+  fail.push("Flutter must persist the M-Pesa idempotency key before dispatching the first top-up request");
+}
+if (flutterDeepLinks.includes("transfer") || flutterDeepLinks.includes("topup")) {
+  fail.push("Wallet deep-link parser must not accept payment or transfer destinations");
+}
+
 if (fail.length) {
   console.error(fail.map((item) => `- ${item}`).join("\n"));
   process.exit(1);
