@@ -321,7 +321,7 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "27fa3eae535bfa3aaf249a7821103adbc16734ec",
+      "ref": "4d7c26861240fae0fc8a69872dc326b3e1b2bbff",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
         ".env.example",
