@@ -139,7 +139,7 @@
         "contracts/upstream/federation/backend-private-v1.openapi.yaml"
       ],
       "status": "activitypub-and-atproto-private-bridge-contract-candidate-pr-53-live-staging-acceptance-pending",
-      "notes": "Federation remains a protocol adapter, not the identity or visibility authority. ActivityPub and AT Protocol are separate protocol implementations. The private Backend bridge now has a provider OpenAPI candidate in PR #53 covering durable ActivityPub activity enqueue, Backend-authorized remote-object pages and Backend-authorized ATProto author feeds. The Backend client supplies actor URI/DID allowlists and revalidates returned provenance; Federation must not select viewer follows or create local Testagram identities. PR #53 is pinned for cross-organ contract audit but is not merged; staging service-auth, timeout/fallback and load acceptance remain pending."
+      "notes": "Federation remains a protocol adapter, not the identity or visibility authority. ActivityPub and AT Protocol are separate protocol implementations. The private Backend bridge now has a provider OpenAPI candidate in PR #53 covering durable ActivityPub activity enqueue, Backend-authorized remote-object pages and Backend-authorized ATProto author feeds, and protocol-native remote identity verification for pending ActivityPub/Bluesky subscriptions. The Backend client supplies actor URI/DID allowlists and revalidates returned provenance; Federation must not select viewer follows or create local Testagram identities. PR #53 is pinned for cross-organ contract audit but is not merged; staging service-auth, timeout/fallback and load acceptance remain pending."
     },
     {
       "id": "algorithm",
