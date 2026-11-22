@@ -96,7 +96,9 @@
         49,
         50,
         51
-      ]
+      ],
+      "candidateCommit": "81259c37d943312de648e3754ea146c027bc7ee5",
+      "candidatePullRequest": 53
     },
     {
       "id": "api-control-plane",
