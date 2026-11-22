@@ -89,6 +89,36 @@ for (const route of mediaRoutes) {
 if (!backendMediaClient.includes('"X-Testagram-API-Version"')) fail.push("Backend Data Centre client must send X-Testagram-API-Version");
 if (!dataCentreMediaServer.includes('r.Header.Get("X-Testagram-API-Version")')) fail.push("Data Centre media server must enforce X-Testagram-API-Version");
 
+const identityEvidenceOpenAPI = readFileSync("contracts/upstream/datacentre/identity-evidence-v1.openapi.yaml", "utf8");
+const identityEvidenceTests = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/media/main_test.go"), "utf8");
+const backendAPIEntry = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/main.go"), "utf8");
+const identityEvidenceRoutes = [
+  ["/internal/v1/identity-evidence/readyz", "s.identityReady"],
+  ["/internal/v1/identity-evidence/upload-url", "s.uploadURL"],
+  ["/internal/v1/identity-evidence/verify", "s.verify"],
+  ["/internal/v1/identity-evidence/status", "s.status"],
+  ["/internal/v1/identity-evidence/download-url", "s.downloadURL"],
+  ["/internal/v1/identity-evidence/delete", "s.delete"],
+];
+for (const [path, handler] of identityEvidenceRoutes) {
+  if (!dataCentreMediaServer.includes(`mux.HandleFunc("${path}",${handler})`)) fail.push(`Data Centre identity-evidence provider missing route: ${path}`);
+  if (!identityEvidenceOpenAPI.includes(`${path}:`)) fail.push(`Data Centre identity-evidence OpenAPI missing route: ${path}`);
+}
+for (const [label, source, marker] of [
+  ["Backend Data Centre identity client", backendMediaClient, 'c.prefix = "/internal/v1/identity-evidence"'],
+  ["Backend identity-evidence config", backendAPIEntry, 'env("IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN", "")'],
+  ["Backend identity-evidence config", backendAPIEntry, "NewIdentityEvidenceClient(dataCentreURL, identityEvidenceToken"],
+  ["Backend identity-evidence config", backendAPIEntry, "must be distinct from FRESH_DATA_CENTRE_INTERNAL_TOKEN"],
+  ["Data Centre identity-evidence auth", dataCentreMediaServer, 'strings.HasPrefix(r.URL.Path,"/internal/v1/identity-evidence/")'],
+  ["Data Centre identity-evidence auth", dataCentreMediaServer, "expected=s.cfg.identityToken"],
+  ["Data Centre identity-evidence OpenAPI", identityEvidenceOpenAPI, "IdentityEvidenceBearer"],
+  ["Data Centre identity-evidence OpenAPI", identityEvidenceOpenAPI, "identity-evidence-private"],
+  ["Data Centre identity-evidence tests", identityEvidenceTests, "TestIdentityEvidenceNamespaceRequiresDedicatedRoute"],
+  ["Data Centre identity-evidence tests", identityEvidenceTests, "TestIdentityEvidenceReadinessRequiresDedicatedCredential"],
+  ["Data Centre identity-evidence tests", identityEvidenceTests, "TestIdentityEvidenceNamespaceIsPrivateAndBoundToApplication"],
+]) {
+  if (!source.includes(marker)) fail.push(`${label} missing isolated identity-evidence contract marker: ${marker}`);
+}
 const backendDataCentreClient = backendMediaClient;
 const dataCentreVideoAuth = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/video/native_auth.go"), "utf8");
 const dataCentreVideoMain = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/video/main.go"), "utf8");
@@ -186,6 +216,20 @@ if (!rankingContract.includes("enum: [for_you, following, media, discover]")) {
 if (!algorithmClient.includes('case "for_you", "following", "media", "discover":')) {
   fail.push("Backend Algorithm client must validate exactly the feedMode enum published by the Algorithm contract");
 }
+const algorithmServer = readFileSync(resolve(lock.repositories.algorithm.checkoutPath, "testagram-feed/cmd/feed-api/main.go"), "utf8");
+for (const [label, source, marker] of [
+  ["Backend Algorithm topic client", algorithmClient, "/v1/topics/rank"],
+  ["Algorithm topic OpenAPI", algorithmOpenAPI, "/v1/topics/rank:"],
+  ["Algorithm topic provider", algorithmServer, 'HandleFunc("POST /v1/topics/rank"'],
+  ["Backend Algorithm topic tests", algorithmRankTests, "TestRankTopicsSendsAuthenticatedBoundedContract"],
+]) {
+  if (!source.includes(marker)) fail.push(`${label} missing agreed topic-ranking contract marker: ${marker}`);
+}
+const topicRankingPath = algorithmOpenAPI.indexOf("/v1/topics/rank:");
+const topicRankingContract = topicRankingPath >= 0 ? algorithmOpenAPI.slice(topicRankingPath, topicRankingPath + 2400) : "";
+if (!topicRankingContract.includes("required: [limit, candidates]") || !topicRankingContract.includes("maxItems: 200")) {
+  fail.push("Algorithm topic OpenAPI must bound Backend-authorized candidates and require a result limit");
+}
 
 const backendFederationClient = readFileSync(resolve(lock.repositories.backend.checkoutPath, "internal/federationclient/client.go"), "utf8");
 const federationServer = readFileSync(resolve(lock.repositories.federation.checkoutPath, "internal/httpapi/server.go"), "utf8");
@@ -198,6 +242,12 @@ for (const [label, source, marker] of [
   ["Federation ingress", federationIngress, "validInternalBearer(r, ingressToken)"],
   ["Federation ingress", federationIngress, "EnqueueOutbox"],
   ["Federation ingress", federationIngress, "http.StatusAccepted"],
+  ["Backend Federation client", backendFederationClient, '/internal/v1/atproto/feed'],
+  ["Federation server", federationServer, 'HandleFunc("POST /internal/v1/atproto/feed"'],
+  ["Backend Federation client", backendFederationClient, '/internal/v1/remote-objects'],
+  ["Federation server", federationServer, 'HandleFunc("POST /internal/v1/remote-objects"'],
+  ["Backend Federation client", backendFederationClient, '/internal/v1/remote-subscriptions/verify'],
+  ["Federation server", federationServer, 'HandleFunc("POST /internal/v1/remote-subscriptions/verify"'],
 ]) {
   if (!source.includes(marker)) fail.push(`${label} missing agreed durable-ingress contract marker: ${marker}`);
 }
