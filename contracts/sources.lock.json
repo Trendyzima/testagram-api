@@ -259,7 +259,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "713aea6d4253ccadd6a058f3dd95edc108490320",
+      "ref": "2b4ea04f2f80faf9c347cb69cf885a8ccc43664b",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",
@@ -323,7 +323,9 @@
         "test/profile_safety_api_test.dart",
         "docs/product/deep-link-routing.md",
         "lib/features/monetization/monetization_hub_screen.dart",
-        "test/features/monetization/monetization_hub_screen_test.dart"
+        "test/features/monetization/monetization_hub_screen_test.dart",
+        "lib/features/federation/remote_post_detail_screen.dart",
+        "test/features/discovery/explore_remote_detail_test.dart"
       ]
     },
     "federation": {
