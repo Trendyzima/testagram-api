@@ -193,7 +193,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "f3abef58743d27d7a8f62b15fae7e3f7509ee1ef",
+      "ref": "99edc3e096675f5c39ab6a9bd0050dcee30283a0",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/native-auth-session-integration.yml",
@@ -343,7 +343,7 @@
     },
     "federation": {
       "fullName": "Trendyzima/federated-content",
-      "ref": "4d7c26861240fae0fc8a69872dc326b3e1b2bbff",
+      "ref": "cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca",
       "checkoutPath": "source-repos/federation",
       "sourcePaths": [
         ".env.example",
