@@ -27,13 +27,13 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. Flutter PR #114, Backend PR #437 (stacked on native-auth PR #424), Data Centre PR #116 and Federation PR #53 are pinned to exact open review candidates. CDN pins the exact merged PR #125 commit; Algorithm pins its latest observed mainline revision. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
+The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. Flutter PR #116, Backend PR #437 (stacked on native-auth PR #424), Data Centre PR #115 and Federation PR #53 are pinned to exact open review candidates. CDN pins the exact merged PR #125 commit; Algorithm pins its latest observed mainline revision. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `76ba92dc44ac8b4288765215a33cd572ff6f8389` (PR #116 deep-link/wallet candidate; mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
+| Flutter | `457006e09aef914c0d5365e7e72285a405e0ef37` (PR #116 deep-link/wallet and monetization-page foundation candidate; mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
 | Backend | `93da847b74d2e874595d113deacbbcda3c283b3a` (PR #436 profile/wallet candidate; stacked on #424 `cc33913f0fd4e86669f7c717e12b2503990e6d88`) |
-| Data Centre | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` (PR #116 OpenAPI candidate; mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
+| Data Centre | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` (PR #115 OpenAPI candidate; mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` |
 | Federation | `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` (PR #53 candidate; mainline base `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d`) |
