@@ -154,6 +154,11 @@ for (const [label, source, marker] of [
  }
  if (!backendEnvExample.includes("DATA_CENTRE_MEDIA_API_URL=http://media:8096")) fail.push("Backend env example must use the private media service DNS endpoint");
  if (!dataCentreCompose.includes("MEDIA_INTERNAL_TOKEN: ${FRESH_DATA_CENTRE_INTERNAL_TOKEN:-}")) fail.push("Data Centre media service token must use FRESH_DATA_CENTRE_INTERNAL_TOKEN");
+if (!backendCompose.includes("IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN: ${IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN:-}")) fail.push("Backend API must receive the dedicated identity-evidence service token");
+if (!dataCentreCompose.includes("IDENTITY_EVIDENCE_INTERNAL_TOKEN: ${IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN:-}")) fail.push("Data Centre media service must receive the identity-evidence token under its dedicated environment key");
+if (!backendDeploy.includes("ensure_random_secret IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN") || !backendDeploy.includes('write_dc_env_value IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must provision a dedicated identity-evidence token to the Data Centre");
+if (!backendDeploy.includes('write_env_value IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN"') || !backendDeploy.includes('verify_container_env "$DC_ENV" "$DATACENTRE/backend/docker-compose.yml" media IDENTITY_EVIDENCE_INTERNAL_TOKEN "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must verify the same dedicated identity-evidence token in both API and Data Centre containers");
+if (!backendDeploy.includes("must be distinct from FRESH_DATA_CENTRE_INTERNAL_TOKEN")) fail.push("Backend deployment must reject reuse of the general media token for identity evidence");
  if (!backendDeploy.includes('write_dc_env_value FRESH_DATA_CENTRE_INTERNAL_TOKEN "$FRESH_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must provision the same private media token into the Data Centre runtime env");
  if (!backendDeploy.includes('MEDIA_DATABASE_USER="$(read_dc_env_value MEDIA_DATABASE_USER)"') ||
     !backendDeploy.includes('MEDIA_DATABASE_PASSWORD="$(read_dc_env_value MEDIA_DATABASE_PASSWORD)"') ||
@@ -260,6 +265,7 @@ for (const [label, source, marker] of [
   ["Federation private provider OpenAPI", federationPrivateOpenAPI, "/internal/v1/atproto/feed:"],
   ["Federation private provider OpenAPI", federationPrivateOpenAPI, "/internal/v1/remote-subscriptions/verify:"],
   ["API Control Plane Federation OpenAPI", internalFederationOpenAPI, "/internal/v1/remote-objects:"],
+  ["API Control Plane Federation OpenAPI", internalFederationOpenAPI, "/internal/v1/activities:"],
   ["API Control Plane Federation OpenAPI", internalFederationOpenAPI, "/internal/v1/atproto/feed:"],
   ["API Control Plane Federation OpenAPI", internalFederationOpenAPI, "/internal/v1/remote-subscriptions/verify:"],
   ["Federation ATProto handler", federationATProto, "validInternalBearer(r, token)"],
