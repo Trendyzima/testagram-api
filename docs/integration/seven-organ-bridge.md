@@ -2,7 +2,7 @@
 
 **Bridge branch:** `integration/seven-organ-bridge-20261120`  
 **Control plane:** `Trendyzima/testagram-api`  
-**Status:** current Backend and Flutter stacked candidates are pinned; source CI and live runtime acceptance remain pending.
+**Status:** current Backend and Flutter stacked candidates are pinned and their exact-head source CI has passed; live runtime acceptance remains pending.
 
 This repository is the build-time governance layer, not a monorepo and not a runtime gateway. The six runtime organs remain independently owned repositories. The API Control Plane coordinates their contracts, immutable source pins, generated SDKs, route inventory and compatibility checks.
 
@@ -10,8 +10,8 @@ This repository is the build-time governance layer, not a monorepo and not a run
 
 | Organ | Repository | Locked source revision | Source status |
 |---|---|---|---|
-| Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `2d29bb883645bc6ffd6ef5ff3409cd1bd59d6c54` | Open PR #116 candidate; includes deep links, social/knowledge, profile/wallet/monetization and the #117/#118/#120/#123 stacked feature work; not in main |
-| Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `31040c345f286b5dd34a91ea8c94af3da21e704b` | Open PR #424 candidate; includes native auth plus #434/#435/#437/#439/#441 feature stack via #450; mainline conflicts resolved; exact-head CI pending |
+| Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `2d29bb883645bc6ffd6ef5ff3409cd1bd59d6c54` | Open PR #116 candidate; includes deep links, social/knowledge, profile/wallet/monetization and the #117/#118/#120/#123 stacked feature work; exact-head CI passed; not in main |
+| Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `31040c345f286b5dd34a91ea8c94af3da21e704b` | Open PR #424 candidate; includes native auth plus #434/#435/#437/#439/#441 feature stack via #450; mainline conflicts resolved; exact-head CI passed |
 | Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` | Current mainline; PR #115 merged |
 | CDN | [cdn-](https://github.com/Trendyzima/cdn-) | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Current mainline; PR #125 merged |
 | Algorithm | [the-algorithm](https://github.com/Trendyzima/the-algorithm) | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Current mainline |
@@ -30,7 +30,7 @@ The six runtime pins are stored in `contracts/sources.lock.json`. Backend and Fl
 - Federation: PRs #49–#53 are merged into main (navigation, dependency reliability, native ownership boundary and private protocol contracts).
 - API Control Plane: PRs #115 and #117 are merged into main; bridge PR #116 is the active draft candidate.
 
-The current bridge itself is API Control Plane PR #116. It has been reopened as a draft; its source pins and status documents are being refreshed to the current Backend #424 and Flutter #116 candidate heads before a fresh full contract run.
+The current bridge itself is API Control Plane PR #116, now ready for independent review. Its source pins, route inventory, acceptance record and seven-organ status documents are refreshed to the current Backend #424 and Flutter #116 candidate heads. Full contract CI passed on run `45005227967`.
 
 Flutter PR #113's negative-auth fixture cleanup is already merged into main.
 
