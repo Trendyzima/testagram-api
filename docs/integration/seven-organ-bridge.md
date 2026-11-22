@@ -10,7 +10,7 @@ This repository is the build-time governance layer, not a monorepo and not a run
 
 | Organ | Repository | Locked source revision | Source status |
 |---|---|---|---|
-| Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `2d29bb883645bc6ffd6ef5ff3409cd1bd59d6c54` | Open PR #116 candidate; includes deep links, social/knowledge, profile/wallet/monetization and the #117/#118/#120/#123 stacked feature work; exact-head CI is being rerun after API edge ingress hardening; not in main |
+| Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `e8fa65f321ad700c9e5f04fef86cd5604da500b0` | Open PR #116 candidate; includes deep links, social/knowledge, profile/wallet/monetization and the #117/#118/#120/#123 stacked feature work; exact-head CI is being rerun after API edge ingress hardening; not in main |
 | Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `33844c9051b29e8b77ec4febc6c490e5dc404d2e` | Open PR #424 candidate; includes native auth plus #434/#435/#437/#439/#441 feature stack via #450; mainline conflicts resolved; exact-head CI passed |
 | Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` | Current mainline; PR #115 merged |
 | CDN | [cdn-](https://github.com/Trendyzima/cdn-) | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Current mainline; PR #125 merged |
@@ -142,7 +142,7 @@ A green bridge audit proves source/contract consistency only. It does not prove 
 
 ## Latest communication and client source-pin refresh — 2026-11-22
 
-- Flutter candidate pin: PR #116 head `2d29bb883645bc6ffd6ef5ff3409cd1bd59d6c54`, now includes #117/#118/#120 and the #123 messaging/calls integration. PR #123's exact-head web-container and Pages validations passed (runs `45003999923` and `45003999926`). The combined #116 CI is running on the new head; message composition remains encrypted-envelope-only and plaintext rendering remains blocked.
+- Flutter candidate pin: PR #116 head `e8fa65f321ad700c9e5f04fef86cd5604da500b0`, now includes #117/#118/#120 and the #123 messaging/calls integration. PR #123's exact-head web-container and Pages validations passed (runs `45003999923` and `45003999926`). The combined #116 CI is pending on the latest mainline-synced head; message composition remains encrypted-envelope-only and plaintext rendering remains blocked.
 - Backend candidate pin: PR #424 head `33844c9051b29e8b77ec4febc6c490e5dc404d2e`. The four original mainline conflicts were reconciled in merge commit `254d49744139d762fc679a062375c826d2f91f97`; PR #450 then merged the #434/#435/#437/#439/#441 communication, wallet and knowledge-engine stack into the #424 branch. The combined #424 CI is running on this exact head.
 - The Backend edge-proxy deployment repair PR #449 is merged into main. The production deployment now fails closed at the new preflight because the production GitHub secret `TESTAGRAM_EDGE_PROXY_SHARED_TOKEN` is empty; the machine-selection and deployment steps were skipped. Configure the same 64-hex value used by the Cloudflare API Worker before attempting a production deployment.
 - Data Centre PR #115 and Federation PR #53 are merged into main; the bridge pins `99edc3e096675f5c39ab6a9bd0050dcee30283a0` and `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca` respectively.
