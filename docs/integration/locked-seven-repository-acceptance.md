@@ -27,12 +27,12 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. Flutter PR #117 (stacked on Flutter PR #116), Backend PR #437 (stacked on native-auth PR #424), Data Centre PR #115 and Federation PR #53 are pinned to exact open review candidates. CDN pins the exact merged PR #125 commit; Algorithm pins its latest observed mainline revision. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
+The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. Flutter PR #118 (stacked on #117 and #116), Backend PR #439 (stacked on #437, #435, #434 and #424), Data Centre PR #115 and Federation PR #53 are pinned to exact open review candidates. CDN pins the exact merged PR #125 commit; Algorithm pins its latest observed mainline revision. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `2b4ea04f2f80faf9c347cb69cf885a8ccc43664b` (PR #117 hybrid social/knowledge candidate; stacked on PR #116 head `713aea6d4253ccadd6a058f3dd95edc108490320`; mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
-| Backend | `93da847b74d2e874595d113deacbbcda3c283b3a` (PR #436 profile/wallet candidate; stacked on #424 `cc33913f0fd4e86669f7c717e12b2503990e6d88`) |
+| Flutter | `8988ef48c55811d6faccbfa05bebb486d4775f65` (PR #118 direct messaging/calls candidate; stacked on PR #117 and #116; exact-head Flutter analysis, tests, Android QA builds and web builds passed; mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
+| Backend | `484c7486be1f238ffd09a71d2e85843a0561e01d` (PR #439 communication privacy/block-policy candidate; stacked on #437, #435, #434 and #424; Backend CI and PostgreSQL communication policy integration passed) |
 | Data Centre | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` (PR #115 OpenAPI candidate; mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` |
