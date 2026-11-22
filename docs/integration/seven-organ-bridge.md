@@ -11,7 +11,7 @@ This repository is the build-time governance layer, not a monorepo and not a run
 | Organ | Repository | Locked source revision | Source status |
 |---|---|---|---|
 | Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `638463c1e6d09137440cab8638729cc73eb9b98a` | PR #114 hybrid client candidate; not merged (mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
-| Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `cc33913f0fd4e86669f7c717e12b2503990e6d88` | Temporary native-auth PR #424 candidate; not merged |
+| Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `f4cbc62121a7e20114358d89d6cd6add9beec36e` | PR #436 profile/wallet candidate stacked on native-auth PR #424; not merged |
 | Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` | PR #115 identity-evidence OpenAPI candidate; not merged (mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
 | CDN | [cdn-](https://github.com/Trendyzima/cdn-) | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Current mainline; PR #125 merged |
 | Algorithm | [the-algorithm](https://github.com/Trendyzima/the-algorithm) | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Current mainline |
