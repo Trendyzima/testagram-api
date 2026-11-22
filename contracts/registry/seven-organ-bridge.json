@@ -4,9 +4,9 @@
   "createdFrom": {
     "repository": "Trendyzima/testagram-api",
     "branch": "main",
-    "commit": "201fd3335c737e7fe36ed34dfa1ec07b03c31047"
+    "commit": "14e67fffb2150021d7b94bd8941f49ac0485d034"
   },
-  "status": "backend-and-flutter-stacked-candidates-pinned-runtime-acceptance-pending",
+  "status": "native-auth-communication-and-flutter-feature-candidates-pinned; runtime-acceptance-pending",
   "repositories": [
     {
       "id": "flutter-client",
@@ -14,15 +14,16 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "flutter-client",
-      "mainCommit": "44d19f98808768750cfe5e590f8a451bf1cc404d",
+      "mainCommit": "dc9ff61a701ec64214c5993453311f9caf630927",
       "mergedPullRequests": [
         109,
         112,
         113,
-        121
+        121,
+        122
       ],
-      "candidateCommit": "b818e6c2c2ec2dd909eb001afb9c055ab562b9bd",
-      "candidatePullRequest": 120
+      "candidateCommit": "2d29bb883645bc6ffd6ef5ff3409cd1bd59d6c54",
+      "candidatePullRequest": 116
     },
     {
       "id": "backend",
@@ -30,18 +31,24 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "a793c55db8b5c258524bfef4b8872f5c6c1038e5",
+      "mainCommit": "aa88f93d05a48061dd372d369edaac6da0d8f65e",
       "mergedPullRequests": [
-        419,
         418,
+        419,
         421,
         423,
         426,
         427,
-        428
+        428,
+        433,
+        443,
+        445,
+        447,
+        448,
+        449
       ],
-      "candidateCommit": "2c76af240289931dab390360d107d1df2adddb2e",
-      "candidatePullRequest": 441
+      "candidateCommit": "31040c345f286b5dd34a91ea8c94af3da21e704b",
+      "candidatePullRequest": 424
     },
     {
       "id": "data-centre",
@@ -189,13 +196,13 @@
     "All six runtime source pins must match the exact declared candidate or merged organ revisions; candidate pins remain unaccepted until independent review, merge and live acceptance, then must be replaced with their exact mainline merge SHAs."
   ],
   "excludedFromAcceptance": [
-    "A branch without a reviewed pull request is not automatically merged.",
-    "Flutter PR chain #116 → #117 → #118 → #120 is open and unmerged; the lock pins the exact #120 head. These candidate screens and contracts are not production acceptance.",
-    "Backend PR chain #424 → #434 → #435 → #437 → #439 → #441 is open and unmerged; the lock pins the exact #441 head. Review and merge sequentially; do not merge stacked candidates out of order.",
-    "Backend PR #440 is validation-only and must be closed, never merged. It is not a runtime source candidate.",
+    "Flutter PR #116 is the open integration candidate at 2d29bb883645bc6ffd6ef5ff3409cd1bd59d6c54. PRs #117, #118, #120 and #123 are merged into stacked feature branches only; none of those changes is yet in Flutter main. The full combined #116 CI must pass before merge.",
+    "Backend PR #424 is the open native-auth and communication candidate at 31040c345f286b5dd34a91ea8c94af3da21e704b. Its mainline conflict resolution is complete. The communication, wallet and knowledge-engine stack from #434/#435/#437/#439/#441 was brought into the #424 branch through PR #450; these are stacked-branch merges, not mainline merges. Exact-head #424 CI must pass before merge.",
+    "Backend PR #440 is validation-only and is closed without merge. It must never be merged.",
     "CDN PR #125 is merged at 21a254e9f67dc7a8e55dca37151a6db532405e53; its live production routing and staging acceptance remain separate gates.",
-    "Data Centre PR #115 and Federation PR #53 remain open candidate contracts and are not merged or staging-accepted.",
+    "Data Centre PR #115 and Federation PR #53 are merged into their respective main branches and are pinned to the exact current mainline commits.",
     "Merged source revisions do not prove live DNS, TLS, deployment health, provider durability or end-to-end staging acceptance.",
-    "Backend approval-ledger changes are represented by the sequential #424 → #434 → #435 → #437 → #439 → #441 candidate chain; do not revive the superseded overlapping #431/#432 path."
+    "The Backend edge-proxy deployment repair PR #449 is merged into main. The latest production deploy stopped at the preflight because TESTAGRAM_EDGE_PROXY_SHARED_TOKEN is not configured in the production GitHub environment; no machine start or production deployment occurred.",
+    "Backend approval-ledger and communication changes must remain within the reviewed #424 candidate stack. Do not revive the superseded overlapping #431/#432 path."
   ]
 }
