@@ -10,27 +10,27 @@ This repository is the build-time governance layer, not a monorepo and not a run
 
 | Organ | Repository | Locked source revision | Source status |
 |---|---|---|---|
-| Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `638463c1e6d09137440cab8638729cc73eb9b98a` | PR #114 hybrid client candidate; not merged (mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
-| Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `f4cbc62121a7e20114358d89d6cd6add9beec36e` | PR #436 profile/wallet candidate stacked on native-auth PR #424; not merged |
+| Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `714b0f9b3846c0a038db8ae7b01e2a49b626eefe` | PR #120 plaintext-rendering hardening stacked on #118 → #117 → #116; open, draft, unmerged |
+| Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `0578db9f3cff5c943915eebee890bc1f97e461c2` | PR #441 fail-closed communication follow-up stacked on #439 → #437 → #435 → #434 → #424; open, draft, unmerged |
 | Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` | PR #115 identity-evidence OpenAPI candidate; not merged (mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
 | CDN | [cdn-](https://github.com/Trendyzima/cdn-) | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Current mainline; PR #125 merged |
 | Algorithm | [the-algorithm](https://github.com/Trendyzima/the-algorithm) | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Current mainline |
 | Federation | [federated-content](https://github.com/Trendyzima/federated-content) | `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` | PR #53 private ActivityPub/ATProto contract candidate; not merged (mainline base `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d`) |
 | Contract control plane | [testagram-api](https://github.com/Trendyzima/testagram-api) | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` | Governance mainline; this bridge PR remains open |
 
-The six runtime pins are stored in `contracts/sources.lock.json`. Flutter, Backend, Data Centre and Federation intentionally pin open review candidates (#114, #424, #115 and #53) for pre-merge contract audit; after each merges, replace its pin with the exact mainline merge SHA. CDN and Algorithm pin current mainline heads. CDN PR #125 is merged. Backend PRs #434 and #435 remain stacked behind #424 and are excluded from the source pin until independently reviewed and merged.
+The six runtime pins are stored in `contracts/sources.lock.json`. Flutter, Backend, Data Centre and Federation intentionally pin open review candidates (#120, #441, #115 and #53) for pre-merge contract audit; Flutter #120 includes stacked #118/#117/#116 and Backend #441 includes #439/#437/#435/#434/#424. After each chain is independently reviewed and merged in order, replace its pin with the exact mainline merge SHA. CDN and Algorithm pin current mainline heads. CDN PR #125 is merged. Backend PRs #434 and #435 remain stacked behind #424 and are excluded from the source pin until independently reviewed and merged.
 
 ## 2. Merged organ changes represented by this baseline
 
-- Flutter: PRs #109, #112 and #113 (navigation, native-auth deployment documentation and negative-auth fixture cleanup).
-- Backend: PRs #418, #419, #421, #423, #426, #427 and #428. PR #424 remains open; #434 and #435 are stacked candidates and none is counted as merged.
+- Flutter: PRs #109, #112 and #113 (navigation, native-auth deployment documentation and negative-auth fixture cleanup). PRs #116 → #117 → #118 → #120 are open, stacked candidates and none is counted as merged.
+- Backend: PRs #418, #419, #421, #423, #426, #427 and #428. PRs #424, #434, #435, #437, #439 and #441 remain open stacked candidates and none is counted as merged. PR #440 is validation-only and must never be merged.
 - Data Centre: PRs #111, #112, #113 and #114 (architecture, seven-organ ownership, negative-issuer fixture cleanup and media lifecycle hardening). PR #115 is an unmerged identity-evidence OpenAPI candidate.
 - CDN: PRs #122, #123, #124 and #125 (navigation, native media-authorization boundary, negative-auth fixture cleanup and guarded canonical-domain handoff).
 - Algorithm: PRs #27, #28 and #29 (navigation and seven-organ ownership).
 - Federation: PRs #49, #50 and #51 (navigation, dependency reliability and native ownership boundary).
 - API Control Plane: PR #115 (seven-organ navigation and governance graph).
 
-The current bridge itself is PR #116. It remains open until the refreshed source-pin, SDK, route, documentation-residue and edge-wiring checks pass and the Backend candidate is independently reviewed and merged.
+The current bridge itself is PR #116. It remains open until the refreshed source-pin, SDK, route, documentation-residue and edge-wiring checks pass and the Backend candidate chain is independently reviewed and merged sequentially.
 
 One test-only residue cleanup PR is also open:
 - Flutter PR #113 removes retired-provider wording from two negative auth/widget fixtures.
@@ -97,7 +97,7 @@ The compatibility residue must only be removed through a tested forward migratio
 
 ## 7. Production and security gates still open
 
-- Backend PR #424 requires independent review and merge. Its CI is source-level evidence; its deployment job was skipped.
+- Backend PR chain #424 → #434 → #435 → #437 → #439 → #441 requires sequential independent review and merge. PR #440 is validation-only and must be closed, never merged. CI is source-level evidence and does not prove deployment.
 - Staff invitation, role-change and revocation need the complete two-person lifecycle.
 - Real browser WebAuthn registration/assertion, recovery, replay rejection and revoked-credential tests remain required.
 - Admin Console readiness must be verified against the deployed Backend and production-like PostgreSQL.
@@ -139,3 +139,13 @@ dart test
 ```
 
 A green bridge audit proves source/contract consistency only. It does not prove live deployment, DNS/TLS ownership, production WebAuthn, media-provider durability, Federation interoperability or disaster recovery.
+
+
+## Latest communication and client source-pin refresh — 2026-11-22
+
+- Flutter source pin: PR #120 head `714b0f9b3846c0a038db8ae7b01e2a49b626eefe`, stacked on #118 (`8988ef48c55811d6faccbfa05bebb486d4775f65`) → #117 (`15d06124dd9aa1b83a1a24fc989a6a9c35ecbb1f`) → #116. The #120 widget regression fixture now includes the complete v1 envelope fields; the exact #120 head's Cloudflare Pages and web-container builds passed (runs `44994585577` and `44994585616`). Message composition remains disabled and legacy plaintext is never rendered.
+- Backend source pin: PR #441 head `0578db9f3cff5c943915eebee890bc1f97e461c2`, stacked on #439 (`a493cd5ab9185f4eb43d82aa2c05fa0107e59620`) → #437 (`93da847b74d2e874595d113deacbbcda3c283b3a`) → #435 → #434 → #424. The current #441 Backend CI is running; the prior head's formatting failure was traced to `cmd/api/communication_capability.go` and the branch now contains the gofmt-ordered import block. Do not call the run green until the exact current head completes.
+- Backend #441 closes fail-open policy handling, routes message delete and call end through the conversation gate, and removes the legacy plaintext message body from the public message-list response. Its PostgreSQL schema workflow passed on the current head; concurrency/race coverage and independent review remain release gates.
+- Backend PR #440 is validation-only and must be closed, never merged. Do not merge the stacked communication candidates out of order.
+- Profile/wallet foundations in #437 and Flutter social/deep-link/wallet/monetization foundations in #116 passed their previously recorded exact-head CI. Monetization pages remain navigation foundations; non-wallet actions are unavailable pending verified Backend contracts and settlement/ledger tests.
+- No source pin in this document implies a production deployment, live domain cutover, provider settlement, WebAuthn production acceptance or media durability drill.
