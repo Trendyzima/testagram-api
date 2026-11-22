@@ -318,10 +318,6 @@
         "docs/product/hybrid-social-knowledge-screen-system.md",
         "lib/features/knowledge/knowledge_hub_screen.dart",
         "test/features/knowledge/knowledge_hub_screen_test.dart",
-        "lib/core/testagram_deep_link.dart",
-        "lib/features/wallet/topup_attempt_store.dart",
-        "test/core/testagram_deep_link_test.dart",
-        "test/features/wallet/topup_attempt_store_test.dart",
         "test/core/backend_api_wallet_test.dart",
         "test/profile_safety_api_test.dart"
       ]
