@@ -27,17 +27,17 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. Flutter PR #118 (stacked on #117 and #116), Backend PR #439 (stacked on #437, #435, #434 and #424), Data Centre PR #115 and Federation PR #53 are pinned to exact open review candidates. CDN pins the exact merged PR #125 commit; Algorithm pins its latest observed mainline revision. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
+The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. This revision refreshes the baseline to the exact observed mainline commits of all six runtime repositories as of 2026-11-22. The control-plane bridge branch remains a review candidate and is one commit behind current control-plane mainline; it must be reconciled before merge. This is an integration-review source baseline, not a deployment attestation. A migration present in a pinned source tree is source evidence, not proof that production has applied it.
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `8988ef48c55811d6faccbfa05bebb486d4775f65` (PR #118 direct messaging/calls candidate; stacked on PR #117 and #116; exact-head Flutter analysis, tests, Android QA builds and web builds passed; mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
-| Backend | `a493cd5ab9185f4eb43d82aa2c05fa0107e59620` (current PR #439 communication privacy/block-policy candidate; stacked on #437, #435, #434 and #424; exact-head Backend CI and PostgreSQL communication policy integration passed) |
-| Data Centre | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` (PR #115 OpenAPI candidate; mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
-| Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
-| Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` |
-| Federation | `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` (PR #53 candidate; mainline base `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d`) |
-| CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` (PR #125 merged) |
+| Flutter | `03082cc7e2419dc3bac241fd12791043915ea760` (2026-11-22 mainline; social, knowledge and wallet client surfaces with Backend-backed feed/discovery contracts) |
+| Backend | `4c44c989d006a261ac06e4dcad4e30a8904e2cc8` (2026-11-22 mainline; native identity schema preflight aligned with archived legacy tables) |
+| Data Centre | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` (2026-11-22 mainline; private identity-evidence API contract) |
+| Testagram API control plane | `14e67fffb2150021d7b94bd8941f49ac0485d034` (current mainline base; this bridge branch must incorporate any newer control-plane mainline commit before merge) |
+| Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` (2026-11-21 mainline) |
+| Federation | `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca` (2026-11-22 mainline; private Backend federation bridge contract) |
+| CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` (2026-11-22 mainline; guarded native API custom-domain handoff) |
 
 A source pin is not a deployment record. Every accepted staging and production run must separately record the actual running image digest and source revision. Mutable tags such as `main` and `latest` are not acceptable release identities.
 
