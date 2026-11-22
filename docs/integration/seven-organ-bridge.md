@@ -10,7 +10,7 @@ This repository is the build-time governance layer, not a monorepo and not a run
 
 | Organ | Repository | Locked source revision | Source status |
 |---|---|---|---|
-| Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `1f58971720c7a72139d56900a5895c49fa105639` | Current mainline; PR #114 remains an unmerged candidate |
+| Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `da1c78d69c9e83c27824dd59516f73ed77d1d8a4` | PR #114 hybrid client candidate; not merged (mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
 | Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `cc33913f0fd4e86669f7c717e12b2503990e6d88` | Temporary native-auth PR #424 candidate; not merged |
 | Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `17d050d9b74d193a1857bf53588f1ae2b47f12b5` | PR #115 identity-evidence OpenAPI candidate; not merged (mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
 | CDN | [cdn-](https://github.com/Trendyzima/cdn-) | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Current mainline; PR #125 merged |
@@ -18,7 +18,7 @@ This repository is the build-time governance layer, not a monorepo and not a run
 | Federation | [federated-content](https://github.com/Trendyzima/federated-content) | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Current mainline |
 | Contract control plane | [testagram-api](https://github.com/Trendyzima/testagram-api) | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` | Governance mainline; this bridge PR remains open |
 
-The six runtime pins are stored in `contracts/sources.lock.json`. Backend and Data Centre intentionally pin open review candidates (#424 and #115) for pre-merge contract audit; after each merges, replace its pin with the exact mainline merge SHA. Flutter, CDN, Algorithm and Federation pin current mainline heads. CDN PR #125 is merged. Flutter PR #114 remains a separate unmerged client candidate. Backend PRs #434 and #435 remain stacked behind #424 and are excluded from the source pin until independently reviewed and merged.
+The six runtime pins are stored in `contracts/sources.lock.json`. Flutter, Backend and Data Centre intentionally pin open review candidates (#114, #424 and #115) for pre-merge contract audit; after each merges, replace its pin with the exact mainline merge SHA. CDN, Algorithm and Federation pin current mainline heads. CDN PR #125 is merged. Backend PRs #434 and #435 remain stacked behind #424 and are excluded from the source pin until independently reviewed and merged.
 
 ## 2. Merged organ changes represented by this baseline
 
