@@ -443,3 +443,14 @@ Backend CI run `44965415739` and workflow syntax validation run `44965411063` we
 The API bridge source lock remains intentionally pinned to the unmerged Backend #424 candidate and CDN #125 candidate. It has not been advanced to PR #434, and no moving branch name is used as an accepted dependency. Refresh the source lock only after independent security review and actual merge of the accepted Backend dependency chain, using the final merge commit SHA.
 
 No PR was merged. No production deployment, DNS or route transfer, Worker deletion, staff permission change or staging-zone acceptance occurred. Staff invitations, role changes, revocations and permission changes remain disabled until a transactional two-person executor is implemented and independently accepted.
+
+
+## 25. Additional Worker ownership detail from read-only Cloudflare audit — 2026-11-22
+
+Cloudflare audit job `44965369931` succeeded in GET-only mode. It confirms that `testagram-heartbeat` owns the enabled production custom domain `heartbeat.testagram.site` in zone `testagram.site`, and the zone has a proxied AAAA record for that hostname. The Worker still carries `SUPABASE_HEARTBEAT_RPC_URL` and `SUPABASE_PUBLISHABLE_KEY` bindings. It has no reported Cron trigger, route or tail consumer in this inventory, but its custom-domain and DNS ownership prove it is live. Do not delete it or remove its hostname during the API gateway cleanup; it requires a separate native heartbeat replacement, health verification, exact domain transfer and separate retirement approval.
+
+The unexplained Worker `xclone-9b4dz1-9b4dz1-8936-20260809` has no listed custom domain, route, Cron trigger, binding or tail consumer; latest deployment source is `dash_template` (2026-08-15). However, the audit reports `workers_dev=unknown`, so its public workers.dev endpoint status is not proven. Keep it out of all deletion allowlists until that endpoint and account-level service references are explicitly checked.
+
+The same audit shows `testagram-web` has a `17 3 * * *` Cron trigger as well as the exact WebFinger route. The route-transfer workflow must transfer only the exact WebFinger route ID; it must not delete/redeploy `testagram-web` or remove its Cron trigger. The CDN Worker has its own active five-minute Cron and remains protected from cleanup.
+
+No DNS, Worker, Pages, zone or account mutations occurred. This narrows the API cleanup scope but does not authorize any production cleanup or route transfer.
