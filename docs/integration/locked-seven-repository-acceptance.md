@@ -32,7 +32,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `76ba92dc44ac8b4288765215a33cd572ff6f8389` (PR #116 deep-link/wallet candidate; mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
-| Backend | `5d548d4907673131c4c05a61a97ee9a34b807e9e` (PR #436 profile/wallet candidate; stacked on #424 `cc33913f0fd4e86669f7c717e12b2503990e6d88`) |
+| Backend | `abdb4ce18ecc6f32dbd707ae8210d5c2efa9f03f` (PR #436 profile/wallet candidate; stacked on #424 `cc33913f0fd4e86669f7c717e12b2503990e6d88`) |
 | Data Centre | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` (PR #116 OpenAPI candidate; mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` |
@@ -249,7 +249,7 @@ The bridge records four runtime organs at their latest merged mainline revisions
 | Organ | Repository | Locked source revision | Integration status |
 |---|---|---|---|
 | Flutter client | `Trendyzima/testagram-flutter-client-` | `1f58971720c7a72139d56900a5895c49fa105639` | Mainline; PRs #112 documentation cleanup and #113 retired-provider test-label cleanup merged |
-| Backend | `Trendyzima/Testagram-backend-` | `a793c55db8b5c258524bfef4b8872f5c6c1038e5` | Mainline; PR #436 candidate `5d548d4907673131c4c05a61a97ee9a34b807e9e` is stacked on PR #424 candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88` |
+| Backend | `Trendyzima/Testagram-backend-` | `a793c55db8b5c258524bfef4b8872f5c6c1038e5` | Mainline; PR #436 candidate `abdb4ce18ecc6f32dbd707ae8210d5c2efa9f03f` is stacked on PR #424 candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88` |
 | Data Centre | `Trendyzima/Testagram-data-centre-` | `ada6f26a289775720bb47a639242dbd868388055` | Mainline; PR #116 identity-evidence OpenAPI candidate `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` |
 | CDN | `Trendyzima/cdn-` | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Mainline; PR #125 merged at this exact commit |
 | Algorithm | `Trendyzima/the-algorithm` | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline; PRs #28 and #29 ownership documentation merged |
@@ -519,7 +519,7 @@ This section supersedes earlier candidate-pin snapshots above where they conflic
 ### Backend profile and wallet candidate
 
 - Backend PR #437 is a draft stacked on the exact Backend #435 head `1e165ae9d5ca2f4ebdf7a7b4b25b7294f43a2149`; #435 is stacked on #434, which is stacked on #424.
-- Exact PR #436 head: `5d548d4907673131c4c05a61a97ee9a34b807e9e`.
+- Exact PR #436 head: `abdb4ce18ecc6f32dbd707ae8210d5c2efa9f03f`.
 - Adds authenticated `testagram.social.profile.resolve` with viewer-scoped discoverability, accepted-follow and block checks; the resolved UUID is passed through the canonical profile read handler.
 - Binds M-Pesa top-up idempotency keys to the original phone, whole-KES amount and currency. Reuse with a different payload returns conflict.
 - Adds owner-scoped status recovery by idempotency key and includes that key in the caller's wallet transaction history for restart reconciliation.
@@ -550,3 +550,6 @@ This section supersedes earlier candidate-pin snapshots above where they conflic
 - No staging attestation or production deployment is implied by these feature branches.
 
 The earlier Flutter PRs #114 and #115 were closed as superseded; PR #116 now contains their profile/knowledge work plus the deep-link and wallet recovery changes in one mainline-targeted candidate.
+
+
+Flutter source pin: `5b49a549701a6a4f2fcf6f694db5f6384008e8ff` (consolidated PR #116; exact source lock pin).
