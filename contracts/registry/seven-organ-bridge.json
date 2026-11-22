@@ -30,7 +30,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "7731a20cbd7cfe5b055f9bfec0d5eb97498ce847",
+      "mainCommit": "92ff5e90856f48460497466a2d1ec5112b85e24c",
       "mergedPullRequests": [
         418,
         419,
@@ -46,7 +46,8 @@
         447,
         448,
         449,
-        472
+        472,
+        473
       ]
     },
     {
@@ -195,7 +196,7 @@
     "All six runtime source pins identify exact current mainline commits; production and product acceptance remain independent gates."
   ],
   "excludedFromAcceptance": [
-    "Backend PR #424 and its reviewed communication, wallet and knowledge-engine stack are merged. The source pin is refreshed to current Backend mainline 4c44c989d006a261ac06e4dcad4e30a8904e2cc8.",
+    "Backend PR #424 and its reviewed communication, wallet and knowledge-engine stack are merged. The current Backend source pin is 92ff5e90856f48460497466a2d1ec5112b85e24c; PR #473 corrects the API edge upstream to the direct Backend API origin and adds regression coverage without changing Go API route registrations.",
     "Flutter mainline is pinned to 2f31cac2e21887e15c7be8f9d4a14b698b3e05cc. This source update changes only the production domain-smoke workflow to assert the locked G3 fail-closed behavior; the Flutter application source and previously built immutable web image are unchanged.",
     "Backend production deployment run 45038404739 succeeded on the existing InstaBox machine testagramdb. Backend, PostgreSQL, Flutter web, Go CDN, Algorithm, Federation, Data Centre media/platform/worker/video/notification and edge proxy health checks passed. Private B2/R2 write-read-delete probes and directional Backend/Federation credential checks passed.",
     "The deployed release keeps public registration, staff enrollment and Federation delivery workers fail-closed until their independent acceptance gates pass. Successful deployment is not proof of native-auth migration, WebAuthn live acceptance, ActivityPub interoperability or production registration readiness.",
