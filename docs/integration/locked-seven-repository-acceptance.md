@@ -27,7 +27,7 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. Backend and CDN intentionally pin the exact open review candidates in PR #424 and PR #125 so the bridge audits the proposed native-auth and guarded-routing changes. The other four runtime pins target their latest observed mainline revisions. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
+The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. Backend intentionally pins the exact open review candidate in PR #424; CDN pins the exact merged PR #125 commit. The other four runtime pins target their latest observed mainline revisions. This is an integration-review source baseline, not a deployment attestation. Backend PR #423's social-platform schema foundation is included in the retirement candidate; its migration is source evidence, not proof that production has applied it.
 
 | Repository | Baseline commit |
 |---|---|
@@ -37,7 +37,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` |
 | Federation | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` |
-| CDN | `19f2ed0df2993ba833aee9526c2a7e6cbd4a0662` (PR #125 candidate; unmerged) |
+| CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` (PR #125 merged) |
 
 A source pin is not a deployment record. Every accepted staging and production run must separately record the actual running image digest and source revision. Mutable tags such as `main` and `latest` are not acceptable release identities.
 
@@ -332,7 +332,7 @@ The current `contracts/sources.lock.json` and `contracts/registry/seven-organ-br
 | Runtime organ | Mainline revision | Review candidate revision |
 |---|---|---|
 | Backend | `a793c55db8b5c258524bfef4b8872f5c6c1038e5` | PR #424: `cc33913f0fd4e86669f7c717e12b2503990e6d88` |
-| CDN | `490119514788c13c327ee05eb4ce068a0f73966e` | PR #125: `19f2ed0df2993ba833aee9526c2a7e6cbd4a0662` |
+| CDN | `490119514788c13c327ee05eb4ce068a0f73966e` | PR #125: `21a254e9f67dc7a8e55dca37151a6db532405e53` |
 | Flutter | `1f58971720c7a72139d56900a5895c49fa105639` | Mainline includes NodeInfo 2.1, real-account WebFinger, actor and unknown-account smoke; PR #100 is a stale draft based on older mainline |
 | Data Centre | `ada6f26a289775720bb47a639242dbd868388055` | Mainline |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Mainline |
