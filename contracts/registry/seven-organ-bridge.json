@@ -96,7 +96,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "federation",
-      "mainCommit": "cbd9f2587f8d7ce0703c4123c9a2bd76bb51ca",
+      "mainCommit": "cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca",
       "mergedPullRequests": [
         49,
         50,
