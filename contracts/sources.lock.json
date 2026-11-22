@@ -228,7 +228,7 @@
     },
     "cdn": {
       "fullName": "Trendyzima/cdn-",
-      "ref": "19f2ed0df2993ba833aee9526c2a7e6cbd4a0662",
+      "ref": "21a254e9f67dc7a8e55dca37151a6db532405e53",
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         ".github/workflows/ci.yml",
