@@ -4,11 +4,12 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "31040c345f286b5dd34a91ea8c94af3da21e704b",
+      "ref": "33844c9051b29e8b77ec4febc6c490e5dc404d2e",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
         ".github/workflows/ci.yml",
+        ".github/workflows/cloudflare-api-gateway.yml",
         ".github/workflows/cloudflare-domain-routing-audit.yml",
         ".github/workflows/identity-evidence-staging-smoke.yml",
         ".github/workflows/instabox-deploy.yml",
@@ -116,6 +117,9 @@
         "docs/profile-wallet-idempotency.md",
         "docs/six-repository-runtime-integration-contract.md",
         "docs/tv-catalogue-operations.md",
+        "infra/cloudflare-api-gateway/src/index.mjs",
+        "infra/cloudflare-api-gateway/test/index.test.mjs",
+        "infra/cloudflare-api-gateway/wrangler.toml",
         "internal/algorithmclient/client.go",
         "internal/algorithmclient/client_test.go",
         "internal/datacentreclient/client.go",
@@ -182,6 +186,8 @@
         "scripts/validate-canonical-deploy-smoke.py",
         "tests/test-native-staff-webauthn-migration.sh",
         "tests/test-social-platform-product-foundation.sh",
+        "tests/test_cloudflare_api_gateway_deployment_order.py",
+        "tests/test_instabox_edge_proxy_secret.py",
         "tests/test_instabox_federation_runtime_contract.py",
         "tests/test_instabox_image_digest_verification.py",
         "tests/test_instabox_runtime_healthcheck_paths.py",
