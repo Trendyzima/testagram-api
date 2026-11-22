@@ -10,15 +10,15 @@ This repository is the build-time governance layer, not a monorepo and not a run
 
 | Organ | Repository | Locked source revision | Source status |
 |---|---|---|---|
-| Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `761c41b247a49aac7e9b352493465e3c321a2ffb` | Current mainline |
-| Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `e6fdb962c2a10159df352312e01ea05842ffde13` | Temporary native-auth PR #424 candidate; not merged |
-| Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `58de0bf36b76f9cd74824901b6a86de29f420c65` | Current mainline |
-| CDN | [cdn-](https://github.com/Trendyzima/cdn-) | `490119514788c13c327ee05eb4ce068a0f73966e` | Current mainline |
+| Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `1f58971720c7a72139d56900a5895c49fa105639` | Current mainline; PR #114 remains an unmerged candidate |
+| Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `cc33913f0fd4e86669f7c717e12b2503990e6d88` | Temporary native-auth PR #424 candidate; not merged |
+| Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `ada6f26a289775720bb47a639242dbd868388055` | Current mainline |
+| CDN | [cdn-](https://github.com/Trendyzima/cdn-) | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Current mainline; PR #125 merged |
 | Algorithm | [the-algorithm](https://github.com/Trendyzima/the-algorithm) | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Current mainline |
 | Federation | [federated-content](https://github.com/Trendyzima/federated-content) | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Current mainline |
 | Contract control plane | [testagram-api](https://github.com/Trendyzima/testagram-api) | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` | Governance mainline; this bridge PR remains open |
 
-The six runtime pins are stored in `contracts/sources.lock.json`. The Backend pin is intentionally a temporary reviewed candidate so the bridge audits the native-only code before it is merged. It must be replaced with the exact Backend mainline merge SHA after PR #424 merges. The five other runtime revisions were compared with their previous pins; intervening changes were documentation-only.
+The six runtime pins are stored in `contracts/sources.lock.json` and match the observed mainline heads, except Backend, which intentionally pins PR #424's exact native-auth candidate for pre-merge audit. After #424 merges, replace that pin with the exact Backend mainline merge SHA. The Flutter, Data Centre and CDN pins have been refreshed to their current mainline heads; CDN PR #125 is merged. Flutter PR #114 remains a candidate and is not part of the locked source pin. Backend PRs #434 and #435 remain stacked candidates behind #424 and are excluded from the accepted source pin until independently reviewed and merged.
 
 ## 2. Merged organ changes represented by this baseline
 
@@ -43,7 +43,7 @@ These changes do not alter runtime behavior. Their CI and review must pass befor
 flowchart LR
   F[Flutter] -->|native user session / public API| B[Backend]
   F -->|approved media URLs / bytes| C[CDN]
-  B -->|private platform and media APIs| D[Data Centre]
+  B -->|private media and identity-evidence APIs| D[Data Centre]
   B -->|viewer assertions / origin auth| C
   B -->|authorized candidate IDs| A[Algorithm]
   B -->|directional private auth / durable outbox| X[Federation]
@@ -69,7 +69,7 @@ The bridge cross-repository audit now verifies the implementation on both sides 
 
 1. **Flutter → Backend:** native login/refresh client, secure refresh storage, in-memory access token and authenticated Backend request path.
 2. **Flutter → CDN:** approved media URL handling and object/viewer-bound private-media authorization.
-3. **Backend → Data Centre:** five versioned private media routes, dedicated bearer credential, request ID, bounded client timeout, redirect rejection, private Compose network and separate media database.
+3. **Backend → Data Centre:** the typed candidate client uses the versioned private media and identity-evidence routes, dedicated distinct bearer credentials, bounded timeouts, redirect rejection and the private service network. Data Centre's separate platform configuration/event/audit API is implemented, but a typed Backend consumer for that platform API is not verified and is not claimed as an active edge.
 4. **Data Centre → Backend identity:** video and notification user-aware routes require the shared native JWT secret and resolve canonical users through PostgreSQL session/account checks.
 5. **Backend → CDN:** Backend-issued short-lived viewer assertion, separate origin credential, private no-store behavior, and fail-closed origin relay.
 6. **Backend → Algorithm:** dedicated service bearer, API version, request ID, bounded timeout, 200-candidate/50-result limits and matching OpenAPI enum.
