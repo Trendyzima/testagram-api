@@ -467,3 +467,20 @@ The exact WebAuthn RP ID and credential identifier are now persisted on each new
 **Acceptance remains pending:** PR #434 is still draft and has no independent review submission. It is not merged. PR #424 also remains open and requires its own independent review. The old #431/#432 branches must not be merged separately. The bridge source lock remains pinned to the unmerged #424 candidate, not #434; it must only move to the actual accepted merge commit after the dependency chain is independently reviewed and merged.
 
 The latest Cloudflare inventory still shows no separate Testagram staging zone among the visible zones. `api.testagram.site` remains on `testagram-api` with legacy Supabase bindings; `testagram.site/.well-known/webfinger*` remains on `testagram-web`; `heartbeat.testagram.site` remains on `testagram-heartbeat`; the unexpected Worker remains provenance-unverified; and `testagram-cdn` retains its protected five-minute Cron. The audit was read-only. No production routing, DNS, Worker, Pages, staff permission or deployment mutation occurred.
+
+
+## 26. Backend PR #434 full CI acceptance snapshot — 2026-11-22
+
+Backend PR #434's stable candidate head is `4c7a5a74b5e9209f63dff4e0d6b4ee6439f3b10c`, directly based on PR #424 candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88`. Git comparison confirms 22 commits ahead, 0 behind, with the #424 candidate as the merge base.
+
+Fresh Backend CI run `44965539075` completed successfully across all 15 jobs on that exact head. This includes:
+- Admin permissions and dual-control PostgreSQL integration, including concurrent approval-versus-credential-revocation serialization.
+- Identity registration PostgreSQL migration/invariant integration, now applying migration 061 twice and seeding exact RP/credential-bound approver fixtures.
+- Exact WebAuthn registration/assertion browser integration.
+- Native staff WebAuthn credential, replay and counter tests.
+- Go race detector, vet, build and vulnerability scan.
+- Self-hosted Compose validation and all other PostgreSQL/MinIO integration jobs.
+
+Cloudflare read-only audit `44965539105` and workflow syntax validation `44965534370` also succeeded. No production Cloudflare changes occurred.
+
+PR #434 remains draft and has zero independent review submissions. Green CI is candidate evidence only; it is not a merge approval or production migration attestation. The source lock remains intentionally pinned to unmerged #424 candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88`, not #434. Refresh it only after independent review and actual merge of the accepted dependency chain, using the final merge commit SHA. Staff invitations, role changes, revocations and permission changes remain disabled.
