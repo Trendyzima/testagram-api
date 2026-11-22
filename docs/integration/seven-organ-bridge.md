@@ -2,7 +2,7 @@
 
 **Bridge branch:** `integration/seven-organ-bridge-20261120`  
 **Control plane:** `Trendyzima/testagram-api`  
-**Status:** source pins and static wiring audited; Backend retirement candidate and live runtime acceptance remain pending.
+**Status:** current Backend and Flutter stacked candidates are pinned; source CI and live runtime acceptance remain pending.
 
 This repository is the build-time governance layer, not a monorepo and not a runtime gateway. The six runtime organs remain independently owned repositories. The API Control Plane coordinates their contracts, immutable source pins, generated SDKs, route inventory and compatibility checks.
 
@@ -10,30 +10,29 @@ This repository is the build-time governance layer, not a monorepo and not a run
 
 | Organ | Repository | Locked source revision | Source status |
 |---|---|---|---|
-| Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `b818e6c2c2ec2dd909eb001afb9c055ab562b9bd` | PR #120 plaintext-rendering hardening stacked on #118 → #117 → #116; open, draft, unmerged |
-| Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `2c76af240289931dab390360d107d1df2adddb2e` | PR #441 fail-closed communication follow-up stacked on #439 → #437 → #435 → #434 → #424; open, draft, unmerged |
-| Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` | PR #115 identity-evidence OpenAPI candidate; not merged (mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
+| Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `2d29bb883645bc6ffd6ef5ff3409cd1bd59d6c54` | Open PR #116 candidate; includes deep links, social/knowledge, profile/wallet/monetization and the #117/#118/#120/#123 stacked feature work; not in main |
+| Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `31040c345f286b5dd34a91ea8c94af3da21e704b` | Open PR #424 candidate; includes native auth plus #434/#435/#437/#439/#441 feature stack via #450; mainline conflicts resolved; exact-head CI pending |
+| Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` | Current mainline; PR #115 merged |
 | CDN | [cdn-](https://github.com/Trendyzima/cdn-) | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Current mainline; PR #125 merged |
 | Algorithm | [the-algorithm](https://github.com/Trendyzima/the-algorithm) | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Current mainline |
-| Federation | [federated-content](https://github.com/Trendyzima/federated-content) | `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` | PR #53 private ActivityPub/ATProto contract candidate; not merged (mainline base `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d`) |
-| Contract control plane | [testagram-api](https://github.com/Trendyzima/testagram-api) | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` | Governance mainline; this bridge PR remains open |
+| Federation | [federated-content](https://github.com/Trendyzima/federated-content) | `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca` | Current mainline; PR #53 merged |
+| Contract control plane | [testagram-api](https://github.com/Trendyzima/testagram-api) | `14e67fffb2150021d7b94bd8941f49ac0485d034` | Governance mainline; bridge PR #116 is reopened and remains draft |
 
-The six runtime pins are stored in `contracts/sources.lock.json`. Flutter, Backend, Data Centre and Federation intentionally pin open review candidates (#120, #441, #115 and #53) for pre-merge contract audit; Flutter #120 includes stacked #118/#117/#116 and Backend #441 includes #439/#437/#435/#434/#424. After each chain is independently reviewed and merged in order, replace its pin with the exact mainline merge SHA. CDN and Algorithm pin current mainline heads. CDN PR #125 is merged. Backend PRs #434 and #435 remain stacked behind #424 and are excluded from the source pin until independently reviewed and merged.
+The six runtime pins are stored in `contracts/sources.lock.json`. Backend and Flutter intentionally pin the exact heads of the active open candidate PRs #424 and #116. The Backend candidate now includes the #434/#435/#437/#439/#441 feature stack through stacked PR #450; Flutter #116 includes the #117/#118/#120/#123 feature stack. Data Centre #115 and Federation #53 are now merged and pin their current mainline commits. CDN and Algorithm also pin current mainline heads. After each active candidate is independently reviewed and merged to main, replace its pin with the exact mainline merge SHA. CDN PR #125 is merged. Backend PRs #434 and #435 remain stacked behind #424 and are excluded from the source pin until independently reviewed and merged.
 
 ## 2. Merged organ changes represented by this baseline
 
-- Flutter: PRs #109, #112 and #113 (navigation, native-auth deployment documentation and negative-auth fixture cleanup). PRs #116 → #117 → #118 → #120 are open, stacked candidates and none is counted as merged.
-- Backend: PRs #418, #419, #421, #423, #426, #427 and #428. PRs #424, #434, #435, #437, #439 and #441 remain open stacked candidates and none is counted as merged. PR #440 is validation-only and must never be merged.
-- Data Centre: PRs #111, #112, #113 and #114 (architecture, seven-organ ownership, negative-issuer fixture cleanup and media lifecycle hardening). PR #115 is an unmerged identity-evidence OpenAPI candidate.
-- CDN: PRs #122, #123, #124 and #125 (navigation, native media-authorization boundary, negative-auth fixture cleanup and guarded canonical-domain handoff).
-- Algorithm: PRs #27, #28 and #29 (navigation and seven-organ ownership).
-- Federation: PRs #49, #50 and #51 (navigation, dependency reliability and native ownership boundary).
-- API Control Plane: PR #115 (seven-organ navigation and governance graph).
+- Flutter mainline: PRs #109, #112, #113, #121 and #122. PR #116 remains the open feature candidate; #117/#118/#120/#123 are merged into its stacked feature branches, not into main.
+- Backend mainline: PRs #418, #419, #421, #423, #426, #427, #428, #433, #443, #445, #447, #448 and #449. PR #424 remains the open native-auth/communication candidate; #434/#435/#437/#439/#441 were merged into stacked branches and #450 brought that stack into #424. PR #440 is validation-only, closed without merge.
+- Data Centre: PRs #111–#115 are merged into main (architecture, seven-organ ownership, fixture cleanup, media lifecycle and identity-evidence OpenAPI).
+- CDN: PRs #122–#125 are merged into main (navigation, media authorization, fixture cleanup and guarded canonical-domain handoff).
+- Algorithm: PRs #27–#29 are merged into main (navigation and seven-organ ownership).
+- Federation: PRs #49–#53 are merged into main (navigation, dependency reliability, native ownership boundary and private protocol contracts).
+- API Control Plane: PRs #115 and #117 are merged into main; bridge PR #116 is the active draft candidate.
 
-The current bridge itself is PR #116. It remains open until the refreshed source-pin, SDK, route, documentation-residue and edge-wiring checks pass and the Backend candidate chain is independently reviewed and merged sequentially.
+The current bridge itself is API Control Plane PR #116. It has been reopened as a draft; its source pins and status documents are being refreshed to the current Backend #424 and Flutter #116 candidate heads before a fresh full contract run.
 
-One test-only residue cleanup PR is also open:
-- Flutter PR #113 removes retired-provider wording from two negative auth/widget fixtures.
+Flutter PR #113's negative-auth fixture cleanup is already merged into main.
 
 These changes do not alter runtime behavior. Their CI and review must pass before merge.
 
@@ -143,9 +142,9 @@ A green bridge audit proves source/contract consistency only. It does not prove 
 
 ## Latest communication and client source-pin refresh — 2026-11-22
 
-- Flutter source pin: PR #120 head `b818e6c2c2ec2dd909eb001afb9c055ab562b9bd`, stacked on #118 (`8988ef48c55811d6faccbfa05bebb486d4775f65`) → #117 (`15d06124dd9aa1b83a1a24fc989a6a9c35ecbb1f`) → #116. The #120 widget regression fixture now includes the complete v1 envelope fields; the exact #120 head's Cloudflare Pages and web-container builds passed (runs `44994585577` and `44994585616`). Message composition remains disabled and legacy plaintext is never rendered.
-- Backend source pin: PR #441 head `2c76af240289931dab390360d107d1df2adddb2e`, stacked on #439 (`a493cd5ab9185f4eb43d82aa2c05fa0107e59620`) → #437 (`93da847b74d2e874595d113deacbbcda3c283b3a`) → #435 → #434 → #424. The current #441 Backend CI is running; the prior head's formatting failure was traced to `cmd/api/communication_capability.go` and the branch now contains the gofmt-ordered import block. Do not call the run green until the exact current head completes.
-- Backend #441 closes fail-open policy handling, routes message delete and call end through the conversation gate, makes call creation/join/end transactional, and removes the legacy plaintext message body from the public message-list response. Its PostgreSQL schema workflow passed on the current head; concurrency/race coverage and independent review remain release gates.
-- Backend PR #440 is validation-only and must be closed, never merged. Do not merge the stacked communication candidates out of order.
-- Profile/wallet foundations in #437 and Flutter social/deep-link/wallet/monetization foundations in #116 passed their previously recorded exact-head CI. Monetization pages remain navigation foundations; non-wallet actions are unavailable pending verified Backend contracts and settlement/ledger tests.
+- Flutter candidate pin: PR #116 head `2d29bb883645bc6ffd6ef5ff3409cd1bd59d6c54`, now includes #117/#118/#120 and the #123 messaging/calls integration. PR #123's exact-head web-container and Pages validations passed (runs `45003999923` and `45003999926`). The combined #116 CI is running on the new head; message composition remains encrypted-envelope-only and plaintext rendering remains blocked.
+- Backend candidate pin: PR #424 head `31040c345f286b5dd34a91ea8c94af3da21e704b`. The four original mainline conflicts were reconciled in merge commit `254d49744139d762fc679a062375c826d2f91f97`; PR #450 then merged the #434/#435/#437/#439/#441 communication, wallet and knowledge-engine stack into the #424 branch. The combined #424 CI is running on this exact head.
+- The Backend edge-proxy deployment repair PR #449 is merged into main. The production deployment now fails closed at the new preflight because the production GitHub secret `TESTAGRAM_EDGE_PROXY_SHARED_TOKEN` is empty; the machine-selection and deployment steps were skipped. Configure the same 64-hex value used by the Cloudflare API Worker before attempting a production deployment.
+- Data Centre PR #115 and Federation PR #53 are merged into main; the bridge pins `99edc3e096675f5c39ab6a9bd0050dcee30283a0` and `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca` respectively.
+- PR #440 is validation-only and closed without merge. PR #450 is merged into the #424 feature branch, not into main. The #424 and #116 candidate chains remain unmerged into their respective main branches.
 - No source pin in this document implies a production deployment, live domain cutover, provider settlement, WebAuthn production acceptance or media durability drill.
