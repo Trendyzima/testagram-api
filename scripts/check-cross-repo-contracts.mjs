@@ -146,13 +146,13 @@ for (const [label, source, marker] of [
  const backendCompose = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/docker-compose.yml"), "utf8");
  const backendDeploy = readFileSync(resolve(lock.repositories.backend.checkoutPath, "scripts/start-instabox-deployment.sh"), "utf8");
  const identityReplication = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/identity_media_replication.go"), "utf8");
- const backendEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
+ const backendDataCentreEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
  const dataCentreCompose = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/docker-compose.yml"), "utf8");
  for (const variable of ["FRESH_MEDIA_ENABLED", "DATA_CENTRE_MEDIA_API_URL", "FRESH_DATA_CENTRE_INTERNAL_TOKEN"]) {
    if (!backendCompose.includes(variable)) fail.push(`Backend Compose missing Data Centre media variable: ${variable}`);
-   if (!backendEnvExample.includes(variable)) fail.push(`Backend env example missing Data Centre media variable: ${variable}`);
+   if (!backendDataCentreEnvExample.includes(variable)) fail.push(`Backend env example missing Data Centre media variable: ${variable}`);
  }
- if (!backendEnvExample.includes("DATA_CENTRE_MEDIA_API_URL=http://media:8096")) fail.push("Backend env example must use the private media service DNS endpoint");
+ if (!backendDataCentreEnvExample.includes("DATA_CENTRE_MEDIA_API_URL=http://media:8096")) fail.push("Backend env example must use the private media service DNS endpoint");
  if (!dataCentreCompose.includes("MEDIA_INTERNAL_TOKEN: ${FRESH_DATA_CENTRE_INTERNAL_TOKEN:-}")) fail.push("Data Centre media service token must use FRESH_DATA_CENTRE_INTERNAL_TOKEN");
 if (!dataCentreCompose.includes("IDENTITY_EVIDENCE_INTERNAL_TOKEN: ${IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN:-}")) fail.push("Data Centre media service must receive the identity-evidence token under its dedicated environment key");
 if (!backendDeploy.includes("ensure_random_secret IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN") || !backendDeploy.includes('write_dc_env_value IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must provision a dedicated identity-evidence token to the Data Centre");
