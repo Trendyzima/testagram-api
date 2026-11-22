@@ -454,3 +454,16 @@ The unexplained Worker `xclone-9b4dz1-9b4dz1-8936-20260809` has no listed custom
 The same audit shows `testagram-web` has a `17 3 * * *` Cron trigger as well as the exact WebFinger route. The route-transfer workflow must transfer only the exact WebFinger route ID; it must not delete/redeploy `testagram-web` or remove its Cron trigger. The CDN Worker has its own active five-minute Cron and remains protected from cleanup.
 
 No DNS, Worker, Pages, zone or account mutations occurred. This narrows the API cleanup scope but does not authorize any production cleanup or route transfer.
+
+
+## 25. Backend PR #434 final candidate CI completed — 2026-11-22
+
+Backend PR #434's current head is `4c7a5a74b5e9209f63dff4e0d6b4ee6439f3b10c`, directly descended from PR #424 candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88`. Git comparison reports 22 commits ahead, 0 behind, with #424 as the exact merge base. Its changed files are limited to the approval-integrity migration, Admin Console decision path and regression coverage, PostgreSQL provisioning fixtures, self-hosted migration preflight/Compose wiring, migration harness and CI workflow.
+
+Fresh Backend CI run `44965539075` completed successfully across all 15 jobs on the exact #434 head. Workflow syntax validation run `44965534370` also passed. The read-only Cloudflare domain-routing audit `44965539105` passed. The CI includes PostgreSQL dual-control and identity-registration integration, exact WebAuthn credential binding, mismatched payload-digest rejection, migration idempotence, Compose validation, browser WebAuthn, race detector, Vet, Build and runtime-boundary checks.
+
+The exact WebAuthn RP ID and credential identifier are now persisted on each new approval record. The database trigger checks the same credential at insert and final quorum transition and locks it against concurrent revocation. The application binds the approval to the authenticated elevation subject and verifies the immutable canonical payload digest before recording. Historical unbound approval rows are not accepted into a new quorum; affected pending requests must expire and be re-requested.
+
+**Acceptance remains pending:** PR #434 is still draft and has no independent review submission. It is not merged. PR #424 also remains open and requires its own independent review. The old #431/#432 branches must not be merged separately. The bridge source lock remains pinned to the unmerged #424 candidate, not #434; it must only move to the actual accepted merge commit after the dependency chain is independently reviewed and merged.
+
+The latest Cloudflare inventory still shows no separate Testagram staging zone among the visible zones. `api.testagram.site` remains on `testagram-api` with legacy Supabase bindings; `testagram.site/.well-known/webfinger*` remains on `testagram-web`; `heartbeat.testagram.site` remains on `testagram-heartbeat`; the unexpected Worker remains provenance-unverified; and `testagram-cdn` retains its protected five-minute Cron. The audit was read-only. No production routing, DNS, Worker, Pages, staff permission or deployment mutation occurred.
