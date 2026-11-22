@@ -31,6 +31,12 @@ for (const path of sdkPaths) {
   const content = readFileSync(path, "utf8");
   assert.doesNotMatch(content, retiredIdentityProviderPattern, `${path}: external identity-provider reference is forbidden in the public SDK and API contract`);
 }
+const productPolicy = readFileSync("docs/product/forensic-capability-gap-register-and-qa-contract.md", "utf8");
+assert.doesNotMatch(
+  productPolicy,
+  retiredIdentityProviderPattern,
+  "product policy must describe prohibited dependencies generically rather than retaining retired-provider branding",
+);
 const sdk = readFileSync(sdkPaths[0], "utf8");
 assert.match(sdk, /Testagram-native Backend access token/);
 assert.match(sdk, /Authorization/);
