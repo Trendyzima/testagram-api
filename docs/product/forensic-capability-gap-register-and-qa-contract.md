@@ -299,3 +299,10 @@ A Q&A feature is complete only when Backend source, PostgreSQL migration and int
 A successful build does not prove live deployment. A merged API contract does not prove a Backend route exists. A visible Flutter screen does not prove the write path is authorized. A Bluesky cursor does not prove AT Protocol federation. A social reply is not an accepted answer.
 
 No production deployment, feature-flag enablement, database migration, DNS change, staff permission change or federation write enablement is authorized by this planning document.
+
+
+## 12. Execution trace — 2026-11-22
+
+The first Backend persistence slice has been opened as [Backend PR #435](https://github.com/Trendyzima/Testagram-backend-/pull/435), stacked on Backend #434 and native-auth #424. It adds the initial Q&A tables, accepted-answer integrity guards, immutable answer revision records, idempotency ledgers, Compose migration mount and a backup-gated operator migration script.
+
+The dedicated PostgreSQL 17 schema workflow #3 passed, including migration replay and the tested database invariants. PR #435 remains draft: HTTP handlers, public OpenAPI routes, generated SDKs, Flutter wiring, feed/search integration and end-to-end authorization tests are not yet complete. The parent Backend CI is still in progress. This execution trace is evidence of a tested schema candidate only; it is not a production migration or feature-availability claim.
