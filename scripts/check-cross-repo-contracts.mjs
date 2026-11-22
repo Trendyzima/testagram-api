@@ -365,6 +365,51 @@ for (const [label, source, marker] of [
   if (!source.includes(marker)) fail.push(`${label} missing public Federation routing marker: ${marker}`);
 }
 
+// The public API ingress is a distinct Cloudflare Worker route, not the media CDN.
+// Keep the edge token, trusted forwarding headers, Caddy gate, and route activation
+// order identical across the Backend deployment artifacts.
+const backendApiEdgeWorker = readFileSync(resolve(lock.repositories.backend.checkoutPath, "infra/cloudflare-api-gateway/src/index.mjs"), "utf8");
+const backendApiEdgeTests = readFileSync(resolve(lock.repositories.backend.checkoutPath, "infra/cloudflare-api-gateway/test/index.test.mjs"), "utf8");
+const backendApiEdgeWorkflow = readFileSync(resolve(lock.repositories.backend.checkoutPath, ".github/workflows/cloudflare-api-gateway.yml"), "utf8");
+const backendApiEdgeWrangler = readFileSync(resolve(lock.repositories.backend.checkoutPath, "infra/cloudflare-api-gateway/wrangler.toml"), "utf8");
+const backendApiEdgeDeployTest = readFileSync(resolve(lock.repositories.backend.checkoutPath, "tests/test_cloudflare_api_gateway_deployment_order.py"), "utf8");
+const backendEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
+const backendDeployScript = readFileSync(resolve(lock.repositories.backend.checkoutPath, "scripts/start-instabox-deployment.sh"), "utf8");
+for (const [label, source, marker] of [
+  ["Backend API edge Worker", backendApiEdgeWorker, 'const EXPECTED_ORIGIN_HOST = "8443-agq4me2xgrgx5ge52ts437tqea.instabox.tech"'],
+  ["Backend API edge Worker", backendApiEdgeWorker, 'headers.set("x-forwarded-host", API_HOST)'],
+  ["Backend API edge Worker", backendApiEdgeWorker, 'headers.set("x-testagram-edge-token", edgeToken)'],
+  ["Backend API edge Worker", backendApiEdgeWorker, 'headers.delete(name)'],
+  ["Backend API edge tests", backendApiEdgeTests, "without trusting client forwarding headers"],
+  ["Backend API edge tests", backendApiEdgeTests, "fails closed when the shared edge token is absent or malformed"],
+  ["Backend API edge workflow", backendApiEdgeWorkflow, "confirm_production_deploy"],
+  ["Backend API edge workflow", backendApiEdgeWorkflow, "wrangler@4 secret put EDGE_PROXY_SHARED_TOKEN"],
+  ["Backend API edge workflow", backendApiEdgeWorkflow, "API edge secret installed before route attachment"],
+  ["Backend API edge workflow", backendApiEdgeWorkflow, "Canonical API route was not verified after attachment"],
+  ["Backend API edge workflow", backendApiEdgeWorkflow, "exactly one active testagram.site zone in the pinned Cloudflare account"],
+  ["Backend API edge workflow", backendApiEdgeWorkflow, "partial or overlapping cutover"],
+  ["Backend API edge config", backendApiEdgeWrangler, "workers_dev = false"],
+  ["Backend API edge config", backendApiEdgeWrangler, 'APP_ORIGIN = "https://8443-agq4me2xgrgx5ge52ts437tqea.instabox.tech"'],
+  ["Backend Caddy API edge", backendCaddyfile, "@api_edge header X-Forwarded-Host api.testagram.site"],
+  ["Backend Caddy API edge", backendCaddyfile, "header X-Testagram-Edge-Token {$EDGE_PROXY_SHARED_TOKEN}"],
+  ["Backend Caddy API edge", backendCaddyfile, "header_up -X-Testagram-Edge-Token"],
+  ["Backend Caddy API edge", backendCaddyfile, "reverse_proxy api:8080"],
+  ["Backend Compose API edge", backendCompose, "EDGE_PROXY_SHARED_TOKEN: ${EDGE_PROXY_SHARED_TOKEN:?Set EDGE_PROXY_SHARED_TOKEN in .env}"],
+  ["Backend edge env template", backendEnvExample, "EDGE_PROXY_SHARED_TOKEN=REPLACE_WITH_A_SEPARATE_RANDOM_32_BYTE_EDGE_TOKEN"],
+  ["Backend deployment token persistence", backendDeployScript, 'write_env_value EDGE_PROXY_SHARED_TOKEN "$TESTAGRAM_EDGE_PROXY_SHARED_TOKEN"'],
+  ["Backend deployment token forwarding", backendDeployScript, "EDGE_PROXY_SHARED_TOKEN:$edge_proxy_token"],
+]) {
+  if (!source.includes(marker)) fail.push(`${label} missing shared API edge contract marker: ${marker}`);
+}
+const edgeSecretInstallIndex = backendApiEdgeWorkflow.indexOf("wrangler@4 secret put EDGE_PROXY_SHARED_TOKEN");
+const edgeRouteAttachIndex = backendApiEdgeWorkflow.indexOf("-X POST");
+if (edgeSecretInstallIndex < 0 || edgeRouteAttachIndex < 0 || edgeSecretInstallIndex >= edgeRouteAttachIndex) {
+  fail.push("Backend API edge must install EDGE_PROXY_SHARED_TOKEN before creating the public api.testagram.site route");
+}
+if (backendApiEdgeWrangler.includes("routes =")) {
+  fail.push("Backend API edge Wrangler config must not attach a public route before the shared secret is installed");
+}
+
 const cdnServer = readFileSync(resolve(lock.repositories.cdn.checkoutPath, "internal/edge/server.go"), "utf8");
 const cdnTests = readFileSync(resolve(lock.repositories.cdn.checkoutPath, "internal/edge/server_test.go"), "utf8");
 for (const [label, source, marker] of [
