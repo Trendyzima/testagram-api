@@ -10,9 +10,9 @@ This repository is the build-time governance layer, not a monorepo and not a run
 
 | Organ | Repository | Locked source revision | Source status |
 |---|---|---|---|
-| Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `da1c78d69c9e83c27824dd59516f73ed77d1d8a4` | PR #114 hybrid client candidate; not merged (mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
+| Flutter client | [testagram-flutter-client-](https://github.com/Trendyzima/testagram-flutter-client-) | `f2819268f03aa76c259e94839dd8afddc3542b69` | PR #114 hybrid client candidate; not merged (mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
 | Backend | [Testagram-backend-](https://github.com/Trendyzima/Testagram-backend-) | `cc33913f0fd4e86669f7c717e12b2503990e6d88` | Temporary native-auth PR #424 candidate; not merged |
-| Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `d37c6d9d233093698371f2ffdfbb68bf462a6a39` | PR #115 identity-evidence OpenAPI candidate; not merged (mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
+| Data Centre | [Testagram-data-centre-](https://github.com/Trendyzima/Testagram-data-centre-) | `a4b11707d37d7b6f023be0c4d32b51f823e0a4d5` | PR #115 identity-evidence OpenAPI candidate; not merged (mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
 | CDN | [cdn-](https://github.com/Trendyzima/cdn-) | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Current mainline; PR #125 merged |
 | Algorithm | [the-algorithm](https://github.com/Trendyzima/the-algorithm) | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Current mainline |
 | Federation | [federated-content](https://github.com/Trendyzima/federated-content) | `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` | PR #53 private ActivityPub/ATProto contract candidate; not merged (mainline base `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d`) |
