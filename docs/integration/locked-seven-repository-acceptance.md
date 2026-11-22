@@ -639,7 +639,7 @@ This block is the current source-lock authority and supersedes older candidate/m
 | Federation | `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca` | Current mainline; PR #53 merged. |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Current mainline. |
 
-The API Control Plane governance mainline is `14e67fffb2150021d7b94bd8941f49ac0485d034`; bridge PR #116 passed full contract CI on exact head `3bf64616892f5fd9f013f3f31504f472bb71ec9c` (run `45005227967`), including source checkout, route inventory, cross-organ contract, locked acceptance and native-auth residue checks. It is ready for independent review, not merged.
+The API Control Plane governance mainline is `14e67fffb2150021d7b94bd8941f49ac0485d034`; bridge PR #116 passed full contract CI on exact head `c040cbff47c2adb8f75aff5d73485c3591182d41` (run `45006661103`), including source checkout, route inventory, cross-organ contract, locked acceptance, native-auth residue and API edge ingress checks. It is ready for independent review, not merged.
 
 PR #424 and PR #116 remain open candidate branches, not merged mainline. PR #450 and PR #123 are merged into those respective feature branches only. Data Centre #115 and Federation #53 are actual mainline merges. None of these source pins proves live deployment, production WebAuthn, media durability, Federation interoperability or coordinated disaster recovery.
 
