@@ -41,10 +41,10 @@ Backend PostgreSQL is the sole authority for Testagram user identity, sessions, 
 
 ## Verified source and CI position
 
-- The API bridge source lock is being refreshed to the current exact candidate heads: Backend PR #424 (`31040c345f286b5dd34a91ea8c94af3da21e704b`) and Flutter PR #116 (`2d29bb883645bc6ffd6ef5ff3409cd1bd59d6c54`); Data Centre, CDN, Algorithm and Federation pin their current mainline commits.
+- The API bridge source lock is refreshed to the current exact candidate heads: Backend PR #424 (`31040c345f286b5dd34a91ea8c94af3da21e704b`) and Flutter PR #116 (`2d29bb883645bc6ffd6ef5ff3409cd1bd59d6c54`); Data Centre, CDN, Algorithm and Federation pin their current mainline commits.
 - Data Centre PR #115 and Federation PR #53 are now merged into main. Flutter PR #123 is merged into the PR #116 feature branch; Backend PR #450 is merged into the PR #424 feature branch. These are candidate-branch integrations, not mainline merges.
-- The combined Backend #424 exact-head CI is running. The combined Flutter #116 exact-head CI is running. The API bridge CI must be rerun after the refreshed source lock and status documents are committed.
-- The prior API bridge audit failure was traced to a retired-provider mention in the newly added product gap document; the follow-up branch commit removed that mention. The current branch's fresh audit is still pending.
+- The combined Backend #424 exact-head CI passed on `31040c345f286b5dd34a91ea8c94af3da21e704b`. The combined Flutter #116 exact-head CI passed on `2d29bb883645bc6ffd6ef5ff3409cd1bd59d6c54`. The API bridge CI passed on `3bf64616892f5fd9f013f3f31504f472bb71ec9c` (run `45005227967`).
+- The API bridge's native-auth audit passed across 442 runtime, deployment, configuration and documentation files. The product gap document now uses provider-neutral prohibition wording. The exhaustive compatibility check recognizes only the three exact dated, immutable historical migration paths; no unclassified provider traces remain.
 - Backend PR #449 fixed the missing edge-token propagation in the deployment code and is merged into main. The latest production deploy fails safely before machine selection because `TESTAGRAM_EDGE_PROXY_SHARED_TOKEN` is not configured in the production GitHub environment; no machine start, deployment or DNS change occurred.
 
 ## Production blockers
