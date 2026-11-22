@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "4c44c989d006a261ac06e4dcad4e30a8904e2cc8",
+      "ref": "7731a20cbd7cfe5b055f9bfec0d5eb97498ce847",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
