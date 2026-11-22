@@ -632,14 +632,14 @@ This block is the current source-lock authority and supersedes older candidate/m
 
 | Runtime organ | Exact immutable source pin | Current provenance |
 |---|---|---|
-| Backend | `33844c9051b29e8b77ec4febc6c490e5dc404d2e` | Open PR #424 candidate; mainline conflict reconciliation and the communication/privacy, wallet and knowledge-engine stack are included through stacked PR #450. Exact-head CI is being revalidated, including the Cloudflare API edge secret-before-route deployment guard. |
+| Backend | `33844c9051b29e8b77ec4febc6c490e5dc404d2e` | Open PR #424 candidate; mainline conflict reconciliation and the communication/privacy, wallet and knowledge-engine stack are included through stacked PR #450. Exact-head CI passed, including the Cloudflare API edge secret-before-route deployment guard. |
 | Flutter Client | `e8fa65f321ad700c9e5f04fef86cd5604da500b0` | Open PR #116 candidate; deep-link, social/knowledge, profile/wallet/monetization and messaging/calls stack included, synced with latest mainline auth/keepalive fixes. Exact-head CI is being revalidated. |
 | Data Centre | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` | Current mainline; PR #115 merged. |
 | CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Current mainline; PR #125 merged. |
 | Federation | `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca` | Current mainline; PR #53 merged. |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` | Current mainline. |
 
-The API Control Plane governance mainline is `14e67fffb2150021d7b94bd8941f49ac0485d034`; bridge PR #116 passed full contract CI on exact head `c040cbff47c2adb8f75aff5d73485c3591182d41` (run `45006661103`), including source checkout, route inventory, cross-organ contract, locked acceptance, native-auth residue and API edge ingress checks. It is ready for independent review, not merged.
+The API Control Plane governance mainline is `14e67fffb2150021d7b94bd8941f49ac0485d034`; bridge PR #116 passed full contract CI on exact head `2f912b111fced100254744cd11085b552f17da22` (run `45006780261`), including source checkout, route inventory, cross-organ contract, locked acceptance, native-auth residue and API edge ingress checks. It is ready for independent review, not merged.
 
 PR #424 and PR #116 remain open candidate branches, not merged mainline. PR #450 and PR #123 are merged into those respective feature branches only. Data Centre #115 and Federation #53 are actual mainline merges. None of these source pins proves live deployment, production WebAuthn, media durability, Federation interoperability or coordinated disaster recovery.
 
