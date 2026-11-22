@@ -111,10 +111,10 @@ const negativePolicyReferences = new Map([
 ]);
 for (const path of new Set(scanned)) {
   const source = readFileSync(path, "utf8");
-  const normalized = path.replaceAll("\\\\", "/");
+  const normalized = path.replaceAll("\\", "/");
   if (!/appwrite/i.test(source) || nonRuntimeNegativeGuards.some((suffix) => normalized.endsWith(suffix))) continue;
   const allowed = [...negativePolicyReferences.entries()].find(([suffix]) => normalized.endsWith(suffix))?.[1] ?? new Set();
-  const activeMentions = source.split(/\\r?\\n/).filter((line) => /appwrite/i.test(line) && !allowed.has(line.trim()));
+  const activeMentions = source.split(/\r?\n/).filter((line) => /appwrite/i.test(line) && !allowed.has(line.trim()));
   if (activeMentions.length > 0) providerViolations.push(path);
 }
 assert.equal(
@@ -175,7 +175,7 @@ const unclassifiedHits = [];
 for (const path of new Set(exhaustiveFiles)) {
   const source = readFileSync(path, "utf8");
   if (!/appwrite/i.test(source)) continue;
-  const normalized = path.replaceAll("\\\\", "/");
+  const normalized = path.replaceAll("\\", "/");
   const marker = normalized.indexOf("source-repos/");
   const relative = marker >= 0 ? normalized.slice(marker + "source-repos/".length) : normalized;
   if (historicalCompatibilityAllowlist.has(relative)) historicalHits.push(relative);
