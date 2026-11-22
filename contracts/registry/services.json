@@ -55,8 +55,8 @@
         "packages/dart/README.md",
         "packages/dart/lib/testagram_api.dart"
       ],
-      "status": "consumer-with-native-identity-and-public-api-contract",
-      "notes": "Flutter uses the Testagram-native Backend auth client for login, password recovery/reset, session restore, refresh and logout. It calls only the Backend public API with the short-lived native access token. Applicant and verification-session tokens are limited to their own identity operations; the native password is set only after approved provisioning. No foreign-provider bearer token is sent by the public client. Flutter must never receive service tokens, storage-provider keys, database credentials or private service URLs."
+      "status": "hybrid-social-knowledge-client-candidate-pr-114-open-ci-and-contract-audit-pending",
+      "notes": "Flutter PR #114 proposes the Testagram-owned hybrid social and knowledge experience: Home, Discover, Ask, Notifications and More navigation; Backend-authoritative feed ordering metadata; Discover All/Posts/People filters; typed notification actions; and profile block action through the native Backend API. The candidate adds contract-backed POST/DELETE block operations and API tests; it does not add mute/report controls without verified Backend routes. Q&A remains explicitly unavailable until Backend PR #435 adds handlers and API integration. PR #114 is pinned as a candidate for cross-organ route audit, not accepted or merged. Flutter must never receive service tokens, storage-provider keys, database credentials or private service URLs."
     },
     {
       "id": "data-centre-platform",
