@@ -1,6 +1,6 @@
 # Seven-organ production-readiness audit
 
-**Audit date:** 2026-11-21  
+**Audit date:** 2026-11-22  
 **Status:** Source-level integration candidate; NOT accepted for production.
 
 This document supersedes earlier architecture snapshots. The seven repositories are six runtime organs plus one build-time governance organ. The API Control Plane is not a runtime gateway.
@@ -22,9 +22,9 @@ Backend PostgreSQL is the sole authority for Testagram user identity, sessions, 
 ## Native authentication position
 
 - Flutter uses the Testagram-owned native authentication client. Short-lived access tokens stay in memory; rotating refresh credentials are stored in platform secure storage.
-- Backend PR #424 is the native-only authentication retirement candidate currently pinned by the bridge. It removes the unused external-provider adapter, parallel legacy API/feed/storage runtime and obsolete deployment entrypoints.
+- Backend PR #424 is the open native-only authentication retirement candidate. Its current branch includes the communication/privacy, wallet and knowledge-engine stack brought in through PR #450. The four original conflicts with main have been reconciled; the current combined head is `31040c345f286b5dd34a91ea8c94af3da21e704b`.
 - The candidate binds access tokens to canonical user IDs, session IDs and token versions. Protected routes recheck PostgreSQL session/account state. Refresh rotation, replay rejection, logout and revocation have PostgreSQL integration coverage.
-- Backend PR #424 remains open and has no independent human review recorded. Its green CI is source-level evidence, not a merged mainline or live deployment.
+- PR #424 remains open and requires independent review plus fresh exact-head CI. It is not merged to main and is not a live deployment.
 - Data Centre video and notification user-facing routes use Backend-native JWT verification and live PostgreSQL session/account checks. User tokens are not platform service credentials.
 - Admin Console staff access uses native staff principals, role grants, encrypted staff sessions and WebAuthn-backed MFA elevation. General two-person staff invitation/role-change/revocation, live browser ceremony and recovery acceptance remain incomplete.
 - Public registration and staff enrollment remain fail-closed until the live readiness handshake, credential ceremony/recovery and two-person lifecycle gates pass.
@@ -41,23 +41,23 @@ Backend PostgreSQL is the sole authority for Testagram user identity, sessions, 
 
 ## Verified source and CI position
 
-- The API bridge now pins the latest observed mainline revisions for Flutter, Data Centre, CDN, Algorithm and Federation; the Backend pin targets the open PR #424 review candidate.
-- The five non-Backend revisions were compared with their previous pins; intervening changes were documentation-only.
-- The refreshed bridge CI passed source checkout, OpenAPI lint, SDK build, TypeScript tests, Dart validation, Backend route audit, cross-repository contract audit, locked G0–G7 acceptance, navigation and seven-organ topology checks.
-- The expanded provider-residue audit found stale documentation in this repository and a negative legacy-config check in the Data Centre CI workflow. Those findings are being corrected and revalidated; do not treat the earlier narrow scan as proof of a repository-wide zero-residue state.
-- Backend PR #424 CI passed its application, PostgreSQL integration, security, container, self-hosted stack and schema checks. The actual deployment job was skipped; no live deployment was proved.
+- The API bridge source lock is being refreshed to the current exact candidate heads: Backend PR #424 (`31040c345f286b5dd34a91ea8c94af3da21e704b`) and Flutter PR #116 (`2d29bb883645bc6ffd6ef5ff3409cd1bd59d6c54`); Data Centre, CDN, Algorithm and Federation pin their current mainline commits.
+- Data Centre PR #115 and Federation PR #53 are now merged into main. Flutter PR #123 is merged into the PR #116 feature branch; Backend PR #450 is merged into the PR #424 feature branch. These are candidate-branch integrations, not mainline merges.
+- The combined Backend #424 exact-head CI is running. The combined Flutter #116 exact-head CI is running. The API bridge CI must be rerun after the refreshed source lock and status documents are committed.
+- The prior API bridge audit failure was traced to a retired-provider mention in the newly added product gap document; the follow-up branch commit removed that mention. The current branch's fresh audit is still pending.
+- Backend PR #449 fixed the missing edge-token propagation in the deployment code and is merged into main. The latest production deploy fails safely before machine selection because `TESTAGRAM_EDGE_PROXY_SHARED_TOKEN` is not configured in the production GitHub environment; no machine start, deployment or DNS change occurred.
 
 ## Production blockers
 
 ### Identity and staff security
-- Obtain independent review and merge the exact reviewed Backend candidate.
+- Complete exact-head CI and independent security review, then merge the reviewed Backend candidate.
 - Implement the full two-person staff invitation, role-change and revocation lifecycle.
 - Perform real browser WebAuthn registration/assertion, recovery, replay rejection and revoked-credential tests.
 - Verify Admin Console readiness against the deployed Backend and production-like PostgreSQL.
 - Keep public registration and staff enrollment disabled until every gate passes.
 
 ### Routing and deployment
-- Production `api.testagram.site` remains associated with the legacy Worker. The native Backend origin must be deployed and health-checked before any custom-domain ownership transfer.
+- Production `api.testagram.site` remains associated with the legacy Worker. The native Backend origin must be deployed and health-checked before any custom-domain ownership transfer. The deployment workflow is currently blocked by the missing `TESTAGRAM_EDGE_PROXY_SHARED_TOKEN` production secret; use the same 64-hex token configured on the Cloudflare API Worker.
 - The CDN routing workflow must implement a tested ownership transfer, DNS/TLS continuity and rollback. Do not bypass its preflight.
 - The Flutter production-domain smoke previously failed apex redirect, NodeInfo and WebFinger checks. Re-run after the correct origins are deployed.
 - Capture exact source SHAs and immutable image digests for every deployed organ. Green CI and published images do not prove deployment.
