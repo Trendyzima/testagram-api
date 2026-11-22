@@ -406,3 +406,16 @@ The latest read-only Cloudflare inventory enumerated the visible zones as `blues
 Backend PR #433's guarded cleanup workflow lists heartbeat and the unexpected Worker as separate exact-name candidates, but its custom-domain and consumer preflights should block heartbeat while the live custom domain remains. No dry-run cleanup was dispatched, and no Worker was deleted. The active five-minute `testagram-cdn` Cron remains excluded from cleanup.
 
 The API bridge source lock intentionally remains pinned to the unmerged Backend #424 and CDN #125 candidates. It must not be advanced to PR #434 or any candidate head until the exact reviewed changes are merged and the accepted merge commits are known. No production DNS, route, Worker, Pages, staff permission or deployment mutation occurred.
+
+
+## 22. Backend approval-integrity transplant supersedes the stale #431/#432 stack — 2026-11-22
+
+Backend PR #434 (`security/native-approval-ledger-integrity-on-424-20261122`) is the clean replacement candidate for the former #432 stack. It is directly based on PR #424's exact native-auth candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88`; Git comparison reports the base as the merge base, 8 commits ahead and 0 behind at the last ancestry check. It excludes #431's overlapping permission-handler correction; the #424 fail-closed permission handler and regression test remain inherited from the base.
+
+PR #434 carries the approval-integrity migration, ordered migration application and Compose mount, PostgreSQL fixtures, migration-manifest checks, and exact WebAuthn RP ID plus credential-ID binding for every new approval. The application decision path now obtains the exact authenticator ID from the credential-bound recent step-up and writes it with the approval record. The approval-quorum trigger checks that exact credential remains active, verified and not clone-warned at finalization. Admin readiness checks the new schema columns.
+
+The latest PR #434 head observed during this update was `f95340a9f81ea3257e8d7fdb48db33b496bed5e6`; its workflow syntax check passed, while Backend CI and the Cloudflare audit were still running/queued. Earlier complete Backend CI on the predecessor head passed all 15 jobs, but did not cover all later exact-credential/readiness changes. The latest commit adds the credential-bound schema requirement to the migration readiness diagnostics. Therefore PR #434 remains draft and unaccepted pending fresh CI on its final stable head and independent security review.
+
+The bridge source lock deliberately remains pinned to PR #424, not #434: #434 is a stacked, unmerged security candidate and must not be represented as an accepted source dependency. Refresh the Backend lock only after the #424/#434 dependency chain is independently reviewed and actually merged; then pin the resulting merge commit, not a moving branch name. PR #431/#432 must not be merged separately.
+
+No production migration, staff permission enablement, deployment, Cloudflare routing change or cleanup is authorized by this candidate. Staff invitations, role changes, revocations and permission changes remain disabled.
