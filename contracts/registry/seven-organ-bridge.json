@@ -14,7 +14,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "flutter-client",
-      "mainCommit": "03082cc7e2419dc3bac241fd12791043915ea760",
+      "mainCommit": "2f31cac2e21887e15c7be8f9d4a14b698b3e05cc",
       "mergedPullRequests": [
         109,
         112,
@@ -196,7 +196,7 @@
   ],
   "excludedFromAcceptance": [
     "Backend PR #424 and its reviewed communication, wallet and knowledge-engine stack are merged. The source pin is refreshed to current Backend mainline 4c44c989d006a261ac06e4dcad4e30a8904e2cc8.",
-    "Flutter PR #116 is merged. The source pin is refreshed to current Flutter mainline 03082cc7e2419dc3bac241fd12791043915ea760. The web image built from this commit is published and smoke-tested; production rollout is pending.",
+    "Flutter mainline is pinned to 2f31cac2e21887e15c7be8f9d4a14b698b3e05cc. This source update changes only the production domain-smoke workflow to assert the locked G3 fail-closed behavior; the Flutter application source and previously built immutable web image are unchanged.",
     "Backend production deployment run 45038404739 succeeded on the existing InstaBox machine testagramdb. Backend, PostgreSQL, Flutter web, Go CDN, Algorithm, Federation, Data Centre media/platform/worker/video/notification and edge proxy health checks passed. Private B2/R2 write-read-delete probes and directional Backend/Federation credential checks passed.",
     "The deployed release keeps public registration, staff enrollment and Federation delivery workers fail-closed until their independent acceptance gates pass. Successful deployment is not proof of native-auth migration, WebAuthn live acceptance, ActivityPub interoperability or production registration readiness.",
     "CDN PR #125 is merged at 21a254e9f67dc7a8e55dca37151a6db532405e53. Go CDN origin is installed and healthy; Cloudflare Worker deployment and canonical hostname routing remain separate production cutover gates and are not inferred from source CI.",
