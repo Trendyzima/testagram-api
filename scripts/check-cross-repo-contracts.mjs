@@ -146,7 +146,7 @@ for (const [label, source, marker] of [
  const backendCompose = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/docker-compose.yml"), "utf8");
  const backendDeploy = readFileSync(resolve(lock.repositories.backend.checkoutPath, "scripts/start-instabox-deployment.sh"), "utf8");
  const identityReplication = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/identity_media_replication.go"), "utf8");
- const backendEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
+ const backendEdgeEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
  const dataCentreCompose = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/docker-compose.yml"), "utf8");
  for (const variable of ["FRESH_MEDIA_ENABLED", "DATA_CENTRE_MEDIA_API_URL", "FRESH_DATA_CENTRE_INTERNAL_TOKEN"]) {
    if (!backendCompose.includes(variable)) fail.push(`Backend Compose missing Data Centre media variable: ${variable}`);
@@ -373,7 +373,7 @@ const backendApiEdgeTests = readFileSync(resolve(lock.repositories.backend.check
 const backendApiEdgeWorkflow = readFileSync(resolve(lock.repositories.backend.checkoutPath, ".github/workflows/cloudflare-api-gateway.yml"), "utf8");
 const backendApiEdgeWrangler = readFileSync(resolve(lock.repositories.backend.checkoutPath, "infra/cloudflare-api-gateway/wrangler.toml"), "utf8");
 const backendApiEdgeDeployTest = readFileSync(resolve(lock.repositories.backend.checkoutPath, "tests/test_cloudflare_api_gateway_deployment_order.py"), "utf8");
-const backendEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
+const backendEdgeEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
 const backendDeployScript = readFileSync(resolve(lock.repositories.backend.checkoutPath, "scripts/start-instabox-deployment.sh"), "utf8");
 for (const [label, source, marker] of [
   ["Backend API edge Worker", backendApiEdgeWorker, 'const EXPECTED_ORIGIN_HOST = "8443-agq4me2xgrgx5ge52ts437tqea.instabox.tech"'],
@@ -382,6 +382,8 @@ for (const [label, source, marker] of [
   ["Backend API edge Worker", backendApiEdgeWorker, 'headers.delete(name)'],
   ["Backend API edge tests", backendApiEdgeTests, "without trusting client forwarding headers"],
   ["Backend API edge tests", backendApiEdgeTests, "fails closed when the shared edge token is absent or malformed"],
+  ["Backend API edge deployment test", backendApiEdgeDeployTest, "test_worker_is_not_publicly_routed_by_wrangler_before_secret_install"],
+  ["Backend API edge deployment test", backendApiEdgeDeployTest, "test_preflight_fails_closed_on_any_overlapping_route_owned_by_another_worker"],
   ["Backend API edge workflow", backendApiEdgeWorkflow, "confirm_production_deploy"],
   ["Backend API edge workflow", backendApiEdgeWorkflow, "wrangler@4 secret put EDGE_PROXY_SHARED_TOKEN"],
   ["Backend API edge workflow", backendApiEdgeWorkflow, "API edge secret installed before route attachment"],
@@ -395,7 +397,7 @@ for (const [label, source, marker] of [
   ["Backend Caddy API edge", backendCaddyfile, "header_up -X-Testagram-Edge-Token"],
   ["Backend Caddy API edge", backendCaddyfile, "reverse_proxy api:8080"],
   ["Backend Compose API edge", backendCompose, "EDGE_PROXY_SHARED_TOKEN: ${EDGE_PROXY_SHARED_TOKEN:?Set EDGE_PROXY_SHARED_TOKEN in .env}"],
-  ["Backend edge env template", backendEnvExample, "EDGE_PROXY_SHARED_TOKEN=REPLACE_WITH_A_SEPARATE_RANDOM_32_BYTE_EDGE_TOKEN"],
+  ["Backend edge env template", backendEdgeEnvExample, "EDGE_PROXY_SHARED_TOKEN=REPLACE_WITH_A_SEPARATE_RANDOM_32_BYTE_EDGE_TOKEN"],
   ["Backend deployment token persistence", backendDeployScript, 'write_env_value EDGE_PROXY_SHARED_TOKEN "$TESTAGRAM_EDGE_PROXY_SHARED_TOKEN"'],
   ["Backend deployment token forwarding", backendDeployScript, "EDGE_PROXY_SHARED_TOKEN:$edge_proxy_token"],
 ]) {
