@@ -533,8 +533,8 @@ This section supersedes all earlier status snapshots in this document where they
 - M-Pesa idempotency keys are bound to the normalized phone, whole-KES amount and currency. Reuse with a different payload returns conflict.
 - The Backend supports owner-scoped status recovery by the original idempotency key, including when a checkout ID was not returned to the client.
 - The Flutter client persists the exact attempt before network dispatch and reuses the same key on ambiguous retries.
-- Backend PR #437 is ready for independent review and remains stacked on #435. Its exact-head Backend CI run `44972023262` is in progress. PostgreSQL migrations, WebAuthn, authorization, MinIO, outbox and other integration jobs have passed; API tests/static checks are the remaining running job.
-- An earlier exact feature run failed only the gofmt gate because `wallet_mpesa.go` lacked a final newline. That newline is corrected in the current pinned head. Do not mark the current Backend gate passed until run `44972023262` completes.
+- Backend PR #437 is ready for independent review and remains stacked on #435. Its exact-head Backend CI run `44972023262` passed, as did the Knowledge Engine PostgreSQL schema and Cloudflare domain routing audit. The complete Go tests/race detector, vet, build, route/security checks and PostgreSQL integration matrix are green.
+- The first exact-head attempt exposed a missing final newline in `wallet_mpesa.go`; this was corrected, and the final pinned head passed the full Backend CI.
 
 ### Flutter profile, deep-link and wallet work
 
@@ -546,9 +546,9 @@ This section supersedes all earlier status snapshots in this document where they
 
 ### API Control Plane and organ validation
 
-- API Control Plane PR #116 is pinned at `7fccbb7e8c61c5b2c48091a3e8393bacb7215829`. Its latest API contract CI run `44971990433` passed both Node and Dart validation.
+- API Control Plane PR #116 currently has documentation head `a7ff5980b957cd028714f2b8d85bc761bd4184d2`; the latest code/source-lock head `7fccbb7e8c61c5b2c48091a3e8393bacb7215829` passed API contract CI run `44971990433` (Node and Dart). The subsequent change is acceptance-document-only.
 - The cross-repository suite now checks Backend profile resolution, block safety, allow-listed deep links, wallet idempotency binding, secure persistence-before-dispatch and the wallet-only navigation boundary.
-- Data Centre PR #115 and Federation PR #53 have successful candidate CI runs. Both still require independent review.
+- Data Centre PR #115 and Federation PR #53 have successful candidate CI runs. Both still require independent review; neither is merged.
 - CDN PR #125 is merged. The Backend's CDN-origin PostgreSQL integration and read-only Cloudflare routing audit passed on the latest Backend feature validation.
 - Algorithm is pinned to its merged mainline commit; the pinned commit has no direct workflow status recorded. The API bridge contract suite validates the integration contract but is not a substitute for live Algorithm staging tests.
 
