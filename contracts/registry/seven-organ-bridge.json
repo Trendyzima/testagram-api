@@ -120,7 +120,7 @@
     {
       "from": "backend",
       "to": "data-centre",
-      "contract": "private platform/media APIs; distinct service credentials"
+      "contract": "private media and identity-evidence APIs with distinct service credentials; Data Centre platform config/events/audit API is not yet a verified Backend consumer edge"
     },
     {
       "from": "backend",
