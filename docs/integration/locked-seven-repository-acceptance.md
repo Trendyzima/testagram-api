@@ -419,3 +419,12 @@ The latest PR #434 head observed during this update was `f95340a9f81ea3257e8d7fd
 The bridge source lock deliberately remains pinned to PR #424, not #434: #434 is a stacked, unmerged security candidate and must not be represented as an accepted source dependency. Refresh the Backend lock only after the #424/#434 dependency chain is independently reviewed and actually merged; then pin the resulting merge commit, not a moving branch name. PR #431/#432 must not be merged separately.
 
 No production migration, staff permission enablement, deployment, Cloudflare routing change or cleanup is authorized by this candidate. Staff invitations, role changes, revocations and permission changes remain disabled.
+
+
+## 23. Latest Backend transplant head and CI state — 2026-11-22
+
+A subsequent forensic refresh observed Backend PR #434 at head `25ebde27e54ae8af28b91910846e48158cb1771f`, still directly based on PR #424 head `cc33913f0fd4e86669f7c717e12b2503990e6d88`. Git comparison remains clean: 16 commits ahead, 0 behind. The newest change adds a PostgreSQL negative test proving an approver cannot substitute a different authenticator credential for the exact credential registered to that staff principal.
+
+The Backend CI run `44965224380` is now running against this exact head; its Admin permissions and dual-control PostgreSQL integration job is included. Workflow syntax validation passed on this head. The immediately preceding Backend CI attempts were cancelled as newer commits arrived, so they are not acceptance evidence. Cloudflare audit remains read-only.
+
+PR #434 remains draft, with no independent review. The bridge lock remains pinned to the unmerged #424 source candidate and has not been advanced to #434 or any unmerged branch. This status is an audit snapshot only; refresh the Backend source pin after independent review and actual merge of the accepted dependency chain.
