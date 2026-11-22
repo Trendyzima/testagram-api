@@ -31,7 +31,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `8a459719a2e24a30de0e6bfe421bcba0859dabb4` (PR #115 deep-link/wallet candidate; mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
+| Flutter | `291b73f65aa62dcbde514384209c66109d0ebbaf` (PR #115 deep-link/wallet candidate; mainline base `1f58971720c7a72139d56900a5895c49fa105639`) |
 | Backend | `f4cbc62121a7e20114358d89d6cd6add9beec36e` (PR #436 profile/wallet candidate; stacked on #424 `cc33913f0fd4e86669f7c717e12b2503990e6d88`) |
 | Data Centre | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` (PR #115 OpenAPI candidate; mainline base `ada6f26a289775720bb47a639242dbd868388055`) |
 | Testagram API control plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` |
@@ -528,7 +528,7 @@ This section supersedes earlier candidate-pin snapshots above where they conflic
 ### Flutter deep-link and wallet candidate
 
 - Flutter PR #115 is based on mainline `1f58971720c7a72139d56900a5895c49fa105639`.
-- Exact PR #115 head: `8a459719a2e24a30de0e6bfe421bcba0859dabb4`.
+- Exact PR #115 head: `291b73f65aa62dcbde514384209c66109d0ebbaf`.
 - Adds allow-listed username profile, UUID profile and wallet landing link parsing; carries the initial route through the authentication gate and resolves usernames through the Backend.
 - Persists the M-Pesa request identity in secure storage before network dispatch, reuses the same key on retry, and recovers ambiguous attempts by the owner-scoped idempotency reference.
 - The Flutter repository contains no Android/iOS runner projects. Dart parsing and initial-route handling are not proof of native App Links or Universal Links. Verified Android `assetlinks.json`, iOS `apple-app-site-association`, signing identity and warm-link handling remain release gates.
@@ -545,6 +545,6 @@ This section supersedes earlier candidate-pin snapshots above where they conflic
 ### Current CI evidence
 
 - Backend PR #436 CI run `44969983123` failed its initial gofmt gate; the changed Go files were formatted and the latest exact-head CI run is `44970439444` (queued at this inspection).
-- Flutter PR #115 CI runs `44969985905`, `44969985881`, `44969985856` and `44969985870` were queued at inspection.
+- Flutter PR #115 latest exact-head CI runs `44970427486`, `44970427504`, `44970427446` and `44970427493` were in progress/pending at inspection.
 - Queued is not passed. Independent reviews remain required.
 - No staging attestation or production deployment is implied by these feature branches.
