@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "ee23105c9f291cd93d4e24729a33ec4e3adceb66",
+      "ref": "767ec2336f66330e270514d8fb361023ffd5da7d",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -40,6 +40,7 @@
         "cmd/api/federation_publish.go",
         "cmd/api/federation_publish_test.go",
         "cmd/api/feed_home.go",
+        "cmd/api/feed_home_ranking_test.go",
         "cmd/api/fresh_media_bridge.go",
         "cmd/api/fresh_media_bridge_test.go",
         "cmd/api/identity_evidence_http_integration_test.go",
