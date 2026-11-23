@@ -985,7 +985,7 @@ paths:
       operationId: searchContent
       tags: [Search]
       summary: Search people and posts
-      description: Privacy-filtered product search. Authentication is optional for public results; Backend applies visibility and authorization rules.
+      description: Privacy-filtered product search. Authentication is optional for public results; Backend applies visibility and authorization rules. Advanced filters apply to post results; people discovery remains governed by account discoverability.
       security:
         - testagramBearer: []
         - {}
@@ -1006,13 +1006,45 @@ paths:
           name: media_only
           required: false
           schema: { type: boolean, default: false }
+        - in: query
+          name: from
+          required: false
+          schema: { type: string, minLength: 2, maxLength: 30, pattern: '^[A-Za-z0-9_.]+$' }
+          description: Restrict post results to an exact username. A leading @ is accepted by the Flutter client and removed before sending.
+        - in: query
+          name: since
+          required: false
+          schema: { type: string }
+          description: Inclusive lower creation-time bound. Accepts RFC3339 timestamps or YYYY-MM-DD as UTC midnight.
+        - in: query
+          name: until
+          required: false
+          schema: { type: string }
+          description: Exclusive upper creation-time bound. Accepts RFC3339 timestamps or YYYY-MM-DD, interpreted as the following UTC midnight.
+        - in: query
+          name: language
+          required: false
+          schema: { type: string, maxLength: 35, pattern: '^[A-Za-z0-9-]+$' }
+          description: Exact language tag filter, case-insensitive.
+        - in: query
+          name: sort
+          required: false
+          schema: { type: string, enum: [latest, popular], default: latest }
+          description: Newest-first or engagement-weighted order; SQL ordering is selected from a fixed server enum.
+        - in: query
+          name: video_only
+          required: false
+          schema: { type: boolean, default: false }
+          description: Require a ready, public video asset owned by the post author. This never bypasses post visibility or media authorization.
       responses:
         '200':
           description: Search result page; exact payload shape must be confirmed from Backend tests.
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/social/posts:
     post:
       operationId: createSocialPost

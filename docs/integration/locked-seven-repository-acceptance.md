@@ -31,8 +31,8 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `023752d5ceaf048d5a30f4ce49b9ec738b722d4e` (2026-11-23 mainline; native Knowledge topic discovery, follow controls and topic-scoped question feeds) |
-| Backend | `767ec2336f66330e270514d8fb361023ffd5da7d` (2026-11-23 mainline; Knowledge topics/Q&A, native Lists and authorization-scoped List-backed custom feeds merged; deployment workflow passed, with existing-volume Lists migration still separately gated) |
+| Flutter | `225364cc4ea0f453836a6e75c7a39c4f65dabdd7` (2026-11-23 mainline; Knowledge topics, Lists client and List-backed custom-feed request support) |
+| Backend | `70cafba1e3a62978c93a7e34ae97fea8d47c7119` (2026-11-23 mainline; Knowledge topics/Q&A, native Lists, List-backed custom feeds and privacy-safe advanced search merged; engagement score uses bounded bigint arithmetic) |
 | Data Centre | `8bc8b86d5ad718bb0d4820a832c301602c2021bf` (2026-11-23 mainline; dependency-aware video worker readiness) |
 | Testagram API control plane | `3ac00b6252b21d3acceeff1bf621a42106e321a9` (2026-11-23 mainline; Knowledge topics/Q&A contract merged; List-backed custom-feed contract remains a review candidate) |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` (2026-11-21 mainline) |
@@ -676,3 +676,7 @@ The run verified healthy Backend API, PostgreSQL, Flutter web, Go CDN, Algorithm
 - Native identity, WebAuthn staff enrollment, M-Pesa settlement, full media durability/restore, independent Federation interoperability, end-user device acceptance and coordinated disaster recovery remain separate G0-G7 gates.
 
 **Release decision remains NOT ACCEPTED** until all required G0-G7 staging and production evidence is recorded. Healthy containers and a successful deployment workflow are not substitutes for those gates.
+
+## Backend List-feed safety release — 2026-11-23
+
+Backend mainline is pinned to `5d994277f7d77f60fed0a0b0627f254ecc2ec080`. The merged List-backed custom-feed filter is applied only when a valid, accessible `list_id` is requested; the ordinary global feed does not reference the optional Lists tables. The mainline deployment workflow passed, including Backend/Data Centre private media probes and public API/CDN/apex health checks. The deployment applied native identity migration inputs only; the existing-volume social-platform Lists migration remains separately backup-first and approval-gated. Therefore, this source/deployment record does not claim the Lists schema is live or custom feeds have passed authenticated production E2E.
