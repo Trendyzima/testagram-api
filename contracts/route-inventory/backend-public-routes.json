@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "70cafba1e3a62978c93a7e34ae97fea8d47c7119",
+  "sourceRef": "fa44a936c82bb3d327f968913251ae1907549d0d",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across all production Go files in cmd/api at exact locked Backend mainline commit 70cafba1e3a62978c93a7e34ae97fea8d47c7119. Knowledge topics/Q&A, curated Lists, List-backed custom feeds and advanced privacy-safe search are contracted. The global feed remains independent of the optional Lists schema until the additive migration is explicitly applied.",
+  "note": "Static public/API route registrations across all production Go files in cmd/api at exact locked Backend mainline commit fa44a936c82bb3d327f968913251ae1907549d0d. Native trending words and hashtags are contracted. Email preference routes remain pending the Backend email-notification PR merge.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
@@ -299,6 +299,11 @@
       "method": "GET",
       "path": "/api/threads/{thread_id}/reposts/state",
       "status": "registered-only"
+    },
+    {
+      "method": "GET",
+      "path": "/api/trends/words",
+      "status": "contracted"
     },
     {
       "method": "GET",
