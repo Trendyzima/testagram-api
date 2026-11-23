@@ -646,6 +646,11 @@ paths:
           schema: { type: boolean, default: false }
           description: Set true to return only posts with at least one ready, public video attachment. Backend applies post visibility, block, mute, ownership and media-readiness checks before returning a playback URL.
         - in: query
+          name: list_id
+          required: false
+          schema: { type: string, format: uuid }
+          description: Restrict candidates to members of an existing Testagram List. The List must be owned by the viewer or have public/unlisted visibility. List membership never grants access to protected or private posts; normal account visibility, accepted-follow, block, mute, moderation and deletion checks still apply. Pagination cursors are scoped to the selected List and cannot be reused on another feed.
+        - in: query
           name: sources
           required: false
           style: form
@@ -670,9 +675,12 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/UnifiedFeedEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
         '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/hashtags/trending:
     get:
       operationId: getTrendingHashtags
