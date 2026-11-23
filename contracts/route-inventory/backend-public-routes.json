@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "7f5ca5f2001b3927dad4e5103728dabaa0ce945d",
+  "sourceRef": "e48160fa16e25df34a91fba0d2ad763a91defaac",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across all production Go files in cmd/api at exact locked Backend mainline commit 7f5ca5f2001b3927dad4e5103728dabaa0ce945d. Native trending words and consent-based email preference/unsubscribe endpoints are registered and contracted.",
+  "note": "Static public/API route registrations across all production Go files in cmd/api at exact locked Backend mainline commit e48160fa16e25df34a91fba0d2ad763a91defaac. Native trending words and consent-based email preference/unsubscribe endpoints are registered and contracted.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
