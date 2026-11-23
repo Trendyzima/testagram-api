@@ -32,7 +32,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `d59aa77bf3809c8ca758001c3bffcde2688d5085` (2026-11-23 mainline; Knowledge topics, List-backed custom feeds and advanced search filters in Explore) |
-| Backend | `fa44a936c82bb3d327f968913251ae1907549d0d` (2026-11-23 mainline; Knowledge topics/Q&A, native Lists, List-backed custom feeds and privacy-safe advanced search merged; engagement score uses bounded bigint arithmetic) |
+| Backend | `7f5ca5f2001b3927dad4e5103728dabaa0ce945d` (2026-11-23 mainline; Knowledge topics/Q&A, native Lists, List-backed custom feeds and privacy-safe advanced search merged; engagement score uses bounded bigint arithmetic) |
 | Data Centre | `8bc8b86d5ad718bb0d4820a832c301602c2021bf` (2026-11-23 mainline; dependency-aware video worker readiness) |
 | Testagram API control plane | `cac5209a27f891fe5ef5d54cd10e5dbb5eedff72` (2026-11-23 mainline; Knowledge topics/Q&A contract merged; List-backed custom-feed contract remains a review candidate) |
 | Algorithm | `057f4490ae12bdbea0216e231f3e44957cf3716e` (2026-11-21 mainline) |
