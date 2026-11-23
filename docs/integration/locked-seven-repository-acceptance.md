@@ -1,7 +1,7 @@
 # Locked seven-repository end-to-end acceptance
 
 **Status: LOCKED — acceptance criteria are stable; execution is not yet accepted.**  
-**Locked on:** 2026-11-18  
+**Locked on:** 2026-11-23  
 **Tracking issue:** https://github.com/Trendyzima/testagram-api/issues/96  
 **Control plane:** `Trendyzima/testagram-api` (contract/build-time only; not a runtime service)
 
@@ -27,17 +27,17 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. This revision refreshes the baseline to the exact observed mainline commits of all six runtime repositories as of 2026-11-22. The control-plane bridge branch remains a review candidate and is one commit behind current control-plane mainline; it must be reconciled before merge. This is an integration-review source baseline, not a deployment attestation. A migration present in a pinned source tree is source evidence, not proof that production has applied it.
+The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. This revision refreshes the baseline to the exact observed mainline commits of all six runtime repositories and the control-plane mainline as of 2026-11-23. The Knowledge topics/Q&A release and its Flutter client are merged; the API contract update remains a review candidate based on the current control-plane mainline. This is an integration-review source baseline, not a deployment attestation. This is an integration-review source baseline, not a deployment attestation. A migration present in a pinned source tree is source evidence, not proof that production has applied it.
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `2f31cac2e21887e15c7be8f9d4a14b698b3e05cc` (2026-11-22 mainline; production domain smoke now verifies the locked G3 fail-closed contract; app source and web image unchanged) |
-| Backend | `92ff5e90856f48460497466a2d1ec5112b85e24c` (2026-11-22 mainline; API edge upstream pinned to the direct Backend API origin with fail-closed route attachment) |
-| Data Centre | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` (2026-11-22 mainline; private identity-evidence API contract) |
-| Testagram API control plane | `14e67fffb2150021d7b94bd8941f49ac0485d034` (current mainline base; this bridge branch must incorporate any newer control-plane mainline commit before merge) |
+| Flutter | `023752d5ceaf048d5a30f4ce49b9ec738b722d4e` (2026-11-23 mainline; native Knowledge topic discovery, follow controls and topic-scoped question feeds) |
+| Backend | `d2e2a9362719bb2219ffa7ecadce334d40bc4e92` (2026-11-23 mainline; curated Knowledge topics and topic-scoped Q&A API merged and deployed) |
+| Data Centre | `8bc8b86d5ad718bb0d4820a832c301602c2021bf` (2026-11-23 mainline; dependency-aware video worker readiness) |
+| Testagram API control plane | `4ae9727835c30485d419b0ea8c1e3430076c0af1` (2026-11-23 mainline base for the Knowledge contract review) |
 | Algorithm | `92cf9b47e4de38306c4fe7b61ece24c3e075aa22` (2026-11-21 mainline) |
 | Federation | `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca` (2026-11-22 mainline; private Backend federation bridge contract) |
-| CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` (2026-11-22 mainline; guarded native API custom-domain handoff) |
+| CDN | `8b8b7212741f81d98216c4f79cde95ebccfe2f97` (2026-11-23 mainline; canonical Go CDN runtime release) |
 
 A source pin is not a deployment record. Every accepted staging and production run must separately record the actual running image digest and source revision. Mutable tags such as `main` and `latest` are not acceptable release identities.
 
