@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "92ff5e90856f48460497466a2d1ec5112b85e24c",
+  "sourceRef": "d2e2a9362719bb2219ffa7ecadce334d40bc4e92",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across all production Go files in cmd/api at the exact locked Backend mainline commit 92ff5e90856f48460497466a2d1ec5112b85e24c. Backend PR #473 changes the API edge Worker upstream origin and adds regression tests; it does not alter Go API route registrations. Refresh this inventory whenever Backend mainline changes; route status remains governed by the OpenAPI contract and independent acceptance gates.",
+  "note": "Static public/API route registrations across all production Go files in cmd/api at the exact locked Backend mainline commit d2e2a9362719bb2219ffa7ecadce334d40bc4e92. Knowledge topic and Q&A routes are now registered and contracted; route status remains governed by the OpenAPI contract and independent acceptance gates. Refresh this inventory whenever Backend mainline changes.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
@@ -23,6 +23,11 @@
     {
       "method": "DELETE",
       "path": "/api/hashtags/{tag}/follow",
+      "status": "contracted"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/knowledge/topics/{topic_slug}/follow",
       "status": "contracted"
     },
     {
@@ -108,6 +113,31 @@
     {
       "method": "GET",
       "path": "/api/identity/sessions/{session_id}",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/knowledge/questions",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/knowledge/questions/{question_id}",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/knowledge/topics",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/knowledge/topics/{topic_slug}",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/knowledge/topics/{topic_slug}/questions",
       "status": "contracted"
     },
     {
@@ -344,6 +374,26 @@
       "method": "POST",
       "path": "/api/iptv/social",
       "status": "registered-only"
+    },
+    {
+      "method": "POST",
+      "path": "/api/knowledge/questions",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
+      "path": "/api/knowledge/questions/{question_id}/answers",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
+      "path": "/api/knowledge/questions/{question_id}/answers/{answer_id}/accept",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
+      "path": "/api/knowledge/topics/{topic_slug}/follow",
+      "status": "contracted"
     },
     {
       "method": "POST",
