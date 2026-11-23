@@ -52,7 +52,7 @@
     },
     {
       "method": "DELETE",
-      "path": "/api/social/lists/{list_id}/members/{target_user_id}",
+      "path": "/api/social/lists/{list_id}/members/{member_id}",
       "status": "contracted"
     },
     {
