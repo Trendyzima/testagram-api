@@ -681,6 +681,112 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/me/email-notifications:
+    get:
+      operationId: getMyEmailNotificationPreferences
+      tags: [Notifications]
+      summary: Read the authenticated user's social email preferences
+      description: Returns explicit consent settings for new-follower and new-post activity emails. Missing preference records default to disabled. Requires the Testagram-native access JWT.
+      security:
+        - testagramBearer: []
+      responses:
+        '200':
+          description: Current social email preferences and consent prompt state.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [new_follower_email_enabled, new_post_email_enabled, consent_version, consent_prompt_required]
+                    properties:
+                      new_follower_email_enabled: { type: boolean }
+                      new_post_email_enabled: { type: boolean }
+                      consent_version: { type: string }
+                      consent_prompt_required: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    put:
+      operationId: updateMyEmailNotificationPreferences
+      tags: [Notifications]
+      summary: Update the authenticated user's social email consent
+      description: Updates one or both independent social email preferences. Disabling a category cancels queued, not-yet-sent messages for that category. Both preferences default to disabled until the user opts in.
+      security:
+        - testagramBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              minProperties: 1
+              properties:
+                new_follower_email_enabled: { type: boolean }
+                new_post_email_enabled: { type: boolean }
+      responses:
+        '200':
+          description: Updated preferences and current consent prompt state.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/email/unsubscribe:
+    get:
+      operationId: previewSocialEmailUnsubscribe
+      tags: [Notifications]
+      summary: Preview a one-click social email unsubscribe
+      description: Displays a confirmation page for the category-bound token. GET never changes preferences; the recipient must submit the confirmation form.
+      security: []
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema: { type: string, minLength: 40, maxLength: 128 }
+      responses:
+        '200':
+          description: HTML confirmation page.
+          content:
+            text/html:
+              schema: { type: string }
+        '404': { description: Invalid or expired unsubscribe token. }
+    post:
+      operationId: confirmSocialEmailUnsubscribe
+      tags: [Notifications]
+      summary: Confirm a one-click social email unsubscribe
+      description: Disables only the category bound to the opaque token, cancels pending messages in that category and records token use. Repeated submissions are idempotent. No login is required.
+      security: []
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema: { type: string, minLength: 40, maxLength: 128 }
+      requestBody:
+        required: false
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                token: { type: string, minLength: 40, maxLength: 128 }
+      responses:
+        '200':
+          description: Unsubscribe confirmation page.
+          content:
+            text/html:
+              schema: { type: string }
+        '400': { description: Invalid unsubscribe request. }
+        '404': { description: Invalid or expired unsubscribe token. }
+        '503': { description: Unsubscribe is temporarily unavailable. }
   /api/trends/words:
     get:
       operationId: getTrendingWords
