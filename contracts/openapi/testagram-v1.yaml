@@ -2463,6 +2463,193 @@ paths:
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
 
+  /api/social/lists:
+    get:
+      operationId: listSocialLists
+      tags: [Social]
+      summary: List the current viewer's curated Lists
+      description: Returns only Lists owned by the authenticated Testagram account. Results are bounded to 100 and pinned Lists appear first.
+      responses:
+        '200':
+          description: Viewer-owned Lists.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, const: true }
+                  data:
+                    type: object
+                    required: [items]
+                    properties:
+                      items: { type: array, items: { $ref: '#/components/schemas/SocialList' } }
+                  request_id: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    post:
+      operationId: createSocialList
+      tags: [Social]
+      summary: Create a curated List
+      description: Creates a private List by default. Visibility may be private, unlisted or public. Only the owner can manage membership and delete the List.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [name]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 64 }
+                description: { type: string, maxLength: 280, default: '' }
+                visibility: { type: string, enum: [private, unlisted, public], default: private }
+      responses:
+        '201':
+          description: List created.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, const: true }
+                  data: { $ref: '#/components/schemas/SocialList' }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/lists/{list_id}:
+    get:
+      operationId: getSocialList
+      tags: [Social]
+      summary: Read a List visible to the current viewer
+      parameters:
+        - in: path
+          name: list_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: List details and owner capability.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, const: true }
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/SocialList'
+                      - type: object
+                        required: [is_owner]
+                        properties:
+                          is_owner: { type: boolean }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    delete:
+      operationId: deleteSocialList
+      tags: [Social]
+      summary: Delete an owned List
+      parameters:
+        - in: path
+          name: list_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Owned List soft-deleted. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/lists/{list_id}/members:
+    get:
+      operationId: listSocialListMembers
+      tags: [Social]
+      summary: List privacy-filtered members of a List
+      parameters:
+        - in: path
+          name: list_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Active, viewer-visible List members; blocked and inaccessible protected accounts are excluded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, const: true }
+                  data:
+                    type: object
+                    required: [items, owner_id]
+                    properties:
+                      items: { type: array, items: { $ref: '#/components/schemas/SocialListMember' } }
+                      owner_id: { type: string, format: uuid }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    post:
+      operationId: addSocialListMember
+      tags: [Social]
+      summary: Add an eligible account to an owned List
+      description: Only the owner may add members. The Backend enforces account discoverability, protected-account follow state, block relationships and a serialized 500-member cap. Duplicate additions are idempotent.
+      parameters:
+        - in: path
+          name: list_id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [user_id]
+              properties:
+                user_id: { type: string, format: uuid }
+      responses:
+        '200': { description: Member added or already present. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { description: List or member is unavailable to the viewer. }
+        '409': { description: List has reached its 500-member capacity. }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/lists/{list_id}/members/{member_id}:
+    delete:
+      operationId: removeSocialListMember
+      tags: [Social]
+      summary: Remove a member from a List
+      description: The List owner may remove any member; a member may remove themselves. The route is idempotent only when a matching membership exists.
+      parameters:
+        - in: path
+          name: list_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: path
+          name: member_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Member removed. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+
 components:
   securitySchemes:
     testagramBearer:
@@ -2477,6 +2664,29 @@ components:
       required: true
       schema: { type: string, minLength: 1 }
   schemas:
+    SocialList:
+      type: object
+      required: [id, owner_id, name, description, visibility, created_at, members_count]
+      properties:
+        id: { type: string, format: uuid }
+        owner_id: { type: string, format: uuid }
+        name: { type: string, minLength: 1, maxLength: 64 }
+        description: { type: string, maxLength: 280 }
+        visibility: { type: string, enum: [private, unlisted, public] }
+        pinned: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        members_count: { type: integer, minimum: 0, maximum: 500 }
+    SocialListMember:
+      type: object
+      required: [user_id, username, added_at, is_self]
+      properties:
+        user_id: { type: string, format: uuid }
+        username: { type: string }
+        display_name: { type: [string, 'null'] }
+        avatar_key: { type: [string, 'null'] }
+        added_at: { type: string, format: date-time }
+        is_self: { type: boolean }
     KnowledgeTopic:
       type: object
       required: [id, slug, name, description, followers_count, questions_count, is_following]
