@@ -404,7 +404,7 @@ if (backendApiEdgeWorker.includes("8080-agq4me2xgrgx5ge52ts437tqea.instabox.tech
 if (backendApiEdgeWrangler.includes("8080-agq4me2xgrgx5ge52ts437tqea.instabox.tech")) fail.push("Backend API edge config must not target the retired 8080 origin");
 if (!backendApiEdgeTests.includes(legacyOrigin)) fail.push("Backend API edge tests must reject the retired 8080 origin");
 const edgeSecretInstallIndex = backendApiEdgeWorkflow.indexOf("wrangler@4 secret put EDGE_PROXY_SHARED_TOKEN");
-const edgeRouteAttachIndex = backendApiEdgeWorkflow.indexOf("-X POST");
+const edgeRouteAttachIndex = backendApiEdgeWorkflow.indexOf('"$API/zones/$zone_id/workers/routes" -o "$RUNNER_TEMP/edge-route-created.json"');
 if (edgeSecretInstallIndex < 0 || edgeRouteAttachIndex < 0 || edgeSecretInstallIndex >= edgeRouteAttachIndex) {
   fail.push("Backend API edge must install EDGE_PROXY_SHARED_TOKEN before creating the public api.testagram.site route");
 }
