@@ -113,7 +113,7 @@
       "defaultBranch": "main",
       "kind": "governance",
       "sourcePinKey": null,
-      "mainCommit": "4ae9727835c30485d419b0ea8c1e3430076c0af1",
+      "mainCommit": "3ac00b6252b21d3acceeff1bf621a42106e321a9",
       "mergedPullRequests": [
         115,
         117
