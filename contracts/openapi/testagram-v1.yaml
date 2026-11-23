@@ -1022,13 +1022,13 @@ paths:
         - in: query
           name: since
           required: false
-          schema: { type: string, format: date-time }
-          description: Inclusive lower creation-time bound. Backend also accepts YYYY-MM-DD as UTC midnight.
+          schema: { type: string }
+          description: Inclusive lower creation-time bound. Accepts RFC3339 timestamps or YYYY-MM-DD as UTC midnight.
         - in: query
           name: until
           required: false
-          schema: { type: string, format: date-time }
-          description: Exclusive upper creation-time bound. Backend also accepts YYYY-MM-DD and interprets it as the following UTC midnight.
+          schema: { type: string }
+          description: Exclusive upper creation-time bound. Accepts RFC3339 timestamps or YYYY-MM-DD, interpreted as the following UTC midnight.
         - in: query
           name: language
           required: false
