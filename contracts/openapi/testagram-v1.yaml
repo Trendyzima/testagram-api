@@ -2478,13 +2478,83 @@ components:
       required: true
       schema: { type: string, minLength: 1 }
   schemas:
-
-  KnowledgeTopic:
-    type: object
-    required: [id, slug, name, description, followers_count, questions_count, is_following]
-    properties:
-      id: { type: string, format: uuid }
-      slug: { type: string, pattern: '^[a-z0-9][a-z0-9-]{1,62}    NativeAuthResponse:
+    KnowledgeTopic:
+      type: object
+      required: [id, slug, name, description, followers_count, questions_count, is_following]
+      properties:
+        id: { type: string, format: uuid }
+        slug: { type: string, pattern: '^[a-z0-9][a-z0-9-]{1,62}$' }
+        name: { type: string, maxLength: 80 }
+        description: { type: string, maxLength: 500 }
+        followers_count: { type: integer, minimum: 0 }
+        questions_count: { type: integer, minimum: 0 }
+        is_following: { type: boolean }
+    KnowledgeQuestionPage:
+      type: object
+      required: [ok, data]
+      properties:
+        ok: { type: boolean, const: true }
+        data:
+          type: object
+          required: [items, has_more, next_cursor]
+          properties:
+            items:
+              type: array
+              items:
+                type: object
+                required: [id, author_id, title, body, visibility, status, answers_count, topics, author]
+                properties:
+                  id: { type: string, format: uuid }
+                  author_id: { type: string, format: uuid }
+                  title: { type: string, maxLength: 180 }
+                  body: { type: string, maxLength: 20000 }
+                  visibility: { type: string, enum: [public, followers, private] }
+                  status: { type: string, enum: [open, answered, closed] }
+                  accepted_answer_id: { type: [string, 'null'], format: uuid }
+                  answers_count: { type: integer, minimum: 0 }
+                  topics:
+                    type: array
+                    items:
+                      type: object
+                      required: [slug, name]
+                      properties:
+                        slug: { type: string }
+                        name: { type: string }
+                  author:
+                    type: object
+                    required: [id, username, protected_account]
+                    properties:
+                      id: { type: string, format: uuid }
+                      username: { type: string }
+                      display_name: { type: [string, 'null'] }
+                      avatar_key: { type: [string, 'null'] }
+                      avatar_url: { type: string }
+                      protected_account: { type: boolean }
+            has_more: { type: boolean }
+            next_cursor: { type: string }
+        request_id: { type: string }
+    KnowledgeAnswer:
+      type: object
+      required: [id, question_id, author_id, body, revision_number, created_at, updated_at, accepted, author]
+      properties:
+        id: { type: string, format: uuid }
+        question_id: { type: string, format: uuid }
+        author_id: { type: string, format: uuid }
+        body: { type: string, maxLength: 20000 }
+        revision_number: { type: integer, minimum: 1 }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        accepted: { type: boolean }
+        author:
+          type: object
+          required: [id, username]
+          properties:
+            id: { type: string, format: uuid }
+            username: { type: string }
+            display_name: { type: [string, 'null'] }
+            avatar_key: { type: [string, 'null'] }
+            avatar_url: { type: string }
+    NativeAuthResponse:
       type: object
       additionalProperties: false
       required: [ok, data, error, request_id]
