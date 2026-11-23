@@ -607,6 +607,11 @@
     },
     {
       "method": "POST",
+      "path": "/internal/mail/events",
+      "status": "registered-only"
+    },
+    {
+      "method": "POST",
       "path": "/internal/media/fresh/cdn-download-url",
       "status": "registered-only"
     },
