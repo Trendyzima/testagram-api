@@ -27,7 +27,7 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. This revision refreshes the baseline to the exact observed mainline commits of all six runtime repositories and the control-plane mainline as of 2026-11-23. The Knowledge topics/Q&A release and its Flutter client are merged; the API contract update remains a review candidate based on the current control-plane mainline. This is an integration-review source baseline, not a deployment attestation. This is an integration-review source baseline, not a deployment attestation. A migration present in a pinned source tree is source evidence, not proof that production has applied it.
+The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. This revision refreshes the baseline to the exact observed mainline commits of all six runtime repositories and the control-plane mainline as of 2026-11-23. The Knowledge topics/Q&A release and its Flutter client are merged; the API contract update remains a review candidate based on the current control-plane mainline. This is an integration-review source baseline, not a deployment attestation. A migration present in a pinned source tree is source evidence, not proof that production has applied it.
 
 | Repository | Baseline commit |
 |---|---|
