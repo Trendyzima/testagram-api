@@ -676,3 +676,7 @@ The run verified healthy Backend API, PostgreSQL, Flutter web, Go CDN, Algorithm
 - Native identity, WebAuthn staff enrollment, M-Pesa settlement, full media durability/restore, independent Federation interoperability, end-user device acceptance and coordinated disaster recovery remain separate G0-G7 gates.
 
 **Release decision remains NOT ACCEPTED** until all required G0-G7 staging and production evidence is recorded. Healthy containers and a successful deployment workflow are not substitutes for those gates.
+
+## Backend List-feed safety release — 2026-11-23
+
+Backend mainline is pinned to `5d994277f7d77f60fed0a0b0627f254ecc2ec080`. The merged List-backed custom-feed filter is applied only when a valid, accessible `list_id` is requested; the ordinary global feed does not reference the optional Lists tables. The mainline deployment workflow passed, including Backend/Data Centre private media probes and public API/CDN/apex health checks. The deployment applied native identity migration inputs only; the existing-volume social-platform Lists migration remains separately backup-first and approval-gated. Therefore, this source/deployment record does not claim the Lists schema is live or custom feeds have passed authenticated production E2E.
