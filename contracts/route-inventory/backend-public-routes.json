@@ -47,6 +47,16 @@
     },
     {
       "method": "DELETE",
+      "path": "/api/social/lists/{list_id}",
+      "status": "contracted"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/social/lists/{list_id}/members/{target_user_id}",
+      "status": "contracted"
+    },
+    {
+      "method": "DELETE",
       "path": "/api/social/posts/{post_id}/bookmarks",
       "status": "contracted"
     },
@@ -174,6 +184,21 @@
       "method": "GET",
       "path": "/api/social/history",
       "status": "registered-only"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/lists",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/lists/{list_id}",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/lists/{list_id}/members",
+      "status": "contracted"
     },
     {
       "method": "GET",
@@ -459,6 +484,16 @@
       "method": "POST",
       "path": "/api/social/history",
       "status": "registered-only"
+    },
+    {
+      "method": "POST",
+      "path": "/api/social/lists",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
+      "path": "/api/social/lists/{list_id}/members",
+      "status": "contracted"
     },
     {
       "method": "POST",
