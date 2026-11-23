@@ -371,7 +371,7 @@ const backendApiEdgeDeployTest = readFileSync(resolve(lock.repositories.backend.
 const backendApiEdgeEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
 const backendDeployScript = readFileSync(resolve(lock.repositories.backend.checkoutPath, "scripts/start-instabox-deployment.sh"), "utf8");
 for (const [label, source, marker] of [
-  ["Backend API edge Worker", backendApiEdgeWorker, 'const EXPECTED_ORIGIN_HOST = "8080-agq4me2xgrgx5ge52ts437tqea.instabox.tech"'],
+  ["Backend API edge Worker", backendApiEdgeWorker, 'const EXPECTED_ORIGIN_HOST = "8443-agq4me2xgrgx5ge52ts437tqea.instabox.tech"'],
   ["Backend API edge Worker", backendApiEdgeWorker, 'headers.set("x-forwarded-host", API_HOST)'],
   ["Backend API edge Worker", backendApiEdgeWorker, 'headers.set("x-testagram-edge-token", edgeToken)'],
   ["Backend API edge Worker", backendApiEdgeWorker, 'headers.delete(name)'],
@@ -386,9 +386,9 @@ for (const [label, source, marker] of [
   ["Backend API edge workflow", backendApiEdgeWorkflow, "exactly one active testagram.site zone in the pinned Cloudflare account"],
   ["Backend API edge workflow", backendApiEdgeWorkflow, "partial or overlapping cutover"],
   ["Backend API edge config", backendApiEdgeWrangler, "workers_dev = false"],
-  ["Backend API edge config", backendApiEdgeWrangler, 'APP_ORIGIN = "https://8080-agq4me2xgrgx5ge52ts437tqea.instabox.tech"'],
+  ["Backend API edge config", backendApiEdgeWrangler, 'APP_ORIGIN = "https://8443-agq4me2xgrgx5ge52ts437tqea.instabox.tech"'],
   ["Backend Caddy API edge", backendCaddyfile, "@api_edge {"],
-  ["Backend Caddy API edge", backendCaddyfile, "header X-Forwarded-Host api.testagram.site"],
+  ["Backend Caddy API edge", backendCaddyfile, "header_up X-Forwarded-Host api.testagram.site"],
   ["Backend Caddy API edge", backendCaddyfile, "header X-Testagram-Edge-Token {$EDGE_PROXY_SHARED_TOKEN}"],
   ["Backend Caddy API edge", backendCaddyfile, "header_up -X-Testagram-Edge-Token"],
   ["Backend Caddy API edge", backendCaddyfile, "reverse_proxy api:8080"],
@@ -399,12 +399,12 @@ for (const [label, source, marker] of [
 ]) {
   if (!source.includes(marker)) fail.push(`${label} missing shared API edge contract marker: ${marker}`);
 }
-const oldApexOrigin = "https://8443-agq4me2xgrgx5ge52ts437tqea.instabox.tech";
-if (backendApiEdgeWorker.includes("8443-agq4me2xgrgx5ge52ts437tqea.instabox.tech")) fail.push("Backend API edge Worker must not target the apex Caddy origin on port 8443");
-if (backendApiEdgeWrangler.includes("8443-agq4me2xgrgx5ge52ts437tqea.instabox.tech")) fail.push("Backend API edge config must not target the apex Caddy origin on port 8443");
-if (!backendApiEdgeTests.includes(oldApexOrigin)) fail.push("Backend API edge tests must reject the apex Caddy origin on port 8443");
+const legacyOrigin = "https://8080-agq4me2xgrgx5ge52ts437tqea.instabox.tech";
+if (backendApiEdgeWorker.includes("8080-agq4me2xgrgx5ge52ts437tqea.instabox.tech")) fail.push("Backend API edge Worker must not target the retired 8080 origin");
+if (backendApiEdgeWrangler.includes("8080-agq4me2xgrgx5ge52ts437tqea.instabox.tech")) fail.push("Backend API edge config must not target the retired 8080 origin");
+if (!backendApiEdgeTests.includes(legacyOrigin)) fail.push("Backend API edge tests must reject the retired 8080 origin");
 const edgeSecretInstallIndex = backendApiEdgeWorkflow.indexOf("wrangler@4 secret put EDGE_PROXY_SHARED_TOKEN");
-const edgeRouteAttachIndex = backendApiEdgeWorkflow.indexOf("-X POST");
+const edgeRouteAttachIndex = backendApiEdgeWorkflow.indexOf('"$API/zones/$zone_id/workers/routes" -o "$RUNNER_TEMP/edge-route-created.json"');
 if (edgeSecretInstallIndex < 0 || edgeRouteAttachIndex < 0 || edgeSecretInstallIndex >= edgeRouteAttachIndex) {
   fail.push("Backend API edge must install EDGE_PROXY_SHARED_TOKEN before creating the public api.testagram.site route");
 }

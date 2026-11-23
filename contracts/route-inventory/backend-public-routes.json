@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "70cafba1e3a62978c93a7e34ae97fea8d47c7119",
+  "sourceRef": "7f5ca5f2001b3927dad4e5103728dabaa0ce945d",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across all production Go files in cmd/api at exact locked Backend mainline commit 70cafba1e3a62978c93a7e34ae97fea8d47c7119. Knowledge topics/Q&A, curated Lists, List-backed custom feeds and advanced privacy-safe search are contracted. The global feed remains independent of the optional Lists schema until the additive migration is explicitly applied.",
+  "note": "Static public/API route registrations across all production Go files in cmd/api at exact locked Backend mainline commit 7f5ca5f2001b3927dad4e5103728dabaa0ce945d. Native trending words and consent-based email preference/unsubscribe endpoints are registered and contracted.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
@@ -87,6 +87,11 @@
     },
     {
       "method": "GET",
+      "path": "/api/email/unsubscribe",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
       "path": "/api/federation/subscriptions",
       "status": "contracted"
     },
@@ -148,6 +153,11 @@
     {
       "method": "GET",
       "path": "/api/knowledge/topics/{topic_slug}/questions",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/email-notifications",
       "status": "contracted"
     },
     {
@@ -302,6 +312,11 @@
     },
     {
       "method": "GET",
+      "path": "/api/trends/words",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
       "path": "/api/tv/health",
       "status": "registered-only"
     },
@@ -353,6 +368,11 @@
     {
       "method": "POST",
       "path": "/api/capability",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
+      "path": "/api/email/unsubscribe",
       "status": "contracted"
     },
     {
@@ -587,6 +607,11 @@
     },
     {
       "method": "POST",
+      "path": "/internal/mail/events",
+      "status": "registered-only"
+    },
+    {
+      "method": "POST",
       "path": "/internal/media/fresh/cdn-download-url",
       "status": "registered-only"
     },
@@ -613,6 +638,11 @@
     {
       "method": "PUT",
       "path": "/api/identity/sessions/{session_id}/evidence/{evidence_id}/upload",
+      "status": "contracted"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/me/email-notifications",
       "status": "contracted"
     },
     {
