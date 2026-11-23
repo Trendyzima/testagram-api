@@ -297,6 +297,11 @@
     },
     {
       "method": "GET",
+      "path": "/internal/edge/recovery-ready",
+      "status": "registered-only"
+    },
+    {
+      "method": "GET",
       "path": "/internal/tv/catalog",
       "status": "registered-only"
     },
