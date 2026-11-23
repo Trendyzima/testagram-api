@@ -31,7 +31,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `023752d5ceaf048d5a30f4ce49b9ec738b722d4e` (2026-11-23 mainline; native Knowledge topic discovery, follow controls and topic-scoped question feeds) |
+| Flutter | `225364cc4ea0f453836a6e75c7a39c4f65dabdd7` (2026-11-23 mainline; Knowledge topics, Lists client and List-backed custom-feed request support) |
 | Backend | `5d994277f7d77f60fed0a0b0627f254ecc2ec080` (2026-11-23 mainline; Knowledge topics/Q&A, native Lists and List-backed custom feeds merged; global feed remains safe before the gated Lists migration) |
 | Data Centre | `8bc8b86d5ad718bb0d4820a832c301602c2021bf` (2026-11-23 mainline; dependency-aware video worker readiness) |
 | Testagram API control plane | `3ac00b6252b21d3acceeff1bf621a42106e321a9` (2026-11-23 mainline; Knowledge topics/Q&A contract merged; List-backed custom-feed contract remains a review candidate) |
