@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "92ff5e90856f48460497466a2d1ec5112b85e24c",
+  "sourceRef": "ee23105c9f291cd93d4e24729a33ec4e3adceb66",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across all production Go files in cmd/api at the exact locked Backend mainline commit 92ff5e90856f48460497466a2d1ec5112b85e24c. Backend PR #473 changes the API edge Worker upstream origin and adds regression tests; it does not alter Go API route registrations. Refresh this inventory whenever Backend mainline changes; route status remains governed by the OpenAPI contract and independent acceptance gates.",
+  "note": "Static public/API route registrations across all production Go files in cmd/api at the exact locked Backend mainline commit ee23105c9f291cd93d4e24729a33ec4e3adceb66. Knowledge topic, Q&A and curated Lists routes are registered and contracted; authenticated edge recovery readiness remains registered-only. Refresh this inventory whenever Backend mainline changes.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
@@ -27,6 +27,11 @@
     },
     {
       "method": "DELETE",
+      "path": "/api/knowledge/topics/{topic_slug}/follow",
+      "status": "contracted"
+    },
+    {
+      "method": "DELETE",
       "path": "/api/social/blocks/{target_user_id}",
       "status": "contracted"
     },
@@ -39,6 +44,16 @@
       "method": "DELETE",
       "path": "/api/social/history",
       "status": "registered-only"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/social/lists/{list_id}",
+      "status": "contracted"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/social/lists/{list_id}/members/{member_id}",
+      "status": "contracted"
     },
     {
       "method": "DELETE",
@@ -112,6 +127,31 @@
     },
     {
       "method": "GET",
+      "path": "/api/knowledge/questions",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/knowledge/questions/{question_id}",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/knowledge/topics",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/knowledge/topics/{topic_slug}",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/knowledge/topics/{topic_slug}/questions",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
       "path": "/api/me/federation",
       "status": "contracted"
     },
@@ -144,6 +184,21 @@
       "method": "GET",
       "path": "/api/social/history",
       "status": "registered-only"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/lists",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/lists/{list_id}",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/lists/{list_id}/members",
+      "status": "contracted"
     },
     {
       "method": "GET",
@@ -267,6 +322,11 @@
     },
     {
       "method": "GET",
+      "path": "/internal/edge/recovery-ready",
+      "status": "registered-only"
+    },
+    {
+      "method": "GET",
       "path": "/internal/tv/catalog",
       "status": "registered-only"
     },
@@ -347,6 +407,26 @@
     },
     {
       "method": "POST",
+      "path": "/api/knowledge/questions",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
+      "path": "/api/knowledge/questions/{question_id}/answers",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
+      "path": "/api/knowledge/questions/{question_id}/answers/{answer_id}/accept",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
+      "path": "/api/knowledge/topics/{topic_slug}/follow",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
       "path": "/api/media/attach",
       "status": "contracted"
     },
@@ -404,6 +484,16 @@
       "method": "POST",
       "path": "/api/social/history",
       "status": "registered-only"
+    },
+    {
+      "method": "POST",
+      "path": "/api/social/lists",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
+      "path": "/api/social/lists/{list_id}/members",
+      "status": "contracted"
     },
     {
       "method": "POST",

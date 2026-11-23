@@ -514,7 +514,7 @@ const flutterNativeAuth = readFileSync(resolve(lock.repositories["flutter-client
 const flutterBackendApi = readFileSync(resolve(lock.repositories["flutter-client"].checkoutPath, "lib/core/backend_api.dart"), "utf8");
 const flutterSafetyTests = readFileSync(resolve(lock.repositories["flutter-client"].checkoutPath, "test/profile_safety_api_test.dart"), "utf8");
 const backendRouteInventory = JSON.parse(readFileSync("contracts/route-inventory/backend-public-routes.json", "utf8"));
-const normalizeClientPath = (path) => path.replace(/\{[^}]+\}/g, '{}').replace(/\$[A-Za-z_][A-Za-z0-9_]*/g, '{}');
+const normalizeClientPath = (path) => path.replace(/\$\{[^}]+\}/g, '{}').replace(/\{[^}]+\}/g, '{}').replace(/\$[A-Za-z_][A-Za-z0-9_]*/g, '{}');
 const contractedBackendOperations = new Set(backendRouteInventory.routes.filter((route) => route.status === 'contracted').map((route) => route.method.toUpperCase() + ' ' + normalizeClientPath(route.path)));
 const flutterBackendOperations = [...flutterBackendApi.matchAll(/_request\('(GET|POST|PUT|DELETE|HEAD)',\s*baseUri\.resolve\('([^']+)'/g)].map((match) => match[1] + ' ' + normalizeClientPath(match[2]));
 const uncontractedFlutterOperations = flutterBackendOperations.filter((operation) => !contractedBackendOperations.has(operation));

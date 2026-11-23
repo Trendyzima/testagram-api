@@ -36,6 +36,8 @@ tags:
     description: Privacy-filtered people and post discovery.
   - name: Hashtags
     description: Privacy-filtered hashtag timelines and public trending topics.
+  - name: Knowledge
+    description: Authenticated, privacy-filtered questions, answers and curated topic discovery.
   - name: Notifications
     description: Authenticated notification retrieval and read state.
   - name: Threads
@@ -2107,6 +2109,547 @@ paths:
               schema: { $ref: '#/components/schemas/ApiError' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
 
+  /api/knowledge/topics:
+    get:
+      operationId: listKnowledgeTopics
+      tags: [Knowledge]
+      summary: Discover curated Knowledge topics
+      description: Requires a Testagram-native session. Returns active curated topics only. Search and counts are viewer-safe; follower counts exclude inactive accounts and question counts apply the same visibility policy as the question feed.
+      parameters:
+        - in: query
+          name: q
+          schema: { type: string, maxLength: 80 }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 50, default: 30 }
+        - in: query
+          name: after
+          description: Opaque keyset cursor returned as next_cursor; currently the last topic slug.
+          schema: { type: string, pattern: '^[a-z0-9][a-z0-9-]{1,62}$' }
+      responses:
+        '200':
+          description: Viewer-safe curated topic page.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, const: true }
+                  data:
+                    type: object
+                    required: [items, has_more, next_cursor]
+                    properties:
+                      items:
+                        type: array
+                        items: { $ref: '#/components/schemas/KnowledgeTopic' }
+                      has_more: { type: boolean }
+                      next_cursor: { type: string }
+                  error: { type: [object, 'null'] }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/knowledge/topics/{topic_slug}:
+    get:
+      operationId: getKnowledgeTopic
+      tags: [Knowledge]
+      summary: Read a curated Knowledge topic
+      parameters:
+        - in: path
+          name: topic_slug
+          required: true
+          schema: { type: string, pattern: '^[a-z0-9][a-z0-9-]{1,62}$' }
+      responses:
+        '200':
+          description: Topic details and current viewer follow state.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, const: true }
+                  data: { $ref: '#/components/schemas/KnowledgeTopic' }
+                  error: { type: [object, 'null'] }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/knowledge/topics/{topic_slug}/follow:
+    post:
+      operationId: followKnowledgeTopic
+      tags: [Knowledge]
+      summary: Follow a curated Knowledge topic
+      description: Idempotent for an existing follow. Requires a native session and is rate limited.
+      parameters:
+        - in: path
+          name: topic_slug
+          required: true
+          schema: { type: string, pattern: '^[a-z0-9][a-z0-9-]{1,62}$' }
+      responses:
+        '200':
+          description: Topic is followed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, const: true }
+                  data:
+                    type: object
+                    required: [slug, is_following]
+                    properties:
+                      slug: { type: string }
+                      is_following: { type: boolean, const: true }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    delete:
+      operationId: unfollowKnowledgeTopic
+      tags: [Knowledge]
+      summary: Unfollow a curated Knowledge topic
+      description: Idempotent when the viewer is not currently following the topic.
+      parameters:
+        - in: path
+          name: topic_slug
+          required: true
+          schema: { type: string, pattern: '^[a-z0-9][a-z0-9-]{1,62}$' }
+      responses:
+        '200':
+          description: Topic is no longer followed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, const: true }
+                  data:
+                    type: object
+                    required: [slug, is_following]
+                    properties:
+                      slug: { type: string }
+                      is_following: { type: boolean, const: false }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/knowledge/topics/{topic_slug}/questions:
+    get:
+      operationId: listKnowledgeTopicQuestions
+      tags: [Knowledge]
+      summary: List questions tagged with a topic
+      parameters:
+        - in: path
+          name: topic_slug
+          required: true
+          schema: { type: string, pattern: '^[a-z0-9][a-z0-9-]{1,62}$' }
+        - in: query
+          name: status
+          schema: { type: string, enum: [all, open, answered], default: all }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+        - in: query
+          name: before
+          description: Opaque keyset cursor returned as next_cursor.
+          schema: { type: string }
+      responses:
+        '200':
+          description: Viewer-authorized topic question page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KnowledgeQuestionPage' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/knowledge/questions:
+    get:
+      operationId: listKnowledgeQuestions
+      tags: [Knowledge]
+      summary: List viewer-authorized Knowledge questions
+      parameters:
+        - in: query
+          name: status
+          schema: { type: string, enum: [all, open, answered], default: all }
+        - in: query
+          name: limit
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+        - in: query
+          name: mine
+          schema: { type: boolean, default: false }
+        - in: query
+          name: following
+          schema: { type: boolean, default: false }
+        - in: query
+          name: topics_following
+          description: Restrict to questions tagged with at least one active topic the viewer follows.
+          schema: { type: boolean, default: false }
+        - in: query
+          name: before
+          description: Opaque keyset cursor returned as next_cursor.
+          schema: { type: string }
+      responses:
+        '200':
+          description: Viewer-authorized Knowledge question page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/KnowledgeQuestionPage' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    post:
+      operationId: createKnowledgeQuestion
+      tags: [Knowledge]
+      summary: Publish a moderated Knowledge question
+      description: Requires a native session, an active curated topic catalog when topic_slugs are supplied, and a safe idempotency key. Question creation, topic assignment and the idempotency record are atomic. Moderation is fail-closed; content requiring review is not published.
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema: { type: string, minLength: 8, maxLength: 128, pattern: '^[A-Za-z0-9._:-]{8,128}$' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [title]
+              properties:
+                title: { type: string, minLength: 8, maxLength: 180 }
+                body: { type: string, maxLength: 20000, default: '' }
+                visibility: { type: string, enum: [public, followers, private], default: public }
+                language: { type: string, maxLength: 32, default: '' }
+                topic_slugs:
+                  type: array
+                  maxItems: 5
+                  uniqueItems: true
+                  items: { type: string, pattern: '^[a-z0-9][a-z0-9-]{1,62}$' }
+      responses:
+        '201':
+          description: Question published with topic assignments.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, const: true }
+                  data:
+                    type: object
+                    required: [id, author_id, title, body, visibility, status, topic_slugs]
+                    properties:
+                      id: { type: string, format: uuid }
+                      author_id: { type: string, format: uuid }
+                      title: { type: string }
+                      body: { type: string }
+                      visibility: { type: string, enum: [public, followers, private] }
+                      status: { type: string, const: open }
+                      topic_slugs: { type: array, items: { type: string } }
+                  request_id: { type: string }
+        '200': { description: Idempotent replay of a previously published question. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { description: Idempotency key was already used for different content. }
+        '422': { description: Content requires review and was not published. }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/knowledge/questions/{question_id}:
+    get:
+      operationId: getKnowledgeQuestion
+      tags: [Knowledge]
+      summary: Read a viewer-authorized question and its answers
+      parameters:
+        - in: path
+          name: question_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Question, active topics, visible answers and owner capability.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, const: true }
+                  data:
+                    type: object
+                    required: [id, author_id, title, body, visibility, status, topics, answers, can_accept_answer]
+                    properties:
+                      id: { type: string, format: uuid }
+                      author_id: { type: string, format: uuid }
+                      title: { type: string }
+                      body: { type: string }
+                      visibility: { type: string, enum: [public, followers, private] }
+                      status: { type: string, enum: [open, answered, closed] }
+                      accepted_answer_id: { type: string, format: uuid }
+                      topics: { type: array, items: { type: object, required: [slug, name], properties: { slug: { type: string }, name: { type: string } } } }
+                      answers: { type: array, items: { $ref: '#/components/schemas/KnowledgeAnswer' } }
+                      can_accept_answer: { type: boolean }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/knowledge/questions/{question_id}/answers:
+    post:
+      operationId: createKnowledgeAnswer
+      tags: [Knowledge]
+      summary: Submit a moderated answer to an open question
+      description: Requires a native session and a safe idempotency key. Moderation is fail-closed. Answers are separate Knowledge records, not social post replies.
+      parameters:
+        - in: path
+          name: question_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema: { type: string, minLength: 8, maxLength: 128, pattern: '^[A-Za-z0-9._:-]{8,128}$' }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [body]
+              properties:
+                body: { type: string, minLength: 1, maxLength: 20000 }
+      responses:
+        '201': { description: Answer created. }
+        '200': { description: Idempotent replay of an existing answer. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { description: Question is closed or idempotency key conflicts. }
+        '422': { description: Content requires review and was not published. }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/knowledge/questions/{question_id}/answers/{answer_id}/accept:
+    post:
+      operationId: acceptKnowledgeAnswer
+      tags: [Knowledge]
+      summary: Accept an answer as the question author
+      description: Only the question author may accept a live answer written by another account. The question update is transactional.
+      parameters:
+        - in: path
+          name: question_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: path
+          name: answer_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Answer accepted and question marked answered. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { description: Only the question author may accept an answer. }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { description: Answer is not acceptable for this question. }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+
+  /api/social/lists:
+    get:
+      operationId: listSocialLists
+      tags: [Social]
+      summary: List the current viewer's curated Lists
+      description: Returns only Lists owned by the authenticated Testagram account. Results are bounded to 100 and pinned Lists appear first.
+      responses:
+        '200':
+          description: Viewer-owned Lists.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, const: true }
+                  data:
+                    type: object
+                    required: [items]
+                    properties:
+                      items: { type: array, items: { $ref: '#/components/schemas/SocialList' } }
+                  request_id: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    post:
+      operationId: createSocialList
+      tags: [Social]
+      summary: Create a curated List
+      description: Creates a private List by default. Visibility may be private, unlisted or public. Only the owner can manage membership and delete the List.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [name]
+              properties:
+                name: { type: string, minLength: 1, maxLength: 64 }
+                description: { type: string, maxLength: 280, default: '' }
+                visibility: { type: string, enum: [private, unlisted, public], default: private }
+      responses:
+        '201':
+          description: List created.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, const: true }
+                  data: { $ref: '#/components/schemas/SocialList' }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/lists/{list_id}:
+    get:
+      operationId: getSocialList
+      tags: [Social]
+      summary: Read a List visible to the current viewer
+      parameters:
+        - in: path
+          name: list_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: List details and owner capability.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, const: true }
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/SocialList'
+                      - type: object
+                        required: [is_owner]
+                        properties:
+                          is_owner: { type: boolean }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    delete:
+      operationId: deleteSocialList
+      tags: [Social]
+      summary: Delete an owned List
+      parameters:
+        - in: path
+          name: list_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Owned List soft-deleted. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/lists/{list_id}/members:
+    get:
+      operationId: listSocialListMembers
+      tags: [Social]
+      summary: List privacy-filtered members of a List
+      parameters:
+        - in: path
+          name: list_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Active, viewer-visible List members; blocked and inaccessible protected accounts are excluded.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, const: true }
+                  data:
+                    type: object
+                    required: [items, owner_id]
+                    properties:
+                      items: { type: array, items: { $ref: '#/components/schemas/SocialListMember' } }
+                      owner_id: { type: string, format: uuid }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    post:
+      operationId: addSocialListMember
+      tags: [Social]
+      summary: Add an eligible account to an owned List
+      description: Only the owner may add members. The Backend enforces account discoverability, protected-account follow state, block relationships and a serialized 500-member cap. Duplicate additions are idempotent.
+      parameters:
+        - in: path
+          name: list_id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [user_id]
+              properties:
+                user_id: { type: string, format: uuid }
+      responses:
+        '200': { description: Member added or already present. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { description: List or member is unavailable to the viewer. }
+        '409': { description: List has reached its 500-member capacity. }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/lists/{list_id}/members/{member_id}:
+    delete:
+      operationId: removeSocialListMember
+      tags: [Social]
+      summary: Remove a member from a List
+      description: The List owner may remove any member; a member may remove themselves. The route is idempotent only when a matching membership exists.
+      parameters:
+        - in: path
+          name: list_id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: path
+          name: member_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { description: Member removed. }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+
 components:
   securitySchemes:
     testagramBearer:
@@ -2121,6 +2664,105 @@ components:
       required: true
       schema: { type: string, minLength: 1 }
   schemas:
+    SocialList:
+      type: object
+      required: [id, owner_id, name, description, visibility, created_at, members_count]
+      properties:
+        id: { type: string, format: uuid }
+        owner_id: { type: string, format: uuid }
+        name: { type: string, minLength: 1, maxLength: 64 }
+        description: { type: string, maxLength: 280 }
+        visibility: { type: string, enum: [private, unlisted, public] }
+        pinned: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        members_count: { type: integer, minimum: 0, maximum: 500 }
+    SocialListMember:
+      type: object
+      required: [user_id, username, added_at, is_self]
+      properties:
+        user_id: { type: string, format: uuid }
+        username: { type: string }
+        display_name: { type: [string, 'null'] }
+        avatar_key: { type: [string, 'null'] }
+        added_at: { type: string, format: date-time }
+        is_self: { type: boolean }
+    KnowledgeTopic:
+      type: object
+      required: [id, slug, name, description, followers_count, questions_count, is_following]
+      properties:
+        id: { type: string, format: uuid }
+        slug: { type: string, pattern: '^[a-z0-9][a-z0-9-]{1,62}$' }
+        name: { type: string, maxLength: 80 }
+        description: { type: string, maxLength: 500 }
+        followers_count: { type: integer, minimum: 0 }
+        questions_count: { type: integer, minimum: 0 }
+        is_following: { type: boolean }
+    KnowledgeQuestionPage:
+      type: object
+      required: [ok, data]
+      properties:
+        ok: { type: boolean, const: true }
+        data:
+          type: object
+          required: [items, has_more, next_cursor]
+          properties:
+            items:
+              type: array
+              items:
+                type: object
+                required: [id, author_id, title, body, visibility, status, answers_count, topics, author]
+                properties:
+                  id: { type: string, format: uuid }
+                  author_id: { type: string, format: uuid }
+                  title: { type: string, maxLength: 180 }
+                  body: { type: string, maxLength: 20000 }
+                  visibility: { type: string, enum: [public, followers, private] }
+                  status: { type: string, enum: [open, answered, closed] }
+                  accepted_answer_id: { type: [string, 'null'], format: uuid }
+                  answers_count: { type: integer, minimum: 0 }
+                  topics:
+                    type: array
+                    items:
+                      type: object
+                      required: [slug, name]
+                      properties:
+                        slug: { type: string }
+                        name: { type: string }
+                  author:
+                    type: object
+                    required: [id, username, protected_account]
+                    properties:
+                      id: { type: string, format: uuid }
+                      username: { type: string }
+                      display_name: { type: [string, 'null'] }
+                      avatar_key: { type: [string, 'null'] }
+                      avatar_url: { type: string }
+                      protected_account: { type: boolean }
+            has_more: { type: boolean }
+            next_cursor: { type: string }
+        request_id: { type: string }
+    KnowledgeAnswer:
+      type: object
+      required: [id, question_id, author_id, body, revision_number, created_at, updated_at, accepted, author]
+      properties:
+        id: { type: string, format: uuid }
+        question_id: { type: string, format: uuid }
+        author_id: { type: string, format: uuid }
+        body: { type: string, maxLength: 20000 }
+        revision_number: { type: integer, minimum: 1 }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        accepted: { type: boolean }
+        author:
+          type: object
+          required: [id, username]
+          properties:
+            id: { type: string, format: uuid }
+            username: { type: string }
+            display_name: { type: [string, 'null'] }
+            avatar_key: { type: [string, 'null'] }
+            avatar_url: { type: string }
     NativeAuthResponse:
       type: object
       additionalProperties: false

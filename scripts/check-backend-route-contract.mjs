@@ -74,6 +74,7 @@ const expectedPublicInternalRoutes = new Set([
   "POST /internal/media/fresh/revoke",
   "POST /internal/media/fresh/cdn-download-url",
   "GET /internal/tv/catalog",
+  "GET /internal/edge/recovery-ready",
   "POST /internal/tv/health",
   "GET /internal/cdn/v1/{}",
   "HEAD /internal/cdn/v1/{}",
