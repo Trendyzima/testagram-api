@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "92ff5e90856f48460497466a2d1ec5112b85e24c",
+      "ref": "d2e2a9362719bb2219ffa7ecadce334d40bc4e92",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -59,6 +59,10 @@
         "cmd/api/identity_review_webauthn_integration_test.go",
         "cmd/api/identity_review_webauthn_readiness_integration_test.go",
         "cmd/api/iptv_social.go",
+        "cmd/api/knowledge_engine.go",
+        "cmd/api/knowledge_engine_test.go",
+        "cmd/api/knowledge_topics.go",
+        "cmd/api/knowledge_topics_test.go",
         "cmd/api/main.go",
         "cmd/api/media.go",
         "cmd/api/media_cdn_origin_test.go",
@@ -103,6 +107,7 @@
         "deploy/self-hosted/apply-federation-outbox-migration.sh",
         "deploy/self-hosted/apply-media-replication-migrations.sh",
         "deploy/self-hosted/apply-native-identity-migrations.sh",
+        "deploy/self-hosted/apply-social-platform-product-migration.sh",
         "deploy/self-hosted/docker-compose.yml",
         "deploy/self-hosted/minio-tools/init.sh",
         "docs/architecture/instabox-only-deployment.md",
@@ -142,6 +147,8 @@
         "internal/virtualstorage/s3provider.go",
         "internal/virtualstorage/s3provider_test.go",
         "internal/virtualstorage/storage.go",
+        "migrations/062_testagram_knowledge_engine.sql",
+        "migrations/064_knowledge_topic_seed_catalog.sql",
         "migrations/20261106_tv_health_postgres.sql",
         "migrations/20261108_communication_core.sql",
         "migrations/20261111_admin_security_controls.sql",
@@ -184,6 +191,7 @@
         "scripts/start-instabox-deployment.sh",
         "scripts/test-identity-registration-migration.sh",
         "scripts/validate-canonical-deploy-smoke.py",
+        "tests/test-knowledge-engine-migration.sh",
         "tests/test-native-staff-webauthn-migration.sh",
         "tests/test-social-platform-product-foundation.sh",
         "tests/test_cloudflare_api_gateway_deployment_order.py",
@@ -197,7 +205,8 @@
         "tests/test_native_auth_runtime_boundary.py",
         "tests/test_native_identity_migration_manifest.py",
         "tests/test_r2_managed_domain_request.py",
-        "tests/test_self_hosted_backup_guards.py"
+        "tests/test_self_hosted_backup_guards.py",
+        "tests/test_social_platform_migration_safety.py"
       ]
     },
     "data-centre": {
