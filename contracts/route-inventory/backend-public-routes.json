@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "dba7b27c2173766b728364967a90683b094ae6cc",
+  "sourceRef": "70cafba1e3a62978c93a7e34ae97fea8d47c7119",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across all production Go files in cmd/api at exact locked Backend mainline commit dba7b27c2173766b728364967a90683b094ae6cc. Knowledge topics/Q&A, curated Lists, List-backed custom feeds and advanced privacy-safe search are contracted. The global feed remains independent of the optional Lists schema until the additive migration is explicitly applied.",
+  "note": "Static public/API route registrations across all production Go files in cmd/api at exact locked Backend mainline commit 70cafba1e3a62978c93a7e34ae97fea8d47c7119. Knowledge topics/Q&A, curated Lists, List-backed custom feeds and advanced privacy-safe search are contracted. The global feed remains independent of the optional Lists schema until the additive migration is explicitly applied.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
