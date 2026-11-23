@@ -681,12 +681,34 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/trends/words:
+    get:
+      operationId: getTrendingWords
+      tags: [Discovery]
+      summary: Retrieve rising public discussion words
+      description: Returns normalized public discussion words from the previous seven days. The Backend excludes private, protected, deleted and inactive-account content, removes common stop words, and supplies recent-versus-prior-24-hour acceleration to the Algorithm ranker. Authentication is optional; viewer-specific affinity is applied only when available.
+      security:
+        - testagramBearer: []
+        - {}
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      responses:
+        '200':
+          description: Trending words, counts, momentum and ranking metadata.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ExtensibleObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/hashtags/trending:
     get:
       operationId: getTrendingHashtags
       tags: [Hashtags]
       summary: Retrieve trending public hashtags
-      description: Returns distinct public hashtags from the previous seven days. When authenticated, followed hashtags receive viewer-specific ranking affinity; the Backend retains public visibility filtering.
+      description: Returns distinct public hashtags from the previous seven days, ranked using recency, public volume, viewer affinity and short-term acceleration. The Backend retains public visibility filtering.
       security:
         - testagramBearer: []
         - {}
