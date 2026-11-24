@@ -14,7 +14,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "flutter-client",
-      "mainCommit": "e1fbfe87d763a2204b6c9de8b512f29bfffd5260",
+      "mainCommit": "bddcdc25c05fb7d45e879faef97968daddef24cf",
       "mergedPullRequests": [
         109,
         112,
