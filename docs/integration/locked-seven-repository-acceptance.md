@@ -680,3 +680,18 @@ The run verified healthy Backend API, PostgreSQL, Flutter web, Go CDN, Algorithm
 ## Backend List-feed safety release — 2026-11-23
 
 Backend mainline is pinned to `5d994277f7d77f60fed0a0b0627f254ecc2ec080`. The merged List-backed custom-feed filter is applied only when a valid, accessible `list_id` is requested; the ordinary global feed does not reference the optional Lists tables. The mainline deployment workflow passed, including Backend/Data Centre private media probes and public API/CDN/apex health checks. The deployment applied native identity migration inputs only; the existing-volume social-platform Lists migration remains separately backup-first and approval-gated. Therefore, this source/deployment record does not claim the Lists schema is live or custom feeds have passed authenticated production E2E.
+
+## Exact source-pin reconciliation — 2026-11-24
+
+This reconciliation supersedes earlier source-pin snapshots above where they conflict. The values below match the immutable six-runtime source pins in `contracts/sources.lock.json` and the current seven-organ bridge registry. They identify source trees only; they do not attest to deployment, production approval, or completion of G0–G7 acceptance.
+
+| Runtime organ | Exact current mainline SHA |
+|---|---|
+| Backend | `b8cb751e25bfeab5ff5e15bbf72a1610b929a95b` (includes merged Backend PR #535) |
+| Flutter client | `bddcdc25c05fb7d45e879faef97968daddef24cf` |
+| Data Centre | `8bc8b86d5ad718bb0d4820a832c301602c2021bf` |
+| CDN | `8b8b7212741f81d98216c4f79cde95ebccfe2f97` |
+| Federation | `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca` |
+| Algorithm | `da83f146b90cf852838fbacc96a5f4dae876e9d6` |
+
+The Testagram API governance repository is pinned separately at mainline `f11a37d4d375e8f6c768411373b1b73fb2eb8c3d`; it remains build-time contract governance, not a runtime service or hop. The Backend public-listener Mailjet delivery webhook is `POST /internal/mailjet/events` and remains classified as registered-only in the route inventory. The route auditor and inventory now agree with the exact pinned Backend source. No public OpenAPI operation or production delivery acceptance is inferred from this internal webhook registration.
