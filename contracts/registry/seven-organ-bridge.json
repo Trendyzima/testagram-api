@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "14e67fffb2150021d7b94bd8941f49ac0485d034"
   },
-  "status": "backend-e2ee-send-edit-attachment-and-call-room-hardening-merged; flutter-e2ee-label-safety-merged; e2ee-protocol-contract-merged; device-key-implementation-pending; native-mail-live-acceptance-pending",
+  "status": "backend-mainline-production-deploy-pending; flutter-pages-production-deploy-blocked-by-backend-auth-contract-drift; device-key-implementation-pending; native-mail-live-acceptance-pending",
   "repositories": [
     {
       "id": "flutter-client",
@@ -14,7 +14,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "flutter-client",
-      "mainCommit": "453a9f35d4cf53f93f25ac1224a37556d74a5699",
+      "mainCommit": "ad30af1defccbb472fda01b1440fd54d4853f173",
       "mergedPullRequests": [
         109,
         112,
@@ -27,7 +27,8 @@
         150,
         151,
         152,
-        155
+        155,
+        157
       ]
     },
     {
@@ -222,14 +223,14 @@
     "No message or call is advertised as end-to-end encrypted until the reviewed client protocol, device trust, key lifecycle and media lifecycle pass end-to-end acceptance."
   ],
   "excludedFromAcceptance": [
-    "Backend mainline is pinned to the exact current main commit. Backend PRs #548 and #549 remain unmerged candidates: #548 overlaps notification-category changes in #549, and #549 adds social discovery, saved timelines and notification category APIs. Neither PR is represented as accepted mainline.",
-    "Flutter mainline is pinned to the exact current main commit. Flutter PR #155 (profile privacy/media pagination) and stacked PR #156 (social route coverage and client API wiring) remain unmerged draft candidates. Their successful build checks do not constitute a production release.",
-    "Backend production deployment run 45038404739 succeeded on the existing InstaBox machine testagramdb. Backend, PostgreSQL, Flutter web, Go CDN, Algorithm, Federation, Data Centre media/platform/worker/video/notification and edge proxy health checks passed. Private B2/R2 write-read-delete probes and directional Backend/Federation credential checks passed.",
-    "The deployed release keeps public registration, staff enrollment and Federation delivery workers fail-closed until their independent acceptance gates pass. Successful deployment is not proof of native-auth migration, WebAuthn live acceptance, ActivityPub interoperability or production registration readiness.",
+    "Backend PR #548 was closed without merge; its overlapping notification-category work was superseded by merged PR #549. Backend #549 is accepted mainline and adds social discovery, saved timelines and notification category APIs.",
+    "Flutter PRs #155 (profile privacy/media pagination) and #157 (social route coverage, saved timelines and client API wiring) are merged and represented by the exact Flutter mainline pin. Stacked PR #156 was closed without merge; its intended delta was transplanted into #157. Merge and CI success do not constitute a production web deployment.",
+    "Backend production deployment run 45038404739 is historical evidence for the previously deployed release only. The latest mainline push validation run 45709231112 passed validation but intentionally skipped the production deploy job because production deployment requires an explicit manual confirmation.",
+    "The deployed production signup endpoint returned HTTP 400 INVALID_PASSWORD to the release probe, while current Backend mainline explicitly returns HTTP 403 IDENTITY_REVIEW_REQUIRED before password validation. This is unresolved production/source drift; the Flutter Pages workflow correctly refuses to publish until the canonical Backend deployment and live acceptance contract are aligned.",
+    "The deployed release keeps public registration, staff enrollment and Federation delivery workers fail-closed until their independent acceptance gates pass. Successful source CI or a historical deployment is not proof of native-auth migration, WebAuthn live acceptance, ActivityPub interoperability or production registration readiness.",
     "CDN PR #125 is merged at 21a254e9f67dc7a8e55dca37151a6db532405e53. Go CDN origin is installed and healthy; Cloudflare Worker deployment and canonical hostname routing remain separate production cutover gates and are not inferred from source CI.",
-    "Data Centre PR #115 and Federation PR #53 are merged into their respective main branches and pinned to exact current mainline commits.",
+    "Data Centre PR #119 and Algorithm PR #33 are merged into their respective main branches and included in the exact current mainline pins.",
     "Merged source revisions and healthy VPS containers do not prove end-user device acceptance, M-Pesa settlement, full media durability/restore, cross-instance Federation interoperability or disaster recovery.",
-    "Backend approval-ledger and communication changes are in the reviewed #424 mainline history. Do not revive the superseded overlapping #431/#432 path.",
-    "Data Centre PR #119 is an unmerged security candidate that prevents notification-device IDs from being reassigned across accounts. Algorithm PR #33 is an unmerged ranking-integrity candidate that rejects non-finite feature vectors. Neither candidate is included in the immutable mainline pins."
+    "Backend approval-ledger and communication changes are in the reviewed #424 mainline history. Do not revive the superseded overlapping #431/#432 path."
   ]
 }
