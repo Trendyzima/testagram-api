@@ -695,3 +695,19 @@ This reconciliation supersedes earlier source-pin snapshots above where they con
 | Algorithm | `da83f146b90cf852838fbacc96a5f4dae876e9d6` |
 
 The Testagram API governance repository is pinned separately at mainline `f11a37d4d375e8f6c768411373b1b73fb2eb8c3d`; it remains build-time contract governance, not a runtime service or hop. The Backend public-listener Mailjet delivery webhook is `POST /internal/mailjet/events` and remains classified as registered-only in the route inventory. The route auditor and inventory now agree with the exact pinned Backend source. No public OpenAPI operation or production delivery acceptance is inferred from this internal webhook registration.
+
+
+## 2026-11-25 notification and social integration review candidates
+
+The current mainline source pins remain unchanged for production acceptance. The following explicit review candidates are pinned only for cross-repository contract validation; none is merged or deployed:
+
+| Repository | Candidate PR | Candidate commit | Depends on |
+|---|---:|---|---|
+| Backend | [PR #539](https://github.com/Trendyzima/Testagram-backend-/pull/538) | `2af9a3f23ba9c7f82e27e72ecda11b43602024cf` | Stacked on notification-engine PR #537 |
+| Flutter client | [PR #150](https://github.com/Trendyzima/testagram-flutter-client-/pull/150) | `5277dae5f9867789e038ac2533cd76ad53647d86` | Stacked on world-class lists PR #146 and wallet notifications PR #145 |
+
+Backend PR #537 owns the canonical notification event ledger, in-app inbox, delivery rows and wallet event publication. Backend PR #539 adds the pinned-list endpoint and carries the notification stream implementation. The stream reads the canonical `testagram_local.notifications` rows directly from Backend PostgreSQL; it does not require a second Data Centre database, a Data Centre stream service, or a cross-service notification URL. Flutter PR #150 consumes the authenticated Backend SSE route, resumes with `Last-Event-ID`, and refreshes the REST inbox. Data Centre remains independently responsible for its media/storage domain.
+
+Flutter PR #150 is stacked on world-class social upgrade PR #146, which is stacked on wallet notification deep-link PR #145. Identity application intake is separately reviewed in Flutter PR #147. The notification-preferences contract covers authenticated GET/PUT for social, wallet and messaging categories.
+
+Device-token registration, FCM/APNs sender workers, native push delivery, native email dispatch integration, and real-device acceptance remain explicit G1/G4/G7 work. These source review pins do not prove deployment or production acceptance. The release decision remains NOT ACCEPTED until the full G0-G7 evidence is complete.

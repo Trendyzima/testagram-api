@@ -740,6 +740,80 @@ paths:
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/me/notification-preferences:
+    get:
+      operationId: getMyNotificationPreferences
+      tags: [Notifications]
+      summary: Read the authenticated user's push notification preferences
+      description: Returns category consent for social, wallet and messaging notifications. Missing preference records default to enabled. Requires the Testagram-native access JWT.
+      security:
+        - testagramBearer: []
+      responses:
+        '200':
+          description: Current push notification preferences.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [push_social_enabled, push_wallet_enabled, push_messages_enabled]
+                    properties:
+                      push_social_enabled: { type: boolean }
+                      push_wallet_enabled: { type: boolean }
+                      push_messages_enabled: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    put:
+      operationId: updateMyNotificationPreferences
+      tags: [Notifications]
+      summary: Update the authenticated user's push notification preferences
+      description: Updates one or more independent push categories. Omitted categories retain their existing values. Requires the Testagram-native access JWT.
+      security:
+        - testagramBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              minProperties: 1
+              properties:
+                push_social_enabled: { type: boolean }
+                push_wallet_enabled: { type: boolean }
+                push_messages_enabled: { type: boolean }
+      responses:
+        '200':
+          description: Updated preferences in the standard Backend response envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [push_social_enabled, push_wallet_enabled, push_messages_enabled]
+                    properties:
+                      push_social_enabled: { type: boolean }
+                      push_wallet_enabled: { type: boolean }
+                      push_messages_enabled: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/email/unsubscribe:
     get:
       operationId: previewSocialEmailUnsubscribe
@@ -1453,6 +1527,28 @@ paths:
         '200': { description: Follow relationship removed. }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
+  /api/social/notifications/stream:
+    get:
+      operationId: streamNotifications
+      tags: [Notifications]
+      summary: Stream authenticated user's new notifications
+      description: Server-sent events are read directly from the canonical Backend PostgreSQL notification inbox. The stream is read-only, does not mark inbox items read, and supports replay using Last-Event-ID. Requires the Testagram-native access JWT.
+      security:
+        - testagramBearer: []
+      parameters:
+        - in: header
+          name: Last-Event-ID
+          required: false
+          description: Opaque replay cursor returned in the SSE id field.
+          schema: { type: string, maxLength: 512 }
+      responses:
+        '200':
+          description: Server-sent notification events.
+          content:
+            text/event-stream:
+              schema: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/social/notifications:
     get:
       operationId: listNotifications
@@ -2734,6 +2830,52 @@ paths:
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/lists/{list_id}/pin:
+    put:
+      operationId: updateSocialListPin
+      tags: [Social]
+      summary: Pin or unpin an owned List
+      description: Updates the current user's own List pin state. A maximum of five Lists may be pinned. Repeating the same state is idempotent.
+      security:
+        - testagramBearer: []
+      parameters:
+        - in: path
+          name: list_id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [pinned]
+              properties:
+                pinned: { type: boolean }
+      responses:
+        '200':
+          description: Pin state updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, const: true }
+                  data:
+                    type: object
+                    required: [list_id, pinned]
+                    properties:
+                      list_id: { type: string, format: uuid }
+                      pinned: { type: boolean }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { description: Five pinned Lists already exist. }
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/social/lists/{list_id}/members:
