@@ -68,6 +68,13 @@ for (const match of publicRoutesSource.matchAll(/mux\.HandleFunc\("([A-Z]+) ([^"
   // of path family, so a newly introduced prefix cannot silently escape audit.
   registered.add(key(method, path));
 }
+// The native bounce handler uses a named constant so the Worker and API share
+// one path value. Resolve that exact constant for the public-listener audit.
+const bouncePath = source.match(/const nativeBounceIngressPath = "([^"]+)"/);
+if (bouncePath && publicRoutesSource.includes('mux.HandleFunc("POST "+nativeBounceIngressPath')) {
+  publicInternalRoutes.add(key("POST", bouncePath[1]));
+  registered.add(key("POST", bouncePath[1]));
+}
 const expectedPublicInternalRoutes = new Set([
   "POST /internal/media/quarantine",
   "POST /internal/media/fresh/register",
