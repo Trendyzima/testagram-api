@@ -28,26 +28,37 @@ The API repository remains build-time governance only. Flutter calls the public 
 
 ## 3. Protocol selection gate
 
-Use a maintained, independently reviewed implementation of the Signal Protocol family rather than inventing a cipher, handshake, ratchet, signature scheme, or group protocol.
+Use a maintained, independently reviewed implementation of a standardized end-to-end protocol. Do not invent a cipher, handshake, ratchet, signature scheme, group protocol or custom cryptographic wire format.
 
-Required one-to-one properties:
-- asynchronous authenticated session establishment using signed prekeys and one-time prekeys;
-- Double Ratchet message keys with forward secrecy and post-compromise recovery;
-- identity-key binding and signed-prekey verification;
-- replay rejection, bounded skipped-message keys and out-of-order delivery;
-- authenticated associated data binding protocol version, conversation, sender device, recipient device, message ID and epoch;
-- serialized, durable session-state transitions: persist the next state before releasing/sending ciphertext, and commit receive state only after plaintext is durably accepted locally;
-- safe simultaneous session starts, retries, duplicate delivery and crash recovery.
+Testagram must select **one primary protocol family** for private conversations. Do not ship Signal for direct messages and MLS for groups without a deliberate interoperability and migration design. A viable MLS deployment can model a one-to-one conversation as a two-member group and use the same group state machine for larger conversations; a Signal deployment uses its approved one-to-one session protocol and a separately reviewed group protocol.
+
+Required properties:
+- asynchronous authenticated membership/session establishment and verified device identities;
+- forward secrecy and post-compromise recovery;
+- identity-key binding, signed-prekey or MLS credential verification;
+- replay rejection, bounded out-of-order delivery and downgrade resistance;
+- authenticated associated data binding protocol version, conversation, sender device, recipient/device membership, message ID and epoch;
+- serialized, durable cryptographic-state transitions: persist the next state before releasing/sending ciphertext, and commit receive state only after plaintext is durably accepted locally;
+- safe simultaneous session starts, retries, duplicate delivery, membership changes and crash recovery;
+- identical cross-platform wire behavior on Android and the supported web target.
 
 ### Dependency assessment — no package is approved by this document
 
-The Flutter client currently declares Dart SDK compatibility from 3.5.0 and has no Signal Protocol dependency.
+The Flutter client currently declares Dart SDK compatibility from 3.5.0 and has no E2EE protocol dependency.
 
-The Dart `libsignal` wrapper currently documents Dart 3.10 / Flutter 3.38+ minimums, native FFI and web support through dart2js, with dart2wasm explicitly unsupported in its current documentation. It wraps the official Rust implementation but is a third-party binding, not a Signal-maintained Dart client. Its publisher is marked unverified on pub.dev, its package is AGPL-3.0 (with a limited app-store exception that does not automatically extend to the bundled upstream Signal binaries), and its build hooks download precompiled native/WASM artifacts from GitHub releases with SHA-256 checks. These are material licensing, supply-chain, toolchain and deployment risks. Its documentation also warns that message deserialization checks structure but does not authenticate messages, and that production stores must provide durable, serialized persistence; in-memory stores are testing-only. It documents no built-in message backup/restore or Secure Value Recovery. Legal review, source/provenance review, release checksum pinning, Flutter/Dart compatibility testing, web build-mode verification and a durable storage implementation are mandatory before adoption.
+**Signal candidates**
+- The Dart `libsignal` wrapper documents Dart 3.10 / Flutter 3.38+ minimums, native FFI and web support through dart2js; dart2wasm is explicitly unsupported in its current documentation. It wraps the official Rust implementation but is a third-party binding, not a Signal-maintained Dart client. Its pub.dev publisher is marked unverified, the wrapper is AGPL-3.0, and the bundled upstream Signal binaries have separate licensing/exception terms. Build hooks download precompiled native/WASM artifacts from GitHub releases with SHA-256 checks. Its documentation warns that deserialization checks structure but does not authenticate messages, and production stores must provide durable serialized persistence. These are material licensing, supply-chain, toolchain and deployment risks.
+- `libsignal_protocol_dart` is a pure-Dart Signal Protocol implementation with Dart 3.4 compatibility, but pub.dev identifies it as GPL-3.0. It requires a separate source review, protocol-version/interoperability review, implementation audit, maintenance assessment and legal approval.
+- The upstream Signal repository documents Java, Swift and TypeScript library interfaces; a Dart wrapper is a separate supply-chain and maintenance boundary.
+
+**MLS candidate**
+- OpenMLS is a Rust implementation of IETF MLS (RFC 9420), which supports secure groups from two members upward. Its upstream Rust project is MIT-licensed and has undergone an SRLabs security audit. The audit announcement reported eight findings, including one high-severity issue; seven fixes were merged and published, while one low-severity item was still being addressed at the time of that announcement. Verify the exact upstream release and audit remediation state before selecting it.
+- The `openmls` Dart/Flutter wrapper is MIT-licensed and documents Android/iOS/native and standard Flutter web support, encrypted state storage, and Flutter Rust Bridge integration. However, its pub.dev publisher is marked unverified, version 4.0.0 is very recent, it requires Dart 3.10 / Flutter 3.38+, and its documentation says dart2wasm is unsupported until a stable Flutter Rust Bridge fix is available. The wrapper and build-hook artifacts have not been established as independently audited merely because the upstream Rust core has been audited.
+- OpenMLS is therefore a serious candidate for a single MLS protocol across direct and group conversations, but only after reviewing the Dart wrapper source, exact Rust crate pin, native/WASM artifact provenance, durable storage and concurrency behavior, Android/web builds, RFC 9420 test vectors and the upstream audit's remaining low-severity finding.
 
 The pure-Dart `double_ratchet` package is explicitly published by an unverified uploader, states that it has not had an independent audit, uses its own wire format, and does not provide Sesame multi-device management or PQXDH in the documented version. It is not approved as the production protocol implementation.
 
-The older `libsignal_protocol_dart` option also requires a separate maintenance, provenance, algorithm, license and compatibility review. The upstream Signal repository currently documents Java, Swift and TypeScript library interfaces; a Dart wrapper is a separate supply-chain and maintenance boundary. Do not select a package solely because it compiles.
+**Decision gate:** compare Signal and MLS against the same Testagram requirements, licensing constraints, Android/web compatibility, device fanout, storage durability, migration and audit evidence. If no candidate passes, keep secure composition disabled rather than ship home-grown cryptography or a protocol wrapper whose guarantees have not been established.
 
 **Decision gate:** produce a reproducible dependency review covering source repository, publisher/provenance, release signatures/checksums, upstream Signal version, security advisories, supported Dart/Flutter versions, Android ABI/build hooks, web/WASM behavior, storage APIs, test vectors and independent review. If the official protocol implementation cannot support both Android and the required web client safely, do not ship a weaker home-grown fallback; keep secure composition disabled until a supported implementation exists.
 
