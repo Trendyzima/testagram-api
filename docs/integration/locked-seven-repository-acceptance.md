@@ -34,7 +34,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Flutter | `453a9f35d4cf53f93f25ac1224a37556d74a5699` (2026-11-23 mainline; Knowledge topics, List-backed custom feeds and advanced search filters in Explore) |
 | Backend | `fe5b5f610814c4f76812b5b437c14bfecb792bee` (2026-11-23 mainline; Knowledge topics/Q&A, native Lists, List-backed custom feeds and privacy-safe advanced search merged; engagement score uses bounded bigint arithmetic) |
 | Data Centre | `9785fd7d13e572319d60c7694ad1cabb8bcc81dd` (2026-11-23 mainline; dependency-aware video worker readiness) |
-| Testagram API control plane | `a3a61a06012f554906c2ca0bb9149555efda707e` (2026-11-23 mainline; Knowledge topics/Q&A contract merged; List-backed custom-feed contract remains a review candidate) |
+| Testagram API control plane | `f9ece1697bbd679940c80fac7b3cd14028f6b0c9` (2026-11-23 mainline; Knowledge topics/Q&A contract merged; List-backed custom-feed contract remains a review candidate) |
 | Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` (2026-11-21 mainline) |
 | Federation | `0f25d853e5ea5ac546eb1d05847086d387eb2a1c` (2026-11-22 mainline; private Backend federation bridge contract) |
 | CDN | `e0a6e0fd22c934a5bfb6a0a4b9686f33e0fa5ab7` (2026-11-23 mainline; canonical Go CDN runtime release) |
@@ -145,6 +145,30 @@ Treat the platform API and media lifecycle API as separate interfaces; do not cl
 
 **Fail if:** a hostname routes to the wrong origin, a direct-origin bypass defeats edge controls, the running digest is unknown, deployment uses a mutable tag, or a failed smoke is waived without root-cause resolution.
 
+### G8 — Unified notification event, inbox and channel delivery
+
+- Backend PostgreSQL is the only canonical owner of notification events, inbox rows, read state, preferences and channel delivery state. Data Centre's separate notification service/tables must not become a competing product source of truth; any future use must be an explicitly versioned projection with Backend-owned authorization.
+- Every business notification event must be inserted in the same transaction as its originating action and deduplicated by recipient plus stable event key. Verify rollback removes both event and inbox projection, and retry creates no duplicate.
+- REST inbox reads and read-state mutations remain authoritative. SSE is a read-only change signal with an opaque recipient-bound replay cursor; writing an SSE frame is not a provider delivery acknowledgement and must never mutate read state.
+- Push requires authenticated Android/iOS device registration and revocation, strict platform/provider pairing, account ownership enforcement, encrypted token storage with key rotation, token-hash uniqueness, and no token disclosure in responses or logs.
+- A push worker must claim rows using bounded leases and SKIP LOCKED, re-check recipient preferences and active devices immediately before send, apply bounded exponential retry, classify permanent provider rejection, disable invalid tokens, recover expired leases, and expose dead-letter/uncertain outcomes. Provider success must be recorded only after an FCM/APNs acceptance response; ambiguous timeouts must not be silently marked sent.
+- Email delivery must respect explicit category consent, verified addresses, unsubscribe and consent withdrawal. Existing native-mail social email workflows use a separate mail outbox today; they must not be represented as integrated notification_deliveries(channel='email') until an idempotent bridge and end-to-end delivery evidence exist.
+- Test recipient isolation, cross-account device-ID takeover, duplicate event replay, transactional rollback, unread/read reconciliation, SSE disconnect/reconnect, worker restart, provider outage, invalid-token response, preference changes during a lease, consent withdrawal and duplicate/ambiguous provider responses on the exact deployed build.
+
+**Current source-level position (2026-11-26):** Backend mainline contains the channel-neutral event ledger, transactional in-app inbox projection and authenticated read-only SSE stream. The migration defines push-device and delivery tables, and event publication creates push/pending rows only when an enabled device exists. The inspected Backend route inventory contains no push-device registration/revocation endpoints, and the Backend source tree contains no consumer/worker for notification_deliveries; therefore push delivery is not implemented end to end. Social follower/new-post email has separate consent-based enqueue paths into the native mail outbox, not a unified email delivery consumer. Data Centre PR #119 fixed a cross-account device ownership flaw in its separate notification service, but does not close the canonical Backend push gap. This gate remains **NOT ACCEPTED** until device lifecycle, worker, provider configuration and real-device delivery are complete.
+
+### G9 — Messaging and call end-to-end encryption
+
+- Select and approve a reviewed, interoperable E2EE protocol and maintained implementation library before writing protocol code. Do not invent a Testagram-specific cipher, ratchet, key agreement or home-grown substitute.
+- Implement a complete device lifecycle: authenticated device enrollment, identity-key verification, signed prekeys, atomic one-time-prekey claims, replenishment, revocation, identity rotation, multi-device trust and documented recovery after device loss.
+- Establish authenticated encrypted sessions with forward secrecy and post-compromise recovery. The server must not be able to substitute recipient identity keys silently; key changes require explicit client-visible verification.
+- Keep message send/edit and encrypted attachments fail-closed until both sender and recipient have usable, verified device keys and a protocol-backed session. Never accept caller-asserted ciphertext as proof of encryption and never fall back to plaintext.
+- Encrypt attachments client-side with independent random content keys and authenticated encryption before upload. CDN/Data Centre may store and transport ciphertext only; metadata, thumbnails, previews and temporary files must not leak plaintext.
+- Treat voice/video calls as a separate security gate: authenticated signaling, WebRTC DTLS-SRTP, peer identity/key binding, rotation/rekey and encrypted recording policy must be proven before calls are described as E2EE. Signaling tickets or call-history rows are not evidence of encrypted media.
+- Test unknown/stale/replaced identity keys, revoked devices, replayed and exhausted prekeys, concurrent prekey claims, offline delivery, multi-device delivery, lost-device recovery, attachment tampering, backup/restore, downgrade attempts and malicious relay behavior. Complete an independent protocol/security review and interoperability tests.
+
+**Current source-level position (2026-11-26):** Backend deliberately returns fail-closed E2EE_NOT_READY for message send/edit until verified device-key lifecycle exists. The Flutter client does not contain a complete device identity, prekey, ratchet/session or encrypted attachment subsystem. The API governance repository contains proposal-only device/prekey contracts, not an approved protocol or implemented lifecycle. This gate remains **NOT ACCEPTED**; keep encrypted messaging and E2EE call media disabled rather than implying protection that is not present.
+
 ## 4. Execution order and release decision
 
 1. Refresh source pins and provider snapshots; pass G0.
@@ -154,8 +178,10 @@ Treat the platform API and media lifecycle API as separate interfaces; do not cl
 5. Pass G4 media/platform and G5 CDN/origin.
 6. Pass G6 coordinated restore.
 7. Pass G7 routing, failure injection, monitoring and rollback.
-8. Freeze accepted image digests and produce a signed/evidence-linked release manifest.
-9. Obtain explicit production approval, deploy the same artifacts, and repeat public/functional probes.
+8. Pass G8 notification event, inbox, push and consent-aware email acceptance; do not claim unified push/email readiness before provider and real-device evidence exists.
+9. Pass G9 messaging and call E2EE protocol, device lifecycle, attachment and independent security acceptance; retain fail-closed behavior until then.
+10. Freeze accepted image digests and produce a signed/evidence-linked release manifest.
+11. Obtain explicit production approval, deploy the same artifacts, and repeat public/functional probes.
 
 **Release rule:** any failed or unexecuted P0 gate means NOT ACCEPTED. A staging pass does not automatically approve production. Production activation flags remain at their reviewed safe values until their own gate has passed.
 
