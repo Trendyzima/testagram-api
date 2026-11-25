@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "14e67fffb2150021d7b94bd8941f49ac0485d034"
   },
-  "status": "backend-origin-deployed; canonical-cloudflare-routing-pending; native-mail-and-identity-acceptance-pending",
+  "status": "backend-native-mail-merged; flutter-pages-production-deployed; native-mail-live-acceptance-pending",
   "repositories": [
     {
       "id": "flutter-client",
@@ -34,7 +34,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "10d76a5ec21acc02936771d6c21e89f1f2fc0fb0",
+      "mainCommit": "875b473f96fb512d6c89d397ce7dff12746cffec",
       "mergedPullRequests": [
         418,
         419,
@@ -59,6 +59,7 @@
         495,
         496,
         535,
+        536,
         537,
         540,
         541

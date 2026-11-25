@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "10d76a5ec21acc02936771d6c21e89f1f2fc0fb0",
+  "sourceRef": "875b473f96fb512d6c89d397ce7dff12746cffec",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across production Go files in cmd/api at Backend mainline commit 10d76a5ec21acc02936771d6c21e89f1f2fc0fb0. This commit was deployed successfully to InstaBox in workflow run 45611133397: machine/API/Go-CDN/apex origins passed direct health and private-endpoint checks. Canonical Cloudflare hostname routing remains pending; this inventory is not evidence that api.testagram.site or media.testagram.site have been cut over to these origins.",
+  "note": "Static public/API route registrations across production Go files in cmd/api at Backend mainline commit 875b473f96fb512d6c89d397ce7dff12746cffec, after native-mail PR #536 and notification/pinned-list PRs #537/#540 were merged. Flutter Pages production deployment succeeded at client mainline e40c882e95bb781a90ebcea4e8768d855017a5d0; native mail still requires independent live DNS, TCP/25, Gmail/Outlook delivery and bounce replay acceptance. This inventory is source evidence, not a claim of production mail delivery.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
@@ -637,7 +637,7 @@
     },
     {
       "method": "POST",
-      "path": "/internal/mailjet/events",
+      "path": "/internal/mail/bounce",
       "status": "registered-only"
     },
     {
