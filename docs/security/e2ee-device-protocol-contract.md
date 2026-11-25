@@ -130,7 +130,7 @@ A call may be labelled E2EE only after frame-level media encryption is integrate
 
 ## 8. Group and federation boundaries
 
-One-to-one sessions are the first release. Group conversations require a separately reviewed group protocol (for example, a maintained Sender Keys or MLS implementation), authenticated membership epochs, removal/rekey semantics, concurrent membership changes, replay protection and multi-device fanout. Do not reuse one-to-one encryption by inventing shared static group keys.
+One-to-one sessions are the first release, while group conversations remain a separate acceptance gate. If Testagram selects Signal for direct messages, use a compatible, reviewed Signal group protocol and do not silently introduce MLS as a second protocol family without a deliberate interoperability and migration design. If Testagram selects MLS as its single protocol, use MLS for both two-member direct conversations and larger groups, but still gate group membership epochs, removal/rekey semantics, concurrent membership changes, replay protection and multi-device fanout separately. Never invent shared static group keys.
 
 Cross-instance federation is a separate security domain. E2EE across remote servers requires interoperable device identity, prekey discovery, trust and revocation semantics across instances. Until that exists, do not claim federated messages are E2EE and do not downgrade local encrypted conversations when a remote participant is added.
 
