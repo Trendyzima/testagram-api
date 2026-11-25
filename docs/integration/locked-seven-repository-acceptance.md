@@ -710,3 +710,17 @@ The current mainline source pins remain unchanged for production acceptance. The
 The Backend candidate adds the canonical event ledger, in-app and push delivery rows, preference endpoints, and an authenticated SSE proxy to the private Data Centre service. The Data Centre candidate streams the Backend-owned `testagram_local.notifications` read model without creating a second source of truth or marking items read. The Flutter candidate reconnects with `Last-Event-ID` and refreshes the REST inbox. The Backend must set `DATA_CENTRE_NOTIFICATION_STREAM_URL` to the private notification service origin; the Data Centre service must share the Testagram database and have SELECT access to the canonical inbox.
 
 The notification-preferences contract covers authenticated GET/PUT for social, wallet and messaging categories. Device-token registration, FCM/APNs sender workers, native push delivery and real-device acceptance remain explicit G1/G4/G7 work. No provider credential is placed in Flutter, and no candidate is treated as production acceptance.
+
+### Exact notification integration review pins — 2026-11-25
+
+These replace earlier notification candidate SHAs in this document where they differ. They match `contracts/sources.lock.json` and `contracts/registry/seven-organ-bridge.json` on this branch:
+
+| Repository | Open review PR | Exact candidate commit |
+|---|---:|---|
+| Backend | [#537](https://github.com/Trendyzima/Testagram-backend-/pull/537) | `737f8e14a5e2a1e6708cddb1f1104b5c7aa803b6` |
+| Data Centre | [#117](https://github.com/Trendyzima/Testagram-data-centre-/pull/117) | `5b8f5df6dee6b7fe2c53b86b6d8905aa46e62f31` |
+| Flutter client | [#150](https://github.com/Trendyzima/testagram-flutter-client-/pull/150) | `6c07c45bce54dc5cb13e9ea451b711c82c10027e` |
+
+Flutter PR #150 is stacked on world-class social upgrade PR #146, which is stacked on wallet notification deep-link PR #145. Identity application intake is separately reviewed in Flutter PR #147. The Backend candidate checks pass, with deployment jobs skipped; Data Centre candidate checks pass; Flutter PR #150 build checks pass while its Pages and publish workflows are still running at the time of this update. API contract CI must pass against the exact final bridge head before this integration candidate is accepted.
+
+These are source review pins only. They do not change current mainline pins or prove that the services are deployed, connected to the same live database, or accepted in production. The release decision remains NOT ACCEPTED until the full G0–G7 evidence is complete.
