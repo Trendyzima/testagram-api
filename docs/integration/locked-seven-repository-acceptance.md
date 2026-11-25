@@ -157,6 +157,18 @@ Treat the platform API and media lifecycle API as separate interfaces; do not cl
 
 **Current source-level position (2026-11-26):** Backend mainline contains the channel-neutral event ledger, transactional in-app inbox projection and authenticated read-only SSE stream. The migration defines push-device and delivery tables, and event publication creates push/pending rows only when an enabled device exists. The inspected Backend route inventory contains no push-device registration/revocation endpoints, and the Backend source tree contains no consumer/worker for notification_deliveries; therefore push delivery is not implemented end to end. Social follower/new-post email has separate consent-based enqueue paths into the native mail outbox, not a unified email delivery consumer. Data Centre PR #119 fixed a cross-account device ownership flaw in its separate notification service, but does not close the canonical Backend push gap. This gate remains **NOT ACCEPTED** until device lifecycle, worker, provider configuration and real-device delivery are complete.
 
+### G9 — Messaging and call end-to-end encryption
+
+- Select and approve a reviewed, interoperable E2EE protocol and maintained implementation library before writing protocol code. Do not invent a Testagram-specific cipher, ratchet, key agreement or home-grown substitute.
+- Implement a complete device lifecycle: authenticated device enrollment, identity-key verification, signed prekeys, atomic one-time-prekey claims, replenishment, revocation, identity rotation, multi-device trust and documented recovery after device loss.
+- Establish authenticated encrypted sessions with forward secrecy and post-compromise recovery. The server must not be able to substitute recipient identity keys silently; key changes require explicit client-visible verification.
+- Keep message send/edit and encrypted attachments fail-closed until both sender and recipient have usable, verified device keys and a protocol-backed session. Never accept caller-asserted ciphertext as proof of encryption and never fall back to plaintext.
+- Encrypt attachments client-side with independent random content keys and authenticated encryption before upload. CDN/Data Centre may store and transport ciphertext only; metadata, thumbnails, previews and temporary files must not leak plaintext.
+- Treat voice/video calls as a separate security gate: authenticated signaling, WebRTC DTLS-SRTP, peer identity/key binding, rotation/rekey and encrypted recording policy must be proven before calls are described as E2EE. Signaling tickets or call-history rows are not evidence of encrypted media.
+- Test unknown/stale/replaced identity keys, revoked devices, replayed and exhausted prekeys, concurrent prekey claims, offline delivery, multi-device delivery, lost-device recovery, attachment tampering, backup/restore, downgrade attempts and malicious relay behavior. Complete an independent protocol/security review and interoperability tests.
+
+**Current source-level position (2026-11-26):** Backend deliberately returns fail-closed E2EE_NOT_READY for message send/edit until verified device-key lifecycle exists. The Flutter client does not contain a complete device identity, prekey, ratchet/session or encrypted attachment subsystem. The API governance repository contains proposal-only device/prekey contracts, not an approved protocol or implemented lifecycle. This gate remains **NOT ACCEPTED**; keep encrypted messaging and E2EE call media disabled rather than implying protection that is not present.
+
 ## 4. Execution order and release decision
 
 1. Refresh source pins and provider snapshots; pass G0.
@@ -167,8 +179,9 @@ Treat the platform API and media lifecycle API as separate interfaces; do not cl
 6. Pass G6 coordinated restore.
 7. Pass G7 routing, failure injection, monitoring and rollback.
 8. Pass G8 notification event, inbox, push and consent-aware email acceptance; do not claim unified push/email readiness before provider and real-device evidence exists.
-9. Freeze accepted image digests and produce a signed/evidence-linked release manifest.
-10. Obtain explicit production approval, deploy the same artifacts, and repeat public/functional probes.
+9. Pass G9 messaging and call E2EE protocol, device lifecycle, attachment and independent security acceptance; retain fail-closed behavior until then.
+10. Freeze accepted image digests and produce a signed/evidence-linked release manifest.
+11. Obtain explicit production approval, deploy the same artifacts, and repeat public/functional probes.
 
 **Release rule:** any failed or unexecuted P0 gate means NOT ACCEPTED. A staging pass does not automatically approve production. Production activation flags remain at their reviewed safe values until their own gate has passed.
 
