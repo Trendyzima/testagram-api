@@ -302,6 +302,11 @@
     },
     {
       "method": "GET",
+      "path": "/api/social/bookmarks",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
       "path": "/api/social/follow-requests",
       "status": "registered-only"
     },
@@ -518,6 +523,11 @@
     {
       "method": "GET",
       "path": "/api/social/profiles/{user_id}/posts",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/suggestions",
       "status": "contracted"
     },
     {
