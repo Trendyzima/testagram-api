@@ -58,7 +58,7 @@
         496,
         535
       ],
-      "candidateCommit": "e2866b7b06122b46a00e58effbd2d0aa3f86a815",
+      "candidateCommit": "39a5f2680d77366b9b9ec527ddcc7781caf5aa90",
       "candidatePullRequest": 538
     },
     {
@@ -74,9 +74,7 @@
         113,
         114,
         115
-      ],
-      "candidateCommit": "5b8f5df6dee6b7fe2c53b86b6d8905aa46e62f31",
-      "candidatePullRequest": 117
+      ]
     },
     {
       "id": "cdn",
