@@ -695,3 +695,15 @@ This reconciliation supersedes earlier source-pin snapshots above where they con
 | Algorithm | `da83f146b90cf852838fbacc96a5f4dae876e9d6` |
 
 The Testagram API governance repository is pinned separately at mainline `f11a37d4d375e8f6c768411373b1b73fb2eb8c3d`; it remains build-time contract governance, not a runtime service or hop. The Backend public-listener Mailjet delivery webhook is `POST /internal/mailjet/events` and remains classified as registered-only in the route inventory. The route auditor and inventory now agree with the exact pinned Backend source. No public OpenAPI operation or production delivery acceptance is inferred from this internal webhook registration.
+
+
+## 2026-11-25 notification integration review candidates
+
+The current mainline source pins remain unchanged for production acceptance. The following explicit review candidates are pinned only for cross-repository contract validation; neither candidate is merged or deployed:
+
+| Repository | Candidate PR | Candidate commit | Depends on |
+|---|---:|---|---|
+| Backend | [PR #537](https://github.com/Trendyzima/Testagram-backend-/pull/537) | `031c04b16e676dbe37ea033c71c2e963b852535f` | Mainline Backend |
+| Flutter Client | [PR #145](https://github.com/Trendyzima/testagram-flutter-client-/pull/145) | `90973eaec43c453b9b43e9c53be7072374cf7ea1` | Backend notification-preferences contract in this review |
+
+The notification-preferences contract covers authenticated GET/PUT for social, wallet and messaging categories. This contract alignment does not imply that device-token registration, FCM/APNs sender workers, native push delivery or real-device acceptance are complete. Those remain explicit G1/G4/G7 work; no provider credential is placed in Flutter.
