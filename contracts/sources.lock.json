@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "2af9a3f23ba9c7f82e27e72ecda11b43602024cf",
+      "ref": "1caed6d513be3fc64cc0b22c14f124496fb6666e",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -219,7 +219,9 @@
         "tests/test_native_identity_migration_manifest.py",
         "tests/test_r2_managed_domain_request.py",
         "tests/test_self_hosted_backup_guards.py",
-        "tests/test_social_platform_migration_safety.py"
+        "tests/test_social_platform_migration_safety.py",
+        "cmd/api/social_lists_pin.go",
+        "cmd/api/social_lists_pin_test.go"
       ]
     },
     "data-centre": {
@@ -298,7 +300,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "5277dae5f9867789e038ac2533cd76ad53647d86",
+      "ref": "77bee62a56fcdfaa173677163c059eb1baa394bf",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",
@@ -377,7 +379,8 @@
         "test/features/tv/tv_playback_policy_test.dart",
         "test/features/wallet/wallet_screen_test.dart",
         "test/profile_safety_api_test.dart",
-        "tool/tv_health_monitor.mjs"
+        "tool/tv_health_monitor.mjs",
+        "test/features/lists/social_lists_api_test.dart"
       ]
     },
     "federation": {
