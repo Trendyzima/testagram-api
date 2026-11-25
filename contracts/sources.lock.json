@@ -292,6 +292,7 @@
       "checkoutPath": "source-repos/cdn",
       "sourcePaths": [
         ".github/workflows/ci.yml",
+        ".github/workflows/cleanup-detached-api-worker.yml",
         ".github/workflows/deploy-private-r2-worker.yml",
         ".github/workflows/production-media-smoke.yml",
         ".github/workflows/restore-canonical-host-routing.yml",
@@ -308,7 +309,6 @@
         "internal/edge/integration_test.go",
         "internal/edge/server.go",
         "internal/edge/server_test.go",
-        ".github/workflows/cleanup-detached-api-worker.yml",
         "tests/test_restore_canonical_host_routing_guards.py"
       ]
     },
@@ -420,24 +420,24 @@
         "api/events/post-published.v1.schema.json",
         "api/openapi.yaml",
         "docs/backend-integration-contract.md",
+        "docs/internal/openapi/backend-private-v1.yaml",
         "docs/six-repository-runtime-integration-contract.md",
         "internal/backend/client.go",
         "internal/backend/client_test.go",
         "internal/httpapi/internal_activities.go",
         "internal/httpapi/internal_activities_test.go",
-        "internal/httpapi/server.go",
         "internal/httpapi/remote_subscriptions_internal.go",
         "internal/httpapi/remote_subscriptions_internal_test.go",
+        "internal/httpapi/server.go",
         "internal/httpapi/server_test.go",
+        "internal/httpapi/worker_status.go",
         "internal/store/followers.go",
         "internal/store/schema.sql",
         "internal/store/store_test.go",
         "internal/worker/inbox.go",
         "internal/worker/inbox_test.go",
         "internal/worker/outbox.go",
-        "internal/worker/outbox_test.go",
-        "internal/httpapi/worker_status.go",
-        "docs/internal/openapi/backend-private-v1.yaml"
+        "internal/worker/outbox_test.go"
       ]
     },
     "algorithm": {
