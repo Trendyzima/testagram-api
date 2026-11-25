@@ -58,7 +58,7 @@ Required evidence:
 
 ## Gate C — messaging E2EE (Backend PRs #542/#545; Flutter PR #152; API PR #145)
 
-**Source state:** Backend PRs #542 and #545 are merged. Flutter PR #152 is merged. They correctly fail closed: encrypted send/edit and private-message attachments are unavailable until the cryptographic lifecycle exists. API PR #145 remains open and compares Signal and MLS candidates; it adds no runtime implementation and approves no package.
+**Source state:** Backend PRs #542 and #545 are merged. Flutter PR #152 is merged. They correctly fail closed: encrypted send/edit and private-message attachments are unavailable until the cryptographic lifecycle exists. API PR #145 is merged as an architecture evaluation only; it adds no runtime implementation and approves no package. The current decision remains NO PROTOCOL APPROVED.
 
 Required implementation and evidence:
 
@@ -81,7 +81,7 @@ Required implementation and evidence:
 
 ## Gate D — deployment and seven-organ integration
 
-**Source state:** recent Backend mainline validation and integration jobs have passed, but the latest production deployment jobs were skipped. A Flutter Pages deployment succeeded for its recorded commit. Neither fact establishes that all runtime organs are deployed compatibly or reachable.
+**Source state:** the six runtime pins in `contracts/sources.lock.json` were checked against the current `main` HEADs on 2026-11-25 and match: Backend `bd7a5ce1ca59089f3ea57740fa83f4cdd30a0189`; Data Centre `8bc8b86d5ad718bb0d4820a832c301602c2021bf`; CDN `8b8b7212741f81d98216c4f79cde95ebccfe2f97`; Flutter `8ba79ffb45e142978f420652927d70f8ed8257cb`; Federation `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca`; Algorithm `da83f146b90cf852838fbacc96a5f4dae876e9d6`. Backend mainline validation, PostgreSQL integrations, staff WebAuthn tests and vulnerability scan passed on the inspected revision. Production deployment, identity activation and native-mail diagnostic jobs were skipped because the workflow intentionally requires an explicit manual `workflow_dispatch` confirmation; this is a safeguard, not a failed test. A Flutter Pages deployment succeeded for its recorded commit. None of these facts establishes that all runtime organs are deployed compatibly or reachable.
 
 Required evidence for one coordinated staging release:
 
