@@ -703,7 +703,7 @@ The current mainline source pins remain unchanged for production acceptance. The
 
 | Repository | Candidate PR | Candidate commit | Depends on |
 |---|---:|---|---|
-| Backend | [PR #537](https://github.com/Trendyzima/Testagram-backend-/pull/537) | `031c04b16e676dbe37ea033c71c2e963b852535f` | Mainline Backend |
+| Backend | [PR #537](https://github.com/Trendyzima/Testagram-backend-/pull/537) | `637ecfa5c9ab553b7280430c6e9e517219c2b1af` | Mainline Backend |
 | Flutter Client | [PR #145](https://github.com/Trendyzima/testagram-flutter-client-/pull/145) | `90973eaec43c453b9b43e9c53be7072374cf7ea1` | Backend notification-preferences contract in this review |
 
-The notification-preferences contract covers authenticated GET/PUT for social, wallet and messaging categories. This contract alignment does not imply that device-token registration, FCM/APNs sender workers, native push delivery or real-device acceptance are complete. Those remain explicit G1/G4/G7 work; no provider credential is placed in Flutter.
+The Backend candidate also fixes a consumed-request-body recursion in the PUT response path and adds unit coverage for preference defaults, persisted values, database errors and the response envelope. The notification-preferences contract covers authenticated GET/PUT for social, wallet and messaging categories. This contract alignment does not imply that device-token registration, FCM/APNs sender workers, native push delivery or real-device acceptance are complete. Those remain explicit G1/G4/G7 work; no provider credential is placed in Flutter.
