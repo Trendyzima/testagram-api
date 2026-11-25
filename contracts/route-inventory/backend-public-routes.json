@@ -381,6 +381,11 @@
       "status": "contracted"
     },
     {
+      "method": "PUT",
+      "path": "/api/social/lists/{list_id}/pin",
+      "status": "contracted"
+    },
+    {
       "method": "GET",
       "path": "/api/social/notifications",
       "status": "contracted"
