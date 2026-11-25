@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "1caed6d513be3fc64cc0b22c14f124496fb6666e",
+      "ref": "10d76a5ec21acc02936771d6c21e89f1f2fc0fb0",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -221,7 +221,8 @@
         "tests/test_self_hosted_backup_guards.py",
         "tests/test_social_platform_migration_safety.py",
         "cmd/api/social_lists_pin.go",
-        "cmd/api/social_lists_pin_test.go"
+        "cmd/api/social_lists_pin_test.go",
+        "tests/test_instabox_exec_stdin_contract.py"
       ]
     },
     "data-centre": {
@@ -300,7 +301,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "77bee62a56fcdfaa173677163c059eb1baa394bf",
+      "ref": "e40c882e95bb781a90ebcea4e8768d855017a5d0",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",

@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "1caed6d513be3fc64cc0b22c14f124496fb6666e",
+  "sourceRef": "10d76a5ec21acc02936771d6c21e89f1f2fc0fb0",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across production Go files in cmd/api at Backend mainline commit 1caed6d513be3fc64cc0b22c14f124496fb6666e, after notification-engine PR #537 and pinned-list PR #540 were merged. This is a source inventory, not production deployment or live-route acceptance evidence.",
+  "note": "Static public/API route registrations across production Go files in cmd/api at Backend mainline commit 10d76a5ec21acc02936771d6c21e89f1f2fc0fb0. Notification event ledger, SSE, pinned-list routes and InstaBox deployment handoff are merged. This inventory is not evidence of a successful live Backend deployment.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
