@@ -740,6 +740,80 @@ paths:
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/me/notification-preferences:
+    get:
+      operationId: getMyNotificationPreferences
+      tags: [Notifications]
+      summary: Read the authenticated user's push notification preferences
+      description: Returns category consent for social, wallet and messaging notifications. Missing preference records default to enabled. Requires the Testagram-native access JWT.
+      security:
+        - testagramBearer: []
+      responses:
+        '200':
+          description: Current push notification preferences.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [push_social_enabled, push_wallet_enabled, push_messages_enabled]
+                    properties:
+                      push_social_enabled: { type: boolean }
+                      push_wallet_enabled: { type: boolean }
+                      push_messages_enabled: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    put:
+      operationId: updateMyNotificationPreferences
+      tags: [Notifications]
+      summary: Update the authenticated user's push notification preferences
+      description: Updates one or more independent push categories. Omitted categories retain their existing values. Requires the Testagram-native access JWT.
+      security:
+        - testagramBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              minProperties: 1
+              properties:
+                push_social_enabled: { type: boolean }
+                push_wallet_enabled: { type: boolean }
+                push_messages_enabled: { type: boolean }
+      responses:
+        '200':
+          description: Updated preferences in the standard Backend response envelope.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [ok, data, error, request_id]
+                properties:
+                  ok: { const: true }
+                  data:
+                    type: object
+                    additionalProperties: false
+                    required: [push_social_enabled, push_wallet_enabled, push_messages_enabled]
+                    properties:
+                      push_social_enabled: { type: boolean }
+                      push_wallet_enabled: { type: boolean }
+                      push_messages_enabled: { type: boolean }
+                  error: { type: 'null' }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/email/unsubscribe:
     get:
       operationId: previewSocialEmailUnsubscribe
