@@ -34,7 +34,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "e91fb285e0fd171de515b0d0169545ea2368b0c3",
+      "mainCommit": "ed25ef6ffa0a9342c5134d2fae353aa1dca3cffb",
       "mergedPullRequests": [
         418,
         419,
@@ -63,7 +63,8 @@
         537,
         540,
         541,
-        542
+        542,
+        545
       ]
     },
     {
