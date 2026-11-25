@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "14e67fffb2150021d7b94bd8941f49ac0485d034"
   },
-  "status": "current-mainline-plus-explicit-review-candidates; runtime-acceptance-pending",
+  "status": "current-mainline-pins-updated; live-production-acceptance-pending",
   "repositories": [
     {
       "id": "flutter-client",
@@ -14,17 +14,18 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "flutter-client",
-      "mainCommit": "bddcdc25c05fb7d45e879faef97968daddef24cf",
+      "mainCommit": "77bee62a56fcdfaa173677163c059eb1baa394bf",
       "mergedPullRequests": [
         109,
         112,
         113,
         116,
         121,
-        122
-      ],
-      "candidateCommit": "5277dae5f9867789e038ac2533cd76ad53647d86",
-      "candidatePullRequest": 150
+        122,
+        145,
+        146,
+        150
+      ]
     },
     {
       "id": "backend",
@@ -32,7 +33,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "b8cb751e25bfeab5ff5e15bbf72a1610b929a95b",
+      "mainCommit": "1caed6d513be3fc64cc0b22c14f124496fb6666e",
       "mergedPullRequests": [
         418,
         419,
@@ -56,10 +57,10 @@
         493,
         495,
         496,
-        535
-      ],
-      "candidateCommit": "2af9a3f23ba9c7f82e27e72ecda11b43602024cf",
-      "candidatePullRequest": 539
+        535,
+        537,
+        540
+      ]
     },
     {
       "id": "data-centre",
