@@ -703,8 +703,8 @@ The current mainline source pins remain unchanged for production acceptance. The
 
 | Repository | Merged PRs | Current main commit |
 |---|---|---|
-| Backend | [#537](https://github.com/Trendyzima/Testagram-backend-/pull/537), [#540](https://github.com/Trendyzima/Testagram-backend-/pull/540) | `1caed6d513be3fc64cc0b22c14f124496fb6666e` |
-| Flutter client | [#145](https://github.com/Trendyzima/testagram-flutter-client-/pull/145), [#146](https://github.com/Trendyzima/testagram-flutter-client-/pull/146), [#150](https://github.com/Trendyzima/testagram-flutter-client-/pull/150) | `77bee62a56fcdfaa173677163c059eb1baa394bf` |
+| Backend | [#537](https://github.com/Trendyzima/Testagram-backend-/pull/537), [#540](https://github.com/Trendyzima/Testagram-backend-/pull/540), [#541](https://github.com/Trendyzima/Testagram-backend-/pull/541) | `10d76a5ec21acc02936771d6c21e89f1f2fc0fb0` |
+| Flutter client | [#145](https://github.com/Trendyzima/testagram-flutter-client-/pull/145), [#146](https://github.com/Trendyzima/testagram-flutter-client-/pull/146), [#150](https://github.com/Trendyzima/testagram-flutter-client-/pull/150), [#151](https://github.com/Trendyzima/testagram-flutter-client-/pull/151) | `e40c882e95bb781a90ebcea4e8768d855017a5d0` |
 
 Backend #537 owns the canonical notification event ledger, in-app inbox, per-channel delivery rows and wallet event publication. Backend #540 adds the owner-scoped pinned-list endpoint on top of the merged notification foundation. The notification stream reads canonical `testagram_local.notifications` rows directly from Backend PostgreSQL; it does not require a second Data Centre database, a Data Centre stream service, or a cross-service notification URL.
 
