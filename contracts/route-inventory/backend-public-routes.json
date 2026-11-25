@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "f35edbb5ce1bdb74196e9c0f2e2b072bf3d7e719",
+  "sourceRef": "fe5b5f610814c4f76812b5b437c14bfecb792bee",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across production Go files in cmd/api at Backend mainline commit f35edbb5ce1bdb74196e9c0f2e2b072bf3d7e719. This inventory is source evidence, not a claim of production mail delivery. Backend source pin includes merged fail-closed E2EE message send/edit behavior; proposed device/prekey routes are not registered or advertised.",
+  "note": "Static public/API route registrations across production Go files in cmd/api at Backend mainline commit fe5b5f610814c4f76812b5b437c14bfecb792bee, including merged social discovery, saved timeline, profile-media pagination and notification category handlers. This inventory is source evidence, not a claim of production mail delivery. Secure message send/edit remains fail-closed; proposed device/prekey routes are not registered or advertised.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
