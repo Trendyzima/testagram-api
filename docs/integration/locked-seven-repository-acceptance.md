@@ -704,7 +704,7 @@ The notification, pinned-list and native-mail changes are now merged into Backen
 | Repository | Merged PRs | Current main commit |
 |---|---|---|
 | Backend | [#536](https://github.com/Trendyzima/Testagram-backend-/pull/536), [#537](https://github.com/Trendyzima/Testagram-backend-/pull/537), [#540](https://github.com/Trendyzima/Testagram-backend-/pull/540), [#542](https://github.com/Trendyzima/Testagram-backend-/pull/542), [#545](https://github.com/Trendyzima/Testagram-backend-/pull/545) | `ed25ef6ffa0a9342c5134d2fae353aa1dca3cffb` |
-| Flutter client | [#145](https://github.com/Trendyzima/testagram-flutter-client-/pull/145), [#146](https://github.com/Trendyzima/testagram-flutter-client-/pull/146), [#150](https://github.com/Trendyzima/testagram-flutter-client-/pull/150), [#151](https://github.com/Trendyzima/testagram-flutter-client-/pull/151) | `e40c882e95bb781a90ebcea4e8768d855017a5d0` |
+| Flutter client | [#145](https://github.com/Trendyzima/testagram-flutter-client-/pull/145), [#146](https://github.com/Trendyzima/testagram-flutter-client-/pull/146), [#150](https://github.com/Trendyzima/testagram-flutter-client-/pull/150), [#151](https://github.com/Trendyzima/testagram-flutter-client-/pull/151), [#152](https://github.com/Trendyzima/testagram-flutter-client-/pull/152) | `8ba79ffb45e142978f420652927d70f8ed8257cb` |
 
 Backend #537 provides the canonical event ledger, inbox, idempotency, per-channel delivery rows, wallet event publication and authenticated SSE. Backend #540 adds owner-scoped pinned-list controls. Flutter #145/#146/#150 provide wallet deep links, pinned Home lists, and authenticated SSE resume/inbox refresh.
 
