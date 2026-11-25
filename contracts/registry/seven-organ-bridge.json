@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "14e67fffb2150021d7b94bd8941f49ac0485d034"
   },
-  "status": "current-mainline-source-pins; runtime-acceptance-pending",
+  "status": "current-mainline-plus-explicit-review-candidates; runtime-acceptance-pending",
   "repositories": [
     {
       "id": "flutter-client",
@@ -22,7 +22,9 @@
         116,
         121,
         122
-      ]
+      ],
+      "candidateCommit": "90973eaec43c453b9b43e9c53be7072374cf7ea1",
+      "candidatePullRequest": 145
     },
     {
       "id": "backend",
@@ -55,7 +57,9 @@
         495,
         496,
         535
-      ]
+      ],
+      "candidateCommit": "031c04b16e676dbe37ea033c71c2e963b852535f",
+      "candidatePullRequest": 537
     },
     {
       "id": "data-centre",
@@ -120,7 +124,7 @@
       "defaultBranch": "main",
       "kind": "governance",
       "sourcePinKey": null,
-      "mainCommit": "f11a37d4d375e8f6c768411373b1b73fb2eb8c3d",
+      "mainCommit": "7780419d3e3e9756a637596376417820ae39c823",
       "mergedPullRequests": [
         115,
         117
@@ -203,8 +207,8 @@
     "All six runtime source pins identify exact current mainline commits; production and product acceptance remain independent gates."
   ],
   "excludedFromAcceptance": [
-    "Backend PR #424 and its reviewed communication, wallet and knowledge-engine stack are merged. The current Backend source pin is 92ff5e90856f48460497466a2d1ec5112b85e24c; PR #473 corrects the API edge upstream to the direct Backend API origin and adds regression coverage without changing Go API route registrations.",
-    "Flutter mainline is pinned to 2f31cac2e21887e15c7be8f9d4a14b698b3e05cc. This source update changes only the production domain-smoke workflow to assert the locked G3 fail-closed behavior; the Flutter application source and previously built immutable web image are unchanged.",
+    "Backend mainline remains pinned to b8cb751e25bfeab5ff5e15bbf72a1610b929a95b. Backend PR #537 (candidate 031c04b16e676dbe37ea033c71c2e963b852535f) adds the unified notification event ledger, wallet event publication and authenticated category preferences; it is an unmerged draft candidate and its push sender/device-token registration are not implemented.",
+    "Flutter mainline remains pinned to bddcdc25c05fb7d45e879faef97968daddef24cf. Flutter PR #145 (candidate 90973eaec43c453b9b43e9c53be7072374cf7ea1) consumes Backend PR #537's category-preference endpoints and adds wallet notification deep links; it is an unmerged draft candidate and FCM/APNs registration and real-device delivery remain outstanding.",
     "Backend production deployment run 45038404739 succeeded on the existing InstaBox machine testagramdb. Backend, PostgreSQL, Flutter web, Go CDN, Algorithm, Federation, Data Centre media/platform/worker/video/notification and edge proxy health checks passed. Private B2/R2 write-read-delete probes and directional Backend/Federation credential checks passed.",
     "The deployed release keeps public registration, staff enrollment and Federation delivery workers fail-closed until their independent acceptance gates pass. Successful deployment is not proof of native-auth migration, WebAuthn live acceptance, ActivityPub interoperability or production registration readiness.",
     "CDN PR #125 is merged at 21a254e9f67dc7a8e55dca37151a6db532405e53. Go CDN origin is installed and healthy; Cloudflare Worker deployment and canonical hostname routing remain separate production cutover gates and are not inferred from source CI.",
