@@ -76,7 +76,7 @@ const expectedPublicInternalRoutes = new Set([
   "GET /internal/tv/catalog",
   "GET /internal/edge/recovery-ready",
   "POST /internal/tv/health",
-  "POST /internal/mailjet/events",
+  "POST /internal/mail/bounce",
   "GET /internal/cdn/v1/{}",
   "HEAD /internal/cdn/v1/{}",
 ]);
