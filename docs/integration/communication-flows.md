@@ -39,3 +39,18 @@ The `testagram.post.published` event schema is mirrored from Federation's reposi
 - CDN cache misses must resolve only through configured origins/shields. Private media must fail closed when authorization is absent or expired.
 - Federation delivery failure is asynchronous and must not roll back an already committed local post.
 - An unknown or unimplemented capability returns an explicit error; no fabricated success or fallback to retired Supabase behavior.
+
+
+## End-to-end encryption trust boundary (2026-11-25)
+
+The normative target and release gates are defined in [the E2EE device and protocol contract](../security/e2ee-device-protocol-contract.md). That document is an architecture decision, not evidence that E2EE is live.
+
+Current release posture:
+- Flutter secure composition/decryption remains unavailable pending device-key enrollment, identity verification, protocol implementation and durable ratchet storage.
+- Backend message send/edit must reject unverified envelopes with `E2EE_NOT_READY`; a caller-supplied ciphertext field is not proof of encryption.
+- Message and call rows must not advertise E2EE until the corresponding client and server lifecycle is accepted.
+- Data Centre, CDN and notification systems transport/store opaque ciphertext only when the approved lifecycle is implemented; they never receive keys or plaintext.
+- Calls, group conversations, federated E2EE and encrypted attachments are separate release gates.
+- The seven-organ bridge must carry the same protocol version and acceptance status; no organ may independently claim E2EE.
+
+Backend PR #542 (message send/edit fail-closed) and PR #545 (private attachments fail-closed) are merged. Flutter PR #152 is also merged, requiring verified encryption metadata before the inbox displays an encrypted label. The API E2EE protocol contract is PR #142. The Backend migration has not been independently confirmed as applied in production, and no runtime E2EE capability is enabled. Do not update production capability claims from source merges alone.

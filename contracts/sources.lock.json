@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "875b473f96fb512d6c89d397ce7dff12746cffec",
+      "ref": "ed25ef6ffa0a9342c5134d2fae353aa1dca3cffb",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -204,6 +204,7 @@
         "migrations/20261120_social_platform_product_foundation.sql",
         "migrations/20261121_native_staff_webauthn.sql",
         "migrations/20261122_communication_media_encryption_truth.sql",
+        "migrations/20261125_unverified_communication_e2ee_fail_closed.sql",
         "migrations/20261126_testagram_native_mail_feedback.sql",
         "migrations/20261126_unified_notification_engine.sql",
         "scripts/archive/legacy-identity-provider-import.sql",
@@ -312,7 +313,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "e40c882e95bb781a90ebcea4e8768d855017a5d0",
+      "ref": "8ba79ffb45e142978f420652927d70f8ed8257cb",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",
@@ -382,6 +383,7 @@
         "test/features/feed/feed_screen_test.dart",
         "test/features/knowledge/knowledge_api_test.dart",
         "test/features/knowledge/knowledge_hub_screen_test.dart",
+        "test/features/lists/social_lists_api_test.dart",
         "test/features/messaging/direct_messages_and_calls_test.dart",
         "test/features/messaging_and_calls_test.dart",
         "test/features/monetization/monetization_hub_screen_test.dart",
@@ -391,8 +393,7 @@
         "test/features/tv/tv_playback_policy_test.dart",
         "test/features/wallet/wallet_screen_test.dart",
         "test/profile_safety_api_test.dart",
-        "tool/tv_health_monitor.mjs",
-        "test/features/lists/social_lists_api_test.dart"
+        "tool/tv_health_monitor.mjs"
       ]
     },
     "federation": {
