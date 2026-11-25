@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "14e67fffb2150021d7b94bd8941f49ac0485d034"
   },
-  "status": "backend-e2ee-send-edit-and-attachments-fail-closed-merged; flutter-e2ee-label-safety-merged; e2ee-protocol-design-pending; device-key-implementation-pending; native-mail-live-acceptance-pending",
+  "status": "backend-e2ee-send-edit-attachment-and-call-room-hardening-merged; flutter-e2ee-label-safety-merged; e2ee-protocol-contract-merged; device-key-implementation-pending; native-mail-live-acceptance-pending",
   "repositories": [
     {
       "id": "flutter-client",
@@ -35,7 +35,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "ed25ef6ffa0a9342c5134d2fae353aa1dca3cffb",
+      "mainCommit": "91daae0cfe4d419bd0bd30974bb31b4f5a37bf10",
       "mergedPullRequests": [
         418,
         419,
@@ -65,7 +65,8 @@
         540,
         541,
         542,
-        545
+        545,
+        544
       ]
     },
     {
