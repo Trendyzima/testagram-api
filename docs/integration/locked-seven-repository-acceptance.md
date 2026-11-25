@@ -34,7 +34,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Flutter | `453a9f35d4cf53f93f25ac1224a37556d74a5699` (2026-11-23 mainline; Knowledge topics, List-backed custom feeds and advanced search filters in Explore) |
 | Backend | `fe5b5f610814c4f76812b5b437c14bfecb792bee` (2026-11-23 mainline; Knowledge topics/Q&A, native Lists, List-backed custom feeds and privacy-safe advanced search merged; engagement score uses bounded bigint arithmetic) |
 | Data Centre | `9785fd7d13e572319d60c7694ad1cabb8bcc81dd` (2026-11-23 mainline; dependency-aware video worker readiness) |
-| Testagram API control plane | `a3a61a06012f554906c2ca0bb9149555efda707e` (2026-11-23 mainline; Knowledge topics/Q&A contract merged; List-backed custom-feed contract remains a review candidate) |
+| Testagram API control plane | `f9ece1697bbd679940c80fac7b3cd14028f6b0c9` (2026-11-23 mainline; Knowledge topics/Q&A contract merged; List-backed custom-feed contract remains a review candidate) |
 | Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` (2026-11-21 mainline) |
 | Federation | `0f25d853e5ea5ac546eb1d05847086d387eb2a1c` (2026-11-22 mainline; private Backend federation bridge contract) |
 | CDN | `e0a6e0fd22c934a5bfb6a0a4b9686f33e0fa5ab7` (2026-11-23 mainline; canonical Go CDN runtime release) |
