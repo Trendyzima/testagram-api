@@ -58,7 +58,7 @@
         496,
         535
       ],
-      "candidateCommit": "637ecfa5c9ab553b7280430c6e9e517219c2b1af",
+      "candidateCommit": "f7357a8de9394bba80710acdd619d6febb8804d4",
       "candidatePullRequest": 537
     },
     {
@@ -74,7 +74,9 @@
         113,
         114,
         115
-      ]
+      ],
+      "candidateCommit": "5aff95591d8d76108aead59a4d08ade45c128b8a",
+      "candidatePullRequest": 117
     },
     {
       "id": "cdn",
@@ -145,7 +147,7 @@
     {
       "from": "backend",
       "to": "data-centre",
-      "contract": "private media and identity-evidence APIs with distinct service credentials; Data Centre platform config/events/audit API is not yet a verified Backend consumer edge"
+      "contract": "Private media/identity-evidence APIs plus authenticated, read-only notification SSE projection over the canonical Backend PostgreSQL inbox; Data Centre never becomes the event source of truth"
     },
     {
       "from": "backend",
