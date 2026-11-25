@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "f35edbb5ce1bdb74196e9c0f2e2b072bf3d7e719",
+      "ref": "fe5b5f610814c4f76812b5b437c14bfecb792bee",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -240,7 +240,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "2c4b3036ee1b5bb8cf3339dd45861eb6db550fd6",
+      "ref": "9785fd7d13e572319d60c7694ad1cabb8bcc81dd",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/native-auth-session-integration.yml",
@@ -314,7 +314,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "931ccc9334c4333caf14cba27e4189e4484cb436",
+      "ref": "453a9f35d4cf53f93f25ac1224a37556d74a5699",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",
@@ -429,7 +429,7 @@
     },
     "algorithm": {
       "fullName": "Trendyzima/the-algorithm",
-      "ref": "c973b1f515ccdea98dee62d303e406fd7baaeefe",
+      "ref": "3b6a54d5978f8dc33b853698366c0adc110f9614",
       "checkoutPath": "source-repos/algorithm",
       "sourcePaths": [
         "testagram-feed/API-CONTRACT.md",
