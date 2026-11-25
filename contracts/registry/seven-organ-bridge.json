@@ -14,7 +14,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "flutter-client",
-      "mainCommit": "8ba79ffb45e142978f420652927d70f8ed8257cb",
+      "mainCommit": "931ccc9334c4333caf14cba27e4189e4484cb436",
       "mergedPullRequests": [
         109,
         112,
@@ -35,7 +35,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "bd7a5ce1ca59089f3ea57740fa83f4cdd30a0189",
+      "mainCommit": "f35edbb5ce1bdb74196e9c0f2e2b072bf3d7e719",
       "mergedPullRequests": [
         418,
         419,
@@ -76,7 +76,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "data-centre",
-      "mainCommit": "8bc8b86d5ad718bb0d4820a832c301602c2021bf",
+      "mainCommit": "2c4b3036ee1b5bb8cf3339dd45861eb6db550fd6",
       "mergedPullRequests": [
         111,
         112,
@@ -91,7 +91,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "cdn",
-      "mainCommit": "8b8b7212741f81d98216c4f79cde95ebccfe2f97",
+      "mainCommit": "e0a6e0fd22c934a5bfb6a0a4b9686f33e0fa5ab7",
       "mergedPullRequests": [
         122,
         123,
@@ -105,7 +105,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "algorithm",
-      "mainCommit": "da83f146b90cf852838fbacc96a5f4dae876e9d6",
+      "mainCommit": "c973b1f515ccdea98dee62d303e406fd7baaeefe",
       "mergedPullRequests": [
         27,
         28,
@@ -118,7 +118,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "federation",
-      "mainCommit": "cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca",
+      "mainCommit": "0f25d853e5ea5ac546eb1d05847086d387eb2a1c",
       "mergedPullRequests": [
         49,
         50,
@@ -133,7 +133,7 @@
       "defaultBranch": "main",
       "kind": "governance",
       "sourcePinKey": null,
-      "mainCommit": "c20742e7e8e70628b8cbf532bdb5b36a4be5eb7d",
+      "mainCommit": "a3a61a06012f554906c2ca0bb9149555efda707e",
       "mergedPullRequests": [
         115,
         117
@@ -217,13 +217,14 @@
     "No message or call is advertised as end-to-end encrypted until the reviewed client protocol, device trust, key lifecycle and media lifecycle pass end-to-end acceptance."
   ],
   "excludedFromAcceptance": [
-    "Backend mainline remains pinned to b8cb751e25bfeab5ff5e15bbf72a1610b929a95b. Backend PR #537 (candidate 637ecfa5c9ab553b7280430c6e9e517219c2b1af) adds the unified notification event ledger, wallet event publication and authenticated category preferences; it is an unmerged draft candidate and its push sender/device-token registration are not implemented; a PUT response recursion bug was fixed and unit tests were added in the current candidate head.",
-    "Flutter mainline remains pinned to bddcdc25c05fb7d45e879faef97968daddef24cf. Flutter PR #145 (candidate 90973eaec43c453b9b43e9c53be7072374cf7ea1) consumes Backend PR #537's category-preference endpoints and adds wallet notification deep links; it is an unmerged draft candidate and FCM/APNs registration and real-device delivery remain outstanding.",
+    "Backend mainline is pinned to the exact current main commit. Backend PRs #548 and #549 remain unmerged candidates: #548 overlaps notification-category changes in #549, and #549 adds social discovery, saved timelines and notification category APIs. Neither PR is represented as accepted mainline.",
+    "Flutter mainline is pinned to the exact current main commit. Flutter PR #155 (profile privacy/media pagination) and stacked PR #156 (social route coverage and client API wiring) remain unmerged draft candidates. Their successful build checks do not constitute a production release.",
     "Backend production deployment run 45038404739 succeeded on the existing InstaBox machine testagramdb. Backend, PostgreSQL, Flutter web, Go CDN, Algorithm, Federation, Data Centre media/platform/worker/video/notification and edge proxy health checks passed. Private B2/R2 write-read-delete probes and directional Backend/Federation credential checks passed.",
     "The deployed release keeps public registration, staff enrollment and Federation delivery workers fail-closed until their independent acceptance gates pass. Successful deployment is not proof of native-auth migration, WebAuthn live acceptance, ActivityPub interoperability or production registration readiness.",
     "CDN PR #125 is merged at 21a254e9f67dc7a8e55dca37151a6db532405e53. Go CDN origin is installed and healthy; Cloudflare Worker deployment and canonical hostname routing remain separate production cutover gates and are not inferred from source CI.",
     "Data Centre PR #115 and Federation PR #53 are merged into their respective main branches and pinned to exact current mainline commits.",
     "Merged source revisions and healthy VPS containers do not prove end-user device acceptance, M-Pesa settlement, full media durability/restore, cross-instance Federation interoperability or disaster recovery.",
-    "Backend approval-ledger and communication changes are in the reviewed #424 mainline history. Do not revive the superseded overlapping #431/#432 path."
+    "Backend approval-ledger and communication changes are in the reviewed #424 mainline history. Do not revive the superseded overlapping #431/#432 path.",
+    "Data Centre PR #119 is an unmerged security candidate that prevents notification-device IDs from being reassigned across accounts. Algorithm PR #33 is an unmerged ranking-integrity candidate that rejects non-finite feature vectors. Neither candidate is included in the immutable mainline pins."
   ]
 }
