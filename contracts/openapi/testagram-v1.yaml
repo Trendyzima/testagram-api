@@ -2833,6 +2833,52 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/lists/{list_id}/pin:
+    put:
+      operationId: updateSocialListPin
+      tags: [Social]
+      summary: Pin or unpin an owned List
+      description: Updates the current user's own List pin state. A maximum of five Lists may be pinned. Repeating the same state is idempotent.
+      security:
+        - testagramBearer: []
+      parameters:
+        - in: path
+          name: list_id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [pinned]
+              properties:
+                pinned: { type: boolean }
+      responses:
+        '200':
+          description: Pin state updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok, data]
+                properties:
+                  ok: { type: boolean, const: true }
+                  data:
+                    type: object
+                    required: [list_id, pinned]
+                    properties:
+                      list_id: { type: string, format: uuid }
+                      pinned: { type: boolean }
+                  request_id: { type: string }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { description: Five pinned Lists already exist. }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/social/lists/{list_id}/members:
     get:
       operationId: listSocialListMembers
