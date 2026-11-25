@@ -638,7 +638,7 @@
     {
       "method": "POST",
       "path": "/internal/mail/bounce",
-      "status": "contracted"
+      "status": "registered-only"
     },
     {
       "method": "POST",
