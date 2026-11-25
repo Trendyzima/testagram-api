@@ -697,30 +697,17 @@ This reconciliation supersedes earlier source-pin snapshots above where they con
 The Testagram API governance repository is pinned separately at mainline `f11a37d4d375e8f6c768411373b1b73fb2eb8c3d`; it remains build-time contract governance, not a runtime service or hop. The Backend public-listener Mailjet delivery webhook is `POST /internal/mailjet/events` and remains classified as registered-only in the route inventory. The route auditor and inventory now agree with the exact pinned Backend source. No public OpenAPI operation or production delivery acceptance is inferred from this internal webhook registration.
 
 
-## 2026-11-25 notification integration review candidates
+## 2026-11-25 notification and social integration review candidates
 
 The current mainline source pins remain unchanged for production acceptance. The following explicit review candidates are pinned only for cross-repository contract validation; none is merged or deployed:
 
 | Repository | Candidate PR | Candidate commit | Depends on |
 |---|---:|---|---|
-| Backend | [PR #538](https://github.com/Trendyzima/Testagram-backend-/pull/538) | `e2866b7b06122b46a00e58effbd2d0aa3f86a815` | Stacked on notification-engine PR #537 |
-| Data Centre | [PR #117](https://github.com/Trendyzima/Testagram-data-centre-/pull/117) | `5b8f5df6dee6b7fe2c53b86b6d8905aa46e62f31` | Shared Testagram PostgreSQL and Backend notification ledger |
-| Flutter Client | [PR #150](https://github.com/Trendyzima/testagram-flutter-client-/pull/150) | `6c07c45bce54dc5cb13e9ea451b711c82c10027e` | Stacked on world-class lists PR #146 and wallet notification PR #145 |
+| Backend | [PR #538](https://github.com/Trendyzima/Testagram-backend-/pull/538) | `39a5f2680d77366b9b9ec527ddcc7781caf5aa90` | Stacked on notification-engine PR #537 |
+| Flutter client | [PR #150](https://github.com/Trendyzima/testagram-flutter-client-/pull/150) | `6c07c45bce54dc5cb13e9ea451b711c82c10027e` | Stacked on world-class lists PR #146 and wallet notifications PR #145 |
 
-The Backend candidate adds the canonical event ledger, in-app and push delivery rows, preference endpoints, and an authenticated SSE proxy to the private Data Centre service. The Data Centre candidate streams the Backend-owned `testagram_local.notifications` read model without creating a second source of truth or marking items read. The Flutter candidate reconnects with `Last-Event-ID` and refreshes the REST inbox. The Backend must set `DATA_CENTRE_NOTIFICATION_STREAM_URL` to the private notification service origin; the Data Centre service must share the Testagram database and have SELECT access to the canonical inbox.
+Backend PR #537 owns the canonical notification event ledger, in-app inbox, delivery rows and wallet event publication. Backend PR #538 adds the pinned-list endpoint and carries the notification stream implementation. The stream reads the canonical `testagram_local.notifications` rows directly from Backend PostgreSQL; it does not require a second Data Centre database, a Data Centre stream service, or a cross-service notification URL. Flutter PR #150 consumes the authenticated Backend SSE route, resumes with `Last-Event-ID`, and refreshes the REST inbox. Data Centre remains independently responsible for its media/storage domain.
 
-The notification-preferences contract covers authenticated GET/PUT for social, wallet and messaging categories. Device-token registration, FCM/APNs sender workers, native push delivery and real-device acceptance remain explicit G1/G4/G7 work. No provider credential is placed in Flutter, and no candidate is treated as production acceptance.
+Flutter PR #150 is stacked on world-class social upgrade PR #146, which is stacked on wallet notification deep-link PR #145. Identity application intake is separately reviewed in Flutter PR #147. The notification-preferences contract covers authenticated GET/PUT for social, wallet and messaging categories.
 
-### Exact notification integration review pins — 2026-11-25
-
-These replace earlier notification candidate SHAs in this document where they differ. They match `contracts/sources.lock.json` and `contracts/registry/seven-organ-bridge.json` on this branch:
-
-| Repository | Open review PR | Exact candidate commit |
-|---|---:|---|
-| Backend | [#538](https://github.com/Trendyzima/Testagram-backend-/pull/538), stacked on [#537](https://github.com/Trendyzima/Testagram-backend-/pull/537) | `e2866b7b06122b46a00e58effbd2d0aa3f86a815` |
-| Data Centre | [#117](https://github.com/Trendyzima/Testagram-data-centre-/pull/117) | `5b8f5df6dee6b7fe2c53b86b6d8905aa46e62f31` |
-| Flutter client | [#150](https://github.com/Trendyzima/testagram-flutter-client-/pull/150) | `6c07c45bce54dc5cb13e9ea451b711c82c10027e` |
-
-Flutter PR #150 is stacked on world-class social upgrade PR #146, which is stacked on wallet notification deep-link PR #145. Identity application intake is separately reviewed in Flutter PR #147. The Backend PR #538 candidate includes the pinned-list route consumed by Flutter and its workflow validation passed; PR #537 supplies the underlying notification ledger and wallet event publication. Data Centre candidate checks pass; Flutter PR #150 build checks pass while its Pages and publish workflows are running. API contract CI must pass against the exact final bridge head before this integration candidate is accepted.
-
-These are source review pins only. They do not change current mainline pins or prove that the services are deployed, connected to the same live database, or accepted in production. The release decision remains NOT ACCEPTED until the full G0–G7 evidence is complete.
+Device-token registration, FCM/APNs sender workers, native push delivery, native email dispatch integration, and real-device acceptance remain explicit G1/G4/G7 work. These source review pins do not prove deployment or production acceptance. The release decision remains NOT ACCEPTED until the full G0-G7 evidence is complete.
