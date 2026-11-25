@@ -23,8 +23,8 @@
         121,
         122
       ],
-      "candidateCommit": "1814e709c8f352e790e95614ec4ed5e439d2adae",
-      "candidatePullRequest": 149
+      "candidateCommit": "6c07c45bce54dc5cb13e9ea451b711c82c10027e",
+      "candidatePullRequest": 150
     },
     {
       "id": "backend",
@@ -58,8 +58,8 @@
         496,
         535
       ],
-      "candidateCommit": "737f8e14a5e2a1e6708cddb1f1104b5c7aa803b6",
-      "candidatePullRequest": 537
+      "candidateCommit": "e2866b7b06122b46a00e58effbd2d0aa3f86a815",
+      "candidatePullRequest": 538
     },
     {
       "id": "data-centre",
