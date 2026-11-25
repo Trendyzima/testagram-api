@@ -1532,7 +1532,7 @@ paths:
       operationId: streamNotifications
       tags: [Notifications]
       summary: Stream authenticated user's new notifications
-      description: Server-sent events proxied by Backend to the private Data Centre notification service. The stream is read-only, does not mark inbox items read, and supports replay using Last-Event-ID. Requires the Testagram-native access JWT.
+      description: Server-sent events are read directly from the canonical Backend PostgreSQL notification inbox. The stream is read-only, does not mark inbox items read, and supports replay using Last-Event-ID. Requires the Testagram-native access JWT.
       security:
         - testagramBearer: []
       parameters:
@@ -1549,7 +1549,6 @@ paths:
               schema: { type: string }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
-        '502': { description: Private notification stream is unavailable or returned an invalid response. }
   /api/social/notifications:
     get:
       operationId: listNotifications
