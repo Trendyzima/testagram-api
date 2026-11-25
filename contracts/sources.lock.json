@@ -352,6 +352,7 @@
         "test/backend_api_test.dart",
         "test/core/auth/native_auth_client_test.dart",
         "test/core/backend_api_native_auth_test.dart",
+        "test/core/backend_api_notification_stream_test.dart",
         "test/core/backend_api_wallet_test.dart",
         "test/core/communication_api_test.dart",
         "test/core/media/media_upload_policy_test.dart",
