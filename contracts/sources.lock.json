@@ -313,7 +313,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "e40c882e95bb781a90ebcea4e8768d855017a5d0",
+      "ref": "8ba79ffb45e142978f420652927d70f8ed8257cb",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",
@@ -383,6 +383,7 @@
         "test/features/feed/feed_screen_test.dart",
         "test/features/knowledge/knowledge_api_test.dart",
         "test/features/knowledge/knowledge_hub_screen_test.dart",
+        "test/features/lists/social_lists_api_test.dart",
         "test/features/messaging/direct_messages_and_calls_test.dart",
         "test/features/messaging_and_calls_test.dart",
         "test/features/monetization/monetization_hub_screen_test.dart",
@@ -392,8 +393,7 @@
         "test/features/tv/tv_playback_policy_test.dart",
         "test/features/wallet/wallet_screen_test.dart",
         "test/profile_safety_api_test.dart",
-        "tool/tv_health_monitor.mjs",
-        "test/features/lists/social_lists_api_test.dart"
+        "tool/tv_health_monitor.mjs"
       ]
     },
     "federation": {
