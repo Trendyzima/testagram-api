@@ -63,6 +63,17 @@ paths:
             text/plain:
               schema: { type: string, example: "ok\n" }
         '405': { description: Method not allowed; GET is required. }
+  /api/auth/signup:
+    post:
+      operationId: requestPublicSignup
+      tags: [Authentication]
+      summary: Request public account creation (identity review required)
+      description: Public self-service signup is intentionally fail-closed. This endpoint never creates an account. Testagram accounts are provisioned only through the approved identity application flow after verified evidence review and two independent account approvals. Email verification remains required after approved provisioning.
+      security: []
+      responses:
+        '403':
+          description: Identity evidence review and two-person account approval are required before account creation. ORIGIN_NOT_ALLOWED may also be returned when the request origin is not permitted.
+        '405': { description: Method not allowed; POST is required. }
   /api/auth/login:
     post:
       operationId: loginWithTestagramCredentials
