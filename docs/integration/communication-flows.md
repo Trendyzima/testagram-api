@@ -53,4 +53,4 @@ Current release posture:
 - Calls, group conversations, federated E2EE and encrypted attachments are separate release gates.
 - The seven-organ bridge must carry the same protocol version and acceptance status; no organ may independently claim E2EE.
 
-The Backend fail-closed candidate is PR #542 and the Flutter verified-metadata candidate is PR #152. Both remain pending CI/review/merge/deployment at the time this contract was written. Do not update production capability claims from their existence alone.
+Backend PR #542 has merged as commit `e91fb285e0fd171de515b0d0169545ea2368b0c3`, enforcing fail-closed message send/edit and non-E2EE defaults. Flutter PR #152 remains under CI and review; the API E2EE protocol contract is PR #142. The Backend migration has not been independently confirmed as applied in production, and no runtime E2EE capability is enabled. Do not update production capability claims from source merges alone.
