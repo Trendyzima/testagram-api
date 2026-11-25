@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "bd7a5ce1ca59089f3ea57740fa83f4cdd30a0189",
+  "sourceRef": "fe5b5f610814c4f76812b5b437c14bfecb792bee",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across production Go files in cmd/api at Backend mainline commit 875b473f96fb512d6c89d397ce7dff12746cffec, after native-mail PR #536 and notification/pinned-list PRs #537/#540 were merged. Flutter Pages production deployment succeeded at client mainline e40c882e95bb781a90ebcea4e8768d855017a5d0; native mail still requires independent live DNS, TCP/25, Gmail/Outlook delivery and bounce replay acceptance. This inventory is source evidence, not a claim of production mail delivery. Backend source pin includes merged fail-closed E2EE message send/edit behavior; proposed device/prekey routes are not registered or advertised.",
+  "note": "Static public/API route registrations across production Go files in cmd/api at Backend mainline commit fe5b5f610814c4f76812b5b437c14bfecb792bee, including merged social discovery, saved timeline, profile-media pagination and notification category handlers. This inventory is source evidence, not a claim of production mail delivery. Secure message send/edit remains fail-closed; proposed device/prekey routes are not registered or advertised.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
@@ -302,6 +302,11 @@
     },
     {
       "method": "GET",
+      "path": "/api/social/bookmarks",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
       "path": "/api/social/follow-requests",
       "status": "registered-only"
     },
@@ -518,6 +523,11 @@
     {
       "method": "GET",
       "path": "/api/social/profiles/{user_id}/posts",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/social/suggestions",
       "status": "contracted"
     },
     {

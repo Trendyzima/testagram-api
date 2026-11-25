@@ -2202,6 +2202,65 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/bookmarks:
+    get:
+      operationId: getSocialBookmarksFeed
+      tags: [Social, Feed]
+      summary: Retrieve the authenticated user's bookmarked posts
+      description: >-
+        Requires an active authenticated Testagram account. Returns the same normalized, visibility-filtered
+        feed envelope as the home timeline, restricted to posts bookmarked by the viewer. The Backend
+        rechecks post visibility, blocks, mutes, moderation, deletion and media authorization before returning
+        results. The route always uses chronological ordering; the cursor is opaque and must be reused only
+        with this endpoint and viewer.
+      parameters:
+        - in: query
+          name: before
+          required: false
+          schema: { type: string, maxLength: 2048 }
+          description: Opaque cursor returned by the previous bookmarks page.
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+      responses:
+        '200':
+          description: Authorized bookmarked-post page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UnifiedFeedEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/suggestions:
+    get:
+      operationId: getSocialAccountSuggestions
+      tags: [Social]
+      summary: Discover recommended Testagram accounts
+      description: >-
+        Requires an active authenticated Testagram account. Returns discoverable active accounts ranked by
+        mutual accepted followers, recent public posting activity, follower count and stable tie-breakers.
+        Protected accounts, the viewer, existing or pending follow relationships, blocks and mutes are excluded.
+        Suggestions are a bounded first page, not a paginated global directory.
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 20, default: 8 }
+          description: Maximum number of suggested accounts.
+      responses:
+        '200':
+          description: Privacy-filtered account suggestions.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SocialSuggestionsEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/social/profiles/{user_id}:
     parameters:
       - in: path
@@ -3290,6 +3349,38 @@ components:
             next_cursor: { type: string }
         error: { type: 'null' }
         request_id: { type: string }
+    SocialSuggestion:
+      type: object
+      additionalProperties: false
+      required: [id, username, display_name, avatar_url, bio, mutual_followers_count, recent_posts_count, followers_count, is_following, reason]
+      properties:
+        id: { type: string, format: uuid }
+        username: { type: string, maxLength: 64 }
+        display_name: { type: string, maxLength: 256 }
+        avatar_url: { type: string }
+        bio: { type: string, maxLength: 500 }
+        mutual_followers_count: { type: integer, minimum: 0 }
+        recent_posts_count: { type: integer, minimum: 0 }
+        followers_count: { type: integer, minimum: 0 }
+        is_following: { type: boolean }
+        reason: { type: string, enum: [followed_by_people_you_follow, active_in_testagram, popular_in_testagram] }
+    SocialSuggestionsEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [items]
+          properties:
+            items:
+              type: array
+              maxItems: 20
+              items: { $ref: '#/components/schemas/SocialSuggestion' }
+        error: { type: 'null' }
+        request_id: { type: string }
     UnifiedFeedEnvelope:
       type: object
       required: [ok, data, error, request_id]
@@ -3311,6 +3402,8 @@ components:
         ranking_mode: { type: string, enum: [algorithm, chronological] }
         feed_mode: { type: string, enum: [for_you, following, latest, media, discover, federated] }
         video_only: { type: boolean }
+        bookmarks_only: { type: boolean }
+        list_id: { type: [string, 'null'], format: uuid }
     UnifiedFeedItem:
       type: object
       additionalProperties: true
