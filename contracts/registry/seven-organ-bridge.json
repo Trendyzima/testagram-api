@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "14e67fffb2150021d7b94bd8941f49ac0485d034"
   },
-  "status": "backend-native-mail-merged; flutter-pages-production-deployed; native-mail-live-acceptance-pending",
+  "status": "backend-native-mail-merged; backend-communication-e2ee-fail-closed-merged; e2ee-protocol-design-pending; flutter-e2ee-label-validation-pending; native-mail-live-acceptance-pending",
   "repositories": [
     {
       "id": "flutter-client",
@@ -34,7 +34,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "875b473f96fb512d6c89d397ce7dff12746cffec",
+      "mainCommit": "e91fb285e0fd171de515b0d0169545ea2368b0c3",
       "mergedPullRequests": [
         418,
         419,
@@ -62,7 +62,8 @@
         536,
         537,
         540,
-        541
+        541,
+        542
       ]
     },
     {
@@ -208,7 +209,8 @@
     "Flutter never receives private service tokens, provider credentials, database credentials or private service URLs.",
     "The API control plane is build-time governance only and is never a runtime gateway.",
     "No external identity provider is part of the supported runtime; native Testagram Backend authentication is the only user and staff authentication path.",
-    "All six runtime source pins identify exact current mainline commits; production and product acceptance remain independent gates."
+    "All six runtime source pins identify exact current mainline commits; production and product acceptance remain independent gates.",
+    "No message or call is advertised as end-to-end encrypted until the reviewed client protocol, device trust, key lifecycle and media lifecycle pass end-to-end acceptance."
   ],
   "excludedFromAcceptance": [
     "Backend mainline remains pinned to b8cb751e25bfeab5ff5e15bbf72a1610b929a95b. Backend PR #537 (candidate 637ecfa5c9ab553b7280430c6e9e517219c2b1af) adds the unified notification event ledger, wallet event publication and authenticated category preferences; it is an unmerged draft candidate and its push sender/device-token registration are not implemented; a PUT response recursion bug was fixed and unit tests were added in the current candidate head.",
