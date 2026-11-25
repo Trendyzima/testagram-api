@@ -704,7 +704,7 @@ The current mainline source pins remain unchanged for production acceptance. The
 | Repository | Candidate PR | Candidate commit | Depends on |
 |---|---:|---|---|
 | Backend | [PR #537](https://github.com/Trendyzima/Testagram-backend-/pull/537) | `737f8e14a5e2a1e6708cddb1f1104b5c7aa803b6` | Mainline Backend |
-| Data Centre | [PR #117](https://github.com/Trendyzima/Testagram-data-centre-/pull/117) | `74c5b977d61e5569e7766fc50e60bde7b54402b7` | Shared Testagram PostgreSQL and Backend notification ledger |
+| Data Centre | [PR #117](https://github.com/Trendyzima/Testagram-data-centre-/pull/117) | `5b8f5df6dee6b7fe2c53b86b6d8905aa46e62f31` | Shared Testagram PostgreSQL and Backend notification ledger |
 | Flutter Client | [PR #149](https://github.com/Trendyzima/testagram-flutter-client-/pull/149) | `1814e709c8f352e790e95614ec4ed5e439d2adae` | Stacked on Flutter PR #145; consumes the Backend notification stream contract |
 
 The Backend candidate adds the canonical event ledger, in-app and push delivery rows, preference endpoints, and an authenticated SSE proxy to the private Data Centre service. The Data Centre candidate streams the Backend-owned `testagram_local.notifications` read model without creating a second source of truth or marking items read. The Flutter candidate reconnects with `Last-Event-ID` and refreshes the REST inbox. The Backend must set `DATA_CENTRE_NOTIFICATION_STREAM_URL` to the private notification service origin; the Data Centre service must share the Testagram database and have SELECT access to the canonical inbox.
