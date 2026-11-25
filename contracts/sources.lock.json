@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "637ecfa5c9ab553b7280430c6e9e517219c2b1af",
+      "ref": "f7357a8de9394bba80710acdd619d6febb8804d4",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -77,6 +77,7 @@
         "cmd/api/notification_events.go",
         "cmd/api/notification_preferences.go",
         "cmd/api/notification_preferences_test.go",
+        "cmd/api/notification_stream.go",
         "cmd/api/polls.go",
         "cmd/api/post_views.go",
         "cmd/api/profile_avatar.go",
@@ -222,7 +223,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "8bc8b86d5ad718bb0d4820a832c301602c2021bf",
+      "ref": "5aff95591d8d76108aead59a4d08ade45c128b8a",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/native-auth-session-integration.yml",
