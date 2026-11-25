@@ -699,11 +699,14 @@ The Testagram API governance repository is pinned separately at mainline `f11a37
 
 ## 2026-11-25 notification integration review candidates
 
-The current mainline source pins remain unchanged for production acceptance. The following explicit review candidates are pinned only for cross-repository contract validation; neither candidate is merged or deployed:
+The current mainline source pins remain unchanged for production acceptance. The following explicit review candidates are pinned only for cross-repository contract validation; none is merged or deployed:
 
 | Repository | Candidate PR | Candidate commit | Depends on |
 |---|---:|---|---|
-| Backend | [PR #537](https://github.com/Trendyzima/Testagram-backend-/pull/537) | `637ecfa5c9ab553b7280430c6e9e517219c2b1af` | Mainline Backend |
-| Flutter Client | [PR #145](https://github.com/Trendyzima/testagram-flutter-client-/pull/145) | `90973eaec43c453b9b43e9c53be7072374cf7ea1` | Backend notification-preferences contract in this review |
+| Backend | [PR #537](https://github.com/Trendyzima/Testagram-backend-/pull/537) | `8560a8abd9b058df4281b4b078f22a900220475b` | Mainline Backend |
+| Data Centre | [PR #117](https://github.com/Trendyzima/Testagram-data-centre-/pull/117) | `5aff95591d8d76108aead59a4d08ade45c128b8a` | Shared Testagram PostgreSQL and Backend notification ledger |
+| Flutter Client | [PR #149](https://github.com/Trendyzima/testagram-flutter-client-/pull/149) | `321519207b2fd8d26e8abd3a5f77568c7a3bbaaf` | Stacked on Flutter PR #145; consumes the Backend notification stream contract |
 
-The Backend candidate also fixes a consumed-request-body recursion in the PUT response path and adds unit coverage for preference defaults, persisted values, database errors and the response envelope. The notification-preferences contract covers authenticated GET/PUT for social, wallet and messaging categories. This contract alignment does not imply that device-token registration, FCM/APNs sender workers, native push delivery or real-device acceptance are complete. Those remain explicit G1/G4/G7 work; no provider credential is placed in Flutter.
+The Backend candidate adds the canonical event ledger, in-app and push delivery rows, preference endpoints, and an authenticated SSE proxy to the private Data Centre service. The Data Centre candidate streams the Backend-owned `testagram_local.notifications` read model without creating a second source of truth or marking items read. The Flutter candidate reconnects with `Last-Event-ID` and refreshes the REST inbox. The Backend must set `DATA_CENTRE_NOTIFICATION_STREAM_URL` to the private notification service origin; the Data Centre service must share the Testagram database and have SELECT access to the canonical inbox.
+
+The notification-preferences contract covers authenticated GET/PUT for social, wallet and messaging categories. Device-token registration, FCM/APNs sender workers, native push delivery and real-device acceptance remain explicit G1/G4/G7 work. No provider credential is placed in Flutter, and no candidate is treated as production acceptance.
