@@ -31,11 +31,11 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `931ccc9334c4333caf14cba27e4189e4484cb436` (2026-11-23 mainline; Knowledge topics, List-backed custom feeds and advanced search filters in Explore) |
-| Backend | `f35edbb5ce1bdb74196e9c0f2e2b072bf3d7e719` (2026-11-23 mainline; Knowledge topics/Q&A, native Lists, List-backed custom feeds and privacy-safe advanced search merged; engagement score uses bounded bigint arithmetic) |
-| Data Centre | `2c4b3036ee1b5bb8cf3339dd45861eb6db550fd6` (2026-11-23 mainline; dependency-aware video worker readiness) |
+| Flutter | `453a9f35d4cf53f93f25ac1224a37556d74a5699` (2026-11-23 mainline; Knowledge topics, List-backed custom feeds and advanced search filters in Explore) |
+| Backend | `fe5b5f610814c4f76812b5b437c14bfecb792bee` (2026-11-23 mainline; Knowledge topics/Q&A, native Lists, List-backed custom feeds and privacy-safe advanced search merged; engagement score uses bounded bigint arithmetic) |
+| Data Centre | `9785fd7d13e572319d60c7694ad1cabb8bcc81dd` (2026-11-23 mainline; dependency-aware video worker readiness) |
 | Testagram API control plane | `a3a61a06012f554906c2ca0bb9149555efda707e` (2026-11-23 mainline; Knowledge topics/Q&A contract merged; List-backed custom-feed contract remains a review candidate) |
-| Algorithm | `c973b1f515ccdea98dee62d303e406fd7baaeefe` (2026-11-21 mainline) |
+| Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` (2026-11-21 mainline) |
 | Federation | `0f25d853e5ea5ac546eb1d05847086d387eb2a1c` (2026-11-22 mainline; private Backend federation bridge contract) |
 | CDN | `e0a6e0fd22c934a5bfb6a0a4b9686f33e0fa5ab7` (2026-11-23 mainline; canonical Go CDN runtime release) |
 
@@ -252,7 +252,7 @@ The bridge records four runtime organs at their latest merged mainline revisions
 | Backend | `Trendyzima/Testagram-backend-` | `a793c55db8b5c258524bfef4b8872f5c6c1038e5` | Mainline; PR #436 candidate `93da847b74d2e874595d113deacbbcda3c283b3a` is stacked on PR #424 candidate `cc33913f0fd4e86669f7c717e12b2503990e6d88` |
 | Data Centre | `Trendyzima/Testagram-data-centre-` | `ada6f26a289775720bb47a639242dbd868388055` | Mainline; PR #116 identity-evidence OpenAPI candidate `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` |
 | CDN | `Trendyzima/cdn-` | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Mainline; PR #125 merged at this exact commit |
-| Algorithm | `Trendyzima/the-algorithm` | `c973b1f515ccdea98dee62d303e406fd7baaeefe` | Mainline; PRs #28 and #29 ownership documentation merged |
+| Algorithm | `Trendyzima/the-algorithm` | `3b6a54d5978f8dc33b853698366c0adc110f9614` | Mainline; PRs #28 and #29 ownership documentation merged |
 | Federation | `Trendyzima/federated-content` | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Mainline; PR #53 candidate `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` adds private Backend contract including remote-subscription verification |
 | API Control Plane | `Trendyzima/testagram-api` | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` | Governance-only mainline; this bridge remains an open candidate PR |
 
@@ -335,7 +335,7 @@ The current `contracts/sources.lock.json` and `contracts/registry/seven-organ-br
 | CDN | `490119514788c13c327ee05eb4ce068a0f73966e` | PR #125: `21a254e9f67dc7a8e55dca37151a6db532405e53` |
 | Flutter | `1f58971720c7a72139d56900a5895c49fa105639` | Mainline includes NodeInfo 2.1, real-account WebFinger, actor and unknown-account smoke; PR #100 is a stale draft based on older mainline |
 | Data Centre | `ada6f26a289775720bb47a639242dbd868388055` | Mainline |
-| Algorithm | `c973b1f515ccdea98dee62d303e406fd7baaeefe` | Mainline |
+| Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` | Mainline |
 | Federation | `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d` | Mainline |
 
 The seventh API Control Plane remains governance-only at `201fd3335c737e7fe36ed34dfa1ec07b03c31047`; it is not a runtime service or hop. Backend PR #424 and CDN PR #125 remain unmerged candidate pins and are not represented as accepted mainline revisions. Each candidate is checked against its exact current mainline by the source checkout/merge validation before the bridge audits the combined tree.
@@ -494,7 +494,7 @@ This section is the current authoritative status and supersedes earlier historic
 
 - Backend mainline remains `a793c55db8b5c258524bfef4b8872f5c6c1038e5`; Backend PR #424 remains an unmerged candidate at `cc33913f0fd4e86669f7c717e12b2503990e6d88`.
 - CDN PR #125 is **merged** at `21a254e9f67dc7a8e55dca37151a6db532405e53`. The source lock and seven-organ registry now pin this exact merge commit as CDN mainline and no longer classify #125 as a candidate.
-- Data Centre remains pinned to `ada6f26a289775720bb47a639242dbd868388055`; Flutter to `1f58971720c7a72139d56900a5895c49fa105639`; Algorithm to `c973b1f515ccdea98dee62d303e406fd7baaeefe`; Federation to `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d`; API Control Plane mainline baseline to `201fd3335c737e7fe36ed34dfa1ec07b03c31047`.
+- Data Centre remains pinned to `ada6f26a289775720bb47a639242dbd868388055`; Flutter to `1f58971720c7a72139d56900a5895c49fa105639`; Algorithm to `3b6a54d5978f8dc33b853698366c0adc110f9614`; Federation to `3707d9a3f4e4222c23aecb8a97afbaeec45d3c5d`; API Control Plane mainline baseline to `201fd3335c737e7fe36ed34dfa1ec07b03c31047`.
 - Backend #434 is the clean approval-integrity candidate at `2c74c4017ef0cc54a250e070c470d950a0df314e`, directly based on #424. Its exact-head Backend CI, workflow syntax and read-only Cloudflare audit passed. No independent review is recorded.
 - Backend #435 is now based on the exact #434 head `2c74c4017ef0cc54a250e070c470d950a0df314e`; its current head is `1e165ae9d5ca2f4ebdf7a7b4b25b7294f43a2149`. Its Backend CI, Cloudflare audit and Knowledge Engine schema workflow are in progress. The earlier schema-only success on its prior head is not acceptance for this latest head.
 - Do not merge #424, #434 or #435 without independent review and the required sequential checks. #435 must remain stacked on the exact accepted #434 revision.
@@ -524,7 +524,7 @@ This section supersedes all earlier status snapshots in this document where they
 - Data Centre candidate: PR #115, `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef`.
 - Federation candidate: PR #53, `4d7c26861240fae0fc8a69872dc326b3e1b2bbff`.
 - CDN mainline: PR #125 merged at `21a254e9f67dc7a8e55dca37151a6db532405e53`.
-- Algorithm mainline: `c973b1f515ccdea98dee62d303e406fd7baaeefe`; PR #29 is merged.
+- Algorithm mainline: `3b6a54d5978f8dc33b853698366c0adc110f9614`; PR #29 is merged.
 - The current source lock contains 176 Backend source paths and 60 Flutter source paths, plus the locked Data Centre, CDN, Federation and Algorithm paths. The latest source-tree comparison found no missing pinned paths.
 
 ### Backend profile and wallet work
@@ -581,7 +581,7 @@ This section supersedes earlier candidate-pin snapshots where they conflict. The
 | Data Centre | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` | Open draft PR #115 candidate; Go, Android and isolated encrypted restore checks passed. |
 | CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Merged mainline after CDN PR #125. Its exact mainline source pin is not a candidate branch. |
 | Federation | `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` | Open draft PR #53 candidate; test and image checks passed. |
-| Algorithm | `c973b1f515ccdea98dee62d303e406fd7baaeefe` | Current mainline pin. The current main commit is documentation-only and has no check runs attached to this exact SHA; older successful runs are not attributed to it. |
+| Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` | Current mainline pin. The current main commit is documentation-only and has no check runs attached to this exact SHA; older successful runs are not attributed to it. |
 | API Control Plane | `201fd3335c737e7fe36ed34dfa1ec07b03c31047` | Mainline governance baseline only; API Control Plane is build-time governance, not a runtime dependency. |
 
 The Backend and Flutter candidate pins above are intentionally ahead of their respective mainline SHAs. They must remain identified as unmerged candidates and must not be described as deployed or accepted. Refresh candidate pins only when the corresponding source candidate changes; replace them with exact merge commit SHAs only after independent review and actual merge in the required dependency order.
@@ -602,7 +602,7 @@ The six runtime source pins below are the current immutable revisions in `contra
 | Data Centre | `f3abef58743d27d7a8f62b15fae7e3f7509ee1ef` | PR #115 candidate; unmerged |
 | CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` | PR #125 merged; live routing acceptance remains separate |
 | Federation | `4d7c26861240fae0fc8a69872dc326b3e1b2bbff` | PR #53 candidate; unmerged |
-| Algorithm | `c973b1f515ccdea98dee62d303e406fd7baaeefe` | Mainline pin |
+| Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` | Mainline pin |
 
 Backend PR #440 is validation-only and must be closed, never merged. The API Control Plane remains build-time governance only and is not a runtime service or hop. No source pin implies deployment, production approval, provider durability or live end-to-end acceptance.
 
@@ -618,7 +618,7 @@ The following pins supersede earlier candidate snapshots above. Data Centre PR #
 | Data Centre | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` | Mainline after documentation contract PR #115 merge |
 | CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Mainline after PR #125 merge |
 | Federation | `0f25d853e5ea5ac546eb1d05847086d387eb2a1c` | Mainline after private bridge PR #53 and endpoint clarification PR #52 merges |
-| Algorithm | `c973b1f515ccdea98dee62d303e406fd7baaeefe` | Mainline; exact-head workflow evidence remains required |
+| Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` | Mainline; exact-head workflow evidence remains required |
 | API Control Plane | `14e67fffb2150021d7b94bd8941f49ac0485d034` | Mainline governance-only after PR #117 merge; not a runtime service or hop |
 
 Merge commits recorded during this consolidation: Flutter #121 `44d19f98808768750cfe5e590f8a451bf1cc404d`; Data Centre #115 `99edc3e096675f5c39ab6a9bd0050dcee30283a0`; Federation #52 `e8cf8f5013da52659b2d362ec3fc9a7a670f507a`; Federation #53 `0f25d853e5ea5ac546eb1d05847086d387eb2a1c`; API #117 `14e67fffb2150021d7b94bd8941f49ac0485d034`.
@@ -637,7 +637,7 @@ This block is the current source-lock authority and supersedes older candidate/m
 | Data Centre | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` | Current mainline; PR #115 merged. |
 | CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Current mainline; PR #125 merged. |
 | Federation | `0f25d853e5ea5ac546eb1d05847086d387eb2a1c` | Current mainline; PR #53 merged. |
-| Algorithm | `c973b1f515ccdea98dee62d303e406fd7baaeefe` | Current mainline. |
+| Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` | Current mainline. |
 
 The API Control Plane governance mainline is `14e67fffb2150021d7b94bd8941f49ac0485d034`; bridge PR #116 passed full contract CI on exact head `d7cf494275ecd4a89037452efabf126096451404` (run `45006902417` on its parent; the final head change was documentation-only), including source checkout, route inventory, cross-organ contract, locked acceptance, native-auth residue and API edge ingress checks. It is ready for independent review, not merged.
 
@@ -656,7 +656,7 @@ This section is the latest source-pin and deployment reconciliation. It supersed
 | Flutter Client | `03082cc7e2419dc3bac241fd12791043915ea760` | PR #116 merged; latest mainline passed Flutter analysis, unit/widget tests, Android debug and QA builds, web build and image smoke test |
 | Data Centre | `99edc3e096675f5c39ab6a9bd0050dcee30283a0` | Current mainline; PR #115 merged |
 | CDN | `21a254e9f67dc7a8e55dca37151a6db532405e53` | Current mainline; PR #125 merged |
-| Algorithm | `c973b1f515ccdea98dee62d303e406fd7baaeefe` | Current mainline; deployed runtime image is digest-pinned |
+| Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` | Current mainline; deployed runtime image is digest-pinned |
 | Federation | `cbd9f2587f8d7ce0703c4123c9a2bd76bb51ca` | Current mainline; PR #53 merged |
 | API Control Plane | `14e67fffb2150021d7b94bd8941f49ac0485d034` | Governance-only mainline; never a runtime service or hop |
 
@@ -689,7 +689,7 @@ This reconciliation supersedes earlier source-pin snapshots above where they con
 |---|---|
 | Backend | `b8cb751e25bfeab5ff5e15bbf72a1610b929a95b` (includes merged Backend PR #535) |
 | Flutter client | `bddcdc25c05fb7d45e879faef97968daddef24cf` |
-| Data Centre | `2c4b3036ee1b5bb8cf3339dd45861eb6db550fd6` |
+| Data Centre | `9785fd7d13e572319d60c7694ad1cabb8bcc81dd` |
 | CDN | `e0a6e0fd22c934a5bfb6a0a4b9686f33e0fa5ab7` |
 | Federation | `0f25d853e5ea5ac546eb1d05847086d387eb2a1c` |
 | Algorithm | `da83f146b90cf852838fbacc96a5f4dae876e9d6` |
