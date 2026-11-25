@@ -116,3 +116,27 @@ Never attach secrets, raw identity evidence, private keys, refresh tokens, messa
 ## Current release decision
 
 **NOT ACCEPTED FOR FULL PRODUCTION.** The merged code provides important foundations and fail-closed protections, but the live email, identity intake, actual E2EE implementation and coordinated seven-organ deployment gates remain incomplete. The release decision changes only when the evidence above is attached and independently reviewed.
+
+
+## 6. Identity intake implementation review (2026-11-25)
+
+The current Backend implementation and Flutter identity client were inspected directly. The following controls are present in source and should be retained:
+
+- Backend registration rejects requests unless staff WebAuthn readiness and its live prerequisites are ready; PostgreSQL and private Data Centre evidence storage must also be configured and healthy.
+- Registration requires configured Terms and Privacy versions, an adult declaration, explicit acceptance flags, a 256-bit-class idempotency capability (43 URL-safe characters), bounded request bodies, and IP/email rate limits.
+- Idempotent retries are serialized with a transaction-scoped PostgreSQL advisory lock; reuse of the same capability with different application details is rejected.
+- Identity evidence is owned by the private Data Centre media service. There is no Backend-local object-store fallback. Evidence is not considered protected until replication status, digest, size, and content type match.
+- Flutter validates that upload reservations resolve only to the configured HTTPS Backend origin, with the expected path, method, metadata and short expiry. It does not follow a server-provided object-store URL.
+- Recoverable Flutter drafts are stored in secure storage and exclude passwords, native access/refresh tokens, raw evidence bytes and evidence object URLs.
+
+These source-level controls are not production proof. Remaining identity acceptance work: review every status/expiry/revocation/deletion transition; verify the actual Data Centre service's authorization binding, short-lived grants, object immutability, audit trail, deletion propagation and backup exclusion; run the full staging flow with two distinct WebAuthn staff identities; verify atomic account provisioning, email verification, login, refresh rotation, logout, recovery and duplicate/replay handling; and complete jurisdiction-specific legal review of the currently marked draft Terms and Privacy text. Public intake remains disabled until those checks pass.
+
+## 7. Change control and next implementation sequence
+
+1. Keep 503/closed gates for unapproved E2EE, unready identity review, and unverified mail/deployment dependencies.
+2. Land isolated, test-backed changes in their owning runtime repository; update API contracts and source pins only after runtime changes are reviewed and merged.
+3. Run unit, integration, security, contract, cross-organ staging and rollback tests on exact pinned SHAs.
+4. Require an authorized operator to execute the protected production workflow manually and attach real provider/network evidence. Never synthesize successful DNS, mail delivery, identity review or deployment results.
+5. Promote only after all gates above are evidenced; retain rollback and feature-disable paths.
+
+No secrets, provider credentials, production configuration, feature flags, migrations, account records, or deployments were changed by this review.
