@@ -642,11 +642,6 @@
     },
     {
       "method": "POST",
-      "path": "/internal/mailjet/events",
-      "status": "registered-only"
-    },
-    {
-      "method": "POST",
       "path": "/internal/media/fresh/cdn-download-url",
       "status": "registered-only"
     },
