@@ -1,6 +1,6 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "91daae0cfe4d419bd0bd30974bb31b4f5a37bf10",
+  "sourceRef": "bd7a5ce1ca59089f3ea57740fa83f4cdd30a0189",
   "sourceFile": "cmd/api/main.go",
   "note": "Static public/API route registrations across production Go files in cmd/api at Backend mainline commit 875b473f96fb512d6c89d397ce7dff12746cffec, after native-mail PR #536 and notification/pinned-list PRs #537/#540 were merged. Flutter Pages production deployment succeeded at client mainline e40c882e95bb781a90ebcea4e8768d855017a5d0; native mail still requires independent live DNS, TCP/25, Gmail/Outlook delivery and bounce replay acceptance. This inventory is source evidence, not a claim of production mail delivery. Backend source pin includes merged fail-closed E2EE message send/edit behavior; proposed device/prekey routes are not registered or advertised.",
   "dynamicAuthActions": [
