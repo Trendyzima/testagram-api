@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "875b473f96fb512d6c89d397ce7dff12746cffec",
+      "ref": "e91fb285e0fd171de515b0d0169545ea2368b0c3",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -204,6 +204,7 @@
         "migrations/20261120_social_platform_product_foundation.sql",
         "migrations/20261121_native_staff_webauthn.sql",
         "migrations/20261122_communication_media_encryption_truth.sql",
+        "migrations/20261125_unverified_communication_e2ee_fail_closed.sql",
         "migrations/20261126_testagram_native_mail_feedback.sql",
         "migrations/20261126_unified_notification_engine.sql",
         "scripts/archive/legacy-identity-provider-import.sql",
