@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "14e67fffb2150021d7b94bd8941f49ac0485d034"
   },
-  "status": "merged-mainline-pins-current; backend-deployment-retry-pending",
+  "status": "backend-origin-deployed; canonical-cloudflare-routing-pending; native-mail-and-identity-acceptance-pending",
   "repositories": [
     {
       "id": "flutter-client",

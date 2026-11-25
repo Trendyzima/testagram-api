@@ -2,7 +2,7 @@
   "sourceRepository": "Trendyzima/Testagram-backend-",
   "sourceRef": "10d76a5ec21acc02936771d6c21e89f1f2fc0fb0",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across production Go files in cmd/api at Backend mainline commit 10d76a5ec21acc02936771d6c21e89f1f2fc0fb0. Notification event ledger, SSE, pinned-list routes and InstaBox deployment handoff are merged. This inventory is not evidence of a successful live Backend deployment.",
+  "note": "Static public/API route registrations across production Go files in cmd/api at Backend mainline commit 10d76a5ec21acc02936771d6c21e89f1f2fc0fb0. This commit was deployed successfully to InstaBox in workflow run 45611133397: machine/API/Go-CDN/apex origins passed direct health and private-endpoint checks. Canonical Cloudflare hostname routing remains pending; this inventory is not evidence that api.testagram.site or media.testagram.site have been cut over to these origins.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
