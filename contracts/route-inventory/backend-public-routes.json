@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "b8cb751e25bfeab5ff5e15bbf72a1610b929a95b",
+  "sourceRef": "031c04b16e676dbe37ea033c71c2e963b852535f",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across all production Go files in cmd/api at exact locked Backend mainline commit b8cb751e25bfeab5ff5e15bbf72a1610b929a95b. The Mailjet delivery webhook is registered as POST /internal/mailjet/events on the public listener and is tracked as registered-only; native trending words and consent-based email preference/unsubscribe endpoints remain contracted.",
+  "note": "Static public/API route registrations across production Go files in cmd/api at explicit Backend notification-engine review candidate commit 031c04b16e676dbe37ea033c71c2e963b852535f (PR #537). Candidate pins are review-only and are not accepted mainline or deployment evidence.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
@@ -163,6 +163,11 @@
     {
       "method": "GET",
       "path": "/api/me/federation",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/me/notification-preferences",
       "status": "contracted"
     },
     {
@@ -648,6 +653,11 @@
     {
       "method": "PUT",
       "path": "/api/me/federation",
+      "status": "contracted"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/me/notification-preferences",
       "status": "contracted"
     },
     {
