@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "1af703f4ebec64b96f3f82df9bf4c0f9c916c2c3"
   },
-  "status": "all-six-runtime-source-pins-match-current-main; merged-pr-checks-green; post-merge-mainline-ci-running; production-and-staging-live-acceptance-pending; e2ee-and-live-call-gates-open; monetization-backend-workflows-incomplete",
+  "status": "all-six-runtime-source-pins-match-current-main; merged-pr-checks-green; latest-backend-mainline-ci-running; production-and-staging-live-acceptance-pending; e2ee-and-live-call-gates-open; monetization-backend-workflows-incomplete",
   "repositories": [
     {
       "id": "flutter-client",
@@ -14,7 +14,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "flutter-client",
-      "mainCommit": "958a51d378f1b33268f1be05c3cd9fea5302da16",
+      "mainCommit": "07376965588096a689d90c0dc30ca3ed5429f474",
       "mergedPullRequests": [
         109,
         112,
@@ -31,7 +31,8 @@
         157,
         158,
         159,
-        160
+        160,
+        163
       ]
     },
     {
@@ -40,7 +41,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "82e1a93255dfb9fcd4f6386a9a8b767f01fcde98",
+      "mainCommit": "4ca5da34222f70b120ec2bb144bc4ec40e6f6218",
       "mergedPullRequests": [
         418,
         419,
@@ -79,7 +80,8 @@
         552,
         557,
         559,
-        566
+        566,
+        567
       ]
     },
     {
@@ -248,6 +250,7 @@
     "Data Centre PR #119 and Algorithm PR #33 are merged into their respective main branches and included in the exact current mainline pins.",
     "Merged source revisions and healthy VPS containers do not prove end-user device acceptance, M-Pesa settlement, full media durability/restore, cross-instance Federation interoperability or disaster recovery.",
     "Backend approval-ledger and communication changes are in the reviewed #424 mainline history. Do not revive the superseded overlapping #431/#432 path.",
-    "Backend PR #566 merged: owner-authorized DELETE /api/video/uploads/{video_id}, manual staging acceptance harness and no automatic production deployment. Data Centre PR #127 merged: idempotent owner-scoped DELETE /v1/videos/{video_id}, active-job guard, transactional metadata cascade and post-commit original/HLS/poster cleanup. Flutter PR #163 adds the real Android video feed playback/seek acceptance test and is awaiting its full CI run."
+    "Backend PR #566 merged: owner-authorized DELETE /api/video/uploads/{video_id}, manual staging acceptance harness and no automatic production deployment. Data Centre PR #127 merged: idempotent owner-scoped DELETE /v1/videos/{video_id}, active-job guard, transactional metadata cascade and post-commit original/HLS/poster cleanup. Flutter PR #163 adds the real Android video feed playback/seek acceptance test and is awaiting its full CI run.",
+    "Flutter PR #163 merged: Android integration test proves the exact staging video is first in the native feed, initializes/plays HLS and seeks forward. Backend PR #566 and Data Centre PR #127 provide owner-scoped disposable-video cleanup and the manually confirmed staging workflow. Backend PR #567 adds a migration-order CI guard. Live staging execution remains pending; no production deployment was performed."
   ]
 }
