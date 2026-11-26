@@ -92,8 +92,47 @@ if (/^  \/internal\//m.test(publicSpec)) fail.push("Private internal endpoints m
 if (warnings.length) {
   fail.push("Flutter calls Backend operations that are not fully promoted into the public OpenAPI contract:\n" + warnings.map((item) => "- " + item).join("\n"));
 }
+
+const flutterCapabilities = new Set();
+function collectFlutterCapabilities(dir) {
+  for (const name of readdirSync(dir)) {
+    const path = join(dir, name);
+    const stat = statSync(path);
+    if (stat.isDirectory()) collectFlutterCapabilities(path);
+    else if (path.endsWith(".dart")) {
+      const source = readFileSync(path, "utf8");
+      for (const match of source.matchAll(/['"`](testagram\\.[a-z0-9_.]+)['"`]/g)) {
+        flutterCapabilities.add(match[1]);
+      }
+    }
+  }
+}
+collectFlutterCapabilities(resolve(root, "source-repos/flutter-client/lib"));
+
+const backendCapabilityCases = new Set();
+function collectBackendCapabilityCases(dir) {
+  for (const name of readdirSync(dir)) {
+    const path = join(dir, name);
+    const stat = statSync(path);
+    if (stat.isDirectory()) collectBackendCapabilityCases(path);
+    else if (path.endsWith(".go") && !path.endsWith("_test.go")) {
+      const source = readFileSync(path, "utf8");
+      for (const clause of source.matchAll(/\\bcase\\s+([^:]+):/gs)) {
+        for (const match of clause[1].matchAll(/["`](testagram\\.[a-z0-9_.]+)["`]/g)) {
+          backendCapabilityCases.add(match[1]);
+        }
+      }
+    }
+  }
+}
+collectBackendCapabilityCases(resolve(root, "source-repos/backend/cmd/api"));
+const missingCapabilities = [...flutterCapabilities].filter((capability) => !backendCapabilityCases.has(capability)).sort();
+if (missingCapabilities.length) {
+  fail.push("Flutter invokes capabilities without a production Backend dispatch case: " + missingCapabilities.join(", "));
+}
+
 if (fail.length) {
   console.error(fail.map((item) => "- " + item).join("\n"));
   process.exit(1);
 }
-console.log("Flutter-to-Backend boundary audit passed: " + routes.size + " client paths and " + clientOperations.size + " method/path operations are inventoried and contracted; Testagram-native access/refresh-token boundaries are present, and no direct private-service/provider calls were found.");
+console.log("Flutter-to-Backend audit passed: " + routes.size + " routes, " + clientOperations.size + " HTTP operations and " + flutterCapabilities.size + " capabilities have matching contracts/production dispatch; native-auth and private-service boundaries are intact.");
