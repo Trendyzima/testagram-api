@@ -3469,6 +3469,24 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    delete:
+      operationId: deleteCreatorVideoUpload
+      tags: [TV]
+      summary: Delete an owned creator video and its media
+      description: Deletes the owner-scoped video and its stored original, HLS and poster media after processing has stopped. Repeated deletion of an already-missing ID is idempotent for an authenticated caller; non-owned IDs return not found. Active upload or transcode jobs return conflict.
+      security: [{ testagramBearer: [] }]
+      parameters:
+        - name: video_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '204': { description: Video and associated media metadata deleted }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { description: Video processing is still active; retry after processing completes }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/video/uploads/{video_id}/publish:
     post:
       operationId: publishCreatorVideo

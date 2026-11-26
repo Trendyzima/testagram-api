@@ -191,6 +191,55 @@ if (!backendDeploy.includes(dataCentreMediaGate) ||
  if (!backendDeploy.includes("B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET") || !backendDeploy.includes("CLOUDFLARE_R2_IDENTITY_EVIDENCE_PRIVATE_BUCKET") || !backendDeploy.includes("VPS identity evidence bucket must be dedicated")) fail.push("Backend deployment must require explicit dedicated identity-evidence buckets before enabling replication");
  if (!backendDeploy.includes('if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" && "${FRESH_MEDIA_ENABLED:-false}" == "true" ]]; then')) fail.push("Data Centre media provider credentials must remain behind both independent media gates");
 
+
+ // The public Caddy edge and the private video origin must never share a
+ // Docker network. Backend API and video share a dedicated internal network;
+ // Caddy retains platform for the separately gated Federation deployment.
+ const backendPostgresStart = backendCompose.indexOf("\n  postgres:\n");
+ const backendPostgresEnd = backendCompose.indexOf("\n  control-plane:", backendPostgresStart);
+ const backendPostgresService = backendPostgresStart >= 0 && backendPostgresEnd > backendPostgresStart
+   ? backendCompose.slice(backendPostgresStart, backendPostgresEnd)
+   : "";
+ const backendCaddyStart = backendCompose.indexOf("\n  caddy:\n");
+ const backendCaddyEnd = backendCompose.indexOf("\n  node-exporter:", backendCaddyStart);
+ const backendCaddyService = backendCaddyStart >= 0 && backendCaddyEnd > backendCaddyStart
+   ? backendCompose.slice(backendCaddyStart, backendCaddyEnd)
+   : "";
+ const backendAPIStart = backendCompose.indexOf("\n  api:\n");
+ const backendAPIEnd = backendCompose.indexOf("\n  admin-console:", backendAPIStart);
+ const backendAPIService = backendAPIStart >= 0 && backendAPIEnd > backendAPIStart
+   ? backendCompose.slice(backendAPIStart, backendAPIEnd)
+   : "";
+ const dataCentreVideoStart = dataCentreCompose.indexOf("\n  video:\n");
+ const dataCentreVideoEnd = dataCentreCompose.indexOf("\n  video-worker:", dataCentreVideoStart);
+ const dataCentreVideoService = dataCentreVideoStart >= 0 && dataCentreVideoEnd > dataCentreVideoStart
+   ? dataCentreCompose.slice(dataCentreVideoStart, dataCentreVideoEnd)
+   : "";
+ if (!backendCaddyService.includes("networks: [edge, control-plane, platform]") ||
+     backendCaddyService.includes("video-private")) {
+   fail.push("Caddy must retain Federation platform connectivity but must not join the dedicated video-private network");
+ }
+ if (!backendAPIService.includes("networks: [edge, data, monitoring, platform, egress, video-private]")) {
+   fail.push("Backend API must join the dedicated video-private network while retaining its existing service networks");
+ }
+ if (!backendPostgresService.includes("video-private: {}")) {
+   fail.push("Backend PostgreSQL must join video-private so the isolated video service can reach the canonical database without joining platform");
+ }
+ if (!backendCompose.includes("video-private:\n    name: ${TESTAGRAM_VIDEO_NETWORK:-testagram-video-private}\n    internal: true")) {
+   fail.push("Backend Compose must create the dedicated internal video-private network");
+ }
+ if (!dataCentreVideoService.includes("networks: [internal, egress, video-private]") ||
+     dataCentreVideoService.includes("edge") || dataCentreVideoService.includes("platform") ||
+     dataCentreVideoService.includes("\n    ports:") || dataCentreVideoService.includes("\n    expose:")) {
+   fail.push("Data Centre video service must be private on internal/egress/video-private only, with no host-published port");
+ }
+ if (!dataCentreCompose.includes("video-private:\n    external: true\n    name: ${TESTAGRAM_VIDEO_NETWORK:-testagram-video-private}")) {
+   fail.push("Data Centre video service must join the Backend-created external video-private network");
+ }
+ if (!backendDeploy.includes("write_dc_env_value TESTAGRAM_VIDEO_NETWORK")) {
+   fail.push("Backend deployment must pass the dedicated video-private network name to the Data Centre overlay");
+ }
+
 // Verify the other service-to-service edges against both pinned producers and consumers.
 // These are source-level contract guards; staging tests remain separate release gates.
 const algorithmClient = readFileSync(resolve(lock.repositories.backend.checkoutPath, "internal/algorithmclient/client.go"), "utf8");
