@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "1af703f4ebec64b96f3f82df9bf4c0f9c916c2c3"
   },
-  "status": "all-six-runtime-source-pins-match-current-main; all-current-mainline-CI-green; private-video-network-isolation-awaits-Data-Centre-PR-126-merge; protected-staging-video-acceptance-pending-staging-credentials-and-manual-dispatch; production-deployment-manual; e2ee-and-live-call-gates-open; monetization-backend-workflows-incomplete",
+  "status": "all-six-runtime-source-pins-match-current-main; all-current-mainline-CI-green; private-video-network-isolation-and-migration-ordering-merged; protected-staging-video-acceptance-pending-staging-credentials-and-manual-dispatch; production-deployment-manual; e2ee-and-live-call-gates-open; monetization-backend-workflows-incomplete",
   "repositories": [
     {
       "id": "flutter-client",
@@ -94,7 +94,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "data-centre",
-      "mainCommit": "17d12502019e3837718b02869427248f8267e737",
+      "mainCommit": "2bd02ab26569b901d3487a07a4b4c3a8f01d6c77",
       "mergedPullRequests": [
         111,
         112,
@@ -105,6 +105,7 @@
         120,
         121,
         124,
+        126,
         127
       ]
     },
@@ -159,7 +160,7 @@
       "defaultBranch": "main",
       "kind": "governance",
       "sourcePinKey": null,
-      "mainCommit": "1af703f4ebec64b96f3f82df9bf4c0f9c916c2c3",
+      "mainCommit": "e125e6398411f31633a817ac579a6ea99bd9645b",
       "mergedPullRequests": [
         115,
         117,
@@ -256,7 +257,7 @@
     "Data Centre PR #119 and Algorithm PR #33 are merged into their respective main branches and included in the exact current mainline pins.",
     "Merged source revisions and healthy VPS containers do not prove end-user device acceptance, M-Pesa settlement, full media durability/restore, cross-instance Federation interoperability or disaster recovery.",
     "Backend approval-ledger and communication changes are in the reviewed #424 mainline history. Do not revive the superseded overlapping #431/#432 path.",
-    "Data Centre PR #126 contains the private video network boundary and clean-database migration-order corrections. Until it merges, the current Data Centre mainline pin is not accepted as isolated from Caddy/platform.",
-    "The live video acceptance workflow is manual and requires TESTAGRAM_STAGING_API_URL plus the dedicated TESTAGRAM_AUTH_SMOKE_EMAIL and TESTAGRAM_AUTH_SMOKE_PASSWORD in the protected Backend staging environment. No production deployment is authorized by this workflow."
+    "The live video acceptance workflow is manual and requires TESTAGRAM_STAGING_API_URL plus the dedicated TESTAGRAM_AUTH_SMOKE_EMAIL and TESTAGRAM_AUTH_SMOKE_PASSWORD in the protected Backend staging environment. No production deployment is authorized by this workflow.",
+    "Data Centre PR #126 is merged: the video service is private on video-private with no host-published port, Backend API and PostgreSQL share the internal network, Caddy remains isolated, and clean-database migration order is covered by CI. This is source/CI evidence, not a production deployment or live staging video acceptance."
   ]
 }
