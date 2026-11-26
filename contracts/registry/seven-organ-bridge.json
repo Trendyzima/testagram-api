@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "1af703f4ebec64b96f3f82df9bf4c0f9c916c2c3"
   },
-  "status": "all-six-runtime-source-pins-match-current-main; all-current-mainline-ci-green; production-and-staging-live-acceptance-pending; e2ee-and-live-call-gates-open; monetization-backend-workflows-incomplete",
+  "status": "all-six-runtime-source-pins-match-current-main; merged-pr-checks-green; post-merge-mainline-ci-running; production-and-staging-live-acceptance-pending; e2ee-and-live-call-gates-open; monetization-backend-workflows-incomplete",
   "repositories": [
     {
       "id": "flutter-client",
@@ -40,7 +40,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "b9fa663ae2c7480ac0c21a54f2102b4454536358",
+      "mainCommit": "82e1a93255dfb9fcd4f6386a9a8b767f01fcde98",
       "mergedPullRequests": [
         418,
         419,
@@ -78,7 +78,8 @@
         551,
         552,
         557,
-        559
+        559,
+        566
       ]
     },
     {
@@ -87,7 +88,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "data-centre",
-      "mainCommit": "9546ef40e91ca6b8011f5f7ba1b263ffe91aa9f5",
+      "mainCommit": "17d12502019e3837718b02869427248f8267e737",
       "mergedPullRequests": [
         111,
         112,
@@ -96,7 +97,8 @@
         115,
         119,
         120,
-        121
+        121,
+        127
       ]
     },
     {
@@ -245,6 +247,7 @@
     "CDN PR #125 is merged at 21a254e9f67dc7a8e55dca37151a6db532405e53. Go CDN origin is installed and healthy; Cloudflare Worker deployment and canonical hostname routing remain separate production cutover gates and are not inferred from source CI.",
     "Data Centre PR #119 and Algorithm PR #33 are merged into their respective main branches and included in the exact current mainline pins.",
     "Merged source revisions and healthy VPS containers do not prove end-user device acceptance, M-Pesa settlement, full media durability/restore, cross-instance Federation interoperability or disaster recovery.",
-    "Backend approval-ledger and communication changes are in the reviewed #424 mainline history. Do not revive the superseded overlapping #431/#432 path."
+    "Backend approval-ledger and communication changes are in the reviewed #424 mainline history. Do not revive the superseded overlapping #431/#432 path.",
+    "Backend PR #566 merged: owner-authorized DELETE /api/video/uploads/{video_id}, manual staging acceptance harness and no automatic production deployment. Data Centre PR #127 merged: idempotent owner-scoped DELETE /v1/videos/{video_id}, active-job guard, transactional metadata cascade and post-commit original/HLS/poster cleanup. Flutter PR #163 adds the real Android video feed playback/seek acceptance test and is awaiting its full CI run."
   ]
 }
