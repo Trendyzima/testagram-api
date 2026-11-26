@@ -1,6 +1,6 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "4ca5da34222f70b120ec2bb144bc4ec40e6f6218",
+  "sourceRef": "0e0170326b335e7b46747c9682337898896efdd9",
   "sourceFile": "cmd/api/main.go",
   "note": "Backend public route inventory derived from the locked Backend main source. Creator video deletion is owner-authenticated and proxies to the private Data Centre video service.",
   "dynamicAuthActions": [
