@@ -33,8 +33,8 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 |---|---|
 | Flutter | `cc035021646b0851a6d8468c2d8cd93a698a9be4` (2026-11-26 mainline; current Flutter client source head) |
 | Backend | `9a3faa3dfe8dc28e1f6a3badb2dd68a3794c55b8` (2026-11-26 mainline; current Go API, PostgreSQL and native-auth source head) |
-| Data Centre | `9785fd7d13e572319d60c7694ad1cabb8bcc81dd` (2026-11-23 mainline; dependency-aware video worker readiness) |
-| Testagram API control plane | `4a32c3e7235f36482d4f895c12cfd6ad5362a87a` (2026-11-26 mainline; current contract/SDK governance source head) |
+| Data Centre | `d600d28048877612eec46c9db39de7644d1f0855` (2026-11-23 mainline; dependency-aware video worker readiness) |
+| Testagram API control plane | `1af703f4ebec64b96f3f82df9bf4c0f9c916c2c3` (2026-11-26 mainline; current contract/SDK governance source head) |
 | Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` (2026-11-21 mainline) |
 | Federation | `0f25d853e5ea5ac546eb1d05847086d387eb2a1c` (2026-11-22 mainline; private Backend federation bridge contract) |
 | CDN | `e0a6e0fd22c934a5bfb6a0a4b9686f33e0fa5ab7` (2026-11-23 mainline; canonical Go CDN runtime release) |
