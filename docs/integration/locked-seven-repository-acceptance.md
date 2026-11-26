@@ -39,6 +39,8 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Federation | `0f25d853e5ea5ac546eb1d05847086d387eb2a1c` (2026-11-22 mainline; private Backend federation bridge contract) |
 | CDN | `e0a6e0fd22c934a5bfb6a0a4b9686f33e0fa5ab7` (2026-11-23 mainline; canonical Go CDN runtime release) |
 
+**Current evidence status:** Backend post-merge CI/security/container/self-hosted checks passed; Data Centre post-merge `testagram-vps-ci` passed; Flutter PR CI passed and its post-merge mainline CI is running. InstaBox production deployment and Flutter production Pages deployment jobs were skipped. The G4.1 live staging gate has not yet been run; source merges and CI are not staging acceptance.
+
 ### Previous source baseline — retained for audit (2026-11-23)
 
 | Repository | Previous baseline commit |
