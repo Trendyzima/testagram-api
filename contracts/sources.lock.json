@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "b9fa663ae2c7480ac0c21a54f2102b4454536358",
+      "ref": "82e1a93255dfb9fcd4f6386a9a8b767f01fcde98",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -17,6 +17,7 @@
         ".github/workflows/media-provider-smoke.yml",
         ".github/workflows/native-auth-staging-smoke.yml",
         ".github/workflows/self-hosted-stack.yml",
+        ".github/workflows/video-e2e-staging-acceptance.yml",
         "admin-console/identity_review_integration_test.go",
         "admin-console/main.go",
         "admin-console/main_test.go",
@@ -223,6 +224,7 @@
         "scripts/start-instabox-deployment.sh",
         "scripts/test-identity-registration-migration.sh",
         "scripts/validate-canonical-deploy-smoke.py",
+        "scripts/video-e2e-staging-acceptance.py",
         "tests/test-knowledge-engine-migration.sh",
         "tests/test-native-staff-webauthn-migration.sh",
         "tests/test-social-platform-product-foundation.sh",
@@ -244,7 +246,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "9546ef40e91ca6b8011f5f7ba1b263ffe91aa9f5",
+      "ref": "17d12502019e3837718b02869427248f8267e737",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/native-auth-session-integration.yml",
