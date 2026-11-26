@@ -325,7 +325,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "cc035021646b0851a6d8468c2d8cd93a698a9be4",
+      "ref": "958a51d378f1b33268f1be05c3cd9fea5302da16",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",
@@ -381,6 +381,7 @@
         "lib/features/threads/threads_screen.dart",
         "lib/features/tv/tv_channel_cache_policy.dart",
         "lib/features/tv/tv_playback_policy.dart",
+        "lib/features/video/creator_video_screen.dart",
         "lib/features/video/video_feed_screen.dart",
         "lib/features/wallet/wallet_screen.dart",
         "lib/features/wallet/wallet_transaction_detail_screen.dart",
@@ -392,6 +393,7 @@
         "test/core/auth/native_auth_client_test.dart",
         "test/core/backend_api_native_auth_test.dart",
         "test/core/backend_api_notification_stream_test.dart",
+        "test/core/backend_api_video_test.dart",
         "test/core/backend_api_wallet_test.dart",
         "test/core/communication_api_test.dart",
         "test/core/media/media_upload_policy_test.dart",
@@ -417,6 +419,7 @@
         "test/features/profile/profile_media_api_test.dart",
         "test/features/tv/tv_channel_cache_policy_test.dart",
         "test/features/tv/tv_playback_policy_test.dart",
+        "test/features/video/creator_video_screen_test.dart",
         "test/features/wallet/wallet_screen_test.dart",
         "test/profile_safety_api_test.dart",
         "test/profile_screen_test.dart",
