@@ -776,3 +776,23 @@ Flutter production Pages workflow run [45609966694](https://github.com/Trendyzim
 Backend mainline `91daae0cfe4d419bd0bd30974bb31b4f5a37bf10` includes merged message send/edit, private-attachment and call-room entropy hardening. Source merge does not prove the E2EE migration is applied in production or that live end-to-end acceptance has passed. At the time of this reconciliation, Backend CI and InstaBox deployment were still running. Do not claim the new native-mail runtime is deployed until those exact runs finish successfully and deployed service health is checked.
 
 Canonical Cloudflare API/WebFinger routing remains a separate approval-gated cutover. Native mail still requires independent confirmation of stable outbound IPv4/PTR, TCP/25 to Gmail and Outlook, Cloudflare bounce routing and subaddressing, real inbox delivery with SPF/DKIM/DMARC, hard-bounce processing and duplicate replay suppression. The release decision remains NOT ACCEPTED until these live gates, push delivery, identity and the broader G0-G7 acceptance evidence are complete.
+
+## 2026-11-27 private video service contract and staging gate
+
+The six runtime source pins in `contracts/sources.lock.json` are synchronized to the exact current main branches as of this review: Backend `f810c5aab55c4642a3386c6fdc0d5630bb7037c5`, Flutter `07376965588096a689d90c0dc30ca3ed5429f474`, Data Centre `2bd02ab26569b901d3487a07a4b4c3a8f01d6c77`, Federation `0f25d853e5ea5ac546eb1d05847086d387eb2a1c`, CDN `e0a6e0fd22c934a5bfb6a0a4b9686f33e0fa5ab7`, and Algorithm `3b6a54d5978f8dc33b853698366c0adc110f9614`. The API governance repository is not a seventh runtime service.
+
+The public Backend contract remains the only client-facing video API. The Data Centre video contract in `contracts/upstream/datacentre/video-v1.openapi.yaml` describes the private Backend-to-video-service owner-delete operation; Flutter must never call the private listener or receive its origin. The Data Centre video service is reachable only over the isolated internal video network, with Caddy excluded.
+
+### G4.1 — protected creator-video staging acceptance
+
+Execution is manual and must use a disposable staging account/video. The acceptance runner must verify all of the following before cleanup:
+
+1. Private and unpublished videos are denied to unauthorized viewers.
+2. Upload processing reaches ready state and explicit publish changes visibility only after readiness.
+3. The exact published staging video appears in the Flutter Android feed, starts native HLS playback, and seeks forward.
+4. Multi-segment playback and byte-range requests work; invalid and expired playback tokens are rejected.
+5. Deletion is rejected while upload/transcoding is active; owner deletion is idempotent and removes original, HLS and poster media.
+6. View/like idempotency and comment create/read round-trip behave through the public Backend routes.
+7. The runner always deletes the disposable video and verifies media cleanup, including on failure paths.
+
+**Acceptance status: NOT RUN / NOT ACCEPTED.** Source CI, merged PRs and contract validation do not prove staging execution. No production deployment, DNS change, secret change, or production-data mutation is authorized by this gate.
