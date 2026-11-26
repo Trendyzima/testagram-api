@@ -39,7 +39,7 @@ done < <(node -e '
   const main = new Map(b.repositories.map(repo => [repo.id, repo.mainCommit]));
   const sparse = {
     backend: [".github/workflows", "admin-console", "infra", "tests", "cloudflare", "cmd/api", "internal", "deploy/self-hosted", "migrations", "docs", "scripts"],
-    "data-centre": ["backend", "backend/services/platform", "backend/services/media", "docs", ".github/workflows", "vps", "scripts"],
+    "data-centre": ["backend", "backend/services/platform", "backend/services/media", "backend/services/video-worker", "migrations", "docs", ".github/workflows", "vps", "scripts"],
     cdn: [".github", "cmd", "internal/edge", "cloudflare", "docs", "tests"],
     "flutter-client": [".github/workflows", "docs", "lib/app", "lib/core", "lib/features/auth", "lib/features/discovery", "lib/features/feed", "lib/features/federation", "lib/features/knowledge", "lib/features/lists", "lib/features/threads", "lib/features/video", "lib/features/monetization", "lib/features/messaging", "lib/features/calls", "lib/features/profile", "lib/features/posts", "lib/features/notifications", "lib/features/settings", "lib/features/wallet", "lib/features/tv", "test", "test/core", "test/features/auth", "test/features/discovery", "test/features/feed", "test/features/federation", "test/features/knowledge", "test/features/monetization", "test/features/posts", "test/features/profile", "test/features/settings", "test/features/tv", "test/features/wallet", "tool"],
     federation: ["internal/httpapi", "internal/backend", "internal/store", "internal/worker", "api", "docs"],
