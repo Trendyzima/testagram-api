@@ -32,7 +32,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `07376965588096a689d90c0dc30ca3ed5429f474` (2026-11-26 merged PR #163; Android integration test for exact staging feed item, native HLS playback and seeking) |
-| Backend | `4ca5da34222f70b120ec2bb144bc4ec40e6f6218` (2026-11-26 mainline; includes playback guards #557, private ingress closure #559, owner-video deletion/manual staging acceptance #566 and migration-order guard #567) |
+| Backend | `0e0170326b335e7b46747c9682337898896efdd9` (2026-11-26 mainline; exact source pinned by contracts/sources.lock.json after the latest Backend merge; private-video PostgreSQL network and migration-order follow-ups remain under CI validation) |
 | Data Centre | `17d12502019e3837718b02869427248f8267e737` (2026-11-26 merged PR #127; owner-scoped idempotent video deletion, active-job guard and post-commit media cleanup) |
 | Testagram API control plane | `e125e6398411f31633a817ac579a6ea99bd9645b` (2026-11-26 mainline; current contract/SDK governance source head) |
 | Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` (2026-11-21 mainline) |
