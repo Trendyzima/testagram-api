@@ -646,6 +646,11 @@
       "status": "contracted"
     },
     {
+      "method": "DELETE",
+      "path": "/api/video/uploads/{video_id}",
+      "status": "contracted"
+    },
+    {
       "method": "POST",
       "path": "/api/video/uploads/{video_id}/comments",
       "status": "contracted"
