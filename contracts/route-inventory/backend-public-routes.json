@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "9a3faa3dfe8dc28e1f6a3badb2dd68a3794c55b8",
+  "sourceRef": "946ad8c08696003334cf1b634b611aa03cb76ca5",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across production Go files in cmd/api at Backend mainline commit 9a3faa3dfe8dc28e1f6a3badb2dd68a3794c55b8. Flutter-used operations marked contracted must also exist in the public OpenAPI contract. Secure message send/edit remains fail-closed; proposed device/prekey routes are not registered or advertised.",
+  "note": "Static public/API route registrations across production Go files in cmd/api at Backend mainline commit 946ad8c08696003334cf1b634b611aa03cb76ca5. Flutter-used operations marked contracted must also exist in the public OpenAPI contract. Secure message send/edit remains fail-closed; proposed device/prekey routes are not registered or advertised.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
@@ -614,6 +614,31 @@
       "method": "GET",
       "path": "/api/tv/health",
       "status": "registered-only"
+    },
+    {
+      "method": "GET",
+      "path": "/api/video/channels",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
+      "path": "/api/video/channels",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
+      "path": "/api/video/uploads",
+      "status": "contracted"
+    },
+    {
+      "method": "GET",
+      "path": "/api/video/uploads/{video_id}",
+      "status": "contracted"
+    },
+    {
+      "method": "POST",
+      "path": "/api/video/uploads/{video_id}/publish",
+      "status": "contracted"
     },
     {
       "method": "POST",
