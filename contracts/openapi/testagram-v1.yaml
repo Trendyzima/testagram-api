@@ -3486,6 +3486,7 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409': { description: Video upload or transcoding is still active }
+        '500': { description: Private Data Centre database operation failed }
         '502': { description: Private Data Centre video service unavailable }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/video/uploads/{video_id}/publish:
