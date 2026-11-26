@@ -80,10 +80,11 @@
         "contracts/upstream/datacentre/internal-platform.openapi.yaml",
         "docs/integration/data-centre-platform-contract.md",
         "contracts/upstream/datacentre/media-lifecycle-v1.openapi.yaml",
-        "contracts/upstream/datacentre/identity-evidence-v1.openapi.yaml"
+        "contracts/upstream/datacentre/identity-evidence-v1.openapi.yaml",
+        "contracts/upstream/datacentre/video-v1.openapi.yaml"
       ],
-      "status": "mainline-ci-green; private-media-and-identity-evidence-apis-source-implemented; live-staging-acceptance-pending",
-      "notes": "Current Data Centre mainline is 9546ef40e91ca6b8011f5f7ba1b263ffe91aa9f5 (merged PR #121); CI passed on the reviewed source. Video comments and likes require a native user session and a ready, non-private video; HLS segments recheck video visibility and readiness on every request. It owns storage mechanics, media lifecycle providers, video processing, notification delivery infrastructure, platform operations and backups; it does not own product identity, visibility or authorization. Backend has typed, direction-specific clients for private media and identity-evidence APIs, with separate service credentials. The generic platform config/events/audit listener is a distinct private control-plane API and is not a product API; no generic Backend client is claimed. The Flutter notification SSE path reads the canonical Backend inbox directly; Data Centre notification workers are not a second inbox authority. The video service listener is not publicly routed by the current Caddy ingress. Live provider, storage durability, staging and restore acceptance remain separate from source CI."
+      "status": "mainline-source-audited; private-video-service-contract-added; owner-video-delete-merged; live-staging-acceptance-pending",
+      "notes": "Current Data Centre mainline is 2bd02ab26569b901d3487a07a4b4c3a8f01d6c77 (merged PR #126 private video network isolation and migration smoke-order hardening; prior PR #127 owner-scoped deletion remains in history). The dedicated Go video listener is private and not routed through Caddy; its internal video-private network is isolated from edge ingress. Backend reaches it through the private DATA_CENTRE_VIDEO_API_URL origin. The video API validates native Testagram access tokens and live PostgreSQL session/account state, enforces ownership, rejects deletion while uploads/transcoding are active, transactionally removes video/engagement/job metadata, and removes original/HLS/poster media after commit. The public client calls Backend only. Storage durability, live provider behavior, real-device playback, staging acceptance and restore validation remain separate gates; no production deployment is inferred."
     },
     {
       "id": "cdn-edge",
