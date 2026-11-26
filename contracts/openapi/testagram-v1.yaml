@@ -3522,7 +3522,7 @@ paths:
         - name: X-Playback-Session
           in: header
           required: true
-          schema: { type: string, minLength: 8, maxLength: 128, pattern: '^[A-Za-z0-9_-]+
+          schema: { type: string, minLength: 8, maxLength: 128, pattern: "^[A-Za-z0-9_-]+$" }
       responses:
         '202': { description: View accepted; duplicate playback sessions are not counted twice }
         '400': { $ref: '#/components/responses/BadRequest' }
