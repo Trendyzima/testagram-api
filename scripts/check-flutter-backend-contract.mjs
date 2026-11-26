@@ -101,7 +101,7 @@ function collectFlutterCapabilities(dir) {
     if (stat.isDirectory()) collectFlutterCapabilities(path);
     else if (path.endsWith(".dart")) {
       const source = readFileSync(path, "utf8");
-      for (const match of source.matchAll(/['"`](testagram\\.[a-z0-9_.]+)['"`]/g)) {
+      for (const match of source.matchAll(/['"`](testagram\.[a-z0-9_.]+)['"`]/g)) {
         flutterCapabilities.add(match[1]);
       }
     }
@@ -117,8 +117,8 @@ function collectBackendCapabilityCases(dir) {
     if (stat.isDirectory()) collectBackendCapabilityCases(path);
     else if (path.endsWith(".go") && !path.endsWith("_test.go")) {
       const source = readFileSync(path, "utf8");
-      for (const clause of source.matchAll(/\\bcase\\s+([^:]+):/gs)) {
-        for (const match of clause[1].matchAll(/["`](testagram\\.[a-z0-9_.]+)["`]/g)) {
+      for (const clause of source.matchAll(/\bcase\s+([^:]+):/gs)) {
+        for (const match of clause[1].matchAll(/["`](testagram\.[a-z0-9_.]+)["`]/g)) {
           backendCapabilityCases.add(match[1]);
         }
       }
