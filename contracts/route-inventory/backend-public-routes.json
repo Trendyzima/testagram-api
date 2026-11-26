@@ -641,13 +641,13 @@
       "status": "contracted"
     },
     {
-      "method": "GET",
-      "path": "/api/video/uploads/{video_id}/comments",
+      "method": "DELETE",
+      "path": "/api/video/uploads/{video_id}",
       "status": "contracted"
     },
     {
-      "method": "DELETE",
-      "path": "/api/video/uploads/{video_id}",
+      "method": "GET",
+      "path": "/api/video/uploads/{video_id}/comments",
       "status": "contracted"
     },
     {
