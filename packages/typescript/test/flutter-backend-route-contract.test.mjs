@@ -51,3 +51,10 @@ test("Flutter runtime operations are promoted into the public OpenAPI contract",
     assert.ok(operations.has(operation), "public OpenAPI is missing " + operation);
   }
 });
+
+const flutterCheckoutScript = readFileSync(resolve(root, "scripts/checkout-contract-sources.sh"), "utf8");
+test("Flutter sparse checkout includes the pinned list, thread and video feature trees", () => {
+  for (const directory of ["lib/features/lists", "lib/features/threads", "lib/features/video"]) {
+    assert.ok(flutterCheckoutScript.includes('"' + directory + '"'), "sparse checkout is missing " + directory);
+  }
+});
