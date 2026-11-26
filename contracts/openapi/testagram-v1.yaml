@@ -3378,6 +3378,7 @@ paths:
 
   /api/video/channels:
     get:
+      operationId: listCreatorVideoChannels
       tags: [TV]
       summary: List creator channels for the authenticated account
       security: [{ testagramBearer: [] }]
@@ -3390,6 +3391,7 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
     post:
+      operationId: createCreatorVideoChannel
       tags: [TV]
       summary: Create a creator channel
       security: [{ testagramBearer: [] }]
@@ -3416,6 +3418,7 @@ paths:
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/video/uploads:
     post:
+      operationId: uploadCreatorVideo
       tags: [TV]
       summary: Stream a private creator video upload
       description: Multipart uploads require Content-Length and are limited to 20 GiB. New uploads are private; processing and publishing are separate owner-scoped operations.
@@ -3447,6 +3450,7 @@ paths:
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/video/uploads/{video_id}:
     get:
+      operationId: getCreatorVideoUploadStatus
       tags: [TV]
       summary: Read owner-scoped video processing status
       security: [{ testagramBearer: [] }]
@@ -3467,6 +3471,7 @@ paths:
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/video/uploads/{video_id}/publish:
     post:
+      operationId: publishCreatorVideo
       tags: [TV]
       summary: Explicitly publish an owner video after processing is ready
       security: [{ testagramBearer: [] }]
