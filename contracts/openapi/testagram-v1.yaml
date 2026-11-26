@@ -3521,8 +3521,8 @@ paths:
           schema: { type: string, format: uuid }
         - name: X-Playback-Session
           in: header
-          required: false
-          schema: { type: string, maxLength: 128 }
+          required: true
+          schema: { type: string, minLength: 8, maxLength: 128, pattern: '^[A-Za-z0-9_-]+$' }
       responses:
         '202': { description: View accepted; duplicate playback sessions are not counted twice }
         '400': { $ref: '#/components/responses/BadRequest' }
@@ -3626,11 +3626,20 @@ paths:
         - name: file
           in: path
           required: true
-          schema: { type: string, minLength: 1, maxLength: 128 }
+          description: ASCII HLS filename; path separators, traversal segments and characters outside letters, digits, dot, underscore and hyphen are rejected.
+          schema: { type: string, minLength: 1, maxLength: 128, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]*$' }
         - name: token
           in: query
           required: true
           schema: { type: string, minLength: 1, maxLength: 256 }
+        - name: Range
+          in: header
+          required: false
+          schema: { type: string, maxLength: 128 }
+        - name: If-Range
+          in: header
+          required: false
+          schema: { type: string, maxLength: 256 }
       responses:
         '200':
           description: Signed HLS playlist or video segment streamed by the Backend
@@ -3639,8 +3648,16 @@ paths:
               schema: { type: string }
             video/mp2t:
               schema: { type: string, format: binary }
+        '206':
+          description: Partial video segment returned for a byte-range request.
+          headers:
+            Content-Range: { schema: { type: string } }
+            Accept-Ranges: { schema: { type: string } }
+          content:
+            video/mp2t:
+              schema: { type: string, format: binary }
         '400': { $ref: '#/components/responses/BadRequest' }
-        '403': { description: Missing or invalid signed playback token }
+        '403': { description: "Missing, malformed or expired signed playback token" }
         '404': { description: Segment not found }
         '502': { description: Private video service unavailable }
 
