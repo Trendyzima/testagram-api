@@ -31,10 +31,10 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `ad217a528b5059fba03ade6a589d39a91a572f2a` (2026-11-26 mainline; current Flutter client source head) |
+| Flutter | `cc035021646b0851a6d8468c2d8cd93a698a9be4` (2026-11-26 mainline; current Flutter client source head) |
 | Backend | `9a3faa3dfe8dc28e1f6a3badb2dd68a3794c55b8` (2026-11-26 mainline; current Go API, PostgreSQL and native-auth source head) |
 | Data Centre | `9785fd7d13e572319d60c7694ad1cabb8bcc81dd` (2026-11-23 mainline; dependency-aware video worker readiness) |
-| Testagram API control plane | `70dfcea171e027edd7b850b565d0f9d439accdc6` (2026-11-26 mainline; current contract/SDK governance source head) |
+| Testagram API control plane | `4a32c3e7235f36482d4f895c12cfd6ad5362a87a` (2026-11-26 mainline; current contract/SDK governance source head) |
 | Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` (2026-11-21 mainline) |
 | Federation | `0f25d853e5ea5ac546eb1d05847086d387eb2a1c` (2026-11-22 mainline; private Backend federation bridge contract) |
 | CDN | `e0a6e0fd22c934a5bfb6a0a4b9686f33e0fa5ab7` (2026-11-23 mainline; canonical Go CDN runtime release) |
@@ -52,6 +52,8 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | CDN | `e0a6e0fd22c934a5bfb6a0a4b9686f33e0fa5ab7` |
 
 The original gate lock date remains 2026-11-23. This historical table is retained so later source-baseline refreshes do not erase the prior review record.
+
+The merged Flutter baseline now includes the creator-tip journey: recipient resolution, explicit user confirmation, KES amount bounds, retry-stable idempotency, and the existing Backend wallet ledger capability. This is source/CI evidence only; it does not attest live wallet funding, settlement, payout, or production availability.
 
 A source pin is not a deployment record. Every accepted staging and production run must separately record the actual running image digest and source revision. Mutable tags such as `main` and `latest` are not acceptable release identities.
 
