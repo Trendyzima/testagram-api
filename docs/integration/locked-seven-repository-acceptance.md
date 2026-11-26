@@ -31,10 +31,10 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `958a51d378f1b33268f1be05c3cd9fea5302da16` (2026-11-26 merged PR #160; authenticated creator upload, private processing/publishing, Backend-proxied TV feed and native HLS playback) |
-| Backend | `2512323940157586a46b89845135adff06ed5340` (2026-11-26 mainline; includes playback guards PR #557, private Caddy-ingress closure PR #559 and Caddy/platform network separation PR #561) |
-| Data Centre | `d2af54a38701c7951b93a71e1b8784a8d6295c11` (2026-11-26 mainline; includes video visibility PR #121 and removal of the video service from public edge networking PR #124) |
-| Testagram API control plane | `1af703f4ebec64b96f3f82df9bf4c0f9c916c2c3` (2026-11-26 mainline; current contract/SDK governance source head) |
+| Flutter | `07376965588096a689d90c0dc30ca3ed5429f474` (2026-11-26 merged PRs #160 and #163; authenticated creator upload, private processing/publishing, Backend-proxied TV feed and Android HLS playback acceptance test) |
+| Backend | `f810c5aab55c4642a3386c6fdc0d5630bb7037c5` (2026-11-26 mainline; includes playback guards #557, Caddy/platform boundary #561, owner video deletion #566, migration-order guards #567/#570, staging acceptance handoff #568 and private PostgreSQL/video network #571) |
+| Data Centre | `2bd02ab26569b901d3487a07a4b4c3a8f01d6c77` (2026-11-26 mainline; includes video visibility #121, edge isolation #124, owner cleanup #127 and private video network plus migration-order fixes #126) |
+| Testagram API control plane | `e125e6398411f31633a817ac579a6ea99bd9645b` (2026-11-26 mainline; current contract/SDK governance source head before this integration refresh) |
 | Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` (2026-11-21 mainline) |
 | Federation | `0f25d853e5ea5ac546eb1d05847086d387eb2a1c` (2026-11-22 mainline; private Backend federation bridge contract) |
 | CDN | `e0a6e0fd22c934a5bfb6a0a4b9686f33e0fa5ab7` (2026-11-23 mainline; canonical Go CDN runtime release) |
@@ -56,6 +56,8 @@ The original gate lock date remains 2026-11-23. This historical table is retaine
 The merged Flutter baseline now includes the creator-tip journey: recipient resolution, explicit user confirmation, KES amount bounds, retry-stable idempotency, and the existing Backend wallet ledger capability. This is source/CI evidence only; it does not attest live wallet funding, settlement, payout, or production availability.
 
 A source pin is not a deployment record. Every accepted staging and production run must separately record the actual running image digest and source revision. Mutable tags such as `main` and `latest` are not acceptable release identities.
+
+The 2026-11-26 video isolation correction is now merged on Backend and Data Centre mainline. Backend PR #571 places PostgreSQL on the internal video-private network while keeping Caddy off it; Data Centre PR #126 removes the video service from shared platform/edge networking and host port publishing. Its CI also applies the immutable out-of-order Backend migrations only after their prerequisites and proves the video API and FFmpeg worker can reach the database and media volume. These are source and isolated-CI results, not a live staging or production attestation.
 
 ## 3. Locked acceptance gates
 
@@ -123,6 +125,23 @@ Treat the platform API and media lifecycle API as separate interfaces; do not cl
 - Exercise provider outage, partial replication, duplicate completion, expired upload grant, delete retry, stale metadata and worker restart for each implementation separately.
 
 **Fail if:** a successful PUT is treated as replication, ETag is treated as SHA-256, a one-copy object becomes ready, a provider credential reaches Flutter/CDN, or Data Centre becomes the product authorization authority.
+
+### G4-TV — Creator video upload, HLS playback and engagement
+
+This is a separate end-to-end gate from provider replication and CDN origin acceptance. Passing the private-network and FFmpeg worker CI does not pass live account acceptance.
+
+- Use a dedicated native Testagram staging account and a generated disposable MP4. Create or reuse its dedicated creator channel, upload the video as private/unpublished, and poll the processing state until it is ready.
+- Before explicit publication, confirm the private/unpublished video returns not found from the public manifest and does not appear in the public feed.
+- Publish explicitly through the owner-authenticated Backend route. Confirm the item appears in the Flutter-consumed feed with public visibility.
+- Fetch the master and variant HLS playlists and at least two segments through the Backend proxy. Seek with a byte-range request for bytes 0-1023 and require HTTP 206 plus a Content-Range header.
+- Confirm invalid-signature and expired playback tokens are rejected. Data Centre unit coverage includes a correctly signed expired token; the staging harness checks expired and tampered tokens through the public HLS route.
+- Submit a view twice with the exact same X-Playback-Session; the first must count and the retry must not. Like twice from the same account and prove the counter increments once. Create a comment and retrieve it.
+- Run the Flutter Android integration test against the same disposable video; prove feed loading, HLS playback and seeking. The Backend workflow hands the short-lived staging access token, video ID and title to the emulator through newline-delimited, injection-checked GitHub step outputs.
+- Delete the disposable video through the owner-only DELETE /api/video/uploads/{video_id} route. Confirm subsequent status is not found and the video is absent from the public feed. The protected workflow also has an always-run cleanup step guarded by the created video ID.
+
+**Manual staging prerequisites:** Configure TESTAGRAM_STAGING_API_URL as a clean HTTPS staging origin and TESTAGRAM_AUTH_SMOKE_EMAIL / TESTAGRAM_AUTH_SMOKE_PASSWORD as secrets in the Backend repository's protected staging environment. Dispatch .github/workflows/video-e2e-staging-acceptance.yml manually and explicitly confirm staging-only execution, temporary public-feed publication and cleanup. The workflow rejects production hostnames. Do not paste credentials into chat.
+
+**Current status:** source and isolated CI coverage is merged and green; the live staging account/video workflow has not yet been dispatched because the protected staging origin and test-account secrets have not been supplied/configured. Production deployment remains manual and untouched.
 
 ### G5 — Backend → CDN → origin → object storage
 
