@@ -339,7 +339,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "07376965588096a689d90c0dc30ca3ed5429f474",
+      "ref": "b6a34b85282aef83fc2a03e73a4e9e546f362049",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",
