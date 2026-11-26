@@ -628,6 +628,29 @@ paths:
         '400': { description: Verification token is invalid or expired. }
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/feed/public:
+    get:
+      operationId: getPublicFeed
+      tags: [Feed]
+      summary: Retrieve the public native-post timeline
+      description: Public posts from active, non-protected local accounts. No bearer token is required. Cursor is scoped to this native public-post feed; ranking falls back to chronological order if Algorithm is unavailable.
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+        - in: query
+          name: before
+          required: false
+          schema: { type: string, maxLength: 2048 }
+      responses:
+        '200':
+          description: Public native-post page.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PublicFeedEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/feed/home:
     get:
       operationId: getHomeFeed
@@ -1013,6 +1036,52 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/media/list:
+    post:
+      operationId: listOwnedMedia
+      tags: [Media]
+      summary: List ready media owned by the authenticated account
+      description: Returns at most 100 ready owned assets. Private items receive short-lived owner-scoped URLs; provider credentials and raw private object URLs are never exposed.
+      security:
+        - testagramBearer: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: false, maxProperties: 0 }
+      responses:
+        '200':
+          description: Ready assets owned by the authenticated account.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OwnedMediaListEnvelope' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/media/private-download-url:
+    post:
+      operationId: createPrivateMediaDownloadURL
+      tags: [Media]
+      summary: Issue a short-lived URL for one owned private media object
+      description: Backend verifies the object is ready, private and owned by the authenticated account. The URL expires after 300 seconds.
+      security:
+        - testagramBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PrivateMediaDownloadRequest' }
+      responses:
+        '200':
+          description: Short-lived owner-scoped private media URL.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PrivateMediaDownloadEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/media/upload-intent:
     post:
       operationId: createMediaUploadIntent
@@ -1258,6 +1327,57 @@ paths:
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/history:
+    get:
+      operationId: getBrowsingHistory
+      tags: [Social]
+      summary: Read the authenticated account's browsing history
+      description: Returns up to 100 post, thread and video history entries for the authenticated account only.
+      security:
+        - testagramBearer: []
+      responses:
+        '200':
+          description: History ordered by most recent view.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BrowsingHistoryListEnvelope' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    post:
+      operationId: recordBrowsingHistory
+      tags: [Social]
+      summary: Record a viewed post, thread or video
+      description: Upserts one history entry for the authenticated account; repeated views refresh viewed_at and metadata.
+      security:
+        - testagramBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BrowsingHistoryRecordRequest' }
+      responses:
+        '200':
+          description: History entry recorded.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BrowsingHistoryRecordEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    delete:
+      operationId: clearBrowsingHistory
+      tags: [Social]
+      summary: Clear the authenticated account's browsing history
+      security:
+        - testagramBearer: []
+      responses:
+        '200':
+          description: Number of history entries deleted.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BrowsingHistoryClearEnvelope' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/social/posts:
     post:
       operationId: createSocialPost
@@ -1310,6 +1430,23 @@ paths:
               schema: { $ref: '#/components/schemas/ModerationReviewEnvelope' }
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/social/posts/{postId}/poll:
+    parameters:
+      - $ref: '#/components/parameters/PostId'
+    get:
+      operationId: getPostPoll
+      tags: [Social]
+      summary: Read the poll attached to a post
+      description: Bearer authentication is optional; when supplied, has_voted reflects the authenticated viewer. Without a token only a public post's poll is readable.
+      responses:
+        '200':
+          description: Poll attached to the post.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PollEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/social/posts/{postId}/interaction-summary:
     parameters:
       - $ref: '#/components/parameters/PostId'
@@ -1329,6 +1466,23 @@ paths:
   /api/social/posts/{postId}/reaction:
     parameters:
       - $ref: '#/components/parameters/PostId'
+    get:
+      operationId: getPostReactionState
+      tags: [Social]
+      summary: Read the authenticated viewer's post reaction
+      description: Returns whether the viewer reacted, the stored emoji (empty when absent), and the current likes count.
+      security:
+        - testagramBearer: []
+      responses:
+        '200':
+          description: Viewer-specific reaction state.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PostReactionStateEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
     post:
       operationId: createPostReaction
       tags: [Social]
@@ -1356,6 +1510,23 @@ paths:
   /api/social/posts/{postId}/reposts:
     parameters:
       - $ref: '#/components/parameters/PostId'
+    get:
+      operationId: getPostRepostState
+      tags: [Social]
+      summary: Read the authenticated viewer's post-repost state
+      description: Returns whether the viewer has reposted the post and the current repost count.
+      security:
+        - testagramBearer: []
+      responses:
+        '200':
+          description: Viewer-specific repost state.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PostRepostStateEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
     post:
       operationId: createPostRepost
       tags: [Social]
@@ -1643,6 +1814,180 @@ paths:
               schema: { $ref: '#/components/schemas/ExtensibleObject' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      operationId: deleteThread
+      tags: [Threads]
+      summary: Delete an owned thread
+      description: Soft-deletes a thread owned by the authenticated account and queues cleanup for eligible unreferenced media.
+      security:
+        - testagramBearer: []
+      responses:
+        '200':
+          description: Thread deleted and eligible media cleanup queued.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ThreadDeleteEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/threads/{threadId}/likes:
+    parameters:
+      - name: threadId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - in: query
+        name: limit
+        required: false
+        schema: { type: integer, minimum: 1, maximum: 100, default: 50 }
+    get:
+      operationId: listThreadLikes
+      tags: [Threads]
+      summary: List accounts that liked a thread
+      description: Returns active account profiles for a visible thread, newest likes first, capped at 100.
+      security:
+        - testagramBearer: []
+      responses:
+        '200':
+          description: Thread likes.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ThreadInteractionListEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/threads/{threadId}/likes/state:
+    parameters:
+      - name: threadId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getThreadLikeState
+      tags: [Threads]
+      summary: Read the authenticated viewer's thread-like state
+      security:
+        - testagramBearer: []
+      responses:
+        '200':
+          description: Viewer thread-like state.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ThreadLikeStateEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/threads/{threadId}/reposts:
+    parameters:
+      - name: threadId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+      - in: query
+        name: limit
+        required: false
+        schema: { type: integer, minimum: 1, maximum: 100, default: 50 }
+    get:
+      operationId: listThreadReposts
+      tags: [Threads]
+      summary: List accounts that reposted a thread
+      description: Returns active account profiles for a visible thread, newest reposts first, capped at 100.
+      security:
+        - testagramBearer: []
+      responses:
+        '200':
+          description: Thread reposts.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ThreadInteractionListEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/threads/{threadId}/reposts/state:
+    parameters:
+      - name: threadId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getThreadRepostState
+      tags: [Threads]
+      summary: Read the authenticated viewer's thread-repost state
+      security:
+        - testagramBearer: []
+      responses:
+        '200':
+          description: Viewer thread-repost state.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ThreadRepostStateEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/threads/likes/states:
+    post:
+      operationId: getThreadLikeStates
+      tags: [Threads]
+      summary: Read the viewer's like state for multiple threads
+      security:
+        - testagramBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ThreadBatchStateRequest' }
+      responses:
+        '200':
+          description: IDs of supplied threads liked by the viewer.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ThreadBatchStateEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/threads/reposts/states:
+    post:
+      operationId: getThreadRepostStates
+      tags: [Threads]
+      summary: Read the viewer's repost state for multiple threads
+      security:
+        - testagramBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ThreadBatchStateRequest' }
+      responses:
+        '200':
+          description: IDs of supplied threads reposted by the viewer.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ThreadBatchStateEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/threads/bookmarks/states:
+    post:
+      operationId: getThreadBookmarkStates
+      tags: [Threads]
+      summary: Read the viewer's bookmark state for multiple threads
+      security:
+        - testagramBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ThreadBatchStateRequest' }
+      responses:
+        '200':
+          description: IDs of supplied threads bookmarked by the viewer.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ThreadBatchStateEnvelope' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/me/profile:
     get:
       operationId: getMyProfile
@@ -3699,6 +4044,310 @@ components:
         created_at: { type: string, format: date-time }
         expires_at: { type: string, format: date-time }
         submitted_at: { type: [string, 'null'], format: date-time }
+    PublicFeedAuthor:
+      type: object
+      additionalProperties: false
+      required: [id, username, display_name, avatar_key, avatar_url, protected_account]
+      properties:
+        id: { type: string, format: uuid }
+        username: { type: string }
+        display_name: { type: string }
+        avatar_key: { type: string }
+        avatar_url: { type: string }
+        protected_account: { type: boolean }
+    PublicFeedPost:
+      type: object
+      additionalProperties: false
+      required: [id, user_id, content, visibility, media_ids, media_urls, media_content_types, is_video, is_following, language, created_at, likes_count, replies_count, reposts_count, author, origin]
+      properties:
+        id: { type: string, format: uuid }
+        user_id: { type: string, format: uuid }
+        content: { type: string }
+        visibility: { type: string, const: public }
+        media_ids: { type: array, items: { type: string } }
+        media_urls: { type: array, items: { type: string, format: uri } }
+        media_content_types: { type: array, items: { type: string } }
+        media_auth_headers: { type: object, additionalProperties: { type: string } }
+        is_video: { type: boolean }
+        is_following: { type: boolean }
+        language: { type: string }
+        created_at: { type: string, format: date-time }
+        likes_count: { type: integer, minimum: 0 }
+        replies_count: { type: integer, minimum: 0 }
+        reposts_count: { type: integer, minimum: 0 }
+        author: { $ref: '#/components/schemas/PublicFeedAuthor' }
+        origin: { type: string, const: local }
+        ranking_score: { type: number, minimum: 0, maximum: 1 }
+        ranking_reasons: { type: array, items: { type: string } }
+    PublicFeedPage:
+      type: object
+      additionalProperties: false
+      required: [posts, next_cursor, has_more, ranking_mode]
+      properties:
+        posts:
+          type: array
+          maxItems: 50
+          items: { $ref: '#/components/schemas/PublicFeedPost' }
+        next_cursor: { type: string, maxLength: 2048 }
+        has_more: { type: boolean }
+        ranking_mode: { type: string, enum: [algorithm, chronological] }
+    PublicFeedEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data: { $ref: '#/components/schemas/PublicFeedPage' }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadInteractionProfile:
+      type: object
+      additionalProperties: false
+      required: [id, username, display_name, avatar_url]
+      properties:
+        id: { type: string, format: uuid }
+        username: { type: string }
+        display_name: { type: string }
+        avatar_url: { type: string }
+    ThreadInteraction:
+      type: object
+      additionalProperties: false
+      required: [user_id, profile, created_at]
+      properties:
+        user_id: { type: string, format: uuid }
+        profile: { $ref: '#/components/schemas/ThreadInteractionProfile' }
+        created_at: { type: string, format: date-time }
+    ThreadInteractionListEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: '#/components/schemas/ThreadInteraction' }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadLikeStateEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [liked]
+          properties:
+            liked: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadRepostStateEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [reposted]
+          properties:
+            reposted: { type: boolean }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadBatchStateRequest:
+      type: object
+      additionalProperties: false
+      required: [thread_ids]
+      properties:
+        thread_ids:
+          type: array
+          maxItems: 100
+          items: { type: string, format: uuid }
+    ThreadBatchStateEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [thread_ids]
+          properties:
+            thread_ids:
+              type: array
+              maxItems: 100
+              items: { type: string, format: uuid }
+        error: { type: 'null' }
+        request_id: { type: string }
+    ThreadDeleteEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [id, deleted, media_cleanup_queued]
+          properties:
+            id: { type: string, format: uuid }
+            deleted: { const: true }
+            media_cleanup_queued: { const: true }
+        error: { type: 'null' }
+        request_id: { type: string }
+    BrowsingHistoryRecordRequest:
+      type: object
+      additionalProperties: false
+      required: [entity_type, entity_id]
+      properties:
+        entity_type: { type: string, enum: [post, thread, video] }
+        entity_id: { type: string, format: uuid }
+        metadata: { type: object, additionalProperties: true }
+    BrowsingHistoryItem:
+      type: object
+      additionalProperties: false
+      required: [entity_type, entity_id, metadata, created_at]
+      properties:
+        entity_type: { type: string, enum: [post, thread, video] }
+        entity_id: { type: string, format: uuid }
+        metadata: { type: object, additionalProperties: true }
+        created_at: { type: string, format: date-time }
+    BrowsingHistoryListEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [items]
+          properties:
+            items:
+              type: array
+              maxItems: 100
+              items: { $ref: '#/components/schemas/BrowsingHistoryItem' }
+        error: { type: 'null' }
+        request_id: { type: string }
+    BrowsingHistoryRecordEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [recorded]
+          properties:
+            recorded: { const: true }
+        error: { type: 'null' }
+        request_id: { type: string }
+    BrowsingHistoryClearEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [deleted]
+          properties:
+            deleted: { type: integer, minimum: 0 }
+        error: { type: 'null' }
+        request_id: { type: string }
+    OwnedMediaItem:
+      type: object
+      additionalProperties: false
+      required: [id, name, path, url, type, size, updatedAt, visibility, content_type]
+      properties:
+        id: { type: string, minLength: 1, maxLength: 1024 }
+        name: { type: string, maxLength: 255 }
+        path: { type: string, minLength: 1, maxLength: 1024 }
+        url: { type: string, maxLength: 4096 }
+        type: { type: string, enum: [image, video, file] }
+        size: { type: integer, minimum: 0 }
+        updatedAt: { type: string, format: date-time }
+        visibility: { type: string, enum: [public, private] }
+        content_type: { type: string, maxLength: 255 }
+    OwnedMediaListEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [items]
+          properties:
+            items:
+              type: array
+              maxItems: 100
+              items: { $ref: '#/components/schemas/OwnedMediaItem' }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PrivateMediaDownloadRequest:
+      type: object
+      additionalProperties: false
+      required: [key]
+      properties:
+        key: { type: string, minLength: 1, maxLength: 1024 }
+    PrivateMediaDownloadEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [url, expires_in_seconds]
+          properties:
+            url: { type: string, format: uri, maxLength: 4096 }
+            expires_in_seconds: { type: integer, const: 300 }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PostReactionStateEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [liked, emoji, likes_count]
+          properties:
+            liked: { type: boolean }
+            emoji: { type: string, maxLength: 32, description: Empty string when no reaction exists. }
+            likes_count: { type: integer, minimum: 0 }
+        error: { type: 'null' }
+        request_id: { type: string }
+    PostRepostStateEnvelope:
+      type: object
+      additionalProperties: false
+      required: [ok, data, error, request_id]
+      properties:
+        ok: { const: true }
+        data:
+          type: object
+          additionalProperties: false
+          required: [reposted, reposts_count]
+          properties:
+            reposted: { type: boolean }
+            reposts_count: { type: integer, minimum: 0 }
+        error: { type: 'null' }
+        request_id: { type: string }
     ExtensibleObject:
       type: object
       additionalProperties: true
