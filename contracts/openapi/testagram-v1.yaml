@@ -3657,7 +3657,7 @@ paths:
             video/mp2t:
               schema: { type: string, format: binary }
         '400': { $ref: '#/components/responses/BadRequest' }
-        '403': { description: Missing, malformed or expired signed playback token }
+        '403': { description: "Missing, malformed or expired signed playback token" }
         '404': { description: Segment not found }
         '502': { description: Private video service unavailable }
 
