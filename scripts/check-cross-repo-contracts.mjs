@@ -195,18 +195,18 @@ if (!backendDeploy.includes(dataCentreMediaGate) ||
  // The public Caddy edge and the private video origin must never share a
  // Docker network. Backend API and video share a dedicated internal network;
  // Caddy retains platform for the separately gated Federation deployment.
- const backendCaddyStart = backendCompose.indexOf("\\n  caddy:\\n");
- const backendCaddyEnd = backendCompose.indexOf("\\n  node-exporter:", backendCaddyStart);
+ const backendCaddyStart = backendCompose.indexOf("\n  caddy:\n");
+ const backendCaddyEnd = backendCompose.indexOf("\n  node-exporter:", backendCaddyStart);
  const backendCaddyService = backendCaddyStart >= 0 && backendCaddyEnd > backendCaddyStart
    ? backendCompose.slice(backendCaddyStart, backendCaddyEnd)
    : "";
- const backendAPIStart = backendCompose.indexOf("\\n  api:\\n");
- const backendAPIEnd = backendCompose.indexOf("\\n  admin-console:", backendAPIStart);
+ const backendAPIStart = backendCompose.indexOf("\n  api:\n");
+ const backendAPIEnd = backendCompose.indexOf("\n  admin-console:", backendAPIStart);
  const backendAPIService = backendAPIStart >= 0 && backendAPIEnd > backendAPIStart
    ? backendCompose.slice(backendAPIStart, backendAPIEnd)
    : "";
- const dataCentreVideoStart = dataCentreCompose.indexOf("\\n  video:\\n");
- const dataCentreVideoEnd = dataCentreCompose.indexOf("\\n  video-worker:", dataCentreVideoStart);
+ const dataCentreVideoStart = dataCentreCompose.indexOf("\n  video:\n");
+ const dataCentreVideoEnd = dataCentreCompose.indexOf("\n  video-worker:", dataCentreVideoStart);
  const dataCentreVideoService = dataCentreVideoStart >= 0 && dataCentreVideoEnd > dataCentreVideoStart
    ? dataCentreCompose.slice(dataCentreVideoStart, dataCentreVideoEnd)
    : "";
@@ -217,15 +217,15 @@ if (!backendDeploy.includes(dataCentreMediaGate) ||
  if (!backendAPIService.includes("networks: [edge, data, monitoring, platform, egress, video-private]")) {
    fail.push("Backend API must join the dedicated video-private network while retaining its existing service networks");
  }
- if (!backendCompose.includes("video-private:\\n    name: ${TESTAGRAM_VIDEO_NETWORK:-testagram-video-private}\\n    internal: true")) {
+ if (!backendCompose.includes("video-private:\n    name: ${TESTAGRAM_VIDEO_NETWORK:-testagram-video-private}\n    internal: true")) {
    fail.push("Backend Compose must create the dedicated internal video-private network");
  }
  if (!dataCentreVideoService.includes("networks: [internal, egress, video-private]") ||
      dataCentreVideoService.includes("edge") || dataCentreVideoService.includes("platform") ||
-     dataCentreVideoService.includes("\\n    ports:") || dataCentreVideoService.includes("\\n    expose:")) {
+     dataCentreVideoService.includes("\n    ports:") || dataCentreVideoService.includes("\n    expose:")) {
    fail.push("Data Centre video service must be private on internal/egress/video-private only, with no host-published port");
  }
- if (!dataCentreCompose.includes("video-private:\\n    external: true\\n    name: ${TESTAGRAM_VIDEO_NETWORK:-testagram-video-private}")) {
+ if (!dataCentreCompose.includes("video-private:\n    external: true\n    name: ${TESTAGRAM_VIDEO_NETWORK:-testagram-video-private}")) {
    fail.push("Data Centre video service must join the Backend-created external video-private network");
  }
  if (!backendDeploy.includes("write_dc_env_value TESTAGRAM_VIDEO_NETWORK")) {
