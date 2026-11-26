@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "1af703f4ebec64b96f3f82df9bf4c0f9c916c2c3"
   },
-  "status": "all-six-runtime-source-pins-match-current-main; all-current-mainline-CI-green; private-video-network-isolation-and-migration-ordering-merged; protected-staging-video-acceptance-pending-staging-credentials-and-manual-dispatch; production-deployment-manual; e2ee-and-live-call-gates-open; monetization-backend-workflows-incomplete",
+  "status": "all-six-runtime-source-pins-match-current-main; all-current-mainline-CI-green; private-video-network-isolation-migration-ordering-and-durable-media-cleanup-merged; protected-staging-video-acceptance-pending-staging-credentials-and-manual-dispatch; production-deployment-manual; e2ee-and-live-call-gates-open; monetization-backend-workflows-incomplete",
   "repositories": [
     {
       "id": "flutter-client",
@@ -94,7 +94,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "data-centre",
-      "mainCommit": "2bd02ab26569b901d3487a07a4b4c3a8f01d6c77",
+      "mainCommit": "9b98822b6840a41e21401c54569bd6d89cccc0ca",
       "mergedPullRequests": [
         111,
         112,
@@ -106,7 +106,8 @@
         121,
         124,
         126,
-        127
+        127,
+        129
       ]
     },
     {
@@ -245,7 +246,8 @@
     "No external identity provider is part of the supported runtime; native Testagram Backend authentication is the only user and staff authentication path.",
     "All six runtime source pins identify exact current mainline commits; production and product acceptance remain independent gates.",
     "No message or call is advertised as end-to-end encrypted until the reviewed client protocol, device trust, key lifecycle and media lifecycle pass end-to-end acceptance.",
-    "The video service has no host-published port; only Backend API, PostgreSQL and the Data Centre video service join the internal video-private network, while Caddy remains off it."
+    "The video service has no host-published port; only Backend API, PostgreSQL and the Data Centre video service join the internal video-private network, while Caddy remains off it.",
+    "Video deletion commits product metadata removal and a durable media-cleanup outbox intent atomically; physical media cleanup is asynchronous, lease-recoverable and retryable."
   ],
   "excludedFromAcceptance": [
     "Backend PR #548 was closed without merge; its overlapping notification-category work was superseded by merged PR #549. Backend #549 is accepted mainline and adds social discovery, saved timelines and notification category APIs.",
@@ -258,6 +260,7 @@
     "Merged source revisions and healthy VPS containers do not prove end-user device acceptance, M-Pesa settlement, full media durability/restore, cross-instance Federation interoperability or disaster recovery.",
     "Backend approval-ledger and communication changes are in the reviewed #424 mainline history. Do not revive the superseded overlapping #431/#432 path.",
     "The live video acceptance workflow is manual and requires TESTAGRAM_STAGING_API_URL plus the dedicated TESTAGRAM_AUTH_SMOKE_EMAIL and TESTAGRAM_AUTH_SMOKE_PASSWORD in the protected Backend staging environment. No production deployment is authorized by this workflow.",
-    "Data Centre PR #126 is merged: the video service is private on video-private with no host-published port, Backend API and PostgreSQL share the internal network, Caddy remains isolated, and clean-database migration order is covered by CI. This is source/CI evidence, not a production deployment or live staging video acceptance."
+    "Data Centre PR #126 is merged: the video service is private on video-private with no host-published port, Backend API and PostgreSQL share the internal network, Caddy remains isolated, and clean-database migration order is covered by CI. This is source/CI evidence, not a production deployment or live staging video acceptance.",
+    "Data Centre PR #129 is merged at 9b98822b6840a41e21401c54569bd6d89cccc0ca. Creator-video deletion now writes a durable cleanup outbox intent atomically with metadata deletion; the private worker reclaims expired leases, removes original/HLS/poster trees idempotently and retains terminal failures for operator recovery. CI verifies expired-lease recovery and physical cleanup. This is source/CI evidence, not live staging acceptance or production deployment."
   ]
 }

@@ -15,9 +15,15 @@ paths:
         Idempotent for an authenticated caller: an already absent video returns
         204. A video owned by another account is returned as not found. Deletion
         is refused while the video is uploading, queued, processing, or has an
-        active video job. The video row and dependent engagement/job records are
-        removed transactionally; original, HLS and poster directories are
-        removed after commit.
+        active video job. The video row, dependent engagement/job records and a
+        durable media-cleanup outbox intent are committed atomically. The outbox
+        row has no foreign key to the deleted video and survives that deletion.
+        The private video worker claims cleanup with a lease, removes original,
+        HLS and poster directories idempotently, and retries transient failures
+        up to five attempts. A successful 204 confirms metadata deletion and
+        durable cleanup scheduling; it does not promise synchronous filesystem
+        removal. Terminal cleanup failures remain in the outbox for operator
+        inspection and explicit requeue.
       security:
         - testagramNativeBearer: []
       parameters:
@@ -29,7 +35,7 @@ paths:
             format: uuid
       responses:
         "204":
-          description: Video deleted or already absent
+          description: Video metadata deleted (or already absent); media cleanup durably queued or already complete
         "401":
           description: Native Testagram session is missing or invalid
         "404":
