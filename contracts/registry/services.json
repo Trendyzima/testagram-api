@@ -15,7 +15,8 @@
         "social graph and post lifecycle",
         "public API orchestration",
         "canonical remote follower relationships",
-        "canonical public ActivityPub post objects"
+        "canonical public ActivityPub post objects",
+        "authenticated creator video channel, upload, processing-status and publish orchestration"
       ],
       "baseUrl": "https://api.testagram.site",
       "exposure": "public",
@@ -31,7 +32,7 @@
         "contracts/internal/openapi/backend-user-activity-watchdog-v1.yaml"
       ],
       "status": "mainline-source-audited; backend-ci-and-security-checks-green; production-and-live-acceptance-pending; e2ee-and-realtime-gates-open",
-      "notes": "Current Backend mainline is 9a3faa3dfe8dc28e1f6a3badb2dd68a3794c55b8. It is the sole identity, session, authorization and canonical product-data authority. The Flutter-used method/path surface is checked against the Backend route inventory and public OpenAPI by API contract CI. Native signup remains fail-closed behind identity review. Message reaction and sender-only deletion are implemented; encrypted send/edit/attachment remain E2EE_NOT_READY. Call and Audio Spaces lifecycle records are metadata only until public realtime/WebRTC transport and a group SFU pass acceptance. Backend has typed Data Centre clients for private media and identity-evidence APIs; this does not imply a generic platform-control-plane client. Backend CI and security checks passed on the pinned SHA; production deployment and live staging acceptance are not established by source CI."
+      "notes": "Current Backend mainline is 946ad8c08696003334cf1b634b611aa03cb76ca5 (merged PR #551). It is the sole identity, session, authorization and canonical product-data authority. The Flutter-used method/path surface is checked against the Backend route inventory and public OpenAPI by API contract CI. Native signup remains fail-closed behind identity review. Message reaction and sender-only deletion are implemented; encrypted send/edit/attachment remain E2EE_NOT_READY. Call and Audio Spaces lifecycle records are metadata only until public realtime/WebRTC transport and a group SFU pass acceptance. Backend has typed Data Centre clients for private media, identity evidence and video processing APIs; creator channel/upload/status/publish routes proxy through the authenticated Backend to the private video service. Flutter never receives the private video-service URL or its credentials. This does not imply a generic platform-control-plane client. Backend CI and security checks passed on the pinned SHA; production deployment and live staging acceptance are not established by source CI."
     },
     {
       "id": "flutter-client",
