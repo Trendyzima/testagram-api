@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "bridge": "testagram-seven-organ-bridge",
   "createdFrom": "main@e125e6398411f31633a817ac579a6ea99bd9645b",
-  "status": "backend-and-data-centre-mainline-ci-green; flutter-pr-ci-green-and-mainline-ci-running; production-deployment-jobs-skipped; staging-live-acceptance-pending; e2ee-and-live-call-gates-open; monetization-backend-workflows-incomplete",
+  "status": "backend-mainline-ci-green; data-centre-mainline-ci-green; api-bridge-pin-correction-pending-ci; production-deployment-manual; live-staging-acceptance-pending; e2ee-and-live-call-gates-open",
   "repositories": [
     {
       "id": "flutter-client",
@@ -37,7 +37,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "4ca5da34222f70b120ec2bb144bc4ec40e6f6218",
+      "mainCommit": "0e0170326b335e7b46747c9682337898896efdd9",
       "mergedPullRequests": [
         418,
         419,
