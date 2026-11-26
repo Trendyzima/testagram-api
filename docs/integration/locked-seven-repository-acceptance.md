@@ -31,9 +31,9 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `958a51d378f1b33268f1be05c3cd9fea5302da16` (2026-11-26 merged PR #160; authenticated creator upload, private processing/publishing, Backend-proxied TV feed and native HLS playback) |
-| Backend | `b9fa663ae2c7480ac0c21a54f2102b4454536358` (2026-11-26 mainline; includes playback guards PR #557 and private Caddy-ingress closure PR #559) |
-| Data Centre | `9546ef40e91ca6b8011f5f7ba1b263ffe91aa9f5` (2026-11-26 mainline; video engagement auth and per-segment visibility rechecks) |
+| Flutter | `07376965588096a689d90c0dc30ca3ed5429f474` (2026-11-26 merged PR #163; Android integration test for exact staging feed item, native HLS playback and seeking) |
+| Backend | `4ca5da34222f70b120ec2bb144bc4ec40e6f6218` (2026-11-26 mainline; includes playback guards #557, private ingress closure #559, owner-video deletion/manual staging acceptance #566 and migration-order guard #567) |
+| Data Centre | `17d12502019e3837718b02869427248f8267e737` (2026-11-26 merged PR #127; owner-scoped idempotent video deletion, active-job guard and post-commit media cleanup) |
 | Testagram API control plane | `1af703f4ebec64b96f3f82df9bf4c0f9c916c2c3` (2026-11-26 mainline; current contract/SDK governance source head) |
 | Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` (2026-11-21 mainline) |
 | Federation | `0f25d853e5ea5ac546eb1d05847086d387eb2a1c` (2026-11-22 mainline; private Backend federation bridge contract) |
@@ -123,6 +123,22 @@ Treat the platform API and media lifecycle API as separate interfaces; do not cl
 - Exercise provider outage, partial replication, duplicate completion, expired upload grant, delete retry, stale metadata and worker restart for each implementation separately.
 
 **Fail if:** a successful PUT is treated as replication, ETag is treated as SHA-256, a one-copy object becomes ready, a provider credential reaches Flutter/CDN, or Data Centre becomes the product authorization authority.
+
+### G4.1 — Creator video upload, publication, playback and engagement
+
+This is a separate product-media gate layered on G4. Repository merges and service CI do not pass it.
+
+- Run only through the protected staging environment using the dedicated native-auth test identity and TESTAGRAM_STAGING_API_URL. The workflow is manual (workflow_dispatch) and requires explicit confirmation that the origin is non-production, that a temporary public staging-feed item is authorized, and that cleanup is required.
+- Preflight the Backend → Data Centre owner-delete route before creating content. If either service lacks the new route, stop before upload.
+- Create or reuse the dedicated staging creator channel; generate a short disposable MP4; upload it as private; poll processing until ready.
+- Before publication, prove that the private/unpublished video is absent from the public feed and its manifest is denied.
+- Publish explicitly; prove the exact video is returned as the newest public feed item.
+- Load that exact item in the real Flutter Android feed. Verify native VideoPlayer initialization, active playback and a forward seek. Separately verify the Backend-proxied master/variant playlists, multiple HLS segments and HTTP byte-range response (206 with Content-Range).
+- Verify invalid and expired signed HLS tokens are rejected; record the same playback-session view twice and prove the second event is deduplicated; submit a like twice and prove the aggregate counter increments once; create a comment and read it back.
+- Delete the disposable video through the owner-authenticated Backend route. Verify the Data Centre rejects deletion while jobs are active, cascades video/engagement/job metadata, recalculates channel counts, removes original/HLS/poster media after commit, and the deleted video is absent from both owner status and the public feed.
+- Cleanup runs even if the Android playback test fails. The staging channel is dedicated to the smoke identity and may be reused; the video itself must not remain public or addressable.
+
+**Fail if:** any private/unpublished video is exposed, any invalid/expired token streams bytes, range seeking fails, duplicate views/likes increment twice, comments cannot be read back, Flutter does not play/seek the exact test item, or the disposable video remains addressable after cleanup. This gate does not deploy production or change DNS, storage providers, secrets or feature flags.
 
 ### G5 — Backend → CDN → origin → object storage
 
