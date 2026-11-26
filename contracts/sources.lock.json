@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "0e0170326b335e7b46747c9682337898896efdd9",
+      "ref": "f810c5aab55c4642a3386c6fdc0d5630bb7037c5",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -242,7 +242,8 @@
         "tests/test_native_sensitive_action_migration_order.py",
         "tests/test_r2_managed_domain_request.py",
         "tests/test_self_hosted_backup_guards.py",
-        "tests/test_social_platform_migration_safety.py"
+        "tests/test_social_platform_migration_safety.py",
+        "tests/test_video_private_network_contract.py"
       ]
     },
     "data-centre": {
