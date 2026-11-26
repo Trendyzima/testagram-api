@@ -314,7 +314,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "ad217a528b5059fba03ade6a589d39a91a572f2a",
+      "ref": "cc035021646b0851a6d8468c2d8cd93a698a9be4",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",
@@ -357,6 +357,7 @@
         "lib/features/lists/social_lists_screen.dart",
         "lib/features/messaging/conversation_screen.dart",
         "lib/features/messaging/direct_messages_screen.dart",
+        "lib/features/monetization/creator_tip_screen.dart",
         "lib/features/monetization/monetization_hub_screen.dart",
         "lib/features/notifications/notifications_screen.dart",
         "lib/features/posts/post_detail_screen.dart",
@@ -398,6 +399,7 @@
         "test/features/lists/social_lists_api_test.dart",
         "test/features/messaging/direct_messages_and_calls_test.dart",
         "test/features/messaging_and_calls_test.dart",
+        "test/features/monetization/creator_tip_screen_test.dart",
         "test/features/monetization/monetization_hub_screen_test.dart",
         "test/features/posts/post_detail_media_headers_test.dart",
         "test/features/profile/profile_edit_screen_test.dart",
