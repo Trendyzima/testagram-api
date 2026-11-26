@@ -67,9 +67,7 @@
         "platform event/audit intake",
         "storage nodes",
         "notification delivery",
-        "operations and backups",
-        "shared platform event/audit intake",
-        "storage infrastructure and provider operations"
+        "operations and backups"
       ],
       "baseUrl": "http://platform:8095",
       "exposure": "private-network",
@@ -81,8 +79,7 @@
         "contracts/upstream/datacentre/internal-platform.openapi.yaml",
         "docs/integration/data-centre-platform-contract.md",
         "contracts/upstream/datacentre/media-lifecycle-v1.openapi.yaml",
-        "contracts/upstream/datacentre/identity-evidence-v1.openapi.yaml",
-        "contracts/upstream/datacentre/video-v1.openapi.yaml"
+        "contracts/upstream/datacentre/identity-evidence-v1.openapi.yaml"
       ],
       "status": "mainline-ci-green; private-media-and-identity-evidence-apis-source-implemented; owner-video-delete-merged; live-staging-acceptance-pending",
       "notes": "Current Data Centre mainline is 17d12502019e3837718b02869427248f8267e737 (merged PR #127; prior PR #121 remains in history); PR #127 checks passed and post-merge mainline testagram-vps-ci run 45889734546 passed. Video comments and likes require a native user session and a ready, non-private video. Owner-scoped idempotent DELETE /v1/videos/{video_id} refuses active jobs, cascades video/engagement/job metadata, recomputes channel counts and removes original/HLS/poster media after commit; HLS segments recheck video visibility and readiness on every request. It owns storage mechanics, media lifecycle providers, video processing, notification delivery infrastructure, platform operations and backups; it does not own product identity, visibility or authorization. Backend has typed, direction-specific clients for private media and identity-evidence APIs, with separate service credentials. The generic platform config/events/audit listener is a distinct private control-plane API and is not a product API; no generic Backend client is claimed. The Flutter notification SSE path reads the canonical Backend inbox directly; Data Centre notification workers are not a second inbox authority. The video service listener is not publicly routed by the current Caddy ingress. Live provider, storage durability, staging and restore acceptance remain separate from source CI."
