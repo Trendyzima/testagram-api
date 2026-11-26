@@ -36,6 +36,17 @@ for (const match of backendClient.matchAll(/(?:_request|http\.Request)\s*\(\s*['
   const path = normalize(match[2]);
   clientOperations.add(method + " " + path);
 }
+// Capture list helpers and direct HTTP calls as well as _request('METHOD', ...).
+// These paths must match both the Backend route inventory and the OpenAPI contract.
+for (const match of backendClient.matchAll(/_requestList\s*\(\s*baseUri\.resolve\(\s*['"\x60]([^'"\x60]+)['"\x60]\s*\)/gs)) {
+  clientOperations.add("GET " + normalize(match[1]));
+}
+for (const match of backendClient.matchAll(/_client\.(get|post|put|patch|delete)\s*\(\s*baseUri\.resolve\(\s*['"\x60]([^'"\x60]+)['"\x60]/gs)) {
+  clientOperations.add(match[1].toUpperCase() + " " + normalize(match[2]));
+}
+for (const match of backendClient.matchAll(/videoManifestUri\s*\([^)]*\)\s*=>\s*baseUri\.resolve\(\s*['"\x60]([^'"\x60]+)['"\x60]/gs)) {
+  clientOperations.add("GET " + normalize(match[1]));
+}
 for (const operation of clientOperations) {
   const entry = inventoryByOperation.get(operation);
   if (!entry) {
