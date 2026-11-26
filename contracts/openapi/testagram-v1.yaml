@@ -3492,6 +3492,158 @@ paths:
         '409': { description: Video is not ready to publish or publication conflicts with current state }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
 
+
+  /api/video/feed:
+    get:
+      operationId: getPublicVideoFeed
+      tags: [TV]
+      summary: List public videos that are ready for playback
+      security: []
+      responses:
+        '200':
+          description: Public ready video feed
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { type: object, additionalProperties: true }
+        '502': { description: Private video service unavailable }
+  /api/video/uploads/{video_id}/view:
+    post:
+      operationId: recordVideoView
+      tags: [TV]
+      summary: Record a deduplicated public video view
+      security: []
+      parameters:
+        - name: video_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: X-Playback-Session
+          in: header
+          required: false
+          schema: { type: string, maxLength: 128 }
+      responses:
+        '202': { description: View accepted; duplicate playback sessions are not counted twice }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { description: Video is not publicly available }
+  /api/video/uploads/{video_id}/like:
+    post:
+      operationId: likeVideo
+      tags: [TV]
+      summary: Like a public video as the authenticated account
+      security: [{ testagramBearer: [] }]
+      parameters:
+        - name: video_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Like state recorded
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { description: Video not found }
+  /api/video/uploads/{video_id}/comments:
+    get:
+      operationId: listVideoComments
+      tags: [TV]
+      summary: List comments for a public video
+      security: [{ testagramBearer: [] }]
+      parameters:
+        - name: video_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Video comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { type: object, additionalProperties: true }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createVideoComment
+      tags: [TV]
+      summary: Add a comment to a public video
+      security: [{ testagramBearer: [] }]
+      parameters:
+        - name: video_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [body]
+              properties:
+                body: { type: string, minLength: 1, maxLength: 4000 }
+              additionalProperties: false
+      responses:
+        '200':
+          description: Comment accepted
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/video/uploads/{video_id}/manifest:
+    get:
+      operationId: getVideoPlaybackManifest
+      tags: [TV]
+      summary: Resolve a signed HLS master manifest for a public video
+      security: []
+      parameters:
+        - name: video_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '307':
+          description: Redirect to the Backend-proxied HLS master playlist with a signed short-lived playback token
+          headers:
+            Location: { schema: { type: string } }
+        '404': { description: Video is not publicly available }
+        '502': { description: Private video service unavailable }
+  /api/video/uploads/{video_id}/hls/{file}:
+    get:
+      operationId: getVideoHlsSegment
+      tags: [TV]
+      summary: Stream a signed HLS playlist or media segment through Backend
+      security: []
+      parameters:
+        - name: video_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: file
+          in: path
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 128 }
+        - name: token
+          in: query
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 256 }
+      responses:
+        '200':
+          description: Signed HLS playlist or video segment streamed by the Backend
+          content:
+            application/vnd.apple.mpegurl:
+              schema: { type: string }
+            video/mp2t:
+              schema: { type: string, format: binary }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { description: Missing or invalid signed playback token }
+        '404': { description: Segment not found }
+        '502': { description: Private video service unavailable }
+
 components:
   securitySchemes:
     testagramBearer:
