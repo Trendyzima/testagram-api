@@ -30,8 +30,8 @@
         "contracts/internal/openapi/backend-tv-health-monitor-v1.yaml",
         "contracts/internal/openapi/backend-user-activity-watchdog-v1.yaml"
       ],
-      "status": "native-auth-pr-424-plus-approval-ledger-pr-434-qa-pr-435-profile-wallet-pr-437-communication-privacy-pr-439-and-fail-closed-followup-pr-441-candidates-review-pending",
-      "notes": "Backend remains the canonical identity, authorization, content, wallet and relationship authority. The current dependent review chain is PR #424 → #434 → #435 → #437 → #439 → #441. PR #437 adds viewer-scoped username resolution and owner-scoped M-Pesa idempotency recovery; #439 adds communication privacy/block enforcement; #441 is the fail-closed follow-up, closes additional delete/call-end policy routing gaps and removes legacy plaintext from message-list responses. All are open, unmerged candidates and the chain must be reviewed and merged sequentially. PR #440 is validation-only and must never be merged. Independent security review, exact-head CI, PostgreSQL concurrency tests and staging acceptance remain mandatory."
+      "status": "mainline-source-audited; backend-ci-and-security-checks-green; production-and-live-acceptance-pending; e2ee-and-realtime-gates-open",
+      "notes": "Current Backend mainline is 9a3faa3dfe8dc28e1f6a3badb2dd68a3794c55b8. It is the sole identity, session, authorization and canonical product-data authority. The Flutter-used method/path surface is checked against the Backend route inventory and public OpenAPI by API contract CI. Native signup remains fail-closed behind identity review. Message reaction and sender-only deletion are implemented; encrypted send/edit/attachment remain E2EE_NOT_READY. Call and Audio Spaces lifecycle records are metadata only until public realtime/WebRTC transport and a group SFU pass acceptance. Backend has typed Data Centre clients for private media and identity-evidence APIs; this does not imply a generic platform-control-plane client. Backend CI and security checks passed on the pinned SHA; production deployment and live staging acceptance are not established by source CI."
     },
     {
       "id": "flutter-client",
@@ -55,8 +55,8 @@
         "packages/dart/README.md",
         "packages/dart/lib/testagram_api.dart"
       ],
-      "status": "hybrid-social-knowledge-pr-116-deep-links-wallet-monetization-pr-117-messaging-calls-pr-118-plaintext-rendering-hardening-pr-120-candidates-review-pending",
-      "notes": "Flutter PR chain: #116 provides the consolidated social/knowledge, profile safety, deep-link, wallet and monetization foundations; #117 layers the hybrid social/knowledge UI; #118 adds direct-message and voice/video call destinations; #120 removes plaintext message rendering and adds a regression test. The current source pin is the exact #120 head and includes its stacked ancestors. Wallet and profile actions use authenticated Backend contracts. Monetization destinations are navigable foundations only; campaign, earnings, premium, subscription, boost, payout and gifts/tips workflows remain unavailable until their Backend contracts, ledger/provider reconciliation and end-to-end tests exist. Message composition and media calling remain disabled until verified E2EE and signaling/media lifecycles are implemented. Flutter native Android App Links/iOS Universal Links still require verified packaging associations."
+      "status": "mainline-source-audited; flutter-ci-green; api-route-contract-ci-green; e2ee-and-live-call-gates-open; monetization-workflows-partial",
+      "notes": "Current Flutter mainline is ad217a528b5059fba03ade6a589d39a91a572f2a; Flutter CI run 45867560762 and validation run 45867560468 passed on that exact SHA. API contract CI run 45868112697 passed against the current API mainline and pinned client source. Auth, profile, feed, posts/replies/interactions, threads, discovery/search/hashtags, polls, knowledge, lists, history, notifications, federation preferences, wallet and supported media operations use the public Backend contract. Flutter does not call private microservices directly. Messaging exposes only supported metadata/reaction/delete behavior; plaintext and encrypted send/edit/attachments remain disabled pending E2EE device trust and decryption. Calls and Audio Spaces are lifecycle/UI foundations only pending realtime transport, WebRTC media encryption and an SFU. Monetization destinations are navigable foundations; campaign, earnings, premium/subscription, boost, payout and gifts/tips workflows do not yet have complete Backend ledger/provider contracts. Video service direct ingress remains unavailable and must not be pointed at the general API origin."
     },
     {
       "id": "data-centre-platform",
@@ -82,8 +82,8 @@
         "contracts/upstream/datacentre/media-lifecycle-v1.openapi.yaml",
         "contracts/upstream/datacentre/identity-evidence-v1.openapi.yaml"
       ],
-      "status": "private-platform-and-media-provider-implemented-identity-evidence-contract-candidate-pr-115-live-staging-acceptance-pending",
-      "notes": "Data Centre video and notification user-aware routes validate Backend-issued native access JWTs and recheck live PostgreSQL session/account state. PLATFORM_INTERNAL_TOKEN remains separate for protected platform writes. The private media lifecycle API has a typed Backend client in native-auth candidate PR #424 and matching provider routes. Identity evidence is isolated under /internal/v1/identity-evidence/* with its own IDENTITY_EVIDENCE_INTERNAL_TOKEN and dedicated B2/R2 buckets; its provider OpenAPI contract is proposed in Data Centre PR #115 and pinned as a candidate in the bridge. Neither API has passed live staging acceptance. The generic platform config/events/audit API remains a separate service contract and no typed Backend consumer is claimed."
+      "status": "mainline-ci-green; private-media-and-identity-evidence-apis-source-implemented; live-staging-acceptance-pending",
+      "notes": "Current Data Centre mainline is 9785fd7d13e572319d60c7694ad1cabb8bcc81dd and its CI passed on that exact SHA. It owns storage mechanics, media lifecycle providers, video processing, notification delivery infrastructure, platform operations and backups; it does not own product identity, visibility or authorization. Backend has typed, direction-specific clients for private media and identity-evidence APIs, with separate service credentials. The generic platform config/events/audit listener is a distinct private control-plane API and is not a product API; no generic Backend client is claimed. The Flutter notification SSE path reads the canonical Backend inbox directly; Data Centre notification workers are not a second inbox authority. The video service listener is not publicly routed by the current Caddy ingress. Live provider, storage durability, staging and restore acceptance remain separate from source CI."
     },
     {
       "id": "cdn-edge",
@@ -107,8 +107,8 @@
       "contracts": [
         "docs/integration/cdn-edge-contract.md"
       ],
-      "status": "go-cdn-instabox-deployment-wired-live-rollout-and-domain-cutover-pending",
-      "notes": "Backend PR #223 is merged. It replaces the legacy Nginx cache with the immutable Go CDN image (sha256:e4c014a043b761d6f84b05d3973a3a6831522b863eef08685b7ca6db17f55ce9), a persistent bounded cache, private Backend origin, distinct origin/viewer-assertion/purge credentials and cache purge-before-delete. Backend origin-matrix tests, Go security checks, race/static tests and self-hosted Compose validation passed pre-merge. The merged Backend deployment workflow's input-validation job succeeded, but its actual deploy job was skipped; no live Go CDN service or external HTTPS acceptance is evidenced. CDN issues #61/#65 previously reported media.testagram.site serving the older R2 Worker; custom-domain/DNS cutover and rollback still require direct verification. Cloudflare deployment/DNS credentials are not available through the current repository integration. CDN viewer assertions remain distinct from user access JWTs and origin/purge credentials; CDN never becomes the identity or visibility authority."
+      "status": "mainline-ci-and-image-publish-green; production-domain-and-origin-cutover-unverified",
+      "notes": "Current CDN mainline is e0a6e0fd22c934a5bfb6a0a4b9686f33e0fa5ab7. CI, source verification and container publication passed on that exact SHA. The CDN is a byte-delivery plane for public/private media, HLS/DASH, range requests and cache invalidation; Backend remains the authorization and visibility authority. Private media requires Backend viewer assertions and separately authenticated origins/purge operations. A green build or published image does not prove that media.testagram.site DNS, TLS, edge routing, origin reachability, private-media denial or byte-range behavior are live and correct; those require staging/live endpoint acceptance."
     },
     {
       "id": "federation",
@@ -138,8 +138,8 @@
         "contracts/internal/openapi/federation-ingress-v1.yaml",
         "contracts/upstream/federation/backend-private-v1.openapi.yaml"
       ],
-      "status": "activitypub-and-atproto-private-bridge-contract-candidate-pr-53-live-staging-acceptance-pending",
-      "notes": "Federation remains a protocol adapter, not the identity or visibility authority. ActivityPub and AT Protocol are separate protocol implementations. The private Backend bridge now has a provider OpenAPI candidate in PR #53 covering durable ActivityPub activity enqueue, Backend-authorized remote-object pages and Backend-authorized ATProto author feeds, and protocol-native remote identity verification for pending ActivityPub/Bluesky subscriptions. The Backend client supplies actor URI/DID allowlists and revalidates returned provenance; Federation must not select viewer follows or create local Testagram identities. PR #53 is pinned for cross-organ contract audit but is not merged; staging service-auth, timeout/fallback and load acceptance remain pending."
+      "status": "mainline-ci-and-image-publish-green; activitypub-and-atproto-bridges-source-present; delivery-workers-disabled-pending-acceptance",
+      "notes": "Current Federation mainline is 0f25d853e5ea5ac546eb1d05847086d387eb2a1c; CI and image publication passed on that exact SHA. Federation owns ActivityPub/AT Protocol protocol state, keys, inbox/outbox and remote delivery; Backend remains authoritative for local identities, follows, blocks, visibility and moderation. The Backend private bridge and protocol adapters are source-present, but delivery/inbox/outbox workers remain disabled by default until signatures, consent, replay protection, idempotency, durability, interoperability and staging gates pass. Source CI is not proof of live federation interoperability."
     },
     {
       "id": "algorithm",
@@ -158,8 +158,8 @@
       "contracts": [
         "contracts/upstream/algorithm/openapi.yaml"
       ],
-      "status": "feed-and-topic-ranking-contract-and-backend-client-static-contract-aligned-staging-acceptance-pending",
-      "notes": "Backend submits at most 200 already-authorized feed candidates to POST /v1/feed/rank and at most 200 Backend-authorized public hashtag candidates to POST /v1/topics/rank, requesting at most 50 results. The pinned Backend client, Algorithm handlers and OpenAPI agree on both routes, API-version/service-bearer headers and bounded inputs. Backend rejects unknown/duplicate IDs and rechecks current authorization before hydration. Staging service-authentication, timeout/fallback and load acceptance remain required."
+      "status": "mainline-ci-and-image-publish-green; private-ranking-contract-source-aligned; staging-integration-acceptance-pending",
+      "notes": "Current Algorithm mainline is 3b6a54d5978f8dc33b853698366c0adc110f9614; ranking CI and image publication passed on that exact SHA. Backend sends bounded, already-authorized candidate IDs to private ranking endpoints; Algorithm returns ordering/scores only. Backend rejects unknown/duplicate IDs and rechecks visibility, blocks, follows and moderation before hydrating canonical records. Algorithm has no public client API and Flutter never calls it. Private service authentication, timeout/fallback behavior, load and staging acceptance remain distinct from source CI."
     }
   ]
 }
