@@ -66,6 +66,7 @@
         "infrastructure configuration",
         "platform event/audit intake",
         "storage nodes",
+        "video processing",
         "notification delivery",
         "operations and backups"
       ],
@@ -79,33 +80,11 @@
         "contracts/upstream/datacentre/internal-platform.openapi.yaml",
         "docs/integration/data-centre-platform-contract.md",
         "contracts/upstream/datacentre/media-lifecycle-v1.openapi.yaml",
-        "contracts/upstream/datacentre/identity-evidence-v1.openapi.yaml"
-      ],
-      "status": "mainline-ci-green; private-media-and-identity-evidence-apis-source-implemented; owner-video-delete-merged; live-staging-acceptance-pending",
-      "notes": "Current Data Centre mainline is 17d12502019e3837718b02869427248f8267e737 (merged PR #127; prior PR #121 remains in history); PR #127 checks passed and post-merge mainline testagram-vps-ci run 45889734546 passed. Video comments and likes require a native user session and a ready, non-private video. Owner-scoped idempotent DELETE /v1/videos/{video_id} refuses active jobs, cascades video/engagement/job metadata, recomputes channel counts and removes original/HLS/poster media after commit; HLS segments recheck video visibility and readiness on every request. It owns storage mechanics, media lifecycle providers, video processing, notification delivery infrastructure, platform operations and backups; it does not own product identity, visibility or authorization. Backend has typed, direction-specific clients for private media and identity-evidence APIs, with separate service credentials. The generic platform config/events/audit listener is a distinct private control-plane API and is not a product API; no generic Backend client is claimed. The Flutter notification SSE path reads the canonical Backend inbox directly; Data Centre notification workers are not a second inbox authority. The video service listener is not publicly routed by the current Caddy ingress. Live provider, storage durability, staging and restore acceptance remain separate from source CI."
-    },
-    {
-      "id": "data-centre-video",
-      "repository": "Trendyzima/Testagram-data-centre-",
-      "role": "private-media-provider",
-      "authority": [
-        "creator video upload and processing lifecycle",
-        "HLS manifest and segment delivery",
-        "video views, likes and comments persistence",
-        "owner-scoped video deletion and media cleanup"
-      ],
-      "baseUrl": null,
-      "baseUrlEnv": "DATA_CENTRE_VIDEO_API_URL",
-      "exposure": "private-network",
-      "auth": "Backend forwards the Testagram-native user access JWT; the video service independently validates the live PostgreSQL user/session and enforces video ownership; no platform service token is substituted for user identity",
-      "consumers": [
-        "backend-public"
-      ],
-      "contracts": [
+        "contracts/upstream/datacentre/identity-evidence-v1.openapi.yaml",
         "contracts/upstream/datacentre/video-v1.openapi.yaml"
       ],
-      "status": "mainline-ci-green; owner-video-delete-merged; live-staging-acceptance-pending",
-      "notes": "Dedicated Go video service in the Data Centre repository. Backend is the only public ingress and connects through DATA_CENTRE_VIDEO_API_URL; the service listener is private and must not be exposed through Caddy or called directly by Flutter. Uploads begin private, FFmpeg processing must reach ready before publish, signed HLS tokens are checked for every playlist/segment request, and visibility/readiness are rechecked at segment delivery. Views are session-deduplicated; likes are idempotent; comments require native user authentication. PR #127 adds owner-scoped idempotent deletion with active-job protection, transactional metadata/engagement cascade and post-commit original/HLS/poster cleanup. Live upload-to-Android playback/seek and cleanup remain pending the manual staging acceptance workflow."
+      "status": "mainline-ci-green; private-media-and-identity-evidence-apis-source-implemented; owner-video-delete-merged; live-staging-acceptance-pending",
+      "notes": "Current Data Centre mainline is 17d12502019e3837718b02869427248f8267e737 (merged PR #127; prior PR #121 remains in history); PR #127 checks passed and post-merge mainline testagram-vps-ci run 45889734546 passed. Video comments and likes require a native user session and a ready, non-private video. Owner-scoped idempotent DELETE /v1/videos/{video_id} refuses active jobs, cascades video/engagement/job metadata, recomputes channel counts and removes original/HLS/poster media after commit; HLS segments recheck video visibility and readiness on every request. It owns storage mechanics, media lifecycle providers, video processing, notification delivery infrastructure, platform operations and backups; it does not own product identity, visibility or authorization. Backend has typed, direction-specific clients for private media and identity-evidence APIs, with separate service credentials. The generic platform config/events/audit listener is a distinct private control-plane API and is not a product API; no generic Backend client is claimed. The Flutter notification SSE path reads the canonical Backend inbox directly; Data Centre notification workers are not a second inbox authority. The dedicated Go video service is a separate private listener within this repository, configured at the Backend through DATA_CENTRE_VIDEO_API_URL; it is not publicly routed by the current Caddy ingress and is never called directly by Flutter. Live provider, storage durability, staging and restore acceptance remain separate from source CI."
     },
     {
       "id": "cdn-edge",
