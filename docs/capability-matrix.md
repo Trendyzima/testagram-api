@@ -27,7 +27,9 @@
 | Native identity verification | POST /api/identity/applications; GET /api/identity/applications/{application_id}; GET /api/identity/sessions/{session_id}; POST /api/identity/sessions/{session_id}/evidence/*; POST /api/admin/identity/*; POST /api/identity/applications/{application_id}/provisioning-token; POST /api/identity/applications/{application_id}/redeem | Backend + Data Centre | Contracted | Public/private routes and DTOs are in OpenAPI; Backend and Flutter implementation and contract tests exist. Live evidence-provider, email delivery, independent two-person review, provisioning and deployed staging acceptance remain release gates; staff MFA needs a real TOTP/passkey challenge. |
 | Federation preferences | GET/PUT /api/me/federation | Backend + Federation | Registered-only | Separate privacy/security review |
 | M-Pesa callback | POST /api/wallet/mpesa/callback | Backend | Webhook-only | Not a client SDK operation |
-| TV catalogue/player, ads, marketplace, creator tools, admin | No complete public client contract verified | Backend + Data Centre + CDN | Not contracted | Do not infer from private services or legacy UI |
+| Creator channel and upload lifecycle | GET/POST /api/video/channels; POST /api/video/uploads; GET /api/video/uploads/{video_id}; POST /api/video/uploads/{video_id}/publish | Backend + Data Centre | Contracted | Native-session protected; streaming private upload; owner-scoped status; explicit publish only after processing is ready. Backend proxy source CI passed; live media provider acceptance pending. |
+| TV feed, HLS playback, views, likes and comments | GET /api/video/feed; /manifest; /hls/{file}; POST /view, /like; GET/POST /comments | Backend + Data Centre | Candidate-only (#552) | Keep Data Centre video listener private. Backend playback proxy and Flutter adoption are in review; signed HLS token and bounded segment streaming required. |
+| TV catalogue, ads, marketplace, creator analytics, payouts, admin | No complete public client contract verified | Backend + Data Centre + CDN | Not contracted | Do not infer from private services or legacy UI |
 
 ## Promotion gate
 

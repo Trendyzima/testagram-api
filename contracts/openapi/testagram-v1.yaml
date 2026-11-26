@@ -3375,6 +3375,123 @@ paths:
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
 
+
+  /api/video/channels:
+    get:
+      operationId: listCreatorVideoChannels
+      tags: [TV]
+      summary: List creator channels for the authenticated account
+      security: [{ testagramBearer: [] }]
+      responses:
+        '200':
+          description: Owner-scoped channel list
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    post:
+      operationId: createCreatorVideoChannel
+      tags: [TV]
+      summary: Create a creator channel
+      security: [{ testagramBearer: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [handle, name]
+              properties:
+                handle: { type: string, minLength: 3, maxLength: 40, pattern: '^[a-z0-9._-]+$' }
+                name: { type: string, minLength: 1, maxLength: 120 }
+                description: { type: string, maxLength: 2000 }
+      responses:
+        '201':
+          description: Creator channel created
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/video/uploads:
+    post:
+      operationId: uploadCreatorVideo
+      tags: [TV]
+      summary: Stream a private creator video upload
+      description: Multipart uploads require Content-Length and are limited to 20 GiB. New uploads are private; processing and publishing are separate owner-scoped operations.
+      security: [{ testagramBearer: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [video, channel_id, title]
+              properties:
+                video: { type: string, format: binary }
+                channel_id: { type: string, format: uuid }
+                title: { type: string, minLength: 1, maxLength: 200 }
+                description: { type: string, maxLength: 4000 }
+                visibility: { type: string, enum: [private] }
+      responses:
+        '202':
+          description: Upload accepted for private processing
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '411': { description: Content-Length is required }
+        '413': { $ref: '#/components/responses/RequestTooLarge' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/video/uploads/{video_id}:
+    get:
+      operationId: getCreatorVideoUploadStatus
+      tags: [TV]
+      summary: Read owner-scoped video processing status
+      security: [{ testagramBearer: [] }]
+      parameters:
+        - name: video_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Video processing status
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/video/uploads/{video_id}/publish:
+    post:
+      operationId: publishCreatorVideo
+      tags: [TV]
+      summary: Explicitly publish an owner video after processing is ready
+      security: [{ testagramBearer: [] }]
+      parameters:
+        - name: video_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Video publication result
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { description: Video is not ready to publish or publication conflicts with current state }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+
 components:
   securitySchemes:
     testagramBearer:
