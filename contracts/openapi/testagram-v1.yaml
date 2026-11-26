@@ -3492,6 +3492,200 @@ paths:
         '409': { description: Video is not ready to publish or publication conflicts with current state }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
 
+
+  /api/video/feed:
+    get:
+      operationId: listPublicVideoFeed
+      tags: [TV]
+      summary: List ready public videos for the TV feed
+      security: []
+      responses:
+        '200':
+          description: Public, ready video feed
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { type: object, additionalProperties: true }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/video/uploads/{video_id}/view:
+    post:
+      operationId: recordVideoView
+      tags: [TV]
+      summary: Record a deduplicated playback view
+      description: Public playback operation. The Backend forwards the opaque playback-session identifier to the private Data Centre, which hashes it before counting a view.
+      security: []
+      parameters:
+        - name: video_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: X-Playback-Session
+          in: header
+          required: true
+          schema: { type: string, minLength: 8, maxLength: 128, pattern: '^[A-Za-z0-9_-]+$' }
+      responses:
+        '202':
+          description: View accepted; counted indicates whether this playback session was new.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [counted]
+                properties:
+                  counted: { type: boolean }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/video/uploads/{video_id}/like:
+    post:
+      operationId: likePublicVideo
+      tags: [TV]
+      summary: Like a ready public video
+      security: [{ testagramBearer: [] }]
+      parameters:
+        - name: video_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Video like state
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [liked]
+                properties:
+                  liked: { type: boolean, const: true }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/video/uploads/{video_id}/comments:
+    get:
+      operationId: listVideoComments
+      tags: [TV]
+      summary: List comments for a visible video
+      security: [{ testagramBearer: [] }]
+      parameters:
+        - name: video_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Visible video comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { type: object, additionalProperties: true }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    post:
+      operationId: createVideoComment
+      tags: [TV]
+      summary: Add a comment to a ready public video
+      security: [{ testagramBearer: [] }]
+      parameters:
+        - name: video_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [body]
+              properties:
+                body: { type: string, minLength: 1, maxLength: 4000 }
+      responses:
+        '201':
+          description: Comment created
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/video/uploads/{video_id}/manifest:
+    get:
+      operationId: getPublicVideoManifest
+      tags: [TV]
+      summary: Obtain a short-lived signed HLS playback redirect
+      description: Returns a same-origin Backend redirect to the HLS master playlist. The private Data Centre origin is never exposed to clients.
+      security: []
+      parameters:
+        - name: video_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '307':
+          description: Redirect to the Backend HLS route with a video-scoped signed playback token.
+          headers:
+            Location: { schema: { type: string } }
+            Cache-Control: { schema: { type: string, const: 'private, no-store' } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+  /api/video/uploads/{video_id}/hls/{file}:
+    get:
+      operationId: streamPublicVideoHLS
+      tags: [TV]
+      summary: Stream a signed HLS playlist or video segment through Backend
+      description: Requires the short-lived signed token returned by the manifest redirect. Supports byte ranges for native player seeking. The Backend validates the file name and token before proxying to the private Data Centre.
+      security: []
+      parameters:
+        - name: video_id
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: file
+          in: path
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 128, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]*$' }
+        - name: token
+          in: query
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 256 }
+        - name: Range
+          in: header
+          required: false
+          schema: { type: string, maxLength: 128 }
+        - name: If-Range
+          in: header
+          required: false
+          schema: { type: string, maxLength: 256 }
+      responses:
+        '200':
+          description: HLS playlist or media segment
+          content:
+            application/vnd.apple.mpegurl:
+              schema: { type: string, format: binary }
+            video/mp2t:
+              schema: { type: string, format: binary }
+            application/octet-stream:
+              schema: { type: string, format: binary }
+        '206':
+          description: Requested byte range of a video segment
+          headers:
+            Content-Range: { schema: { type: string } }
+            Accept-Ranges: { schema: { type: string } }
+          content:
+            video/mp2t:
+              schema: { type: string, format: binary }
+            application/octet-stream:
+              schema: { type: string, format: binary }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { description: Signed playback token is missing, invalid or expired. }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+
 components:
   securitySchemes:
     testagramBearer:
