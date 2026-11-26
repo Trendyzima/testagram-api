@@ -347,7 +347,6 @@
         "docs/product/hybrid-social-knowledge-screen-system.md",
         "docs/six-repository-runtime-integration-contract.md",
         "docs/tv-channel-cache-policy.md",
-        "integration_test/video_feed_staging_test.dart",
         "lib/app.dart",
         "lib/app/main_shell.dart",
         "lib/core/app_config.dart",
