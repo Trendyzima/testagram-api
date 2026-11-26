@@ -195,6 +195,11 @@ if (!backendDeploy.includes(dataCentreMediaGate) ||
  // The public Caddy edge and the private video origin must never share a
  // Docker network. Backend API and video share a dedicated internal network;
  // Caddy retains platform for the separately gated Federation deployment.
+ const backendPostgresStart = backendCompose.indexOf("\n  postgres:\n");
+ const backendPostgresEnd = backendCompose.indexOf("\n  control-plane:", backendPostgresStart);
+ const backendPostgresService = backendPostgresStart >= 0 && backendPostgresEnd > backendPostgresStart
+   ? backendCompose.slice(backendPostgresStart, backendPostgresEnd)
+   : "";
  const backendCaddyStart = backendCompose.indexOf("\n  caddy:\n");
  const backendCaddyEnd = backendCompose.indexOf("\n  node-exporter:", backendCaddyStart);
  const backendCaddyService = backendCaddyStart >= 0 && backendCaddyEnd > backendCaddyStart
@@ -216,6 +221,9 @@ if (!backendDeploy.includes(dataCentreMediaGate) ||
  }
  if (!backendAPIService.includes("networks: [edge, data, monitoring, platform, egress, video-private]")) {
    fail.push("Backend API must join the dedicated video-private network while retaining its existing service networks");
+ }
+ if (!backendPostgresService.includes("video-private: {}")) {
+   fail.push("Backend PostgreSQL must join video-private so the isolated video service can reach the canonical database without joining platform");
  }
  if (!backendCompose.includes("video-private:\n    name: ${TESTAGRAM_VIDEO_NETWORK:-testagram-video-private}\n    internal: true")) {
    fail.push("Backend Compose must create the dedicated internal video-private network");
