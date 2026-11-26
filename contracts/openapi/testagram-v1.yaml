@@ -3481,7 +3481,7 @@ paths:
           required: true
           schema: { type: string, format: uuid }
       responses:
-        '204': { description: Video deleted, or already absent }
+        '204': { description: "Video deleted, or already absent" }
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
