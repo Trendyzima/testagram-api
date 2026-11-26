@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "1af703f4ebec64b96f3f82df9bf4c0f9c916c2c3"
   },
-  "status": "all-six-runtime-source-pins-match-current-main; all-current-mainline-ci-green; production-and-staging-live-acceptance-pending; e2ee-and-live-call-gates-open; monetization-backend-workflows-incomplete",
+  "status": "all-six-runtime-source-pins-match-current-main; all-current-mainline-CI-green; private-video-network-isolation-awaits-Data-Centre-PR-126-merge; protected-staging-video-acceptance-pending-staging-credentials-and-manual-dispatch; production-deployment-manual; e2ee-and-live-call-gates-open; monetization-backend-workflows-incomplete",
   "repositories": [
     {
       "id": "flutter-client",
@@ -14,7 +14,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "flutter-client",
-      "mainCommit": "958a51d378f1b33268f1be05c3cd9fea5302da16",
+      "mainCommit": "07376965588096a689d90c0dc30ca3ed5429f474",
       "mergedPullRequests": [
         109,
         112,
@@ -31,7 +31,8 @@
         157,
         158,
         159,
-        160
+        160,
+        163
       ]
     },
     {
@@ -40,7 +41,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "2512323940157586a46b89845135adff06ed5340",
+      "mainCommit": "f810c5aab55c4642a3386c6fdc0d5630bb7037c5",
       "mergedPullRequests": [
         418,
         419,
@@ -79,7 +80,12 @@
         552,
         557,
         559,
-        561
+        561,
+        566,
+        567,
+        568,
+        570,
+        571
       ]
     },
     {
@@ -88,7 +94,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "data-centre",
-      "mainCommit": "d2af54a38701c7951b93a71e1b8784a8d6295c11",
+      "mainCommit": "17d12502019e3837718b02869427248f8267e737",
       "mergedPullRequests": [
         111,
         112,
@@ -98,7 +104,8 @@
         119,
         120,
         121,
-        124
+        124,
+        127
       ]
     },
     {
@@ -176,7 +183,7 @@
     {
       "from": "backend",
       "to": "data-centre",
-      "contract": "Private media and identity-evidence APIs using distinct service credentials; Data Centre owns storage mechanics, while Backend remains canonical for identity, authorization and product state. Notification SSE is served directly by Backend from its canonical inbox."
+      "contract": "Private video upload, processing, manifest and HLS APIs over the dedicated video-private network; owner-scoped product operations and signed playback tokens remain enforced by Backend, while Data Centre owns storage and transcode mechanics. Identity-evidence APIs use a separate service credential. Notification SSE is served directly by Backend from its canonical inbox."
     },
     {
       "from": "backend",
@@ -236,7 +243,8 @@
     "The API control plane is build-time governance only and is never a runtime gateway.",
     "No external identity provider is part of the supported runtime; native Testagram Backend authentication is the only user and staff authentication path.",
     "All six runtime source pins identify exact current mainline commits; production and product acceptance remain independent gates.",
-    "No message or call is advertised as end-to-end encrypted until the reviewed client protocol, device trust, key lifecycle and media lifecycle pass end-to-end acceptance."
+    "No message or call is advertised as end-to-end encrypted until the reviewed client protocol, device trust, key lifecycle and media lifecycle pass end-to-end acceptance.",
+    "The video service has no host-published port; only Backend API, PostgreSQL and the Data Centre video service join the internal video-private network, while Caddy remains off it."
   ],
   "excludedFromAcceptance": [
     "Backend PR #548 was closed without merge; its overlapping notification-category work was superseded by merged PR #549. Backend #549 is accepted mainline and adds social discovery, saved timelines and notification category APIs.",
@@ -247,6 +255,8 @@
     "CDN PR #125 is merged at 21a254e9f67dc7a8e55dca37151a6db532405e53. Go CDN origin is installed and healthy; Cloudflare Worker deployment and canonical hostname routing remain separate production cutover gates and are not inferred from source CI.",
     "Data Centre PR #119 and Algorithm PR #33 are merged into their respective main branches and included in the exact current mainline pins.",
     "Merged source revisions and healthy VPS containers do not prove end-user device acceptance, M-Pesa settlement, full media durability/restore, cross-instance Federation interoperability or disaster recovery.",
-    "Backend approval-ledger and communication changes are in the reviewed #424 mainline history. Do not revive the superseded overlapping #431/#432 path."
+    "Backend approval-ledger and communication changes are in the reviewed #424 mainline history. Do not revive the superseded overlapping #431/#432 path.",
+    "Data Centre PR #126 contains the private video network boundary and clean-database migration-order corrections. Until it merges, the current Data Centre mainline pin is not accepted as isolated from Caddy/platform.",
+    "The live video acceptance workflow is manual and requires TESTAGRAM_STAGING_API_URL plus the dedicated TESTAGRAM_AUTH_SMOKE_EMAIL and TESTAGRAM_AUTH_SMOKE_PASSWORD in the protected Backend staging environment. No production deployment is authorized by this workflow."
   ]
 }
