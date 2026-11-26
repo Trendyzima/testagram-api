@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "b9fa663ae2c7480ac0c21a54f2102b4454536358",
+  "sourceRef": "82e1a93255dfb9fcd4f6386a9a8b767f01fcde98",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across production Go files in cmd/api at Backend mainline commit b9fa663ae2c7480ac0c21a54f2102b4454536358. Flutter-used operations marked contracted must also exist in the public OpenAPI contract. Secure message send/edit remains fail-closed; proposed device/prekey routes are not registered or advertised.",
+  "note": "Backend public route inventory derived from the locked Backend main source. Creator video deletion is owner-authenticated and proxies to the private Data Centre video service.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
@@ -637,6 +637,11 @@
     },
     {
       "method": "GET",
+      "path": "/api/video/uploads/{video_id}",
+      "status": "contracted"
+    },
+    {
+      "method": "DELETE",
       "path": "/api/video/uploads/{video_id}",
       "status": "contracted"
     },
