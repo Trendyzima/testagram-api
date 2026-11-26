@@ -101,7 +101,7 @@ function collectFlutterCapabilities(dir) {
     if (stat.isDirectory()) collectFlutterCapabilities(path);
     else if (path.endsWith(".dart")) {
       const source = readFileSync(path, "utf8");
-      for (const match of source.matchAll(/['"`](testagram\.[a-z0-9_.]+)['"`]/g)) {
+      for (const match of source.matchAll(/callCapability\s*\(\s*['"\x60](testagram\.[a-z0-9_.]+)['"\x60]/g)) {
         flutterCapabilities.add(match[1]);
       }
     }
