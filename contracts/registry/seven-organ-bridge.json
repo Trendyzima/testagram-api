@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "14e67fffb2150021d7b94bd8941f49ac0485d034"
   },
-  "status": "backend-mainline-production-deploy-pending; flutter-pages-production-deploy-blocked-by-backend-auth-contract-drift; device-key-implementation-pending; native-mail-live-acceptance-pending",
+  "status": "all-six-runtime-source-pins-match-current-main; all-current-mainline-ci-green; production-and-staging-live-acceptance-pending; e2ee-and-live-call-gates-open; monetization-backend-workflows-incomplete",
   "repositories": [
     {
       "id": "flutter-client",
@@ -28,7 +28,8 @@
         151,
         152,
         155,
-        157
+        157,
+        158
       ]
     },
     {
@@ -141,11 +142,12 @@
       "defaultBranch": "main",
       "kind": "governance",
       "sourcePinKey": null,
-      "mainCommit": "f9ece1697bbd679940c80fac7b3cd14028f6b0c9",
+      "mainCommit": "a31132cd0b9b8d4d844aba84865cc5a3e49e14f9",
       "mergedPullRequests": [
         115,
         117,
-        148
+        148,
+        150
       ]
     }
   ],
@@ -163,7 +165,7 @@
     {
       "from": "backend",
       "to": "data-centre",
-      "contract": "Private media/identity-evidence APIs plus authenticated, read-only notification SSE projection over the canonical Backend PostgreSQL inbox; Data Centre never becomes the event source of truth"
+      "contract": "Private media and identity-evidence APIs using distinct service credentials; Data Centre owns storage mechanics, while Backend remains canonical for identity, authorization and product state. Notification SSE is served directly by Backend from its canonical inbox."
     },
     {
       "from": "backend",
