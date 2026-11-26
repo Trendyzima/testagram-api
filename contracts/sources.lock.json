@@ -240,7 +240,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "9785fd7d13e572319d60c7694ad1cabb8bcc81dd",
+      "ref": "d600d28048877612eec46c9db39de7644d1f0855",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/native-auth-session-integration.yml",
