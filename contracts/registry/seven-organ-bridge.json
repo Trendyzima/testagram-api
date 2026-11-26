@@ -1,11 +1,7 @@
 {
   "schemaVersion": 1,
   "bridge": "testagram-seven-organ-bridge",
-  "createdFrom": {
-    "repository": "Trendyzima/testagram-api",
-    "branch": "main",
-    "commit": "1af703f4ebec64b96f3f82df9bf4c0f9c916c2c3"
-  },
+  "createdFrom": "main@e125e6398411f31633a817ac579a6ea99bd9645b",
   "status": "backend-and-data-centre-mainline-ci-green; flutter-pr-ci-green-and-mainline-ci-running; production-deployment-jobs-skipped; staging-live-acceptance-pending; e2ee-and-live-call-gates-open; monetization-backend-workflows-incomplete",
   "repositories": [
     {
@@ -154,7 +150,7 @@
       "defaultBranch": "main",
       "kind": "governance",
       "sourcePinKey": null,
-      "mainCommit": "1af703f4ebec64b96f3f82df9bf4c0f9c916c2c3",
+      "mainCommit": "e125e6398411f31633a817ac579a6ea99bd9645b",
       "mergedPullRequests": [
         115,
         117,
