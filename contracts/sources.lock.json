@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "82e1a93255dfb9fcd4f6386a9a8b767f01fcde98",
+      "ref": "4ca5da34222f70b120ec2bb144bc4ec40e6f6218",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -239,6 +239,7 @@
         "tests/test_instabox_web_image_release_wiring.py",
         "tests/test_native_auth_runtime_boundary.py",
         "tests/test_native_identity_migration_manifest.py",
+        "tests/test_native_sensitive_action_migration_order.py",
         "tests/test_r2_managed_domain_request.py",
         "tests/test_self_hosted_backup_guards.py",
         "tests/test_social_platform_migration_safety.py"
@@ -327,7 +328,7 @@
     },
     "flutter-client": {
       "fullName": "Trendyzima/testagram-flutter-client-",
-      "ref": "958a51d378f1b33268f1be05c3cd9fea5302da16",
+      "ref": "07376965588096a689d90c0dc30ca3ed5429f474",
       "checkoutPath": "source-repos/flutter-client",
       "sourcePaths": [
         ".github/workflows/client-validation.yml",
@@ -346,6 +347,7 @@
         "docs/product/hybrid-social-knowledge-screen-system.md",
         "docs/six-repository-runtime-integration-contract.md",
         "docs/tv-channel-cache-policy.md",
+        "integration_test/video_feed_staging_test.dart",
         "lib/app.dart",
         "lib/app/main_shell.dart",
         "lib/core/app_config.dart",
