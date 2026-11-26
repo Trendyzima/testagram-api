@@ -32,7 +32,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `958a51d378f1b33268f1be05c3cd9fea5302da16` (2026-11-26 merged PR #160; authenticated creator upload, private processing/publishing, Backend-proxied TV feed and native HLS playback) |
-| Backend | `84695bbe4aa47065f418ecb2b670a0ee61bd1638` (2026-11-26 mainline; merged PR #557 adds playback-session validation and HLS byte-range forwarding) |
+| Backend | `b9fa663ae2c7480ac0c21a54f2102b4454536358` (2026-11-26 mainline; includes playback guards PR #557 and private Caddy-ingress closure PR #559) |
 | Data Centre | `9546ef40e91ca6b8011f5f7ba1b263ffe91aa9f5` (2026-11-26 mainline; video engagement auth and per-segment visibility rechecks) |
 | Testagram API control plane | `1af703f4ebec64b96f3f82df9bf4c0f9c916c2c3` (2026-11-26 mainline; current contract/SDK governance source head) |
 | Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` (2026-11-21 mainline) |
