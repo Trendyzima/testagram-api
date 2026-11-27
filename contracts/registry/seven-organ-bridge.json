@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "1af703f4ebec64b96f3f82df9bf4c0f9c916c2c3"
   },
-  "status": "all-six-runtime-source-pins-match-current-main; Nov-27 Backend native-auth/media staging, Data Centre B2/R2 lifecycle and Flutter Android auth acceptance source baselines reconciled; authenticated staging acceptance pending protected credentials and explicit manual dispatch; production deployment manual; live-call/E2EE and monetization backend gates remain open",
+  "status": "all-six-runtime-source-pins-match-current-main; Backend PR #578 and Data Centre PR #134 merged distinct B2/R2 and API/CDN origin guards; authenticated native-auth and media staging acceptance still pending protected credentials and explicit manual dispatch; production deployment remains manual; live identity-application, E2EE, and monetization acceptance gates remain open",
   "repositories": [
     {
       "id": "flutter-client",
@@ -43,7 +43,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "99c3ed6b435e3a7510134a2d700e87e0f2fbc7de",
+      "mainCommit": "57d4d22b1647536d3bbca32cf9098b5f13aa3fb8",
       "mergedPullRequests": [
         418,
         419,
@@ -97,7 +97,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "data-centre",
-      "mainCommit": "8e476f52d896e2c7ed49bd441fa57cd1ecc97110",
+      "mainCommit": "51ef194d4e3140d8ae721a48831dbb049ad00583",
       "mergedPullRequests": [
         111,
         112,
@@ -165,7 +165,7 @@
       "defaultBranch": "main",
       "kind": "governance",
       "sourcePinKey": null,
-      "mainCommit": "682a355e9be363746a1754cbf41506eea7518a43",
+      "mainCommit": "449f8ac1a4b1a0ef34c4efb42509fa2ce06d301d",
       "mergedPullRequests": [
         115,
         117,
