@@ -3461,7 +3461,6 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
     post:
-    post:
       operationId: uploadCreatorVideo
       tags: [TV]
       summary: Stream a private creator video upload
