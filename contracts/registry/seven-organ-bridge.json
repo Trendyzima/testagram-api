@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "1af703f4ebec64b96f3f82df9bf4c0f9c916c2c3"
   },
-  "status": "all-six-runtime-source-pins-match-current-main; Backend PR #578 and Data Centre PR #134 merged distinct B2/R2 and API/CDN origin guards; authenticated native-auth and media staging acceptance still pending protected credentials and explicit manual dispatch; production deployment remains manual; live identity-application, E2EE, and monetization acceptance gates remain open",
+  "status": "Backend PR #579 merged; exact Backend source pin refreshed to c12e98c8d6aa043b5acbfae08ce593e0a9077435; staging acceptance and production deployment remain separate manual gates",
   "repositories": [
     {
       "id": "flutter-client",
@@ -43,7 +43,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "57d4d22b1647536d3bbca32cf9098b5f13aa3fb8",
+      "mainCommit": "c12e98c8d6aa043b5acbfae08ce593e0a9077435",
       "mergedPullRequests": [
         418,
         419,
@@ -88,7 +88,8 @@
         568,
         570,
         571,
-        572
+        572,
+        579
       ]
     },
     {
