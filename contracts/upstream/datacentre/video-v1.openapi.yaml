@@ -38,7 +38,7 @@ paths:
                         channel_name: { type: string }
                         title: { type: string }
                         description: { type: string }
-                        visibility: { type: string, enum: [private, public] }
+                        visibility: { type: string, enum: [private, unlisted, public] }
                         status: { type: string }
                         duration_ms: { type: integer, minimum: 0 }
                         width: { type: integer, minimum: 0 }
