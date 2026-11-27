@@ -258,7 +258,7 @@
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "685d1380180fabcb1945ef98b7f7a747395d5842",
+      "ref": "8039b4a223c8c96688d6c47cddbc83ead481986d",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/media-provider-staging-acceptance.yml",
@@ -325,7 +325,9 @@
         "backend/services/media/migrations/test_identity_evidence_b2_only.sql",
         "backend/services/media/migrations/test_identity_evidence_legacy_reverify.sql",
         "backend/services/media/migrations/test_identity_evidence_permanent_purge.sql",
-        "docs/platform/legacy-identity-evidence-replica-retirement.md"
+        "docs/platform/legacy-identity-evidence-replica-retirement.md",
+        "backend/.env.example",
+        "backend/services/media/migrations/test_identity_evidence_legacy_reverify_setup.sql"
       ]
     },
     "cdn": {
