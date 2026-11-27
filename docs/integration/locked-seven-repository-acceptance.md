@@ -32,9 +32,9 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `43e367a9468c3dcb0fd7232de197077ba4aa428e` (2026-11-26 merged PRs #160 and #163; authenticated creator upload, private processing/publishing, Backend-proxied TV feed and Android HLS playback acceptance test) |
-| Backend | `57d4d22b1647536d3bbca32cf9098b5f13aa3fb8` (2026-11-27 mainline; includes playback guards #557, Caddy/platform boundary #561, owner video deletion #566, migration-order guards #567/#570, staging acceptance handoff #568 and private PostgreSQL/video network #571) |
-| Data Centre | `51ef194d4e3140d8ae721a48831dbb049ad00583` (2026-11-26 mainline; includes video visibility #121, edge isolation #124, owner cleanup #127 and private video network plus migration-order fixes #126) |
-| Testagram API control plane | `449f8ac1a4b1a0ef34c4efb42509fa2ce06d301d` (2026-11-26 mainline; current contract/SDK governance source head before this integration refresh) |
+| Backend | `46b07877cb11b58ca3b186701d7725068b6dc551` (2026-11-27 current mainline; includes the B2-only identity-evidence boundary, retention audit, native staff lifecycle executor, and latest staging workflow hardening) |
+| Data Centre | `8039b4a223c8c96688d6c47cddbc83ead481986d` (2026-11-27 current mainline; includes B2-only identity evidence, permanent legacy purge, legacy evidence re-verification, and guarded live provider acceptance) |
+| Testagram API control plane | `73515b8222d011df813bf79193bdaf767c79e31e` (2026-11-27 mainline; control-plane source head before this integration refresh) |
 | Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` (2026-11-21 mainline) |
 | Federation | `0f25d853e5ea5ac546eb1d05847086d387eb2a1c` (2026-11-22 mainline; private Backend federation bridge contract) |
 | CDN | `e0a6e0fd22c934a5bfb6a0a4b9686f33e0fa5ab7` (2026-11-23 mainline; canonical Go CDN runtime release) |
@@ -52,6 +52,8 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | CDN | `e0a6e0fd22c934a5bfb6a0a4b9686f33e0fa5ab7` |
 
 The original gate lock date remains 2026-11-23. This historical table is retained so later source-baseline refreshes do not erase the prior review record.
+
+**2026-11-28 source-pin reconciliation:** the previous API control-plane lock omitted 67 Backend commits and 68 Data Centre commits relative to the observed mainline heads. The refreshed lock now pins Backend `46b07877cb11b58ca3b186701d7725068b6dc551` and Data Centre `8039b4a223c8c96688d6c47cddbc83ead481986d`, removes the two deleted Backend identity-replication source paths, and adds the new Backend retention/staff-lifecycle migrations plus Data Centre identity-evidence migrations, SQL tests and legacy-replica retirement runbook. This corrects source drift; it does not claim that the migrations have been applied to staging or production, that legacy objects have been purged, or that provider acceptance has passed.
 
 The merged Flutter baseline now includes the creator-tip journey: recipient resolution, explicit user confirmation, KES amount bounds, retry-stable idempotency, and the existing Backend wallet ledger capability. This is source/CI evidence only; it does not attest live wallet funding, settlement, payout, or production availability.
 
@@ -819,3 +821,6 @@ The 2026-11-27 source baseline includes Backend PR #578 (distinct API/CDN/B2/R2 
 ## Backend native identity readiness source-pin refresh — 2026-11-27
 
 Backend PR #579 is merged into Backend main at `c12e98c8d6aa043b5acbfae08ce593e0a9077435`. The immutable Backend source pin, seven-organ bridge registry and public-route inventory are refreshed to this exact commit. Post-merge Backend CI and self-hosted stack validation passed. The InstaBox workflow completed validation-only checks; no production deployment was performed. Native-auth staging acceptance remains gated on the protected staging environment and real approved staff credentials; this source-pin refresh does not imply live identity registration or production acceptance.
+
+
+**2026-11-28 Data Centre acceptance repair:** PR #141 merged as `8039b4a223c8c96688d6c47cddbc83ead481986d`. The merged change wires the dedicated B2 identity-evidence access key and secret into the private media container and adds deterministic legacy-reverification fixtures to the provider acceptance workflow. The PR's current Android, Go and isolated encrypted database restore jobs passed. This is CI evidence only; it does not prove real bucket credentials, live B2 object lifecycle, historical object purge, or production deployment.

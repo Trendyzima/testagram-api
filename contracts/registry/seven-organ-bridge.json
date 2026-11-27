@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "1af703f4ebec64b96f3f82df9bf4c0f9c916c2c3"
   },
-  "status": "Backend PR #579 merged; exact Backend source pin refreshed to c12e98c8d6aa043b5acbfae08ce593e0a9077435; staging acceptance and production deployment remain separate manual gates",
+  "status": "Six runtime source pins reconciled to exact current mainline commits after Backend and Data Centre identity-evidence hardening; Data Centre PR #141 merged; staging acceptance and production deployment remain separate manual gates",
   "repositories": [
     {
       "id": "flutter-client",
@@ -43,7 +43,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "c12e98c8d6aa043b5acbfae08ce593e0a9077435",
+      "mainCommit": "46b07877cb11b58ca3b186701d7725068b6dc551",
       "mergedPullRequests": [
         418,
         419,
@@ -98,7 +98,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "data-centre",
-      "mainCommit": "51ef194d4e3140d8ae721a48831dbb049ad00583",
+      "mainCommit": "8039b4a223c8c96688d6c47cddbc83ead481986d",
       "mergedPullRequests": [
         111,
         112,
@@ -112,7 +112,8 @@
         126,
         127,
         129,
-        130
+        130,
+        141
       ]
     },
     {
@@ -166,7 +167,7 @@
       "defaultBranch": "main",
       "kind": "governance",
       "sourcePinKey": null,
-      "mainCommit": "449f8ac1a4b1a0ef34c4efb42509fa2ce06d301d",
+      "mainCommit": "73515b8222d011df813bf79193bdaf767c79e31e",
       "mergedPullRequests": [
         115,
         117,

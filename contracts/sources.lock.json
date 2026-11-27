@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "c12e98c8d6aa043b5acbfae08ce593e0a9077435",
+      "ref": "46b07877cb11b58ca3b186701d7725068b6dc551",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -51,8 +51,6 @@
         "cmd/api/identity_evidence_retention.go",
         "cmd/api/identity_evidence_storage.go",
         "cmd/api/identity_evidence_storage_test.go",
-        "cmd/api/identity_media_replication.go",
-        "cmd/api/identity_media_replication_test.go",
         "cmd/api/identity_native.go",
         "cmd/api/identity_native_provisioning.go",
         "cmd/api/identity_native_provisioning_integration_test.go",
@@ -253,12 +251,14 @@
         "tests/test_self_hosted_backup_guards.py",
         "tests/test_social_platform_migration_safety.py",
         "tests/test_video_private_network_contract.py",
-        "tests/test_video_staging_acceptance_outputs.py"
+        "tests/test_video_staging_acceptance_outputs.py",
+        "migrations/20261127_identity_evidence_retention_audit.sql",
+        "migrations/20261127_native_staff_lifecycle_executor.sql"
       ]
     },
     "data-centre": {
       "fullName": "Trendyzima/Testagram-data-centre-",
-      "ref": "51ef194d4e3140d8ae721a48831dbb049ad00583",
+      "ref": "8039b4a223c8c96688d6c47cddbc83ead481986d",
       "checkoutPath": "source-repos/data-centre",
       "sourcePaths": [
         ".github/workflows/media-provider-staging-acceptance.yml",
@@ -318,7 +318,16 @@
         "vps/DEPLOYMENT.md",
         "vps/backup.sh",
         "vps/docker-compose.yml",
-        "vps/restore-drill.sh"
+        "vps/restore-drill.sh",
+        "backend/services/media/migrations/004_identity_evidence_b2_only.sql",
+        "backend/services/media/migrations/005_identity_evidence_permanent_purge.sql",
+        "backend/services/media/migrations/006_identity_evidence_legacy_reverify.sql",
+        "backend/services/media/migrations/test_identity_evidence_b2_only.sql",
+        "backend/services/media/migrations/test_identity_evidence_legacy_reverify.sql",
+        "backend/services/media/migrations/test_identity_evidence_permanent_purge.sql",
+        "docs/platform/legacy-identity-evidence-replica-retirement.md",
+        "backend/.env.example",
+        "backend/services/media/migrations/test_identity_evidence_legacy_reverify_setup.sql"
       ]
     },
     "cdn": {

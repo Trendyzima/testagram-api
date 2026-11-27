@@ -145,7 +145,7 @@ for (const [label, source, marker] of [
  // credentials; those are mapped only behind MEDIA_REPLICATION_ENABLED.
  const backendCompose = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/docker-compose.yml"), "utf8");
  const backendDeploy = readFileSync(resolve(lock.repositories.backend.checkoutPath, "scripts/start-instabox-deployment.sh"), "utf8");
- const identityReplication = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/identity_media_replication.go"), "utf8");
+ const identityEvidenceStorage = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/identity_evidence_storage.go"), "utf8");
  const backendDataCentreEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
  const dataCentreCompose = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/docker-compose.yml"), "utf8");
  for (const variable of ["FRESH_MEDIA_ENABLED", "DATA_CENTRE_MEDIA_API_URL", "FRESH_DATA_CENTRE_INTERNAL_TOKEN"]) {
@@ -187,9 +187,35 @@ if (!backendDeploy.includes(dataCentreMediaGate) ||
     !dataCentreCompose.includes("CLOUDFLARE_R2_ACCESS_KEY_ID: ${CLOUDFLARE_R2_ACCESS_KEY_ID:-}")) {
   fail.push("B2/R2 provider credentials must be isolated to the private Data Centre media service behind both Data Centre media gates");
 }
- if (!identityReplication.includes("identityBucket == privateBucket") || !identityReplication.includes("identityBucket == publicBucket") || !identityReplication.includes('strings.TrimSpace(os.Getenv("B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET"))') || !identityReplication.includes('strings.TrimSpace(os.Getenv("CLOUDFLARE_R2_IDENTITY_EVIDENCE_PRIVATE_BUCKET"))')) fail.push("Backend identity evidence must use dedicated MinIO/B2/R2 buckets distinct from ordinary media");
- if (!backendDeploy.includes("B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET") || !backendDeploy.includes("CLOUDFLARE_R2_IDENTITY_EVIDENCE_PRIVATE_BUCKET") || !backendDeploy.includes("VPS identity evidence bucket must be dedicated")) fail.push("Backend deployment must require explicit dedicated identity-evidence buckets before enabling replication");
- if (!backendDeploy.includes('if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" && "${FRESH_MEDIA_ENABLED:-false}" == "true" ]]; then')) fail.push("Data Centre media provider credentials must remain behind both independent media gates");
+ // Native identity evidence is deliberately B2-only and Data Centre-owned.
+ // The Backend must call the private identity-evidence client; it must not
+ // mount or use its ordinary-media MinIO/R2/B2 replication credentials.
+ const dataCentreIdentityB2OnlyMigration = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/media/migrations/004_identity_evidence_b2_only.sql"), "utf8");
+ const dataCentreIdentityPurgeMigration = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/media/migrations/005_identity_evidence_permanent_purge.sql"), "utf8");
+ const dataCentreIdentityReverifyMigration = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/media/migrations/006_identity_evidence_legacy_reverify.sql"), "utf8");
+ for (const [label, source, marker] of [
+   ["Backend identity-evidence storage", identityEvidenceStorage, "s.identityEvidenceMedia != nil"],
+   ["Backend identity-evidence storage", identityEvidenceStorage, "private Data Centre identity evidence service is not configured"],
+   ["Backend identity-evidence storage", identityEvidenceStorage, "dedicated Backblaze B2 bucket"],
+   ["Data Centre identity storage selector", dataCentreMediaServer, 'if namespace == "identity-evidence-private" { return s.cfg.identityPrimary, s3Store{} }'],
+   ["Data Centre identity metadata selector", dataCentreMediaServer, 'if namespace == "identity-evidence-private" { return s.cfg.identityPrimary, s3Store{} }'],
+   ["Data Centre permanent identity purge", dataCentreMediaServer, "deleteAllB2ObjectVersions(ctx, primary, key)"],
+   ["Data Centre permanent identity purge", dataCentreMediaServer, "identity_evidence_purged_at=now()"],
+   ["Data Centre B2-only migration", dataCentreIdentityB2OnlyMigration, "identity-evidence-private"],
+   ["Data Centre B2-only migration", dataCentreIdentityB2OnlyMigration, "restore_primary"],
+   ["Data Centre permanent-purge migration", dataCentreIdentityPurgeMigration, "identity_evidence_purged_at"],
+   ["Data Centre legacy re-verification migration", dataCentreIdentityReverifyMigration, "queued B2-only verification after legacy identity replica retirement"],
+ ]) {
+   if (!source.includes(marker)) fail.push(`${label} missing B2-only identity boundary marker: ${marker}`);
+ }
+ if (!dataCentreCompose.includes("B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET: ${B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET:-}")) fail.push("Data Centre must configure a dedicated B2 identity-evidence bucket");
+ if (!dataCentreCompose.includes("B2_S3_IDENTITY_EVIDENCE_ACCESS_KEY_ID: ${B2_S3_IDENTITY_EVIDENCE_ACCESS_KEY_ID:-}") ||
+     !dataCentreCompose.includes("B2_S3_IDENTITY_EVIDENCE_SECRET_ACCESS_KEY: ${B2_S3_IDENTITY_EVIDENCE_SECRET_ACCESS_KEY:-}")) fail.push("Data Centre must use dedicated bucket-scoped B2 identity credentials");
+ if (dataCentreCompose.includes("CLOUDFLARE_R2_IDENTITY_EVIDENCE_PRIVATE_BUCKET") ||
+     backendCompose.includes("CLOUDFLARE_R2_IDENTITY_EVIDENCE_PRIVATE_BUCKET") ||
+     backendCompose.includes("B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET")) fail.push("Identity evidence bucket configuration must not be mounted in Backend or R2; it belongs only to Data Centre B2");
+ if (!backendDeploy.includes("ensure_random_secret IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN") ||
+     !backendDeploy.includes('write_dc_env_value IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must provision the dedicated private identity-evidence service token to Data Centre");
 
 
  // The public Caddy edge and the private video origin must never share a
