@@ -798,3 +798,16 @@ Execution is manual and must use a disposable staging account/video. The accepta
 Flutter PR #164 is merged at b6a34b85282aef83fc2a03e73a4e9e546f362049. Creator video deletion is now exposed in the Flutter creator screen after terminal processing states, uses the public Backend owner-delete route, confirms irreversible deletion, and treats HTTP 204 as a valid empty success response. Its Dart analysis, unit/widget tests, Android debug/unsigned release builds and Flutter web build passed. This is source/CI evidence, not protected staging video acceptance or production deployment.
 
 **Acceptance status: NOT RUN / NOT ACCEPTED.** Source CI, merged PRs and contract validation do not prove staging execution. No production deployment, DNS change, secret change, or production-data mutation is authorized by this gate.
+
+
+## Creator video library source-pin refresh — 2026-11-27
+
+The following immutable mainline revisions supersede the older source pins recorded in the historical acceptance sections above. The six runtime source pins in `contracts/sources.lock.json` and the seven-organ bridge registry now use these exact revisions:
+
+- Backend: `387b3d4359d180ec893b5261fcb2e9edc6c77643` — merged PR #572, authenticated owner-scoped creator-video list proxy.
+- Data Centre: `1c148c84c25b4fda2c0fcd2b2eb0f8d8d5b3ef12` — merged PR #130, native-session validated owner-scoped video listing.
+- Flutter Client: `69afaa8cdd47db5952c77065bc5369354458fd25` — merged PR #165, creator video library UI and authenticated Backend API client.
+
+The matching contracts define Backend `GET /api/video/uploads` and private Data Centre `GET /v1/videos`. Owner identity is derived from the validated native session, not a caller-supplied account ID. Flutter calls only the canonical Backend public API.
+
+Validation evidence: Flutter PR #165's four CI/build workflows passed and its Cloudflare Pages preview deployed; Backend PR #572's Go CI/security/schema/stack checks passed; Data Centre PR #130's race/vet/build, isolated restore, video runtime smoke and Android debug build passed. Backend PR #572's deployment validation passed but production deployment jobs were skipped. Live staging and production acceptance remain separate gates.

@@ -148,3 +148,18 @@ A green bridge audit proves source/contract consistency only. It does not prove 
 - Data Centre PR #115 and Federation PR #53 are merged into main; the bridge pins `99edc3e096675f5c39ab6a9bd0050dcee30283a0` and `cbd9f2587f8d7ce0703c4123c9c2a9bd76bb51ca` respectively.
 - PR #440 is validation-only and closed without merge. PR #450 is merged into the #424 feature branch, not into main. The #424 and #116 candidate chains remain unmerged into their respective main branches.
 - No source pin in this document implies a production deployment, live domain cutover, provider settlement, WebAuthn production acceptance or media durability drill.
+
+
+## Creator video library integration — 2026-11-27
+
+The creator video library has now been merged across all three owning organs. The API Control Plane source pins and contracts are refreshed in the companion integration PR:
+
+| Organ | Accepted mainline revision | Change |
+|---|---|---|
+| Flutter Client | `69afaa8cdd47db5952c77065bc5369354458fd25` | PR #165 — authenticated My videos list, status refresh, publish and delete |
+| Backend | `387b3d4359d180ec893b5261fcb2e9edc6c77643` | PR #572 — authenticated public API proxy for the private owner-scoped list |
+| Data Centre | `1c148c84c25b4fda2c0fcd2b2eb0f8d8d5b3ef12` | PR #130 — native-session validated owner-scoped PostgreSQL listing |
+
+The Data Centre contract now specifies `GET /v1/videos`; the public Backend OpenAPI specifies `GET /api/video/uploads`. Both contracts prohibit caller-supplied owner IDs. The Flutter client calls only the canonical Backend route. All four Flutter PR #165 validation/build workflows passed and its Cloudflare Pages preview deployed. Backend PR #572's source CI passed, but its deployment workflow's production jobs were skipped; no production deployment or live video staging acceptance is claimed.
+
+Deletion remains asynchronous after an atomic metadata + durable cleanup-outbox commit. A successful delete response confirms that cleanup is durably queued, not that filesystem bytes were synchronously removed. Production activation remains gated on authenticated staging upload → processing → listing → playback → deletion, plus B2/R2 provider and restore evidence.
