@@ -3417,6 +3417,50 @@ paths:
         '401': { $ref: '#/components/responses/Unauthorized' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/video/uploads:
+    get:
+      operationId: listCreatorVideoUploads
+      tags: [TV]
+      summary: List the authenticated creator's video uploads
+      description: Returns only uploads owned by the authenticated Testagram account. The owner is derived from the native session; callers cannot provide an owner ID. Data Centre remains private behind the Backend proxy.
+      security: [{ testagramBearer: [] }]
+      responses:
+        '200':
+          description: Owner-scoped creator video list
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [items]
+                properties:
+                  items:
+                    type: array
+                    maxItems: 100
+                    items:
+                      type: object
+                      additionalProperties: false
+                      required: [id, channel_id, channel_handle, channel_name, title, description, visibility, status, duration_ms, width, height, views, likes, comments, created_at, updated_at, published_at]
+                      properties:
+                        id: { type: string, format: uuid }
+                        channel_id: { type: string, format: uuid }
+                        channel_handle: { type: string }
+                        channel_name: { type: string }
+                        title: { type: string }
+                        description: { type: string }
+                        visibility: { type: string, enum: [private, public] }
+                        status: { type: string }
+                        duration_ms: { type: integer, minimum: 0 }
+                        width: { type: integer, minimum: 0 }
+                        height: { type: integer, minimum: 0 }
+                        views: { type: integer, minimum: 0 }
+                        likes: { type: integer, minimum: 0 }
+                        comments: { type: integer, minimum: 0 }
+                        created_at: { type: string, format: date-time }
+                        updated_at: { type: string, format: date-time }
+                        published_at: { type: [string, 'null'], format: date-time }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
+    post:
     post:
       operationId: uploadCreatorVideo
       tags: [TV]
