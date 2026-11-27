@@ -814,3 +814,8 @@ Validation evidence: Flutter PR #165's four CI/build workflows passed and its Cl
 
 
 The 2026-11-27 source baseline includes Backend PR #578 (distinct API/CDN/B2/R2 staging origins) and Data Centre PR #134 (distinct B2/R2 provider origins and CI path coverage). These harden acceptance guards but do not replace manual live provider lifecycle runs.
+
+
+## Backend native identity readiness source-pin refresh — 2026-11-27
+
+Backend PR #579 is merged into Backend main at `c12e98c8d6aa043b5acbfae08ce593e0a9077435`. The immutable Backend source pin, seven-organ bridge registry and public-route inventory are refreshed to this exact commit. Post-merge Backend CI and self-hosted stack validation passed. The InstaBox workflow completed validation-only checks; no production deployment was performed. Native-auth staging acceptance remains gated on the protected staging environment and real approved staff credentials; this source-pin refresh does not imply live identity registration or production acceptance.
