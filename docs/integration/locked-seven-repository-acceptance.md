@@ -32,7 +32,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `43e367a9468c3dcb0fd7232de197077ba4aa428e` (2026-11-26 merged PRs #160 and #163; authenticated creator upload, private processing/publishing, Backend-proxied TV feed and Android HLS playback acceptance test) |
-| Backend | `b11b75ecaf79ce43c28b3287b51318d616db6d93` (2026-11-27 mainline; includes playback guards #557, Caddy/platform boundary #561, owner video deletion #566, migration-order guards #567/#570, staging acceptance handoff #568 and private PostgreSQL/video network #571) |
+| Backend | `99c3ed6b435e3a7510134a2d700e87e0f2fbc7de` (2026-11-27 mainline; includes playback guards #557, Caddy/platform boundary #561, owner video deletion #566, migration-order guards #567/#570, staging acceptance handoff #568 and private PostgreSQL/video network #571) |
 | Data Centre | `8e476f52d896e2c7ed49bd441fa57cd1ecc97110` (2026-11-26 mainline; includes video visibility #121, edge isolation #124, owner cleanup #127 and private video network plus migration-order fixes #126) |
 | Testagram API control plane | `e125e6398411f31633a817ac579a6ea99bd9645b` (2026-11-26 mainline; current contract/SDK governance source head before this integration refresh) |
 | Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` (2026-11-21 mainline) |
@@ -779,7 +779,7 @@ Canonical Cloudflare API/WebFinger routing remains a separate approval-gated cut
 
 ## 2026-11-27 private video service contract and staging gate
 
-The six runtime source pins in `contracts/sources.lock.json` are synchronized to the exact current main branches as of this review: Backend `b11b75ecaf79ce43c28b3287b51318d616db6d93`, Flutter `b6a34b85282aef83fc2a03e73a4e9e546f362049`, Data Centre `9b98822b6840a41e21401c54569bd6d89cccc0ca`, Federation `0f25d853e5ea5ac546eb1d05847086d387eb2a1c`, CDN `e0a6e0fd22c934a5bfb6a0a4b9686f33e0fa5ab7`, and Algorithm `3b6a54d5978f8dc33b853698366c0adc110f9614`. The API governance repository is not a seventh runtime service.
+The six runtime source pins in `contracts/sources.lock.json` are synchronized to the exact current main branches as of this review: Backend `99c3ed6b435e3a7510134a2d700e87e0f2fbc7de`, Flutter `b6a34b85282aef83fc2a03e73a4e9e546f362049`, Data Centre `9b98822b6840a41e21401c54569bd6d89cccc0ca`, Federation `0f25d853e5ea5ac546eb1d05847086d387eb2a1c`, CDN `e0a6e0fd22c934a5bfb6a0a4b9686f33e0fa5ab7`, and Algorithm `3b6a54d5978f8dc33b853698366c0adc110f9614`. The API governance repository is not a seventh runtime service.
 
 The public Backend contract remains the only client-facing video API. The Data Centre video contract in `contracts/upstream/datacentre/video-v1.openapi.yaml` describes the private Backend-to-video-service owner-delete operation; Flutter must never call the private listener or receive its origin. The Data Centre video service is reachable only over the isolated internal video network, with Caddy excluded.
 
