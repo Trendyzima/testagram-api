@@ -1,8 +1,8 @@
 {
   "sourceRepository": "Trendyzima/Testagram-backend-",
-  "sourceRef": "57d4d22b1647536d3bbca32cf9098b5f13aa3fb8",
+  "sourceRef": "c12e98c8d6aa043b5acbfae08ce593e0a9077435",
   "sourceFile": "cmd/api/main.go",
-  "note": "Static public/API route registrations across production Go files in cmd/api at Backend mainline commit 57d4d22b1647536d3bbca32cf9098b5f13aa3fb8. Flutter-used operations marked contracted must also exist in the public OpenAPI contract. Secure message send/edit remains fail-closed; proposed device/prekey routes are not registered or advertised.",
+  "note": "Static public/API route registrations across production Go files in cmd/api at Backend mainline commit c12e98c8d6aa043b5acbfae08ce593e0a9077435. Flutter-used operations marked contracted must also exist in the public OpenAPI contract. Secure message send/edit remains fail-closed; proposed device/prekey routes are not registered or advertised.",
   "dynamicAuthActions": [
     "signup",
     "resend-verification",
