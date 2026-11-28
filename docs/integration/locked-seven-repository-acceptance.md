@@ -27,17 +27,17 @@ Backend + PostgreSQL remain the sole authority for Testagram users, sessions, ca
 
 ## 2. Immutable baseline
 
-The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. This revision refreshes the baseline to the exact observed mainline commits of all six runtime repositories and the control-plane mainline as of 2026-11-27. These pins are immutable source references; unmerged feature PRs are excluded until merged. The native self-service signup release and Flutter web release gates are merged; trending words and momentum-aware topic discovery are merged into the API Control Plane. The current pins are source baselines, not deployment attestations. This is an integration-review source baseline, not a deployment attestation. A migration present in a pinned source tree is source evidence, not proof that production has applied it.
+The six runtime source pins are recorded in `contracts/sources.lock.json`; all declared source paths were checked against their immutable Git trees. This revision refreshes the baseline to the exact observed mainline commits of all six runtime repositories and the control-plane mainline as of 2026-11-28. The merged source policy now explicitly makes ordinary signup and sessions independent of identity evidence and review. These pins are immutable source references; unmerged feature PRs are excluded until merged. The native self-service signup release and Flutter web release gates are merged; trending words and momentum-aware topic discovery are merged into the API Control Plane. The current pins are source baselines, not deployment attestations. This is an integration-review source baseline, not a deployment attestation. A migration present in a pinned source tree is source evidence, not proof that production has applied it.
 
 | Repository | Baseline commit |
 |---|---|
-| Flutter | `43e367a9468c3dcb0fd7232de197077ba4aa428e` (2026-11-26 merged PRs #160 and #163; authenticated creator upload, private processing/publishing, Backend-proxied TV feed and Android HLS playback acceptance test) |
-| Backend | `46b07877cb11b58ca3b186701d7725068b6dc551` (2026-11-27 current mainline; includes the B2-only identity-evidence boundary, retention audit, native staff lifecycle executor, and latest staging workflow hardening) |
-| Data Centre | `8039b4a223c8c96688d6c47cddbc83ead481986d` (2026-11-27 current mainline; includes B2-only identity evidence, permanent legacy purge, legacy evidence re-verification, and guarded live provider acceptance) |
-| Testagram API control plane | `73515b8222d011df813bf79193bdaf767c79e31e` (2026-11-27 mainline; control-plane source head before this integration refresh) |
-| Algorithm | `3b6a54d5978f8dc33b853698366c0adc110f9614` (2026-11-21 mainline) |
-| Federation | `0f25d853e5ea5ac546eb1d05847086d387eb2a1c` (2026-11-22 mainline; private Backend federation bridge contract) |
-| CDN | `e0a6e0fd22c934a5bfb6a0a4b9686f33e0fa5ab7` (2026-11-23 mainline; canonical Go CDN runtime release) |
+| Flutter | `ac9db495e2adee3dd5395edd6c56179b1e6ebe28` (2026-11-28 merged PR #168; public signup journey explicitly excludes government ID, selfie, evidence and identity approval) |
+| Backend | `f25e716ecdf6ab88f0fb2104144fa2b5a5d5e57b` (2026-11-28 current mainline; native signup, sessions, refresh, access-token validation and readiness no longer depend on optional identity-provisioning schema; canonical account disablement remains enforced) |
+| Data Centre | `f1b168776d44fa6b64bf1644257893596cdb6925` (2026-11-28 current mainline; identity-evidence API/storage is optional, disabled routes and workers remain isolated, ordinary media remains separately gated) |
+| Testagram API control plane | `4fe9e3757102eea601cb2a61cf2f9699113b3ab1` (2026-11-28 mainline; governance-only contract CI enforces identity-independent public signup/login) |
+| Algorithm | `a0bb5b0b3923a28a8aecf91a199f3567190cec6a` (2026-11-28 current mainline; ranking does not use identity-assurance as ordinary account eligibility) |
+| Federation | `c9ac83f33c4cfa89353e44d8ffbe5345b1ac9fe6` (2026-11-28 current mainline; Federation does not provision or authenticate local accounts) |
+| CDN | `09babc38c77b65b41d076221017a96b2387ac72c` (2026-11-28 current mainline; CDN remains a byte-delivery organ, not an identity authority) |
 
 ### Previous source baseline — retained for audit (2026-11-23)
 
@@ -53,7 +53,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 
 The original gate lock date remains 2026-11-23. This historical table is retained so later source-baseline refreshes do not erase the prior review record.
 
-**2026-11-28 source-pin reconciliation:** the previous API control-plane lock omitted 67 Backend commits and 68 Data Centre commits relative to the observed mainline heads. The refreshed lock now pins Backend `46b07877cb11b58ca3b186701d7725068b6dc551` and Data Centre `8039b4a223c8c96688d6c47cddbc83ead481986d`, removes the two deleted Backend identity-replication source paths, and adds the new Backend retention/staff-lifecycle migrations plus Data Centre identity-evidence migrations, SQL tests and legacy-replica retirement runbook. This corrects source drift; it does not claim that the migrations have been applied to staging or production, that legacy objects have been purged, or that provider acceptance has passed.
+**2026-11-28 source-pin reconciliation:** the current immutable pins are Backend `f25e716ecdf6ab88f0fb2104144fa2b5a5d5e57b`, Data Centre `f1b168776d44fa6b64bf1644257893596cdb6925`, Flutter `ac9db495e2adee3dd5395edd6c56179b1e6ebe28`, CDN `09babc38c77b65b41d076221017a96b2387ac72c`, Algorithm `a0bb5b0b3923a28a8aecf91a199f3567190cec6a`, and Federation `c9ac83f33c4cfa89353e44d8ffbe5345b1ac9fe6`. These pins include merged identity-independence policies and regression tests; they do not attest production deployment, real mailbox delivery or live-device acceptance.
 
 The merged Flutter baseline now includes the creator-tip journey: recipient resolution, explicit user confirmation, KES amount bounds, retry-stable idempotency, and the existing Backend wallet ledger capability. This is source/CI evidence only; it does not attest live wallet funding, settlement, payout, or production availability.
 
@@ -76,16 +76,18 @@ A gate passes only with a reproducible test against the exact deployed build and
 
 **Fail if:** any source pin drifts, a route is registered but represented as fully supported without handler evidence, a snapshot is stale, private routes enter public OpenAPI/SDKs, or a consumer/provider contract differs.
 
-### G1 — Flutter → Backend native identity and user journey
+### G1 — Flutter → Backend native account and user journey
 
+- Ordinary self-service signup and login are identity-independent. Government ID, ID number, selfie, identity evidence, manual identity review, identity approval, identity-evidence storage and identity-service readiness must never be required for a basic account.
+- The separate identity-assurance application is optional, disabled by default, and may gate only a specifically designated protected capability. Its absence, outage or schema unavailability must not affect ordinary signup, email verification, login, refresh, recovery or logout.
 - Flutter uses only the Testagram-native Backend login/refresh/recovery/session path. No external identity-provider endpoint, SDK, JWT, database, server key, session, or fallback is permitted in the supported runtime.
 - Access JWTs remain short-lived and in memory; only opaque rotating refresh tokens are stored in platform secure storage.
-- Backend validates signature, issuer, audience, expiry, token version, session ID, canonical user ID, live PostgreSQL session, account state and verification/provisioning state.
-- Exercise registration only through the approved staging provisioning process, email verification, login, refresh rotation, logout, logout-all, password recovery and session restoration.
+- Backend validates signature, issuer, audience, expiry, token version, session ID, canonical user ID, live PostgreSQL session, canonical account enabled/disabled state, verified email and password-reset state. Native session creation, refresh, access-token validation and readiness do not query or require the optional identity-provisioning schema.
+- Exercise ordinary public registration through `POST /api/auth/signup` using email, username, password, Terms acceptance, Privacy acceptance and age self-declaration; complete email verification before login, then test refresh rotation, logout, logout-all, password recovery and session restoration. Government ID, ID number, selfie, identity evidence, manual review and identity approval are not signup/login prerequisites.
 - Exercise authenticated profile read/update, post create/read, feed retrieval, media grant retrieval and denial for expired/revoked/foreign credentials.
 - Verify web and Android builds on real browsers/devices; prove no service token, storage key, private host, or database credential is bundled into the client.
 
-**Fail if:** any request, build, runtime container, environment contract or client SDK depends on an external identity provider; any provider token is accepted; or native session checks can be bypassed.\n\n**Fail if:** identity is inferred from email equality, a revoked/expired/wrong-audience token is accepted, a refresh token is replayable, the client calls a private service directly, or user data is lost across refresh/logout/restore.
+**Fail if:** any request, build, runtime container, environment contract or client SDK depends on an external identity provider; any provider token is accepted; any ordinary account flow requires government ID, selfie, identity evidence, manual review or identity approval; or native session checks can be bypassed.\n\n**Fail if:** a revoked/expired/wrong-audience token is accepted, a refresh token is replayable, a disabled canonical account is accepted, the client calls a private service directly, or user data is lost across refresh/logout/restore.
 
 ### G2 — Backend → Algorithm ranking
 
@@ -118,7 +120,7 @@ Treat the platform API and media lifecycle API as separate interfaces; do not cl
 - Confirm the media service is attached to the Backend-owned private network, has no public host port, uses its separate media database, and accepts only its dedicated service token plus API version.
 - Treat the Backend native virtual-storage path and the Data Centre dedicated media service as two distinct lifecycle implementations; never combine their receipts or call one a substitute for the other.
 
-  **Backend three-provider media path:** Backend's canonical media metadata/replica ledger and `internal/virtualstorage.Replicator` use Instabox VPS MinIO as the primary media-byte store and Cloudflare R2 + Backblaze B2 as two independent media-byte replicas. Run the guarded `TestLiveMediaReplicationLifecycle` against dedicated staging buckets for private, public and identity-evidence namespaces. Verify actual PUT, independent GET/size/SHA-256 at all three stores, MinIO-primary restoration from a verified surviving replica, missing-R2 repair, same-size B2 corruption repair, tombstone deletion from all three stores, and no ready/public state before all required receipts match.
+  **Backend three-provider media path:** Backend's canonical media metadata/replica ledger and `internal/virtualstorage.Replicator` use Instabox VPS MinIO as the primary media-byte store and Cloudflare R2 + Backblaze B2 as two independent media-byte replicas. Run the guarded `TestLiveMediaReplicationLifecycle` against dedicated staging buckets for ordinary `media-private` and `media-public` namespaces only. Identity-evidence is never part of the ordinary three-provider replicator. Verify actual PUT, independent GET/size/SHA-256 at all three stores, MinIO-primary restoration from a verified surviving replica, missing-R2 repair, same-size B2 corruption repair, tombstone deletion from all three stores, and no ready/public state before all required receipts match.
 
   **Data Centre dedicated media path:** the optional `media` Compose profile uses a separate `MEDIA_DATABASE_URL` and durable outbox, with B2 as media-byte primary and R2 as media-byte replica. Its MinIO + R2 sidecars are metadata mirrors only, not a third media-byte copy. Run the guarded Data Centre `TestLiveMediaReplicationRestoreDelete` workflow to verify actual B2/R2 PUT, GET, HEAD, size/content-type/SHA-256, primary restore, replica repair, retry and deletion. Then exercise Backend's five private routes: `upload-url`, `verify`, `status`, `download-url`, and `delete` through the typed client.
 
@@ -824,3 +826,18 @@ Backend PR #579 is merged into Backend main at `c12e98c8d6aa043b5acbfae08ce593e0
 
 
 **2026-11-28 Data Centre acceptance repair:** PR #141 merged as `8039b4a223c8c96688d6c47cddbc83ead481986d`. The merged change wires the dedicated B2 identity-evidence access key and secret into the private media container and adds deterministic legacy-reverification fixtures to the provider acceptance workflow. The PR's current Android, Go and isolated encrypted database restore jobs passed. This is CI evidence only; it does not prove real bucket credentials, live B2 object lifecycle, historical object purge, or production deployment.
+
+## 29. Identity-independent ordinary account access — 2026-11-28
+
+This is the current policy for all seven organs and supersedes earlier historical statements that described public registration as identity-review-gated. Those statements remain only as historical audit records.
+
+- **Public signup:** `POST /api/auth/signup` accepts email, username, password, Terms acceptance, Privacy acceptance and an age self-declaration. It creates a pending native account and queues email verification.
+- **Login:** `POST /api/auth/login` requires the correct password, verified email, a canonical enabled account and a valid native session. Email verification is required; government identity verification is not.
+- **Explicitly forbidden prerequisites:** government ID, ID number, selfie, identity evidence, identity review, identity approval, identity-evidence bucket, identity-evidence service token, identity schema readiness or identity provisioning ledger state.
+- **Backend regression:** PR #607 removed optional identity-provisioning table reads from session creation, refresh, access-token validation and native-auth readiness. Canonical `testagram_auth.identities.disabled_at` remains enforced. The identity-evidence retention worker starts only when its optional storage client is configured.
+- **Data Centre isolation:** the identity-evidence API token and dedicated bucket credentials default empty; routes remain inaccessible and identity-evidence outbox work remains unselected while the capability is disabled. Ordinary media has separate feature gates.
+- **Other organs:** CDN does not inspect identity evidence; Algorithm does not use identity assurance for ordinary account eligibility or ranking; Federation never creates or authenticates local accounts; Flutter keeps identity application UI outside ordinary signup; the API Control Plane is governance-only and runs contract/regression guards.
+
+Merged source changes: Flutter #168; Backend #606 and #607; Data Centre #142; CDN #131; Algorithm #34; Federation #55; API Control Plane #175 and #176. API PR #177 adds the deployment and cross-organ regression checks. The API source lock and route inventory use the exact six current mainline SHAs listed in section 2.
+
+**Production acceptance is still separate.** Green source CI does not prove that these exact images are deployed, that real signup mail reaches an inbox, that the user can verify and log in on production, or that web/mobile builds have passed a live device journey. No production deployment is claimed by this source-policy update.
