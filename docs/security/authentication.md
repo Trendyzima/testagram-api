@@ -8,7 +8,7 @@ Testagram owns end-user identity, password verification, sessions, recovery and 
 Authorization: Bearer <TESTAGRAM_ACCESS_TOKEN>
 ```
 
-The Backend verifies the HS256 signature, fixed issuer and audience, token lifetime, canonical Testagram UUID, session ID and token version. It then checks the live PostgreSQL session, revocation state, account status, verified email and registration-provisioning state. A valid signature alone is not sufficient.
+The Backend verifies the HS256 signature, fixed issuer and audience, token lifetime, canonical Testagram UUID, session ID and token version. It then checks the live PostgreSQL session, revocation state, account enabled state and verified email. A valid signature alone is not sufficient. Ordinary account access does not depend on an identity application or evidence record; an explicitly disabled account remains blocked.
 
 - Access tokens are short-lived (15 minutes).
 - Refresh tokens are opaque, stored only as one-way hashes, rotated on use and revoked on reuse detection.
@@ -19,11 +19,9 @@ The Backend verifies the HS256 signature, fixed issuer and audience, token lifet
 
 ## Account registration
 
-New accounts enter through the Testagram-owned identity application flow. The application endpoint does not create an account. It requires accepted age, Terms and Privacy declarations, a high-entropy idempotency key, PostgreSQL, configured policy versions, private evidence storage and verified replication.
+Ordinary public account creation uses the Testagram-native `POST /api/auth/signup` email/password endpoint. It creates a pending native account, records the user's Terms, Privacy and age self-declaration, and queues email verification. After the user verifies their email, they can sign in with their password and receive a native session. Ordinary registration does **not** require a government ID, ID number, selfie, identity evidence, manual identity review, identity approval, or identity-evidence storage.
 
-Identity evidence is stored as private object bytes, while PostgreSQL stores opaque object references, bounded metadata and SHA-256 digests. Evidence is not public media. Manual identity review and independent two-person account approval must complete before native account provisioning. Email verification is then required before the account can sign in.
-
-The registration feature flag remains fail-closed until the storage, email, policy and approval services are ready. The Flutter form may be visible while the Backend still returns a clear registration-unavailable response.
+The separate `POST /api/identity/applications` workflow is not the public signup path and does not create a basic account. It is isolated for optional, explicitly protected capabilities that may require additional assurance. Its evidence bytes remain private, and its reviewer/approval controls stay fail-closed when the dedicated identity service is disabled. Failure or unavailability of that optional workflow must never block ordinary signup, email verification, login, refresh, or logout.
 
 ## Staff identity review
 
