@@ -231,7 +231,7 @@ paths:
       operationId: createIdentityApplication
       tags: [Identity]
       summary: Create a native age-assurance application
-      description: Pre-authentication registration entry point. Registration is fail-closed unless Backend registration, policy versions, PostgreSQL, private evidence storage and verified replication are configured. Requires age, Terms and Privacy declarations plus a high-entropy idempotency key. This does not create an account.
+      description: Separate optional identity-assurance application for a specifically protected capability. This is not the public account signup endpoint and does not create a basic Testagram account. It remains inaccessible unless its dedicated identity-review, policy, PostgreSQL, private evidence-storage and replication prerequisites are enabled. Ordinary email/password registration, email verification and login do not depend on this route or its storage.
       security: []
       parameters:
         - in: header
