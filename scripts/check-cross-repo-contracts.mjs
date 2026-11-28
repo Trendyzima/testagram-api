@@ -140,12 +140,15 @@ for (const [label, source, marker] of [
 
 
  // Deployment wiring is part of the Backend <-> Data Centre contract.
- // Fresh-media credentials stay in the Data Centre service. Separately, the
- // Backend's VPS-primary identity-evidence replicator requires B2/R2 replica
- // credentials; those are mapped only behind MEDIA_REPLICATION_ENABLED.
+ // Ordinary media credentials are provisioned behind their own explicit media
+ // gates. Identity-evidence is a separate opt-in capability: a normal rollout
+ // must leave its service token and dedicated bucket credentials empty.
  const backendCompose = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/docker-compose.yml"), "utf8");
  const backendDeploy = readFileSync(resolve(lock.repositories.backend.checkoutPath, "scripts/start-instabox-deployment.sh"), "utf8");
  const identityEvidenceStorage = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/identity_evidence_storage.go"), "utf8");
+ const backendNativeSessions = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/native_sessions.go"), "utf8");
+ const backendMainTests = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/main_test.go"), "utf8");
+ const backendNativeSessionTests = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/native_auth_sessions_integration_test.go"), "utf8");
  const backendDataCentreEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
  const dataCentreCompose = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/docker-compose.yml"), "utf8");
  for (const variable of ["FRESH_MEDIA_ENABLED", "DATA_CENTRE_MEDIA_API_URL", "FRESH_DATA_CENTRE_INTERNAL_TOKEN"]) {
@@ -154,42 +157,74 @@ for (const [label, source, marker] of [
  }
  if (!backendDataCentreEnvExample.includes("DATA_CENTRE_MEDIA_API_URL=http://media:8096")) fail.push("Backend env example must use the private media service DNS endpoint");
  if (!dataCentreCompose.includes("MEDIA_INTERNAL_TOKEN: ${FRESH_DATA_CENTRE_INTERNAL_TOKEN:-}")) fail.push("Data Centre media service token must use FRESH_DATA_CENTRE_INTERNAL_TOKEN");
-if (!dataCentreCompose.includes("IDENTITY_EVIDENCE_INTERNAL_TOKEN: ${IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN:-}")) fail.push("Data Centre media service must receive the identity-evidence token under its dedicated environment key");
-if (!backendDeploy.includes("ensure_random_secret IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN") || !backendDeploy.includes('write_dc_env_value IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must provision a dedicated identity-evidence token to the Data Centre");
-if (!backendDeploy.includes('write_env_value IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN"') || !backendDeploy.includes('verify_container_env "$DC_ENV" "$DATACENTRE/backend/docker-compose.yml" media IDENTITY_EVIDENCE_INTERNAL_TOKEN "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must verify the same dedicated identity-evidence token in both API and Data Centre containers");
-if (!backendDeploy.includes('verify_container_env "$BASE_ENV" "$BASE_COMPOSE" api IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must verify the identity-evidence token in the API container");
-if (!backendDeploy.includes('if [[ "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN" == "$FRESH_DATA_CENTRE_INTERNAL_TOKEN" ]]; then')) fail.push("Backend deployment must rotate the identity-evidence token if it equals the general media token");
+ if (!dataCentreCompose.includes("IDENTITY_EVIDENCE_INTERNAL_TOKEN: ${IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN:-}")) fail.push("Data Centre identity-evidence token must be an optional empty-by-default setting");
+ if (!backendCompose.includes("IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN: ${IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN:-}")) fail.push("Backend identity-evidence token must be optional and empty by default");
+ if (backendDeploy.includes("ensure_random_secret IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN")) fail.push("Ordinary Backend deployment must not generate or require an identity-evidence token");
+ if (backendDeploy.includes('write_env_value IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN"') ||
+     backendDeploy.includes('write_dc_env_value IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Ordinary Backend deployment must not provision identity-evidence credentials into either runtime");
+ if (!backendDeploy.includes('write_env_value IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN ""') ||
+     !backendDeploy.includes('write_dc_env_value IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN ""')) fail.push("Ordinary deployment must explicitly clear stale identity-evidence tokens in Backend and Data Centre environments");
+ if (backendDeploy.includes('verify_container_env "$BASE_ENV" "$BASE_COMPOSE" api IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN') ||
+     backendDeploy.includes('verify_container_env "$DC_ENV" "$DATACENTRE/backend/docker-compose.yml" media IDENTITY_EVIDENCE_INTERNAL_TOKEN')) fail.push("Ordinary deployment must not make identity-evidence token verification a release gate");
+ if (!backendDeploy.includes('write_dc_env_value B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET ""') ||
+     !backendDeploy.includes('write_dc_env_value B2_S3_IDENTITY_EVIDENCE_ACCESS_KEY_ID ""') ||
+     !backendDeploy.includes('write_dc_env_value B2_S3_IDENTITY_EVIDENCE_SECRET_ACCESS_KEY ""')) fail.push("Ordinary deployment must clear dedicated identity-evidence bucket credentials");
+ if (!backendAPIEntry.includes('identityEvidenceToken := env("IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN", "")') ||
+     !backendAPIEntry.includes("if identityEvidenceToken != \"\" {")) fail.push("Backend identity-evidence client must be initialized only when its explicit optional token is supplied");
+ if (!backendAPIEntry.includes("if s.identityEvidenceStorageConfigured() {")) fail.push("Backend identity-evidence upload routes must be registered only when optional storage is configured");
+ if (!backendAPIEntry.includes("if svc.identityEvidenceStorageConfigured() {") ||
+     !backendAPIEntry.includes("go svc.runIdentityEvidenceRetentionWorker(signalCtx)")) fail.push("Backend identity-evidence retention worker must start only when optional storage is configured");
+ if (!backendAPIEntry.includes("identity evidence retention worker remains stopped; optional identity-evidence storage is disabled")) fail.push("Backend must explicitly keep the identity-evidence retention worker stopped when the optional capability is disabled");
+
+ if (!dataCentreMediaServer.includes("cfg.identityEnabled = cfg.identityToken != \"\"") ||
+     !dataCentreMediaServer.includes("identityRoute && !s.cfg.identityEnabled")) fail.push("Data Centre identity-evidence routes must remain disabled without the optional dedicated token");
+ if (!identityEvidenceTests.includes("TestIdentityEvidenceRoutesAreInaccessibleWhenFeatureDisabled")) fail.push("Data Centre must test that identity-evidence routes are inaccessible when the feature is disabled");
+ if (!dataCentreMediaServer.includes("where ($1::boolean or o.namespace <> 'identity-evidence-private')") ||
+     !dataCentreMediaServer.includes("s.cfg.identityEnabled).Scan")) fail.push("Data Centre outbox worker must not select identity-evidence jobs while the optional capability is disabled");
+
+ for (const forbidden of ["testagram_identity.native_registration_provisioning", "lockNativeProvisioningAllowsAccess"]) {
+   if (backendNativeSessions.includes(forbidden)) fail.push(`Native session lifecycle still depends on optional identity provisioning: ${forbidden}`);
+ }
+ if (!backendAPIEntry.includes("nativeAuthReadinessRelations()")) fail.push("Backend native-auth readiness must enumerate only canonical auth/profile relations");
+ if (backendAPIEntry.includes('"testagram_identity.native_registration_provisioning"')) fail.push("Backend native-auth readiness must not require the optional identity-provisioning relation");
+ if (!backendMainTests.includes("TestNativeAuthReadinessDoesNotRequireIdentityProvisioningSchema")) fail.push("Backend must regression-test identity-independent native-auth readiness");
+ if (!backendNativeSessionTests.includes("TestNativeAuthSessionSourceDoesNotDependOnIdentityProvisioningSchema")) fail.push("Backend must regression-test identity-independent session creation/validation");
+
  if (!backendDeploy.includes('write_dc_env_value FRESH_DATA_CENTRE_INTERNAL_TOKEN "$FRESH_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must provision the same private media token into the Data Centre runtime env");
  if (!backendDeploy.includes('MEDIA_DATABASE_USER="$(read_dc_env_value MEDIA_DATABASE_USER)"') ||
-    !backendDeploy.includes('MEDIA_DATABASE_PASSWORD="$(read_dc_env_value MEDIA_DATABASE_PASSWORD)"') ||
-    !backendDeploy.includes('write_dc_env_value MEDIA_DATABASE_URL "$MEDIA_DATABASE_URL"') ||
-    !backendDeploy.includes('postgresql://${MEDIA_DATABASE_USER}:${MEDIA_DATABASE_PASSWORD}@federation-db:5432/${MEDIA_DATABASE_NAME}?sslmode=disable')) {
-    fail.push("Backend deployment must provision the dedicated media database URL with its persistent least-privilege role");
-  }
- if (!backendDeploy.includes('if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" && "${FRESH_MEDIA_ENABLED:-false}" == "true" ]]; then')) fail.push("Data Centre media provider credentials must require both independent media gates");
- if (!backendDeploy.includes('FRESH_MEDIA_ENABLED and DATA_CENTRE_MEDIA_ENABLED must both be true or both be false')) fail.push("Backend deployment must reject inconsistent Data Centre media feature gates");
+     !backendDeploy.includes('MEDIA_DATABASE_PASSWORD="$(read_dc_env_value MEDIA_DATABASE_PASSWORD)"') ||
+     !backendDeploy.includes('write_dc_env_value MEDIA_DATABASE_URL "$MEDIA_DATABASE_URL"') ||
+     !backendDeploy.includes('postgresql://${MEDIA_DATABASE_USER}:${MEDIA_DATABASE_PASSWORD}@federation-db:5432/${MEDIA_DATABASE_NAME}?sslmode=disable')) {
+   fail.push("Backend deployment must provision the dedicated media database URL with its persistent least-privilege role");
+ }
+ if (!backendDeploy.includes('if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" ]]; then')) fail.push("Data Centre ordinary-media provider credentials must be provisioned only behind DATA_CENTRE_MEDIA_ENABLED");
+ if (!backendDeploy.includes('if [[ "$FRESH_MEDIA_ENABLED" == "true" && "$DATA_CENTRE_MEDIA_ENABLED" != "true" ]]; then')) fail.push("Backend deployment must require the Data Centre media profile when fresh media uploads are enabled");
  if (!dataCentreCompose.includes("name: ${TESTAGRAM_NETWORK:-testagram-platform}") || !dataCentreCompose.includes("external: true")) fail.push("Data Centre media service must join the externally-created Backend platform network");
  if (!dataCentreCompose.includes("networks: [platform]")) fail.push("Data Centre media service must join the Backend-owned private platform network");
  if (!dataCentreCompose.includes('expose: ["8096"]')) fail.push("Data Centre media API must expose only the private container port, not publish it publicly");
- if (!backendCompose.includes("B2_S3_ACCESS_KEY_ID:") || !backendCompose.includes("B2_S3_SECRET_ACCESS_KEY:") || !backendCompose.includes("CLOUDFLARE_R2_ACCESS_KEY_ID:") || !backendCompose.includes("CLOUDFLARE_R2_SECRET_ACCESS_KEY:")) fail.push("Backend identity-evidence replica credentials must be mapped into the VPS API container");
+ if (!backendCompose.includes("B2_S3_ACCESS_KEY_ID:") || !backendCompose.includes("B2_S3_SECRET_ACCESS_KEY:") ||
+     !backendCompose.includes("CLOUDFLARE_R2_ACCESS_KEY_ID:") || !backendCompose.includes("CLOUDFLARE_R2_SECRET_ACCESS_KEY:")) {
+   fail.push("Backend Compose must map ordinary-media B2/R2 replica credentials for the separately gated media replication capability");
+ }
  if (!backendCompose.includes("MEDIA_REPLICATION_ENABLED:")) fail.push("Backend Compose must preserve the explicit three-provider replication feature gate");
  const backendReplicaGate = backendDeploy.indexOf('if [[ "$(read_env_value MEDIA_REPLICATION_ENABLED)" == "true" ]]; then');
-const backendReplicaElse = backendDeploy.indexOf('else\n  # Do not leave old provider credentials mounted in the Backend', backendReplicaGate);
-if (backendReplicaGate < 0 || backendReplicaElse < 0 ||
-    !backendDeploy.slice(backendReplicaGate, backendReplicaElse).includes('write_env_value "$key" "$value"') ||
-    !backendDeploy.slice(backendReplicaElse).includes('write_env_value "$key" ""')) {
-  fail.push("Backend API B2/R2 replica credentials must be installed only behind MEDIA_REPLICATION_ENABLED and cleared when it is false");
-}
-const dataCentreMediaGate = 'if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" && "${FRESH_MEDIA_ENABLED:-false}" == "true" ]]; then';
-if (!backendDeploy.includes(dataCentreMediaGate) ||
-    !backendDeploy.includes('write_dc_env_value "$key" "$value"') ||
-    !dataCentreCompose.includes("B2_S3_ACCESS_KEY_ID: ${B2_S3_ACCESS_KEY_ID:-}") ||
-    !dataCentreCompose.includes("CLOUDFLARE_R2_ACCESS_KEY_ID: ${CLOUDFLARE_R2_ACCESS_KEY_ID:-}")) {
-  fail.push("B2/R2 provider credentials must be isolated to the private Data Centre media service behind both Data Centre media gates");
-}
- // Native identity evidence is deliberately B2-only and Data Centre-owned.
- // The Backend must call the private identity-evidence client; it must not
- // mount or use its ordinary-media MinIO/R2/B2 replication credentials.
+ const backendReplicaElse = backendDeploy.indexOf('else\n  # Do not leave old provider credentials mounted in the Backend', backendReplicaGate);
+ if (backendReplicaGate < 0 || backendReplicaElse < 0 ||
+     !backendDeploy.slice(backendReplicaGate, backendReplicaElse).includes('write_env_value "$key" "$value"') ||
+     !backendDeploy.slice(backendReplicaElse).includes('write_env_value "$key" ""')) {
+   fail.push("Backend API B2/R2 replica credentials must be installed only behind MEDIA_REPLICATION_ENABLED and cleared when it is false");
+ }
+ const dataCentreMediaGate = 'if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" ]]; then';
+ if (!backendDeploy.includes(dataCentreMediaGate) ||
+     !backendDeploy.includes('write_dc_env_value "$key" "$value"') ||
+     !dataCentreCompose.includes("B2_S3_ACCESS_KEY_ID: ${B2_S3_ACCESS_KEY_ID:-}") ||
+     !dataCentreCompose.includes("CLOUDFLARE_R2_ACCESS_KEY_ID: ${CLOUDFLARE_R2_ACCESS_KEY_ID:-}")) {
+   fail.push("B2/R2 provider credentials must be isolated to the private Data Centre media service behind both Data Centre media gates");
+ }
+ // Optional identity evidence remains B2-only and Data Centre-owned.
+ // Its private route, credentials and worker remain disabled in ordinary
+ // deployments; if explicitly enabled later, it cannot use ordinary-media
+ // MinIO/R2/B2 replication credentials.
  const dataCentreIdentityB2OnlyMigration = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/media/migrations/004_identity_evidence_b2_only.sql"), "utf8");
  const dataCentreIdentityPurgeMigration = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/media/migrations/005_identity_evidence_permanent_purge.sql"), "utf8");
  const dataCentreIdentityReverifyMigration = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/media/migrations/006_identity_evidence_legacy_reverify.sql"), "utf8");
@@ -197,8 +232,8 @@ if (!backendDeploy.includes(dataCentreMediaGate) ||
    ["Backend identity-evidence storage", identityEvidenceStorage, "s.identityEvidenceMedia != nil"],
    ["Backend identity-evidence storage", identityEvidenceStorage, "private Data Centre identity evidence service is not configured"],
    ["Backend identity-evidence storage", identityEvidenceStorage, "dedicated Backblaze B2 bucket"],
-   ["Data Centre identity storage selector", dataCentreMediaServer, 'if namespace == "identity-evidence-private" { return s.cfg.identityPrimary, s3Store{} }'],
-   ["Data Centre identity metadata selector", dataCentreMediaServer, 'if namespace == "identity-evidence-private" { return s.cfg.identityPrimary, s3Store{} }'],
+   ["Data Centre identity storage selector", dataCentreMediaServer, 'if namespace == "identity-evidence-private" { if !s.cfg.identityEnabled { return s3Store{}, s3Store{} }; return s.cfg.identityPrimary, s3Store{} }'],
+   ["Data Centre identity metadata selector", dataCentreMediaServer, 'if namespace == "identity-evidence-private" { if !s.cfg.identityEnabled { return s3Store{}, s3Store{} }; return s.cfg.identityPrimary, s3Store{} }'],
    ["Data Centre permanent identity purge", dataCentreMediaServer, "deleteAllB2ObjectVersions(ctx, primary, key)"],
    ["Data Centre permanent identity purge", dataCentreMediaServer, "identity_evidence_purged_at=now()"],
    ["Data Centre B2-only migration", dataCentreIdentityB2OnlyMigration, "identity-evidence-private"],
@@ -208,15 +243,12 @@ if (!backendDeploy.includes(dataCentreMediaGate) ||
  ]) {
    if (!source.includes(marker)) fail.push(`${label} missing B2-only identity boundary marker: ${marker}`);
  }
- if (!dataCentreCompose.includes("B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET: ${B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET:-}")) fail.push("Data Centre must configure a dedicated B2 identity-evidence bucket");
+ if (!dataCentreCompose.includes("B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET: ${B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET:-}")) fail.push("Data Centre optional identity bucket setting must default to empty");
  if (!dataCentreCompose.includes("B2_S3_IDENTITY_EVIDENCE_ACCESS_KEY_ID: ${B2_S3_IDENTITY_EVIDENCE_ACCESS_KEY_ID:-}") ||
-     !dataCentreCompose.includes("B2_S3_IDENTITY_EVIDENCE_SECRET_ACCESS_KEY: ${B2_S3_IDENTITY_EVIDENCE_SECRET_ACCESS_KEY:-}")) fail.push("Data Centre must use dedicated bucket-scoped B2 identity credentials");
+     !dataCentreCompose.includes("B2_S3_IDENTITY_EVIDENCE_SECRET_ACCESS_KEY: ${B2_S3_IDENTITY_EVIDENCE_SECRET_ACCESS_KEY:-}")) fail.push("Data Centre optional identity bucket credentials must default to empty");
  if (dataCentreCompose.includes("CLOUDFLARE_R2_IDENTITY_EVIDENCE_PRIVATE_BUCKET") ||
      backendCompose.includes("CLOUDFLARE_R2_IDENTITY_EVIDENCE_PRIVATE_BUCKET") ||
      backendCompose.includes("B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET")) fail.push("Identity evidence bucket configuration must not be mounted in Backend or R2; it belongs only to Data Centre B2");
- if (!backendDeploy.includes("ensure_random_secret IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN") ||
-     !backendDeploy.includes('write_dc_env_value IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must provision the dedicated private identity-evidence service token to Data Centre");
-
 
  // The public Caddy edge and the private video origin must never share a
  // Docker network. Backend API and video share a dedicated internal network;
@@ -370,6 +402,8 @@ if (!federationRemoteSubscriptionTests.includes("TestResolveRemoteActivityPubAct
 // permissions, roles, invitations or revocations from the Admin Console.
 const backendAdminSecurity = readFileSync(resolve(lock.repositories.backend.checkoutPath, "admin-console/security.go"), "utf8");
 const backendAdminMain = readFileSync(resolve(lock.repositories.backend.checkoutPath, "admin-console/main.go"), "utf8");
+const backendStaffInvitation = readFileSync(resolve(lock.repositories.backend.checkoutPath, "admin-console/staff_invitation.go"), "utf8");
+const backendStaffInvitationTests = readFileSync(resolve(lock.repositories.backend.checkoutPath, "admin-console/staff_invitation_integration_test.go"), "utf8");
 const permissionStart = backendAdminSecurity.indexOf("func (a *app) handleSetStaffPermission");
 const permissionEnd = backendAdminSecurity.indexOf("func (a *app) handleStaffList", permissionStart);
 if (permissionStart < 0 || permissionEnd < 0) {
@@ -383,10 +417,23 @@ if (permissionStart < 0 || permissionEnd < 0) {
     if (permissionHandler.includes(marker)) fail.push(`Backend staff permission handler contains an unsafe direct mutation: ${marker}`);
   }
 }
+if (!backendStaffInvitation.includes("required_approvals") ||
+    !backendStaffInvitation.includes("Two different eligible owners must approve it before an email is sent.") ||
+    !backendStaffInvitation.includes("exactly two distinct, currently eligible owner WebAuthn approvers are required") ||
+    !backendStaffInvitation.includes("enqueueStaffInvitationMail") ||
+    !backendStaffInvitation.includes("accepted_at IS NULL AND revoked_at IS NULL")) {
+  fail.push("Backend staff invitations must be issued only after two independent eligible owner WebAuthn approvals and remain single-use");
+}
+if (!backendStaffInvitationTests.includes("TestNativeStaffInvitationLifecycleIntegration") ||
+    !backendStaffInvitationTests.includes("no side effects are allowed before the second approval") ||
+    !backendStaffInvitationTests.includes("replayed invitation status")) {
+  fail.push("Backend staff invitation integration test must cover two-person approval, no premature mail, acceptance and replay rejection");
+}
 for (const [label, source, marker] of [
   ["Backend staff role change", backendAdminSecurity, 'http.StatusNotImplemented,map[string]string{"error":"Staff role changes require the two-person native staff approval workflow. No direct role mutation is permitted."}'],
   ["Backend staff revocation", backendAdminSecurity, 'http.StatusNotImplemented,map[string]string{"error":"Staff revocation requires the two-person native staff approval workflow. No direct role mutation is permitted."}'],
-  ["Backend staff invitation", backendAdminMain, "Native staff invitation provisioning is not yet available"],
+  ["Backend staff invitation route", backendAdminMain, 'mux.HandleFunc("POST /api/staff/invite", a.handleInvite)'],
+  ["Backend staff invitation route", backendAdminMain, 'mux.HandleFunc("POST /api/staff/invitations/accept", a.handleAcceptStaffInvitation)'],
 ]) {
   if (!source.includes(marker)) fail.push(`${label} must remain closed until transactional two-person execution exists`);
 }
