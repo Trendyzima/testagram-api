@@ -197,8 +197,8 @@ for (const [label, source, marker] of [
      !backendDeploy.includes('postgresql://${MEDIA_DATABASE_USER}:${MEDIA_DATABASE_PASSWORD}@federation-db:5432/${MEDIA_DATABASE_NAME}?sslmode=disable')) {
    fail.push("Backend deployment must provision the dedicated media database URL with its persistent least-privilege role");
  }
- if (!backendDeploy.includes('if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" && "${FRESH_MEDIA_ENABLED:-false}" == "true" ]]; then')) fail.push("Data Centre media provider credentials must require both independent media gates");
- if (!backendDeploy.includes('FRESH_MEDIA_ENABLED and DATA_CENTRE_MEDIA_ENABLED must both be true or both be false')) fail.push("Backend deployment must reject inconsistent Data Centre media feature gates");
+ if (!backendDeploy.includes('if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" ]]; then')) fail.push("Data Centre ordinary-media provider credentials must be provisioned only behind DATA_CENTRE_MEDIA_ENABLED");
+ if (!backendDeploy.includes('if [[ "$FRESH_MEDIA_ENABLED" == "true" && "$DATA_CENTRE_MEDIA_ENABLED" != "true" ]]; then')) fail.push("Backend deployment must require the Data Centre media profile when fresh media uploads are enabled");
  if (!dataCentreCompose.includes("name: ${TESTAGRAM_NETWORK:-testagram-platform}") || !dataCentreCompose.includes("external: true")) fail.push("Data Centre media service must join the externally-created Backend platform network");
  if (!dataCentreCompose.includes("networks: [platform]")) fail.push("Data Centre media service must join the Backend-owned private platform network");
  if (!dataCentreCompose.includes('expose: ["8096"]')) fail.push("Data Centre media API must expose only the private container port, not publish it publicly");
@@ -208,13 +208,13 @@ for (const [label, source, marker] of [
  }
  if (!backendCompose.includes("MEDIA_REPLICATION_ENABLED:")) fail.push("Backend Compose must preserve the explicit three-provider replication feature gate");
  const backendReplicaGate = backendDeploy.indexOf('if [[ "$(read_env_value MEDIA_REPLICATION_ENABLED)" == "true" ]]; then');
- const backendReplicaElse = backendDeploy.indexOf('else\\n  # Do not leave old provider credentials mounted in the Backend', backendReplicaGate);
+ const backendReplicaElse = backendDeploy.indexOf('else\n  # Do not leave old provider credentials mounted in the Backend', backendReplicaGate);
  if (backendReplicaGate < 0 || backendReplicaElse < 0 ||
      !backendDeploy.slice(backendReplicaGate, backendReplicaElse).includes('write_env_value "$key" "$value"') ||
      !backendDeploy.slice(backendReplicaElse).includes('write_env_value "$key" ""')) {
    fail.push("Backend API B2/R2 replica credentials must be installed only behind MEDIA_REPLICATION_ENABLED and cleared when it is false");
  }
- const dataCentreMediaGate = 'if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" && "${FRESH_MEDIA_ENABLED:-false}" == "true" ]]; then';
+ const dataCentreMediaGate = 'if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" ]]; then';
  if (!backendDeploy.includes(dataCentreMediaGate) ||
      !backendDeploy.includes('write_dc_env_value "$key" "$value"') ||
      !dataCentreCompose.includes("B2_S3_ACCESS_KEY_ID: ${B2_S3_ACCESS_KEY_ID:-}") ||
@@ -402,6 +402,8 @@ if (!federationRemoteSubscriptionTests.includes("TestResolveRemoteActivityPubAct
 // permissions, roles, invitations or revocations from the Admin Console.
 const backendAdminSecurity = readFileSync(resolve(lock.repositories.backend.checkoutPath, "admin-console/security.go"), "utf8");
 const backendAdminMain = readFileSync(resolve(lock.repositories.backend.checkoutPath, "admin-console/main.go"), "utf8");
+const backendStaffInvitation = readFileSync(resolve(lock.repositories.backend.checkoutPath, "admin-console/staff_invitation.go"), "utf8");
+const backendStaffInvitationTests = readFileSync(resolve(lock.repositories.backend.checkoutPath, "admin-console/staff_invitation_integration_test.go"), "utf8");
 const permissionStart = backendAdminSecurity.indexOf("func (a *app) handleSetStaffPermission");
 const permissionEnd = backendAdminSecurity.indexOf("func (a *app) handleStaffList", permissionStart);
 if (permissionStart < 0 || permissionEnd < 0) {
@@ -415,10 +417,23 @@ if (permissionStart < 0 || permissionEnd < 0) {
     if (permissionHandler.includes(marker)) fail.push(`Backend staff permission handler contains an unsafe direct mutation: ${marker}`);
   }
 }
+if (!backendStaffInvitation.includes("required_approvals") ||
+    !backendStaffInvitation.includes("Two different eligible owners must approve it before an email is sent.") ||
+    !backendStaffInvitation.includes("exactly two distinct, currently eligible owner WebAuthn approvers are required") ||
+    !backendStaffInvitation.includes("enqueueStaffInvitationMail") ||
+    !backendStaffInvitation.includes("accepted_at IS NULL AND revoked_at IS NULL")) {
+  fail.push("Backend staff invitations must be issued only after two independent eligible owner WebAuthn approvals and remain single-use");
+}
+if (!backendStaffInvitationTests.includes("TestNativeStaffInvitationLifecycleIntegration") ||
+    !backendStaffInvitationTests.includes("no side effects are allowed before the second approval") ||
+    !backendStaffInvitationTests.includes("replayed invitation status")) {
+  fail.push("Backend staff invitation integration test must cover two-person approval, no premature mail, acceptance and replay rejection");
+}
 for (const [label, source, marker] of [
   ["Backend staff role change", backendAdminSecurity, 'http.StatusNotImplemented,map[string]string{"error":"Staff role changes require the two-person native staff approval workflow. No direct role mutation is permitted."}'],
   ["Backend staff revocation", backendAdminSecurity, 'http.StatusNotImplemented,map[string]string{"error":"Staff revocation requires the two-person native staff approval workflow. No direct role mutation is permitted."}'],
-  ["Backend staff invitation", backendAdminMain, "Native staff invitation provisioning is not yet available"],
+  ["Backend staff invitation route", backendAdminMain, 'mux.HandleFunc("POST /api/staff/invite", a.handleInvite)'],
+  ["Backend staff invitation route", backendAdminMain, 'mux.HandleFunc("POST /api/staff/invitations/accept", a.handleAcceptStaffInvitation)'],
 ]) {
   if (!source.includes(marker)) fail.push(`${label} must remain closed until transactional two-person execution exists`);
 }
