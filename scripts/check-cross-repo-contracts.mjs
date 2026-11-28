@@ -146,6 +146,9 @@ for (const [label, source, marker] of [
  const backendCompose = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/docker-compose.yml"), "utf8");
  const backendDeploy = readFileSync(resolve(lock.repositories.backend.checkoutPath, "scripts/start-instabox-deployment.sh"), "utf8");
  const identityEvidenceStorage = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/identity_evidence_storage.go"), "utf8");
+ const backendNativeSessions = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/native_sessions.go"), "utf8");
+ const backendMainTests = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/main_test.go"), "utf8");
+ const backendNativeSessionTests = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/native_auth_sessions_integration_test.go"), "utf8");
  const backendDataCentreEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
  const dataCentreCompose = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/docker-compose.yml"), "utf8");
  for (const variable of ["FRESH_MEDIA_ENABLED", "DATA_CENTRE_MEDIA_API_URL", "FRESH_DATA_CENTRE_INTERNAL_TOKEN"]) {
@@ -172,6 +175,14 @@ for (const [label, source, marker] of [
  if (!dataCentreMediaServer.includes("cfg.identityEnabled = cfg.identityToken != \"\"") ||
      !dataCentreMediaServer.includes("identityRoute && !s.cfg.identityEnabled")) fail.push("Data Centre identity-evidence routes must remain disabled without the optional dedicated token");
  if (!identityEvidenceTests.includes("TestIdentityEvidenceRoutesAreInaccessibleWhenFeatureDisabled")) fail.push("Data Centre must test that identity-evidence routes are inaccessible when the feature is disabled");
+ for (const forbidden of ["testagram_identity.native_registration_provisioning", "lockNativeProvisioningAllowsAccess"]) {
+   if (backendNativeSessions.includes(forbidden)) fail.push(`Native session lifecycle still depends on optional identity provisioning: ${forbidden}`);
+ }
+ if (!backendAPIEntry.includes("nativeAuthReadinessRelations()")) fail.push("Backend native-auth readiness must enumerate only canonical auth/profile relations");
+ if (backendAPIEntry.includes('"testagram_identity.native_registration_provisioning"')) fail.push("Backend native-auth readiness must not require the optional identity-provisioning relation");
+ if (!backendMainTests.includes("TestNativeAuthReadinessDoesNotRequireIdentityProvisioningSchema")) fail.push("Backend must regression-test identity-independent native-auth readiness");
+ if (!backendNativeSessionTests.includes("TestNativeAuthSessionSourceDoesNotDependOnIdentityProvisioningSchema")) fail.push("Backend must regression-test identity-independent session creation/validation");
+
  if (!backendDeploy.includes('write_dc_env_value FRESH_DATA_CENTRE_INTERNAL_TOKEN "$FRESH_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must provision the same private media token into the Data Centre runtime env");
  if (!backendDeploy.includes('MEDIA_DATABASE_USER="$(read_dc_env_value MEDIA_DATABASE_USER)"') ||
      !backendDeploy.includes('MEDIA_DATABASE_PASSWORD="$(read_dc_env_value MEDIA_DATABASE_PASSWORD)"') ||
