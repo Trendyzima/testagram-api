@@ -186,6 +186,7 @@ if (!identityEvidenceTests.includes("TestIdentityEvidenceRoutesAreInaccessibleWh
  if (!dataCentreCompose.includes("name: ${TESTAGRAM_NETWORK:-testagram-platform}") || !dataCentreCompose.includes("external: true")) fail.push("Data Centre media service must join the externally-created Backend platform network");
  if (!dataCentreCompose.includes("networks: [platform]")) fail.push("Data Centre media service must join the Backend-owned private platform network");
  if (!dataCentreCompose.includes('expose: ["8096"]')) fail.push("Data Centre media API must expose only the private container port, not publish it publicly");
+ if (!backendCompose.includes("B2_S3_ACCESS_KEY_ID:") || !backendCompose.includes("B2_S3_SECRET_ACCESS_KEY:") || !backendCompose.includes("CLOUDFLARE_R2_ACCESS_KEY_ID:") || !backendCompose.includes("CLOUDFLARE_R2_SECRET_ACCESS_KEY:")) fail.push("Backend Compose must map ordinary-media B2/R2 replica credentials for the separately gated media replication capability");
  if (!backendCompose.includes("MEDIA_REPLICATION_ENABLED:")) fail.push("Backend Compose must preserve the explicit three-provider replication feature gate");
  const backendReplicaGate = backendDeploy.indexOf('if [[ "$(read_env_value MEDIA_REPLICATION_ENABLED)" == "true" ]]; then');
 const backendReplicaElse = backendDeploy.indexOf('else\n  # Do not leave old provider credentials mounted in the Backend', backendReplicaGate);
