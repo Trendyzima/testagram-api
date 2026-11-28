@@ -149,6 +149,8 @@ for (const [label, source, marker] of [
  const backendNativeSessions = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/native_sessions.go"), "utf8");
  const backendMainTests = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/main_test.go"), "utf8");
  const backendNativeSessionTests = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/native_auth_sessions_integration_test.go"), "utf8");
+ const backendNativeAuthBoundary = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/native_auth_boundary.go"), "utf8");
+ const backendNativeAuthBoundaryTests = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/native_auth_boundary_test.go"), "utf8");
  const backendDataCentreEnvExample = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/.env.example"), "utf8");
  const dataCentreCompose = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/docker-compose.yml"), "utf8");
  for (const variable of ["FRESH_MEDIA_ENABLED", "DATA_CENTRE_MEDIA_API_URL", "FRESH_DATA_CENTRE_INTERNAL_TOKEN"]) {
@@ -189,6 +191,9 @@ for (const [label, source, marker] of [
  if (backendAPIEntry.includes('"testagram_identity.native_registration_provisioning"')) fail.push("Backend native-auth readiness must not require the optional identity-provisioning relation");
  if (!backendMainTests.includes("TestNativeAuthReadinessDoesNotRequireIdentityProvisioningSchema")) fail.push("Backend must regression-test identity-independent native-auth readiness");
  if (!backendNativeSessionTests.includes("TestNativeAuthSessionSourceDoesNotDependOnIdentityProvisioningSchema")) fail.push("Backend must regression-test identity-independent session creation/validation");
+ if (!backendNativeAuthBoundary.includes("This protected capability requires separate identity review and two-person approval. Basic Testagram account access does not.")) fail.push("Backend identity-approval denial must be scoped to protected capabilities, not global account access");
+ if (!backendNativeAuthBoundaryTests.includes("Basic Testagram account access does not")) fail.push("Backend must regression-test that identity approval error copy does not imply a basic-account requirement");
+
 
  if (!backendDeploy.includes('write_dc_env_value FRESH_DATA_CENTRE_INTERNAL_TOKEN "$FRESH_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must provision the same private media token into the Data Centre runtime env");
  if (!backendDeploy.includes('MEDIA_DATABASE_USER="$(read_dc_env_value MEDIA_DATABASE_USER)"') ||
