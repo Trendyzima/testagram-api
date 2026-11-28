@@ -391,7 +391,7 @@ if (permissionStart < 0 || permissionEnd < 0) {
 for (const [label, source, marker] of [
   ["Backend staff role change", backendAdminSecurity, 'http.StatusNotImplemented,map[string]string{"error":"Staff role changes require the two-person native staff approval workflow. No direct role mutation is permitted."}'],
   ["Backend staff revocation", backendAdminSecurity, 'http.StatusNotImplemented,map[string]string{"error":"Staff revocation requires the two-person native staff approval workflow. No direct role mutation is permitted."}'],
-  ["Backend staff invitation", backendAdminMain, "Native staff invitation provisioning is not yet available"],
+  ["Backend staff invitation", backendAdminMain, 'http.StatusForbidden,map[string]string{"error":"Staff accounts are provisioned through the controlled two-person Testagram staff workflow."}'],
 ]) {
   if (!source.includes(marker)) fail.push(`${label} must remain closed until transactional two-person execution exists`);
 }
