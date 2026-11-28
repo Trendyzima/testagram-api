@@ -15,25 +15,32 @@ This is a cross-repository contract for Backend, Data Centre, CDN and Flutter. I
 ## End-user authentication contract
 
 1. Flutter submits email and password to Backend `POST /api/auth/login`.
-2. Backend verifies the password against the canonical PostgreSQL identity, checks email verification, account disablement, registration provisioning and password-reset-required state.
+2. Backend verifies the password against the canonical PostgreSQL identity, checks email verification, account enabled state and password-reset-required state. Basic accounts do not need an identity application or evidence record; an explicitly disabled account remains blocked.
 3. Backend issues a 15-minute HS256 access token and an opaque 30-day refresh token. The refresh token is stored server-side only as a one-way hash.
 4. Flutter stores only the refresh token in platform secure storage; access tokens remain in memory.
 5. Refresh rotates the refresh token atomically. Reuse of a revoked token family revokes the family.
 6. Logout revokes the current session. Logout-all increments the identity token version and revokes every active session.
 7. Password recovery returns a generic anti-enumeration response, stores only a one-way hash of the single-use token, expires the token after 30 minutes, and sends the recovery link through Testagram's configured email transport. Successful reset changes the password, increments token version and revokes all active sessions.
-8. Email verification uses an expiring single-use token and is separate from account provisioning.
+8. Email verification uses an expiring single-use token and is required before a new account can sign in.
+
+## Ordinary public registration
+
+- Public self-service signup uses `POST /api/auth/signup` with email, username, password, accepted Terms, accepted Privacy Notice and an age self-declaration.
+- Signup creates a pending Testagram-native account and queues email verification. After verification, the user signs in through `POST /api/auth/login`.
+- Government ID, ID number, selfie, identity evidence, manual identity review, identity approval and identity-evidence storage are not prerequisites for ordinary account creation, email verification, login, refresh or logout.
+- The separate `POST /api/identity/applications` workflow is optional and isolated for specifically protected capabilities. It is not the public signup path and its storage/readiness must never gate ordinary account access.
 
 The Backend validates signature, issuer, audience, role, canonical subject UUID, session UUID, token version and expiry, then checks live PostgreSQL session/account state. A cryptographically valid JWT without an active database session is not authenticated.
 
 ## Registration and provisioning
 
-- Public account creation begins with `POST /api/identity/applications`; this endpoint creates an application, not a login-capable account.
+- Optional identity-assurance applications begin with `POST /api/identity/applications`; this endpoint is not the public signup path and does not create a basic account.
 - The Backend requires accepted age, Terms and Privacy declarations, a high-entropy idempotency key, configured policy versions and rate-limit capacity.
 - Identity evidence requires private object storage, byte-size/content-type checks, SHA-256 verification, reviewer-access auditing and a retention/deletion worker.
 - Two distinct matching identity reviewers and two distinct account approvers are required before native provisioning.
 - Provisioning creates the canonical Testagram identity and profile transactionally, consumes the application-scoped authorization once, and records the provisioning ledger.
 - Email verification must complete before a session can be issued.
-- Registration remains fail-closed until PostgreSQL, private evidence storage, verified replication, email delivery, policy versions and the staff approval path are configured and tested.
+- The optional identity-assurance workflow remains fail-closed until its dedicated PostgreSQL, private evidence storage, verified replication, policy and staff-approval prerequisites are configured and tested. Ordinary public signup depends on its own native account, consent-ledger, email-verification and PostgreSQL requirements only.
 
 ## Media upload contract
 
@@ -65,7 +72,7 @@ Provider ETags are opaque transport metadata, not a portable checksum.
 - Backend: native auth route matrix, session/recovery/revocation tests, identity provisioning and evidence-retention integration tests, transactional outbox/replica ledger, private/public media authorization tests.
 - Data Centre: native session verification for video and notifications, provider smoke tests for MinIO/R2/B2, leased replication/reconciliation, restore and delete drills.
 - CDN: private cache bypass, public classification, origin auth and checksum-safe failover, HEAD/Range/HLS.
-- Flutter: native login/restart/refresh/logout/recovery tests, registration application UX, upload checksum, retry, playback and deletion tests.
+- Flutter: native email/password signup, consent gates, email verification, login/restart/refresh/logout/recovery tests, plus separate tests proving no identity-evidence prompt or identity-review dependency on ordinary signup; upload checksum, retry, playback and deletion tests.
 - API: schema compatibility, generated client drift, exact source commit pins and route inventory parity.
 - Staff console: native login, encrypted session cookie, session validation and PostgreSQL role/MFA checks are implemented. Complete the fail-closed invitation and two-person staff-role onboarding workflow before opening staff enrollment.
 

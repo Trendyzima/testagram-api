@@ -27,7 +27,7 @@ tags:
   - name: Health
     description: Process liveness and dependency readiness.
   - name: Authentication
-    description: End-user and identity-review operations accept only Testagram-native short-lived access JWTs. Backend checks the live PostgreSQL session, account state, enabled staff principal, enrolled-MFA marker and explicit role grants. No external identity-provider bearer token is accepted.
+    description: Ordinary end-user signup and login use Testagram-native email/password credentials and email verification; they do not require government ID, selfie, identity evidence, manual identity review or identity approval. Sensitive identity-review operations are separate, privileged staff workflows requiring a native session, live PostgreSQL account/staff state, fresh MFA proof and explicit role grants. No external identity-provider bearer token is accepted.
   - name: Feed
     description: Authorized home timeline retrieval.
   - name: Social
@@ -45,7 +45,7 @@ tags:
   - name: Federation
     description: Authenticated Testagram federation preferences. ActivityPub protocol traffic is handled by the private Federation service, not by clients.
   - name: Identity
-    description: Applicant-facing native age-assurance application and private evidence submission. No account is provisioned until manual verification and independent two-person approval complete.
+    description: Separate optional identity-assurance application and private evidence submission for specifically protected capabilities. This workflow is not public signup and does not gate ordinary account creation, email verification, login or session refresh.
 security:
   - testagramBearer: []
 paths:
@@ -67,19 +67,42 @@ paths:
     post:
       operationId: requestPublicSignup
       tags: [Authentication]
-      summary: Request public account creation (identity review required)
-      description: Public self-service signup is intentionally fail-closed. This endpoint never creates an account. Testagram accounts are provisioned only through the approved identity application flow after verified evidence review and two independent account approvals. Email verification remains required after approved provisioning.
+      summary: Create a basic Testagram account
+      description: Creates a pending Testagram-native email/password account and queues email verification. Ordinary registration does not require a government ID, ID number, selfie, identity evidence, identity review, or identity approval. The user must accept the current Terms and Privacy Notice and make the age self-declaration. The account becomes eligible to sign in only after its email is verified. Identity assurance is a separate optional workflow and may be enforced only by a specifically protected capability.
       security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [email, username, password, terms_accepted, privacy_accepted, age_confirmed]
+              properties:
+                email: { type: string, format: email, maxLength: 254 }
+                username: { type: string, minLength: 3, maxLength: 30, pattern: '^[A-Za-z0-9_]{3,30}$' }
+                password: { type: string, minLength: 1, maxLength: 128, writeOnly: true, description: 'Must contain 12–128 UTF-8 bytes.' }
+                terms_accepted: { type: boolean, const: true }
+                privacy_accepted: { type: boolean, const: true }
+                age_confirmed: { type: boolean, const: true }
       responses:
-        '403':
-          description: Identity evidence review and two-person account approval are required before account creation. ORIGIN_NOT_ALLOWED may also be returned when the request origin is not permitted.
+        '202':
+          description: Account registration accepted; email verification instructions are queued. Duplicate email addresses receive a generic acknowledgement to prevent account enumeration.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GenericAuthMessage' }
+        '400': { description: "Invalid email, username, password, or missing legal/age declaration." }
+        '403': { description: Request origin is not allowed. }
         '405': { description: Method not allowed; POST is required. }
+        '409': { description: Username is already in use. }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/auth/login:
     post:
       operationId: loginWithTestagramCredentials
       tags: [Authentication]
       summary: Create a native Testagram session
-      description: Verifies the canonical Testagram password, email-verification state, account status and identity-provisioning state. Returns a 15-minute access token and an opaque rotating refresh token. The refresh token must be stored only in platform secure storage.
+      description: Verifies the canonical Testagram password, email-verification state, account enabled state and password-reset state. Ordinary accounts created through public email/password signup can sign in after email verification; no identity application, ID document, selfie, evidence review, or identity approval is required. A specifically disabled account remains blocked. Returns a 15-minute access token and an opaque rotating refresh token. The refresh token must be stored only in platform secure storage.
       security: []
       requestBody:
         required: true
@@ -101,7 +124,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/NativeAuthResponse' }
         '401': { description: Credentials are invalid. }
-        '403': { description: "Email verification, account approval or password reset is required." }
+        '403': { description: "Email verification or a required password reset is outstanding." }
         '429': { $ref: '#/components/responses/RateLimited' }
         '503': { $ref: '#/components/responses/ServiceUnavailable' }
   /api/auth/refresh:
@@ -207,8 +230,8 @@ paths:
     post:
       operationId: createIdentityApplication
       tags: [Identity]
-      summary: Create a native age-assurance application
-      description: Pre-authentication registration entry point. Registration is fail-closed unless Backend registration, policy versions, PostgreSQL, private evidence storage and verified replication are configured. Requires age, Terms and Privacy declarations plus a high-entropy idempotency key. This does not create an account.
+      summary: Create an optional identity-assurance application
+      description: Separate optional identity-assurance application for a specifically protected capability. This is not the public account signup endpoint and does not create a basic Testagram account. It remains inaccessible unless its dedicated identity-review, policy, PostgreSQL, private evidence-storage and replication prerequisites are enabled. Ordinary email/password registration, email verification and login do not depend on this route or its storage.
       security: []
       parameters:
         - in: header

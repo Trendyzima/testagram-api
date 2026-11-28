@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "1af703f4ebec64b96f3f82df9bf4c0f9c916c2c3"
   },
-  "status": "Six runtime source pins reconciled to exact current mainline commits after Backend and Data Centre identity-evidence hardening; Data Centre PR #141 merged; staging acceptance and production deployment remain separate manual gates",
+  "status": "Seven-organ identity-independence invariant added: ordinary public account access is independent of identity evidence and review. Current source pins, CI, deployment and live end-to-end acceptance remain separate verification gates.",
   "repositories": [
     {
       "id": "flutter-client",
@@ -253,13 +253,14 @@
     "All six runtime source pins identify exact current mainline commits; production and product acceptance remain independent gates.",
     "No message or call is advertised as end-to-end encrypted until the reviewed client protocol, device trust, key lifecycle and media lifecycle pass end-to-end acceptance.",
     "The video service has no host-published port; only Backend API, PostgreSQL and the Data Centre video service join the internal video-private network, while Caddy remains off it.",
-    "Video deletion commits product metadata removal and a durable media-cleanup outbox intent atomically; physical media cleanup is asynchronous, lease-recoverable and retryable."
+    "Video deletion commits product metadata removal and a durable media-cleanup outbox intent atomically; physical media cleanup is asynchronous, lease-recoverable and retryable.",
+    "Ordinary public signup, email verification, password login, session refresh, recovery and logout never require government ID, ID number, selfie, identity evidence, identity review, identity approval, or identity-evidence storage; optional identity assurance may gate only specifically designated sensitive capabilities."
   ],
   "excludedFromAcceptance": [
     "Backend PR #548 was closed without merge; its overlapping notification-category work was superseded by merged PR #549. Backend #549 is accepted mainline and adds social discovery, saved timelines and notification category APIs.",
     "Flutter PRs #155 (profile privacy/media pagination) and #157 (social route coverage, saved timelines and client API wiring) are merged and represented by the exact Flutter mainline pin. Stacked PR #156 was closed without merge; its intended delta was transplanted into #157. Merge and CI success do not constitute a production web deployment.",
     "Backend production deployment run 45038404739 is historical evidence for the previously deployed release only. The latest mainline push validation run 45709231112 passed validation but intentionally skipped the production deploy job because production deployment requires an explicit manual confirmation.",
-    "The deployed production signup endpoint returned HTTP 400 INVALID_PASSWORD to the release probe, while current Backend mainline explicitly returns HTTP 403 IDENTITY_REVIEW_REQUIRED before password validation. This is unresolved production/source drift; the Flutter Pages workflow correctly refuses to publish until the canonical Backend deployment and live acceptance contract are aligned.",
+    "Historical production/source drift recorded before Backend PR #602 is superseded by the merged native public-signup implementation; the current source contract must be verified against live deployment before production is declared ready.",
     "The deployed release keeps public registration, staff enrollment and Federation delivery workers fail-closed until their independent acceptance gates pass. Successful source CI or a historical deployment is not proof of native-auth migration, WebAuthn live acceptance, ActivityPub interoperability or production registration readiness.",
     "CDN PR #125 is merged at 21a254e9f67dc7a8e55dca37151a6db532405e53. Go CDN origin is installed and healthy; Cloudflare Worker deployment and canonical hostname routing remain separate production cutover gates and are not inferred from source CI.",
     "Data Centre PR #119 and Algorithm PR #33 are merged into their respective main branches and included in the exact current mainline pins.",
