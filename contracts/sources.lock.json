@@ -230,7 +230,6 @@
         "scripts/native-auth-staging-smoke.py",
         "scripts/self-hosted-backup.sh",
         "scripts/self-hosted-restore-drill.sh",
-        "scripts/staff-webauthn-browser-check.mjs",
         "scripts/start-instabox-deployment.sh",
         "scripts/test-identity-registration-migration.sh",
         "scripts/validate-canonical-deploy-smoke.py",
