@@ -169,8 +169,6 @@ for (const [label, source, marker] of [
     !backendDeploy.includes('postgresql://${MEDIA_DATABASE_USER}:${MEDIA_DATABASE_PASSWORD}@federation-db:5432/${MEDIA_DATABASE_NAME}?sslmode=disable')) {
     fail.push("Backend deployment must provision the dedicated media database URL with its persistent least-privilege role");
   }
- if (!backendDeploy.includes('if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" && "${FRESH_MEDIA_ENABLED:-false}" == "true" ]]; then')) fail.push("Data Centre media provider credentials must require both independent media gates");
- if (!backendDeploy.includes('FRESH_MEDIA_ENABLED and DATA_CENTRE_MEDIA_ENABLED must both be true or both be false')) fail.push("Backend deployment must reject inconsistent Data Centre media feature gates");
  if (!dataCentreCompose.includes("name: ${TESTAGRAM_NETWORK:-testagram-platform}") || !dataCentreCompose.includes("external: true")) fail.push("Data Centre media service must join the externally-created Backend platform network");
  if (!dataCentreCompose.includes("networks: [platform]")) fail.push("Data Centre media service must join the Backend-owned private platform network");
  if (!dataCentreCompose.includes('expose: ["8096"]')) fail.push("Data Centre media API must expose only the private container port, not publish it publicly");
@@ -186,7 +184,13 @@ if (backendReplicaGate < 0 || backendReplicaElse < 0 ||
     !backendDeploy.slice(backendReplicaElse).includes('write_env_value "$key" ""')) {
   fail.push("Backend API B2/R2 replica credentials must be installed only behind MEDIA_REPLICATION_ENABLED and cleared when it is false");
 }
-const dataCentreMediaGate = 'if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" && "${FRESH_MEDIA_ENABLED:-false}" == "true" ]]; then';
+const dataCentreMediaGate = 'if [[ "${DATA_CENTRE_MEDIA_ENABLED:-false}" == "true" ]]; then';
+if (!backendDeploy.includes(dataCentreMediaGate) ||
+    !backendDeploy.includes('write_dc_env_value "$key" "$value"') ||
+    !dataCentreCompose.includes("B2_S3_ACCESS_KEY_ID: ${B2_S3_ACCESS_KEY_ID:-}") ||
+    !dataCentreCompose.includes("CLOUDFLARE_R2_ACCESS_KEY_ID: ${CLOUDFLARE_R2_ACCESS_KEY_ID:-}")) {
+  fail.push("Ordinary B2/R2 media provider credentials must be provisioned only when the Data Centre media profile is explicitly enabled");
+}
 if (!backendDeploy.includes(dataCentreMediaGate) ||
     !backendDeploy.includes('write_dc_env_value "$key" "$value"') ||
     !dataCentreCompose.includes("B2_S3_ACCESS_KEY_ID: ${B2_S3_ACCESS_KEY_ID:-}") ||
