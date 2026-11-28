@@ -8,6 +8,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 SELF = "scripts/guard-native-mail-ownership.py"
 POLICY = "docs/architecture/native-mail-ownership.md"
+HISTORICAL_LOCK = "docs/integration/locked-seven-repository-acceptance.md"
 PROVIDER = re.compile(r"mail[\s._-]*jet|api[.]mailjet[.]com", re.IGNORECASE)
 RETIRED = re.compile(
     r"\b(?:MAILJET_API_KEY|MAILJET_SECRET_KEY|SMTP_HOST|SMTP_USERNAME|SMTP_PASSWORD|"
@@ -21,7 +22,7 @@ def main():
         if not item:
             continue
         relative = item.decode()
-        if relative in {SELF, POLICY}:
+        if relative in {SELF, POLICY, HISTORICAL_LOCK}:
             continue
         try:
             content = (ROOT / relative).read_text(encoding="utf-8")
