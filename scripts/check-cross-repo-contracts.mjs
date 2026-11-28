@@ -199,12 +199,13 @@ if (!backendDeploy.includes(dataCentreMediaGate) ||
  const dataCentreIdentityB2OnlyMigration = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/media/migrations/004_identity_evidence_b2_only.sql"), "utf8");
  const dataCentreIdentityPurgeMigration = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/media/migrations/005_identity_evidence_permanent_purge.sql"), "utf8");
  const dataCentreIdentityReverifyMigration = readFileSync(resolve(lock.repositories["data-centre"].checkoutPath, "backend/services/media/migrations/006_identity_evidence_legacy_reverify.sql"), "utf8");
+  if (identityEvidenceStorage.includes("B2_S3_") || identityEvidenceStorage.includes("CLOUDFLARE_R2")) fail.push("Backend identity-evidence client must not own or configure storage-provider credentials");
  for (const [label, source, marker] of [
    ["Backend identity-evidence storage", identityEvidenceStorage, "s.identityEvidenceMedia != nil"],
    ["Backend identity-evidence storage", identityEvidenceStorage, "private Data Centre identity evidence service is not configured"],
-   ["Backend identity-evidence storage", identityEvidenceStorage, "dedicated Backblaze B2 bucket"],
-   ["Data Centre identity storage selector", dataCentreMediaServer, 'if namespace == "identity-evidence-private" { return s.cfg.identityPrimary, s3Store{} }'],
-   ["Data Centre identity metadata selector", dataCentreMediaServer, 'if namespace == "identity-evidence-private" { return s.cfg.identityPrimary, s3Store{} }'],
+    ["Backend identity-evidence storage", identityEvidenceStorage, "optional capability used only by identity-assurance endpoints"],
+    ["Data Centre identity storage selector", dataCentreMediaServer, 'if namespace == "identity-evidence-private" { if !s.cfg.identityEnabled { return s3Store{}, s3Store{} }; return s.cfg.identityPrimary, s3Store{} }'],
+    ["Data Centre identity metadata selector", dataCentreMediaServer, 'if namespace == "identity-evidence-private" { if !s.cfg.identityEnabled { return s3Store{}, s3Store{} }; return s.cfg.identityPrimary, s3Store{} }'],
    ["Data Centre permanent identity purge", dataCentreMediaServer, "deleteAllB2ObjectVersions(ctx, primary, key)"],
    ["Data Centre permanent identity purge", dataCentreMediaServer, "identity_evidence_purged_at=now()"],
    ["Data Centre B2-only migration", dataCentreIdentityB2OnlyMigration, "identity-evidence-private"],
