@@ -140,9 +140,9 @@ for (const [label, source, marker] of [
 
 
  // Deployment wiring is part of the Backend <-> Data Centre contract.
- // Fresh-media credentials stay in the Data Centre service. Separately, the
- // Backend's VPS-primary identity-evidence replicator requires B2/R2 replica
- // credentials; those are mapped only behind MEDIA_REPLICATION_ENABLED.
+ // Ordinary media credentials stay separately gated. Identity evidence is a
+ // Data Centre-owned optional capability: ordinary deployment clears its token
+ // and bucket credentials, and the Backend never mounts identity bucket keys.
  const backendCompose = readFileSync(resolve(lock.repositories.backend.checkoutPath, "deploy/self-hosted/docker-compose.yml"), "utf8");
  const backendDeploy = readFileSync(resolve(lock.repositories.backend.checkoutPath, "scripts/start-instabox-deployment.sh"), "utf8");
  const identityEvidenceStorage = readFileSync(resolve(lock.repositories.backend.checkoutPath, "cmd/api/identity_evidence_storage.go"), "utf8");
@@ -154,11 +154,14 @@ for (const [label, source, marker] of [
  }
  if (!backendDataCentreEnvExample.includes("DATA_CENTRE_MEDIA_API_URL=http://media:8096")) fail.push("Backend env example must use the private media service DNS endpoint");
  if (!dataCentreCompose.includes("MEDIA_INTERNAL_TOKEN: ${FRESH_DATA_CENTRE_INTERNAL_TOKEN:-}")) fail.push("Data Centre media service token must use FRESH_DATA_CENTRE_INTERNAL_TOKEN");
-if (!dataCentreCompose.includes("IDENTITY_EVIDENCE_INTERNAL_TOKEN: ${IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN:-}")) fail.push("Data Centre media service must receive the identity-evidence token under its dedicated environment key");
-if (!backendDeploy.includes("ensure_random_secret IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN") || !backendDeploy.includes('write_dc_env_value IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must provision a dedicated identity-evidence token to the Data Centre");
-if (!backendDeploy.includes('write_env_value IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN"') || !backendDeploy.includes('verify_container_env "$DC_ENV" "$DATACENTRE/backend/docker-compose.yml" media IDENTITY_EVIDENCE_INTERNAL_TOKEN "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must verify the same dedicated identity-evidence token in both API and Data Centre containers");
-if (!backendDeploy.includes('verify_container_env "$BASE_ENV" "$BASE_COMPOSE" api IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must verify the identity-evidence token in the API container");
-if (!backendDeploy.includes('if [[ "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN" == "$FRESH_DATA_CENTRE_INTERNAL_TOKEN" ]]; then')) fail.push("Backend deployment must rotate the identity-evidence token if it equals the general media token");
+ if (!dataCentreCompose.includes("IDENTITY_EVIDENCE_INTERNAL_TOKEN: ${IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN:-}")) fail.push("Data Centre must map the optional identity token with an empty default");
+ if (!backendCompose.includes("IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN: ${IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN:-}")) fail.push("Backend API must accept the optional identity token with an empty default");
+ if (!backendDeploy.includes('write_env_value IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN ""') ||
+     !backendDeploy.includes('write_dc_env_value IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN ""')) fail.push("ordinary deployment must clear the optional identity-evidence token in both services");
+ if (backendDeploy.includes("ensure_random_secret IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN")) fail.push("ordinary deployment must never generate an identity-evidence token");
+ if (!backendDeploy.includes("Identity-evidence storage is independently opt-in and never provisioned here.")) fail.push("deployment must explicitly keep identity-evidence storage out of ordinary provisioning");
+ if (!backendDataCentreEnvExample.includes("OPTIONAL: only set when separately enabling the identity-assurance evidence capability")) fail.push("Backend env example must mark identity-evidence token optional");
+ if (!backendAPIEntry.includes("if s.identityEvidenceStorageConfigured()")) fail.push("Backend evidence routes must remain conditional on optional Data Centre storage");
  if (!backendDeploy.includes('write_dc_env_value FRESH_DATA_CENTRE_INTERNAL_TOKEN "$FRESH_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must provision the same private media token into the Data Centre runtime env");
  if (!backendDeploy.includes('MEDIA_DATABASE_USER="$(read_dc_env_value MEDIA_DATABASE_USER)"') ||
     !backendDeploy.includes('MEDIA_DATABASE_PASSWORD="$(read_dc_env_value MEDIA_DATABASE_PASSWORD)"') ||
@@ -171,7 +174,10 @@ if (!backendDeploy.includes('if [[ "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKE
  if (!dataCentreCompose.includes("name: ${TESTAGRAM_NETWORK:-testagram-platform}") || !dataCentreCompose.includes("external: true")) fail.push("Data Centre media service must join the externally-created Backend platform network");
  if (!dataCentreCompose.includes("networks: [platform]")) fail.push("Data Centre media service must join the Backend-owned private platform network");
  if (!dataCentreCompose.includes('expose: ["8096"]')) fail.push("Data Centre media API must expose only the private container port, not publish it publicly");
- if (!backendCompose.includes("B2_S3_ACCESS_KEY_ID:") || !backendCompose.includes("B2_S3_SECRET_ACCESS_KEY:") || !backendCompose.includes("CLOUDFLARE_R2_ACCESS_KEY_ID:") || !backendCompose.includes("CLOUDFLARE_R2_SECRET_ACCESS_KEY:")) fail.push("Backend identity-evidence replica credentials must be mapped into the VPS API container");
+  if (backendCompose.includes("B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET") ||
+      backendCompose.includes("B2_S3_IDENTITY_EVIDENCE_ACCESS_KEY_ID") ||
+      backendCompose.includes("B2_S3_IDENTITY_EVIDENCE_SECRET_ACCESS_KEY") ||
+      backendCompose.includes("CLOUDFLARE_R2_IDENTITY_EVIDENCE_PRIVATE_BUCKET")) fail.push("Backend API must never mount identity-evidence bucket credentials");
  if (!backendCompose.includes("MEDIA_REPLICATION_ENABLED:")) fail.push("Backend Compose must preserve the explicit three-provider replication feature gate");
  const backendReplicaGate = backendDeploy.indexOf('if [[ "$(read_env_value MEDIA_REPLICATION_ENABLED)" == "true" ]]; then');
 const backendReplicaElse = backendDeploy.indexOf('else\n  # Do not leave old provider credentials mounted in the Backend', backendReplicaGate);
@@ -208,16 +214,15 @@ if (!backendDeploy.includes(dataCentreMediaGate) ||
  ]) {
    if (!source.includes(marker)) fail.push(`${label} missing B2-only identity boundary marker: ${marker}`);
  }
- if (!dataCentreCompose.includes("B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET: ${B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET:-}")) fail.push("Data Centre must configure a dedicated B2 identity-evidence bucket");
- if (!dataCentreCompose.includes("B2_S3_IDENTITY_EVIDENCE_ACCESS_KEY_ID: ${B2_S3_IDENTITY_EVIDENCE_ACCESS_KEY_ID:-}") ||
-     !dataCentreCompose.includes("B2_S3_IDENTITY_EVIDENCE_SECRET_ACCESS_KEY: ${B2_S3_IDENTITY_EVIDENCE_SECRET_ACCESS_KEY:-}")) fail.push("Data Centre must use dedicated bucket-scoped B2 identity credentials");
- if (dataCentreCompose.includes("CLOUDFLARE_R2_IDENTITY_EVIDENCE_PRIVATE_BUCKET") ||
-     backendCompose.includes("CLOUDFLARE_R2_IDENTITY_EVIDENCE_PRIVATE_BUCKET") ||
-     backendCompose.includes("B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET")) fail.push("Identity evidence bucket configuration must not be mounted in Backend or R2; it belongs only to Data Centre B2");
- if (!backendDeploy.includes("ensure_random_secret IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN") ||
-     !backendDeploy.includes('write_dc_env_value IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN "$IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN"')) fail.push("Backend deployment must provision the dedicated private identity-evidence service token to Data Centre");
-
-
+  if (!dataCentreCompose.includes("B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET: ${B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET:-}")) fail.push("Data Centre must expose the optional dedicated B2 identity bucket with an empty default");
+  if (!dataCentreCompose.includes("B2_S3_IDENTITY_EVIDENCE_ACCESS_KEY_ID: ${B2_S3_IDENTITY_EVIDENCE_ACCESS_KEY_ID:-}") ||
+      !dataCentreCompose.includes("B2_S3_IDENTITY_EVIDENCE_SECRET_ACCESS_KEY: ${B2_S3_IDENTITY_EVIDENCE_SECRET_ACCESS_KEY:-}")) fail.push("Data Centre must expose optional dedicated B2 identity credentials with empty defaults");
+  if (dataCentreCompose.includes("CLOUDFLARE_R2_IDENTITY_EVIDENCE_PRIVATE_BUCKET") ||
+      backendCompose.includes("CLOUDFLARE_R2_IDENTITY_EVIDENCE_PRIVATE_BUCKET") ||
+      backendCompose.includes("B2_S3_IDENTITY_EVIDENCE_PRIVATE_BUCKET")) fail.push("Identity evidence bucket configuration must remain Data Centre B2-only; it must not be mounted in Backend or R2");
+  if (!dataCentreMediaServer.includes('cfg.identityEnabled = cfg.identityToken != ""')) fail.push("Data Centre identity-evidence service must be enabled only by its dedicated optional token");
+  if (!dataCentreMediaServer.includes("if cfg.identityEnabled")) fail.push("Data Centre identity-evidence bucket credentials must be required only when the optional feature is enabled");
+  if (!identityEvidenceTests.includes("TestIdentityEvidenceRoutesAreInaccessibleWhenFeatureDisabled")) fail.push("Data Centre must test that identity-evidence routes stay inaccessible when disabled");
  // The public Caddy edge and the private video origin must never share a
  // Docker network. Backend API and video share a dedicated internal network;
  // Caddy retains platform for the separately gated Federation deployment.
