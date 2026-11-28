@@ -172,9 +172,16 @@ for (const [label, source, marker] of [
  if (!backendAPIEntry.includes('identityEvidenceToken := env("IDENTITY_EVIDENCE_DATA_CENTRE_INTERNAL_TOKEN", "")') ||
      !backendAPIEntry.includes("if identityEvidenceToken != \"\" {")) fail.push("Backend identity-evidence client must be initialized only when its explicit optional token is supplied");
  if (!backendAPIEntry.includes("if s.identityEvidenceStorageConfigured() {")) fail.push("Backend identity-evidence upload routes must be registered only when optional storage is configured");
+ if (!backendAPIEntry.includes("if svc.identityEvidenceStorageConfigured() {") ||
+     !backendAPIEntry.includes("go svc.runIdentityEvidenceRetentionWorker(signalCtx)")) fail.push("Backend identity-evidence retention worker must start only when optional storage is configured");
+ if (!backendAPIEntry.includes("identity evidence retention worker remains stopped; optional identity-evidence storage is disabled")) fail.push("Backend must explicitly keep the identity-evidence retention worker stopped when the optional capability is disabled");
+
  if (!dataCentreMediaServer.includes("cfg.identityEnabled = cfg.identityToken != \"\"") ||
      !dataCentreMediaServer.includes("identityRoute && !s.cfg.identityEnabled")) fail.push("Data Centre identity-evidence routes must remain disabled without the optional dedicated token");
  if (!identityEvidenceTests.includes("TestIdentityEvidenceRoutesAreInaccessibleWhenFeatureDisabled")) fail.push("Data Centre must test that identity-evidence routes are inaccessible when the feature is disabled");
+ if (!dataCentreMediaServer.includes("where ($1::boolean or o.namespace <> 'identity-evidence-private')") ||
+     !dataCentreMediaServer.includes("s.cfg.identityEnabled).Scan")) fail.push("Data Centre outbox worker must not select identity-evidence jobs while the optional capability is disabled");
+
  for (const forbidden of ["testagram_identity.native_registration_provisioning", "lockNativeProvisioningAllowsAccess"]) {
    if (backendNativeSessions.includes(forbidden)) fail.push(`Native session lifecycle still depends on optional identity provisioning: ${forbidden}`);
  }
