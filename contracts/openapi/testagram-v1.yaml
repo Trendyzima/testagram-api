@@ -91,7 +91,7 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/GenericAuthMessage' }
-        '400': { description: Invalid email, username, password, or missing legal/age declaration. }
+        '400': { description: "Invalid email, username, password, or missing legal/age declaration." }
         '403': { description: Request origin is not allowed. }
         '405': { description: Method not allowed; POST is required. }
         '409': { description: Username is already in use. }
