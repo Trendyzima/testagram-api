@@ -6,7 +6,7 @@
     "branch": "main",
     "commit": "4fe9e3757102eea601cb2a61cf2f9699113b3ab1"
   },
-  "status": "Identity-independent signup/login and optional identity deployment boundaries are merged across all six runtime organs. Exact source pins and regression guards are refreshed; live production deployment and mailbox/device acceptance remain separate gates.",
+  "status": "Seven-organ identity-independent signup/login and optional identity-evidence deployment boundaries are merged across all six runtime organs and the API Control Plane. Exact source pins include Backend PR #609. Production deployment and live mailbox/device acceptance remain separate release gates.",
   "repositories": [
     {
       "id": "flutter-client",
@@ -44,7 +44,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "f25e716ecdf6ab88f0fb2104144fa2b5a5d5e57b",
+      "mainCommit": "0ec6fd443d5647725a9e683fc7238a56ba4578a7",
       "mergedPullRequests": [
         418,
         419,
@@ -93,7 +93,8 @@
         579,
         602,
         606,
-        607
+        607,
+        609
       ]
     },
     {
@@ -175,7 +176,7 @@
       "defaultBranch": "main",
       "kind": "governance",
       "sourcePinKey": null,
-      "mainCommit": "4fe9e3757102eea601cb2a61cf2f9699113b3ab1",
+      "mainCommit": "59553612184076d6eea22992eef88495a26ae28d",
       "mergedPullRequests": [
         115,
         117,
@@ -183,7 +184,9 @@
         150,
         152,
         175,
-        176
+        176,
+        177,
+        179
       ]
     }
   ],
