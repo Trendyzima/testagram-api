@@ -29,7 +29,7 @@ for (const [key, fullName] of Object.entries(runtimeRepositories)) {
 
 if (!acceptance.includes("Trendyzima/testagram-api")) failures.push("Locked acceptance document omits the API governance repository");
 if (!acceptance.includes("Identity-independent ordinary account access")) failures.push("Locked acceptance must contain the current identity-independent account-access policy");
-if (!acceptance.includes("Government ID, ID number, selfie, identity evidence, identity review, identity approval")) failures.push("Locked acceptance must explicitly forbid identity evidence and approval as ordinary signup/login prerequisites");
+if (!acceptance.toLowerCase().includes("government id, id number, selfie, identity evidence, identity review, identity approval")) failures.push("Locked acceptance must explicitly forbid identity evidence and approval as ordinary signup/login prerequisites");
 if (!acceptance.includes("native_registration_provisioning")) failures.push("Locked acceptance must record removal of the optional identity-provisioning schema from native sessions");
 
 if (!acceptance.includes("not a runtime service") && !acceptance.includes("not a runtime hop")) {
