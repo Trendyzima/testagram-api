@@ -27,7 +27,7 @@ tags:
   - name: Health
     description: Process liveness and dependency readiness.
   - name: Authentication
-    description: End-user and identity-review operations accept only Testagram-native short-lived access JWTs. Backend checks the live PostgreSQL session, account state, enabled staff principal, enrolled-MFA marker and explicit role grants. No external identity-provider bearer token is accepted.
+    description: Ordinary end-user signup and login use Testagram-native email/password credentials and email verification; they do not require government ID, selfie, identity evidence, manual identity review or identity approval. Sensitive identity-review operations are separate, privileged staff workflows requiring a native session, live PostgreSQL account/staff state, fresh MFA proof and explicit role grants. No external identity-provider bearer token is accepted.
   - name: Feed
     description: Authorized home timeline retrieval.
   - name: Social
@@ -45,7 +45,7 @@ tags:
   - name: Federation
     description: Authenticated Testagram federation preferences. ActivityPub protocol traffic is handled by the private Federation service, not by clients.
   - name: Identity
-    description: Applicant-facing native age-assurance application and private evidence submission. No account is provisioned until manual verification and independent two-person approval complete.
+    description: Separate optional identity-assurance application and private evidence submission for specifically protected capabilities. This workflow is not public signup and does not gate ordinary account creation, email verification, login or session refresh.
 security:
   - testagramBearer: []
 paths:
