@@ -91,6 +91,7 @@
         571,
         572,
         579,
+        602,
         606,
         607
       ]
@@ -280,5 +281,51 @@
     "Data Centre PR #126 is merged: the video service is private on video-private with no host-published port, Backend API and PostgreSQL share the internal network, Caddy remains isolated, and clean-database migration order is covered by CI. This is source/CI evidence, not a production deployment or live staging video acceptance.",
     "Data Centre PR #129 is merged at 9b98822b6840a41e21401c54569bd6d89cccc0ca. Creator-video deletion now writes a durable cleanup outbox intent atomically with metadata deletion; the private worker reclaims expired leases, removes original/HLS/poster trees idempotently and retains terminal failures for operator recovery. CI verifies expired-lease recovery and physical cleanup. This is source/CI evidence, not live staging acceptance or production deployment.",
     "Flutter PR #165 is merged at 69afaa8cdd47db5952c77065bc5369354458fd25. Its creator video library uses authenticated GET /api/video/uploads, lists only Backend-authorized owner records, supports status refresh/publish/delete with terminal-state UI guards, and passed all four Flutter validation/build workflows plus a Cloudflare Pages preview deployment. Backend #572 and Data Centre #130 are merged and pinned. The Backend deployment workflow on #572 passed validation but skipped all production deploy jobs; live staging/production video acceptance remains pending."
-  ]
+  ],
+  "accountAccessPolicy": {
+    "ordinaryRegistration": {
+      "endpoint": "POST /api/auth/signup",
+      "required": [
+        "email",
+        "username",
+        "password",
+        "terms_accepted",
+        "privacy_accepted",
+        "age_confirmed",
+        "email_verification_before_login"
+      ],
+      "forbiddenPrerequisites": [
+        "government_id",
+        "id_number",
+        "selfie",
+        "identity_evidence",
+        "manual_identity_review",
+        "identity_approval",
+        "identity_evidence_bucket",
+        "identity_service_readiness"
+      ]
+    },
+    "ordinaryLogin": {
+      "endpoint": "POST /api/auth/login",
+      "required": [
+        "valid_password",
+        "verified_email",
+        "enabled_canonical_account",
+        "valid_native_session"
+      ],
+      "forbiddenPrerequisites": [
+        "identity_application",
+        "identity_provisioning_row",
+        "identity_evidence",
+        "manual_identity_review",
+        "identity_approval",
+        "identity_evidence_storage"
+      ]
+    },
+    "optionalIdentityAssurance": {
+      "endpoint": "POST /api/identity/applications",
+      "enabledByDefault": false,
+      "scope": "Only explicitly designated protected capabilities; never basic registration or account access"
+    }
+  }
 }
