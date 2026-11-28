@@ -37,6 +37,19 @@ assert.match(invariant, /never require government ID, ID number, selfie, identit
 assert.match(invariant, /optional identity assurance may gate only specifically designated sensitive capabilities/i);
 assert.ok(bridge.repositories.some((repo) => repo.id === "api-control-plane" && repo.kind === "governance"),
   "API Control Plane must remain governance-only, not a runtime identity provider");
+const accessPolicy = bridge.accountAccessPolicy;
+assert.equal(accessPolicy.ordinaryRegistration.endpoint, "POST /api/auth/signup");
+assert.ok(accessPolicy.ordinaryRegistration.required.includes("email_verification_before_login"));
+for (const forbidden of ["government_id", "id_number", "selfie", "identity_evidence", "manual_identity_review", "identity_approval", "identity_evidence_bucket", "identity_service_readiness"]) {
+  assert.ok(accessPolicy.ordinaryRegistration.forbiddenPrerequisites.includes(forbidden), `signup must not require ${forbidden}`);
+}
+assert.equal(accessPolicy.ordinaryLogin.endpoint, "POST /api/auth/login");
+for (const forbidden of ["identity_application", "identity_provisioning_row", "identity_evidence", "manual_identity_review", "identity_approval", "identity_evidence_storage"]) {
+  assert.ok(accessPolicy.ordinaryLogin.forbiddenPrerequisites.includes(forbidden), `login must not require ${forbidden}`);
+}
+assert.equal(accessPolicy.optionalIdentityAssurance.enabledByDefault, false,
+  "optional identity assurance must remain disabled by default");
+
 
 
 const organPolicies = [
