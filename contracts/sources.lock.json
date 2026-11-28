@@ -4,7 +4,7 @@
   "repositories": {
     "backend": {
       "fullName": "Trendyzima/Testagram-backend-",
-      "ref": "0ec6fd443d5647725a9e683fc7238a56ba4578a7",
+      "ref": "89fd2201a6848d891cf3e6615f49447df254b4c4",
       "checkoutPath": "source-repos/backend",
       "sourcePaths": [
         ".github/workflows/cdn-origin-integration.yml",
@@ -83,6 +83,7 @@
         "cmd/api/media_replication_gate_test.go",
         "cmd/api/media_upload_gateway_test.go",
         "cmd/api/native_auth_boundary.go",
+        "cmd/api/native_auth_boundary_test.go",
         "cmd/api/native_auth_sessions_integration_test.go",
         "cmd/api/native_password_recovery_integration_test.go",
         "cmd/api/native_sessions.go",
