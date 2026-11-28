@@ -32,7 +32,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 | Repository | Baseline commit |
 |---|---|
 | Flutter | `ac9db495e2adee3dd5395edd6c56179b1e6ebe28` (2026-11-28 merged PR #168; public signup journey explicitly excludes government ID, selfie, evidence and identity approval) |
-| Backend | `0ec6fd443d5647725a9e683fc7238a56ba4578a7` (2026-11-28 current mainline; native signup, sessions, refresh, access-token validation and readiness no longer depend on optional identity-provisioning schema; canonical account disablement remains enforced) |
+| Backend | `89fd2201a6848d891cf3e6615f49447df254b4c4` (2026-11-28 current mainline; native signup, sessions, refresh, access-token validation and readiness no longer depend on optional identity-provisioning schema; canonical account disablement remains enforced; PR #610 scopes identity-approval error wording to protected capabilities) |
 | Data Centre | `f1b168776d44fa6b64bf1644257893596cdb6925` (2026-11-28 current mainline; identity-evidence API/storage is optional, disabled routes and workers remain isolated, ordinary media remains separately gated) |
 | Testagram API control plane | `4fe9e3757102eea601cb2a61cf2f9699113b3ab1` (2026-11-28 mainline; governance-only contract CI enforces identity-independent public signup/login) |
 | Algorithm | `a0bb5b0b3923a28a8aecf91a199f3567190cec6a` (2026-11-28 current mainline; ranking does not use identity-assurance as ordinary account eligibility) |
@@ -53,7 +53,7 @@ The six runtime source pins are recorded in `contracts/sources.lock.json`; all d
 
 The original gate lock date remains 2026-11-23. This historical table is retained so later source-baseline refreshes do not erase the prior review record.
 
-**2026-11-28 source-pin reconciliation:** the current immutable pins are Backend `0ec6fd443d5647725a9e683fc7238a56ba4578a7`, Data Centre `f1b168776d44fa6b64bf1644257893596cdb6925`, Flutter `ac9db495e2adee3dd5395edd6c56179b1e6ebe28`, CDN `09babc38c77b65b41d076221017a96b2387ac72c`, Algorithm `a0bb5b0b3923a28a8aecf91a199f3567190cec6a`, and Federation `c9ac83f33c4cfa89353e44d8ffbe5345b1ac9fe6`. These pins include merged identity-independence policies and regression tests; they do not attest production deployment, real mailbox delivery or live-device acceptance.
+**2026-11-28 source-pin reconciliation:** the current immutable pins are Backend `89fd2201a6848d891cf3e6615f49447df254b4c4`, Data Centre `f1b168776d44fa6b64bf1644257893596cdb6925`, Flutter `ac9db495e2adee3dd5395edd6c56179b1e6ebe28`, CDN `09babc38c77b65b41d076221017a96b2387ac72c`, Algorithm `a0bb5b0b3923a28a8aecf91a199f3567190cec6a`, and Federation `c9ac83f33c4cfa89353e44d8ffbe5345b1ac9fe6`. These pins include merged identity-independence policies and regression tests; they do not attest production deployment, real mailbox delivery or live-device acceptance.
 
 The merged Flutter baseline now includes the creator-tip journey: recipient resolution, explicit user confirmation, KES amount bounds, retry-stable idempotency, and the existing Backend wallet ledger capability. This is source/CI evidence only; it does not attest live wallet funding, settlement, payout, or production availability.
 
@@ -842,4 +842,4 @@ Merged source changes: Flutter #168; Backend #606, #607 and #610; Data Centre #1
 
 **Production acceptance is still separate.** Green source CI does not prove that these exact images are deployed, that real signup mail reaches an inbox, that the user can verify and log in on production, or that web/mobile builds have passed a live device journey. No production deployment is claimed by this source-policy update.
 
-**2026-11-28 Backend identity-independence pin refresh:** Backend PR #609 clarified that missing/unavailable optional identity-evidence storage fails closed only for identity-assurance endpoints and never for ordinary signup, email verification, login or sessions. The current Backend source pin is `0ec6fd443d5647725a9e683fc7238a56ba4578a7`. This is a source/documentation update, not a production deployment or live mailbox acceptance attestation.
+**2026-11-28 Backend identity-independence pin refresh:** Backend PR #609 clarified that missing/unavailable optional identity-evidence storage fails closed only for identity-assurance endpoints and never for ordinary signup, email verification, login or sessions. Backend PR #610 clarified that identity approval errors apply only to protected capabilities and do not imply a basic account-access requirement. The current Backend source pin is `89fd2201a6848d891cf3e6615f49447df254b4c4`. This is a source/documentation update, not a production deployment or live mailbox acceptance attestation.
