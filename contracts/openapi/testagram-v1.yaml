@@ -81,7 +81,7 @@ paths:
               properties:
                 email: { type: string, format: email, maxLength: 254 }
                 username: { type: string, minLength: 3, maxLength: 30, pattern: '^[A-Za-z0-9_]{3,30}$' }
-                password: { type: string, minLength: 12, maxLength: 128, writeOnly: true }
+                password: { type: string, minLength: 1, maxLength: 128, writeOnly: true, description: 'Must contain 12–128 UTF-8 bytes.' }
                 terms_accepted: { type: boolean, const: true }
                 privacy_accepted: { type: boolean, const: true }
                 age_confirmed: { type: boolean, const: true }
@@ -230,7 +230,7 @@ paths:
     post:
       operationId: createIdentityApplication
       tags: [Identity]
-      summary: Create a native age-assurance application
+      summary: Create an optional identity-assurance application
       description: Separate optional identity-assurance application for a specifically protected capability. This is not the public account signup endpoint and does not create a basic Testagram account. It remains inaccessible unless its dedicated identity-review, policy, PostgreSQL, private evidence-storage and replication prerequisites are enabled. Ordinary email/password registration, email verification and login do not depend on this route or its storage.
       security: []
       parameters:
