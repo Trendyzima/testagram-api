@@ -32,6 +32,7 @@ jobs:
       - run: npm run audit:navigation
       - run: npm run audit:seven-organ-bridge
       - run: npm run audit:native-auth-only
+      - run: npm run audit:identity-independent-signup
 
   validate-dart:
     runs-on: ubuntu-latest
