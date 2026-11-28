@@ -56,14 +56,14 @@ for (const [organ, relativePath, expected] of organPolicies) {
 
 const backendRoot = sourceLock.repositories.backend.checkoutPath;
 const sessionSource = readFileSync(join(backendRoot, "cmd/api/native_sessions.go"), "utf8");
-assert.doesNotMatch(sessionSource, /testagram_identity\\.native_registration_provisioning|lockNativeProvisioningAllowsAccess/,
+assert.doesNotMatch(sessionSource, /testagram_identity\.native_registration_provisioning|lockNativeProvisioningAllowsAccess/,
   "native login, access-token validation and refresh must not depend on the identity-provisioning schema");
 const backendMain = readFileSync(join(backendRoot, "cmd/api/main.go"), "utf8");
-const readiness = backendMain.match(/func nativeAuthReadinessRelations\\(\\) \\[\\]string \\{[\\s\\S]*?\\n\\}/)?.[0] ?? "";
+const readiness = backendMain.match(/func nativeAuthReadinessRelations\(\) \[\]string \{[\s\S]*?\n\}/)?.[0] ?? "";
 assert.ok(readiness.length > 0, "Backend must expose a testable native-auth readiness relation list");
-assert.doesNotMatch(readiness, /testagram_identity\\./,
+assert.doesNotMatch(readiness, /testagram_identity\./,
   "ordinary native-auth readiness must not require identity schema relations");
-assert.match(backendMain, /if svc\\.identityEvidenceStorageConfigured\\(\\) \\{\\s*go svc\\.runIdentityEvidenceRetentionWorker/,
+assert.match(backendMain, /if svc\.identityEvidenceStorageConfigured\(\) \{\s*go svc\.runIdentityEvidenceRetentionWorker/,
   "identity retention worker must not start when optional evidence storage is disabled");
 
 const dataRoot = sourceLock.repositories["data-centre"].checkoutPath;
