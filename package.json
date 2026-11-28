@@ -9,7 +9,7 @@
     "bundle:openapi": "redocly bundle contracts/openapi/testagram-v1.yaml -o dist/openapi.yaml",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test",
-    "check": "npm run lint:openapi && npm run lint:internal-openapi && npm run typecheck && npm test && npm run audit:backend-routes && npm run build:sdk && npm run audit:cross-repo && npm run audit:locked-acceptance && npm run audit:tv-health-contract && npm run audit:flutter-backend && npm run audit:navigation && npm run audit:seven-organ-bridge && npm run audit:native-auth-only",
+    "check": "npm run lint:openapi && npm run lint:internal-openapi && npm run typecheck && npm test && npm run audit:backend-routes && npm run build:sdk && npm run audit:cross-repo && npm run audit:locked-acceptance && npm run audit:tv-health-contract && npm run audit:flutter-backend && npm run audit:navigation && npm run audit:seven-organ-bridge && npm run audit:native-auth-only && npm run audit:identity-independent-signup",
     "audit:backend-routes": "node scripts/check-backend-route-contract.mjs",
     "build:sdk": "tsc -p packages/typescript/tsconfig.build.json",
     "audit:cross-repo": "node scripts/check-cross-repo-contracts.mjs",
@@ -20,7 +20,8 @@
     "audit:locked-acceptance": "node scripts/check-locked-acceptance.mjs",
     "audit:navigation": "node scripts/check-seven-repository-navigation.mjs",
     "audit:seven-organ-bridge": "node scripts/check-seven-organ-bridge.mjs",
-    "audit:native-auth-only": "node scripts/check-native-auth-only.mjs"
+    "audit:native-auth-only": "node scripts/check-native-auth-only.mjs",
+    "audit:identity-independent-signup": "node scripts/check-identity-independent-signup.mjs"
   },
   "devDependencies": {
     "@redocly/cli": "^2.77.0",
