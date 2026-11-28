@@ -44,7 +44,7 @@
       "defaultBranch": "main",
       "kind": "runtime",
       "sourcePinKey": "backend",
-      "mainCommit": "0ec6fd443d5647725a9e683fc7238a56ba4578a7",
+      "mainCommit": "89fd2201a6848d891cf3e6615f49447df254b4c4",
       "mergedPullRequests": [
         418,
         419,
@@ -94,7 +94,8 @@
         602,
         606,
         607,
-        609
+        609,
+        610
       ]
     },
     {
@@ -274,7 +275,7 @@
     "Backend PR #548 was closed without merge; its overlapping notification-category work was superseded by merged PR #549. Backend #549 is accepted mainline and adds social discovery, saved timelines and notification category APIs.",
     "Flutter PRs #155 (profile privacy/media pagination) and #157 (social route coverage, saved timelines and client API wiring) are merged and represented by the exact Flutter mainline pin. Stacked PR #156 was closed without merge; its intended delta was transplanted into #157. Merge and CI success do not constitute a production web deployment.",
     "Backend production deployment run 45038404739 is historical evidence for the previously deployed release only. The latest mainline push validation run 45709231112 passed validation but intentionally skipped the production deploy job because production deployment requires an explicit manual confirmation.",
-    "Backend PR #606 aligned the consent integration assertion with the current Terms version; Backend PR #607 removed optional identity-provisioning schema reads from session creation, refresh, access-token validation and native-auth readiness while preserving canonical disabled-account enforcement. Source CI passes; live production deployment, mailbox delivery and device acceptance remain separate.",
+    "Backend PR #606 aligned the consent integration assertion with the current Terms version; Backend PR #607 removed optional identity-provisioning schema reads from session creation, refresh, access-token validation and native-auth readiness while preserving canonical disabled-account enforcement. Source CI passes; live production deployment, mailbox delivery and device acceptance remain separate. Backend PR #610 also corrected the shared native-auth error message so identity approval is scoped to a protected capability and explicitly does not gate basic account access.",
     "The deployed release keeps public registration, staff enrollment and Federation delivery workers fail-closed until their independent acceptance gates pass. Successful source CI or a historical deployment is not proof of native-auth migration, WebAuthn live acceptance, ActivityPub interoperability or production registration readiness.",
     "CDN PR #125 is merged at 21a254e9f67dc7a8e55dca37151a6db532405e53. Go CDN origin is installed and healthy; Cloudflare Worker deployment and canonical hostname routing remain separate production cutover gates and are not inferred from source CI.",
     "Data Centre PR #119 and Algorithm PR #33 are merged into their respective main branches and included in the exact current mainline pins.",
