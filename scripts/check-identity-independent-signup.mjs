@@ -29,6 +29,17 @@ assert.match(authDocs, /Failure or unavailability of that optional workflow must
 assert.match(authDocs, /Optional identity-assurance intake remains closed/i,
   "staff identity-intake readiness must be explicitly separated from public signup readiness");
 
+const policy = bridge.accountAccessPolicy;
+assert.ok(policy, "seven-organ bridge must define machine-readable basic account policy");
+assert.equal(policy.ordinaryRegistration.endpoint, "POST /api/auth/signup");
+assert.equal(policy.ordinaryLogin.endpoint, "POST /api/auth/login");
+assert.equal(policy.optionalIdentityAssurance.enabledByDefault, false);
+for (const forbidden of ["government_id", "id_number", "selfie", "identity_evidence", "manual_identity_review", "identity_approval", "identity_evidence_bucket", "identity_service_readiness"]) {
+  assert.ok(policy.ordinaryRegistration.forbiddenPrerequisites.includes(forbidden), `signup must forbid ${forbidden} as a prerequisite`);
+}
+for (const forbidden of ["identity_application", "identity_provisioning_row", "identity_evidence", "manual_identity_review", "identity_approval", "identity_evidence_storage"]) {
+  assert.ok(policy.ordinaryLogin.forbiddenPrerequisites.includes(forbidden), `login must forbid ${forbidden} as a prerequisite`);
+}
 const invariant = bridge.invariants.find((item) => item.startsWith("Ordinary public signup, email verification"));
 assert.ok(invariant, "seven-organ bridge must carry the identity-independent basic-access invariant");
 assert.match(invariant, /never require government ID, ID number, selfie, identity evidence, identity review, identity approval/i);
