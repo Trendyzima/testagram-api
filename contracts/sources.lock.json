@@ -23,6 +23,8 @@
         "admin-console/main_test.go",
         "admin-console/security.go",
         "admin-console/security_test.go",
+        "admin-console/staff_invitation.go",
+        "admin-console/staff_invitation_integration_test.go",
         "admin-console/web/app.css",
         "admin-console/web/app.js",
         "admin-console/web/index.html",
